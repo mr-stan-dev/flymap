@@ -1,0 +1,66 @@
+name: flymap
+description: "Offline maps for flights"
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 0.0.1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  
+  http: ^1.1.0
+  geolocator: ^10.1.0
+  latlong2: ^0.9.1
+  maplibre_gl: ^0.22.0
+  
+  path_provider: ^2.1.1
+
+  get_it: ^7.6.7
+  
+  flutter_bloc: ^8.1.4
+  equatable: ^2.0.5
+  go_router: ^14.2.7
+  
+  sembast: ^3.8.5+1
+  path: ^1.8.3
+  sqflite: ^2.3.2
+  shared_preferences: ^2.2.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/data/iata_airlines.csv # source: https://github.com/benct/iata-utils/blob/master/data/iata_airport_list.csv
+    - assets/data/airports.csv # source: https://ourairports.com/data/ filtered by large and medium size in chatgpt
+    - assets/styles/openfreemap_style.json
+    - assets/styles/openfreemap_offline_style.json
+    - assets/sprites/
+    - assets/glyphs/Noto Sans Italic/
+    - assets/glyphs/Noto Sans Regular/
+    - assets/glyphs/Noto Sans Medium/
+    - assets/glyphs/Noto Sans Bold/
+
+  fonts:
+    - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/to/font-from-package

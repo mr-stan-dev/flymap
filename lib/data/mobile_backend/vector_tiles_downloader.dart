@@ -1,0 +1,275 @@
+import 'dart:async';
+import 'dart:io';
+import 'dart:isolate';
+import 'dart:math' as math;
+
+import 'package:flymap/data/mobile_backend/mbtiles_verifier.dart';
+import 'package:flymap/data/mobile_backend/tile_utils.dart';
+import 'package:flymap/usecase/download_map_use_case.dart';
+import 'package:latlong2/latlong.dart' show LatLng;
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:sqflite/sqflite.dart';
+
+import '../../logger.dart';
+import 'package:flymap/data/mobile_backend/vector_tiles_worker.dart';
+import 'package:flymap/data/mobile_backend/vector_tiles_db.dart';
+import 'package:flymap/data/mobile_backend/sea_tiles_filter.dart';
+
+class VectorTilesDownloader {
+  final List<LatLng> polygon;
+  final int minZoom;
+  final int maxZoom;
+  final int isolatesCount;
+  final _logger = Logger('VectorTilesDownloader');
+
+  VectorTilesDownloader({
+    required this.polygon,
+    required this.minZoom,
+    required this.maxZoom,
+    this.isolatesCount = 6,
+  });
+
+  static const _urlTemplate =
+      'https://tiles.openfreemap.org/planet/20250730_001001_pt/{z}/{x}/{y}.pbf';
+
+  Stream<DownloadMapEvent> download() {
+    final controller = StreamController<DownloadMapEvent>();
+
+    _performDownload(controller);
+
+    return controller.stream;
+  }
+
+  Future<void> _performDownload(
+    StreamController<DownloadMapEvent> controller,
+  ) async {
+    try {
+      _logger.log(
+        'Starting download for polygon with ${polygon.length} points, zoom $minZoom-$maxZoom',
+      );
+
+      // Initializing
+      controller.add(const DownloadMapInitializing());
+
+      // Get proper directory path
+      final appDir = await getApplicationCacheDirectory();
+      final targetDirPath = p.join(appDir.path, 'mbtiles');
+
+      // Prepare MBTiles file path
+      final fileName =
+          'region_${DateTime.now().millisecondsSinceEpoch}.mbtiles';
+      final mbtilesPath = p.join(targetDirPath, fileName);
+      _logger.log('MBTiles file: $mbtilesPath');
+
+      // Ensure target directory exists
+      final targetDirectory = Directory(targetDirPath);
+      if (!await targetDirectory.exists()) {
+        _logger.log('Creating target directory: $targetDirPath');
+        await targetDirectory.create(recursive: true);
+      }
+
+      // Create database using sqflite
+      final dbHelper = VectorTilesDb();
+      final db = await openDatabase(
+        mbtilesPath,
+        version: 1,
+        onCreate: dbHelper.createMbtilesSchema,
+      );
+
+      // Compute all tiles
+      final allTiles = <MapTile>[];
+      for (int z = minZoom; z <= maxZoom; z++) {
+        allTiles.addAll(TileUtils.tilesForPolygon(polygon, z));
+      }
+
+      // Filter out sea tiles for zoom >= 6
+      final seaFilter = SeaTilesFilter(minZoomToFilter: 6);
+      final filteredTiles = seaFilter.filterTiles(allTiles);
+      final skipped = allTiles.length - filteredTiles.length;
+      _logger.log(
+        'Computed ${allTiles.length} tiles; skipped $skipped sea tiles; downloading ${filteredTiles.length} tiles',
+      );
+
+      // Computing tiles event
+      controller.add(DownloadMapComputingTiles(filteredTiles.length));
+
+      // Split tiles into chunks
+      final chunks = _splitList(filteredTiles, isolatesCount);
+      _logger.log(
+        'Split into ${chunks.length} chunks with ${isolatesCount} isolates',
+      );
+
+      // Starting workers event
+      controller.add(DownloadMapStartingWorkers(chunks.length));
+
+      // Receive port for worker communication
+      final receivePort = ReceivePort();
+      final totalWorkers = chunks.length;
+      int completed = 0;
+      int tilesDownloaded = 0;
+      final completer = Completer<void>();
+      final tileQueue = <TileData>[];
+      bool isProcessingQueue = false;
+
+      // Process tile queue sequentially to avoid database conflicts
+      Future<void> processTileQueue() async {
+        if (isProcessingQueue) return;
+        isProcessingQueue = true;
+
+        while (tileQueue.isNotEmpty) {
+          final tile = tileQueue.removeAt(0);
+          try {
+            // Check if database is still open
+            if (!db.isOpen) {
+              _logger.log('Database is closed, skipping tile insertion');
+              break;
+            }
+            await dbHelper.insertTile(
+              db,
+              TileRecord(tile.z, tile.x, tile.y, tile.bytes),
+            );
+            tilesDownloaded++;
+
+            // Log progress updates every 50 tiles
+            if (tilesDownloaded % 50 == 0) {
+              final progress = tilesDownloaded / filteredTiles.length;
+              controller.add(DownloadMapProgress(progress));
+              _logger.log(
+                'Downloaded $tilesDownloaded/${filteredTiles.length} tiles (${(tilesDownloaded / filteredTiles.length * 100).toStringAsFixed(1)}%)',
+              );
+            }
+          } catch (e) {
+            _logger.error('Error inserting tile: $e');
+          }
+        }
+        isProcessingQueue = false;
+      }
+
+      // Wait for queue to be completely empty
+      Future<void> waitForQueueEmpty() async {
+        int waitCount = 0;
+        while (tileQueue.isNotEmpty || isProcessingQueue) {
+          waitCount++;
+          if (waitCount % 20 == 0) {
+            // Log every second
+            _logger.log(
+              'Waiting for queue to empty: ${tileQueue.length} tiles remaining, processing: $isProcessingQueue',
+            );
+          }
+          await Future.delayed(Duration(milliseconds: 50));
+        }
+        _logger.log('Queue is now empty');
+      }
+
+      receivePort.listen((message) async {
+        if (message is TileData) {
+          // Add to queue and process
+          tileQueue.add(message);
+          await processTileQueue();
+        } else if (message == 'done') {
+          completed++;
+          _logger.log('Worker $completed/$totalWorkers completed');
+          if (completed == totalWorkers) {
+            _logger.log('All workers completed. Finalizing...');
+            controller.add(const DownloadMapFinalizing());
+
+            // Wait for any remaining tiles to be processed
+            await waitForQueueEmpty();
+            // Final check to process any remaining tiles
+            if (tileQueue.isNotEmpty) {
+              _logger.log('Processing final ${tileQueue.length} tiles...');
+              await processTileQueue();
+            }
+            _logger.log('All tiles processed, closing database...');
+            receivePort.close();
+            await db.close();
+            completer.complete();
+          }
+        }
+      });
+
+      // Spawn isolates
+      _logger.log('Spawning $totalWorkers isolates...');
+      for (final chunk in chunks) {
+        await Isolate.spawn<WorkerInit>(
+          downloadWorker,
+          WorkerInit(chunk, _urlTemplate, receivePort.sendPort),
+        );
+      }
+
+      await completer.future;
+      _logger.log(
+        'Download completed successfully. Total tiles: $tilesDownloaded',
+      );
+
+      // Calculate success rate
+      final totalTiles = filteredTiles.length;
+      final successRate = (tilesDownloaded / totalTiles * 100).toStringAsFixed(
+        1,
+      );
+      _logger.log('Success rate: $successRate% ($tilesDownloaded/$totalTiles)');
+
+      if (tilesDownloaded < totalTiles) {
+        _logger.log(
+          'Warning: Some tiles failed to download. The map may have gaps.',
+        );
+      }
+
+      // Get file info
+      final file = File(mbtilesPath);
+      if (await file.exists()) {
+        final fileSize = await file.length();
+        final fileSizeMB = (fileSize / (1024 * 1024)).toStringAsFixed(2);
+        _logger.log('MBTiles file created successfully:');
+        _logger.log('Path: $mbtilesPath');
+        _logger.log('Size: ${fileSizeMB}MB (${fileSize} bytes)');
+      } else {
+        _logger.log('Warning: MBTiles file not found at: $mbtilesPath');
+        // Check if directory exists
+        final dir = Directory(targetDirPath);
+        if (await dir.exists()) {
+          _logger.log('Target directory exists: $targetDirPath');
+          // List files in directory
+          final files = await dir.list().toList();
+          _logger.log(
+            'Files in directory: ${files.map((f) => f.path.split('/').last).join(', ')}',
+          );
+        } else {
+          _logger.log('Target directory does not exist: $targetDirPath');
+        }
+      }
+
+      // Verify the MBTiles file
+      _logger.log('Verifying MBTiles file...');
+      controller.add(const DownloadMapVerifying());
+
+      final verificationResult = await MbtilesVerifier.verifyMbtilesFile(
+        mbtilesPath,
+      );
+
+      if (verificationResult) {
+        _logger.log('File verification successful, yielding success event');
+        controller.add(DownloadMapDone(mbtilesPath));
+      } else {
+        _logger.log('File verification failed, yielding error event');
+        controller.add(const DownloadMapError('Failed to verify MBTiles file'));
+      }
+
+      controller.close();
+    } catch (e) {
+      _logger.error('Error during download: $e');
+      controller.add(DownloadMapError('Download failed: $e'));
+      controller.close();
+    }
+  }
+
+  List<List<MapTile>> _splitList(List<MapTile> list, int parts) {
+    final res = <List<MapTile>>[];
+    final chunkSize = (list.length / parts).ceil();
+    for (int i = 0; i < list.length; i += chunkSize) {
+      res.add(list.sublist(i, math.min(i + chunkSize, list.length)));
+    }
+    return res;
+  }
+}
