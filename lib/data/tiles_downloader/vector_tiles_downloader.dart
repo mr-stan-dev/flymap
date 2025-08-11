@@ -32,18 +32,39 @@ class VectorTilesDownloader {
   static const _urlTemplate =
       'https://tiles.openfreemap.org/planet/20250730_001001_pt/{z}/{x}/{y}.pbf';
 
+  final List<Isolate> _isolates = [];
+  bool _canceled = false;
+  StreamController<DownloadMapEvent>? _controllerRef;
+
+  void cancel() {
+    _canceled = true;
+    for (final iso in _isolates) {
+      iso.kill(priority: Isolate.immediate);
+    }
+    _isolates.clear();
+    _controllerRef?.add(const DownloadMapError('Canceled'));
+    _controllerRef?.close();
+  }
+
   Stream<DownloadMapEvent> download() {
     final controller = StreamController<DownloadMapEvent>();
-
+    _controllerRef = controller;
     _performDownload(controller);
-
     return controller.stream;
   }
 
   Future<void> _performDownload(
     StreamController<DownloadMapEvent> controller,
   ) async {
+    Database? db;
+    ReceivePort? receivePort;
     try {
+      if (_canceled) {
+        controller.add(const DownloadMapError('Canceled'));
+        controller.close();
+        return;
+      }
+
       _logger.log(
         'Starting download for polygon with ${polygon.length} points, zoom $minZoom-$maxZoom',
       );
@@ -70,11 +91,18 @@ class VectorTilesDownloader {
 
       // Create database using sqflite
       final dbHelper = VectorTilesDb();
-      final db = await openDatabase(
+      db = await openDatabase(
         mbtilesPath,
         version: 1,
         onCreate: dbHelper.createMbtilesSchema,
       );
+
+      if (_canceled) {
+        await db.close();
+        controller.add(const DownloadMapError('Canceled'));
+        controller.close();
+        return;
+      }
 
       // Compute all tiles
       final allTiles = <MapTile>[];
@@ -103,7 +131,7 @@ class VectorTilesDownloader {
       controller.add(DownloadMapStartingWorkers(chunks.length));
 
       // Receive port for worker communication
-      final receivePort = ReceivePort();
+      receivePort = ReceivePort();
       final totalWorkers = chunks.length;
       int completed = 0;
       int tilesDownloaded = 0;
@@ -117,10 +145,14 @@ class VectorTilesDownloader {
         isProcessingQueue = true;
 
         while (tileQueue.isNotEmpty) {
+          if (_canceled) {
+            isProcessingQueue = false;
+            return;
+          }
           final tile = tileQueue.removeAt(0);
           try {
             // Check if database is still open
-            if (!db.isOpen) {
+            if (db == null || !db.isOpen) {
               _logger.log('Database is closed, skipping tile insertion');
               break;
             }
@@ -149,6 +181,7 @@ class VectorTilesDownloader {
       Future<void> waitForQueueEmpty() async {
         int waitCount = 0;
         while (tileQueue.isNotEmpty || isProcessingQueue) {
+          if (_canceled) return;
           waitCount++;
           if (waitCount % 20 == 0) {
             // Log every second
@@ -162,6 +195,7 @@ class VectorTilesDownloader {
       }
 
       receivePort.listen((message) async {
+        if (_canceled) return;
         if (message is TileData) {
           // Add to queue and process
           tileQueue.add(message);
@@ -181,8 +215,8 @@ class VectorTilesDownloader {
               await processTileQueue();
             }
             _logger.log('All tiles processed, closing database...');
-            receivePort.close();
-            await db.close();
+            receivePort?.close();
+            await db?.close();
             completer.complete();
           }
         }
@@ -191,13 +225,19 @@ class VectorTilesDownloader {
       // Spawn isolates
       _logger.log('Spawning $totalWorkers isolates...');
       for (final chunk in chunks) {
-        await Isolate.spawn<WorkerInit>(
+        final iso = await Isolate.spawn<WorkerInit>(
           downloadWorker,
           WorkerInit(chunk, _urlTemplate, receivePort.sendPort),
         );
+        _isolates.add(iso);
       }
 
       await completer.future;
+      if (_canceled) {
+        controller.add(const DownloadMapError('Canceled'));
+        controller.close();
+        return;
+      }
       _logger.log(
         'Download completed successfully. Total tiles: $tilesDownloaded',
       );
@@ -260,6 +300,10 @@ class VectorTilesDownloader {
       _logger.error('Error during download: $e');
       controller.add(DownloadMapError('Download failed: $e'));
       controller.close();
+    } finally {
+      try {
+        await db?.close();
+      } catch (_) {}
     }
   }
 

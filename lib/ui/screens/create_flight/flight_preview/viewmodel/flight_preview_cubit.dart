@@ -159,14 +159,10 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
 
   /// Cancel download
   void cancelDownload() {
+    downloadMapUseCase.cancel();
     _downloadSubscription?.cancel();
     _downloadSubscription = null;
-    // Return to loaded state
-    final currentState = state;
-    if (currentState is MapDownloadingState) {
-      // Re-emit the last loaded state
-      _calculateRouteAndCorridor(params);
-    }
+    _calculateRouteAndCorridor(params);
   }
 
   /// Retry initialization (public method for error recovery)

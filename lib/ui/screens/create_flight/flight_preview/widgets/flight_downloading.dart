@@ -2,17 +2,17 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_pa
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/airport.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_cubit.dart';
 
 class FlightDownloading extends StatelessWidget {
   final FlightPreviewAirports airports;
   final MapDownloadingState downloadingState;
-  final VoidCallback? onCancel;
 
   const FlightDownloading({
     super.key,
     required this.airports,
     required this.downloadingState,
-    this.onCancel,
   });
 
   @override
@@ -128,8 +128,13 @@ class FlightDownloading extends StatelessWidget {
 
           // Cancel button
           TextButton(
-            onPressed: onCancel,
-            child: Text('Cancel Download', style: TextStyle(color: Colors.red)),
+            onPressed: () {
+              context.read<FlightPreviewCubit>().cancelDownload();
+            },
+            child: const Text(
+              'Cancel Download',
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),

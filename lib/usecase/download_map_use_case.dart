@@ -88,12 +88,17 @@ class DownloadMapUseCase {
   final FlightsService _flightsService;
   final MapsService _mapsService;
   final _logger = Logger('DownloadMapUseCase');
+  VectorTilesDownloader? _currentDownloader;
 
   DownloadMapUseCase({required AppDatabase database})
     : _flightsService = FlightsService(database: database),
       _mapsService = MapsService(database: database);
 
   static const double defaultWidthKm = 100;
+
+  void cancel() {
+    _currentDownloader?.cancel();
+  }
 
   Stream<DownloadMapEvent> call({
     required Airport departure,
@@ -116,6 +121,7 @@ class DownloadMapUseCase {
         minZoom: 0,
         maxZoom: 10,
       );
+      _currentDownloader = downloader;
 
       // Forward the download stream and handle completion
       await for (final event in downloader.download()) {
