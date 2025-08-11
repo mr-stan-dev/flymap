@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/logger.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flymap/data/gps_data_provider.dart';
+import 'package:geolocator/geolocator.dart';
 
 class FlightScreenCubit extends Cubit<FlightScreenState> {
   final _logger = Logger('FlightScreenCubit');
@@ -71,7 +72,9 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
     await load();
   }
 
-  void openLocationSettings() {}
+  void openLocationSettings() {
+    Geolocator.openLocationSettings();
+  }
 
   @override
   Future<void> close() {

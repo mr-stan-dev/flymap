@@ -29,15 +29,7 @@ class GpsOffState extends StatelessWidget {
         Builder(
           builder: (context) => ElevatedButton.icon(
             onPressed: () {
-              // TODO: Implement open device settings
-              // For now, just show a snackbar
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Please enable location services in device settings',
-                  ),
-                ),
-              );
+              context.read<FlightScreenCubit>().openLocationSettings();
             },
             icon: const Icon(Icons.settings, size: 16),
             label: const Text('Open Settings'),
