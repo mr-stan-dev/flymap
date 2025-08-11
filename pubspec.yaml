@@ -29,6 +29,7 @@ dependencies:
   path: ^1.8.3
   sqflite: ^2.3.2
   shared_preferences: ^2.2.3
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
@@ -49,18 +50,3 @@ flutter:
     - assets/glyphs/Noto Sans Regular/
     - assets/glyphs/Noto Sans Medium/
     - assets/glyphs/Noto Sans Bold/
-
-  fonts:
-    - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package

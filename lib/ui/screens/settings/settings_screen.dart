@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'viewmodel/settings_cubit.dart';
 import 'viewmodel/settings_state.dart';
@@ -104,12 +105,8 @@ class _SettingsView extends StatelessWidget {
                 title: 'About',
                 subtitle: 'Learn more about the app',
                 leading: const Icon(Icons.info_outline),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('About is not implemented yet.'),
-                    ),
-                  );
+                onTap: () async {
+                  await _openExternalUrl(context, 'https://flymap.app/');
                 },
               ),
               const Divider(height: 1),
@@ -117,11 +114,10 @@ class _SettingsView extends StatelessWidget {
                 title: 'Privacy Policy',
                 subtitle: 'Read our privacy policy',
                 leading: const Icon(Icons.privacy_tip_outlined),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Privacy Policy not implemented.'),
-                    ),
+                onTap: () async {
+                  await _openExternalUrl(
+                    context,
+                    'https://flymap.app/privacy-policy',
                   );
                 },
               ),
@@ -130,6 +126,16 @@ class _SettingsView extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Future<void> _openExternalUrl(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!ok && context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not open $url')));
+    }
   }
 
   Future<String?> _showOptions(
