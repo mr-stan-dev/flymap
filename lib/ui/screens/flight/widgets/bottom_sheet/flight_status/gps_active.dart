@@ -2,7 +2,7 @@ import 'package:flymap/ui/theme/app_colours.dart';
 import 'package:flutter/material.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/entity/gps_data.dart';
-import 'dart:math' as math;
+import 'package:flymap/repository/metric_units_repository.dart';
 
 class GpsActive extends StatelessWidget {
   final FlightScreenLoaded state;
@@ -11,58 +11,86 @@ class GpsActive extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
+    return FutureBuilder(
+      future: _loadUnits(),
+      builder: (context, snapshot) {
+        final units =
+            snapshot.data ??
+            const _Units(
+              speedLabel: 'km/h',
+              altitudeLabel: 'ft',
+              speedFactor: 3.6,
+              altitudeFactor: 3.28084,
+            );
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Speed indicator
-            Expanded(child: _buildSpeedIndicator(context)),
-            const SizedBox(width: 12),
-            // Altitude indicator
-            Expanded(child: _buildAltitudeIndicator(context)),
-          ],
-        ),
-        const SizedBox(height: 16),
+            Row(
+              children: [
+                // Speed indicator
+                Expanded(child: _buildSpeedIndicator(context, units)),
+                const SizedBox(width: 12),
+                // Altitude indicator
+                Expanded(child: _buildAltitudeIndicator(context, units)),
+              ],
+            ),
+            const SizedBox(height: 16),
 
-        // Compass and GPS Accuracy
-        Row(
-          children: [
-            // Compass
-            Expanded(child: _buildCompass(context)),
-            const SizedBox(width: 12),
-            // GPS Accuracy
-            Expanded(child: _buildGpsAccuracyIndicator(context)),
+            // Compass and GPS Accuracy
+            Row(
+              children: [
+                // Compass
+                Expanded(child: _buildCompass(context)),
+                const SizedBox(width: 12),
+                // GPS Accuracy
+                Expanded(child: _buildGpsAccuracyIndicator(context)),
+              ],
+            ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 
-  Widget _buildSpeedIndicator(BuildContext context) {
+  Future<_Units> _loadUnits() async {
+    final repo = MetricUnitsRepository();
+    final speed = await repo.getSpeedUnit();
+    final alt = await repo.getAltitudeUnit();
+    final speedIsMph = speed.name == 'mph';
+    final altIsMeter = alt.name == 'meter';
+    return _Units(
+      speedLabel: speedIsMph ? 'mph' : 'km/h',
+      altitudeLabel: altIsMeter ? 'm' : 'ft',
+      speedFactor: speedIsMph ? 2.23693629 : 3.6, // m/s -> mph or km/h
+      altitudeFactor: altIsMeter ? 1.0 : 3.28084, // meters -> meters or feet
+    );
+  }
+
+  Widget _buildSpeedIndicator(BuildContext context, _Units u) {
     final speed = state.gpsData?.speed ?? 0.0;
-    final speedKmh = speed * 3.6; // Convert m/s to km/h
+    final display = (speed * u.speedFactor).toStringAsFixed(0);
 
     return DashboardCard(
       icon: Icons.speed,
       iconColor: AppColoursCommon.accentBlue,
       title: 'SPEED',
-      mainValue: '${speedKmh.toStringAsFixed(0)}',
+      mainValue: display,
       mainValueColor: AppColoursCommon.accentBlue,
-      subtitle: 'km/h',
+      subtitle: u.speedLabel,
     );
   }
 
-  Widget _buildAltitudeIndicator(BuildContext context) {
+  Widget _buildAltitudeIndicator(BuildContext context, _Units u) {
     final altitude = state.gpsData?.altitude ?? 0.0;
+    final display = (altitude * u.altitudeFactor).toStringAsFixed(0);
 
     return DashboardCard(
       icon: Icons.height,
       iconColor: Colors.purple,
       title: 'ALTITUDE',
-      mainValue: '${altitude.toStringAsFixed(0)}',
+      mainValue: display,
       mainValueColor: Colors.purple,
-      subtitle: 'ft',
+      subtitle: u.altitudeLabel,
     );
   }
 
@@ -204,4 +232,17 @@ class DashboardCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _Units {
+  final String speedLabel;
+  final String altitudeLabel;
+  final double speedFactor;
+  final double altitudeFactor;
+  const _Units({
+    required this.speedLabel,
+    required this.altitudeLabel,
+    required this.speedFactor,
+    required this.altitudeFactor,
+  });
 }

@@ -3,18 +3,17 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:math' as math;
 
-import 'package:flymap/data/mobile_backend/mbtiles_verifier.dart';
-import 'package:flymap/data/mobile_backend/tile_utils.dart';
+import 'package:flymap/data/tiles_downloader/mbtiles_verifier.dart';
+import 'package:flymap/data/tiles_downloader/sea_tiles_filter.dart';
+import 'package:flymap/data/tiles_downloader/tile_utils.dart';
+import 'package:flymap/data/tiles_downloader/vector_tiles_db.dart';
+import 'package:flymap/data/tiles_downloader/vector_tiles_worker.dart';
+import 'package:flymap/logger.dart';
 import 'package:flymap/usecase/download_map_use_case.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-
-import '../../logger.dart';
-import 'package:flymap/data/mobile_backend/vector_tiles_worker.dart';
-import 'package:flymap/data/mobile_backend/vector_tiles_db.dart';
-import 'package:flymap/data/mobile_backend/sea_tiles_filter.dart';
 
 class VectorTilesDownloader {
   final List<LatLng> polygon;

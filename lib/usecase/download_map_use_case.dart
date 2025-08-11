@@ -6,13 +6,11 @@ import 'package:flymap/data/great_circle_route_provider.dart';
 import 'package:flymap/data/local/app_database.dart';
 import 'package:flymap/data/local/flights_service.dart';
 import 'package:flymap/data/local/maps_service.dart';
-import 'package:flymap/data/mobile_backend/vector_tiles_downloader.dart';
 import 'package:flymap/data/route_corridor_provider.dart';
+import 'package:flymap/data/tiles_downloader/vector_tiles_downloader.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/map/flight_map.dart';
-import 'package:flymap/entity/map/map_file.dart';
-import 'package:flymap/entity/map/map_layer.dart';
 import 'package:latlong2/latlong.dart';
 import '../logger.dart';
 
