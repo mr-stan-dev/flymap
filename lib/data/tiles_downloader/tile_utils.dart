@@ -33,7 +33,6 @@ class TileUtils {
     List<LatLng> polygon,
     int zoom,
   ) sync* {
-    print('[VectorTilesDownloader] Computing tiles for zoom $zoom...');
     // Rough approach: iterate over bounding box tiles and include tile if its center in polygon.
     double minLat = polygon.first.latitude;
     double maxLat = polygon.first.latitude;

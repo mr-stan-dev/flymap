@@ -1,10 +1,15 @@
 import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 import 'package:flymap/entity/gps_data.dart';
+import 'package:flymap/repository/metric_units_repository.dart';
 
 /// Provides GPS data updates and status changes
 class GpsDataProvider {
   StreamSubscription<Position>? _subscription;
+  final MetricUnitsRepository _unitsRepository;
+
+  GpsDataProvider({MetricUnitsRepository? unitsRepository})
+    : _unitsRepository = unitsRepository ?? MetricUnitsRepository();
 
   Future<void> start({
     required void Function(GpsStatus status, {GpsData? data}) onUpdate,
@@ -37,14 +42,30 @@ class GpsDataProvider {
       distanceFilter: 10,
     );
 
+    final speedUnit = await _unitsRepository.getSpeedUnit();
+    final altitudeUnit = await _unitsRepository.getAltitudeUnit();
+
     _subscription = Geolocator.getPositionStream(locationSettings: settings)
         .listen(
           (pos) {
+            // Raw from geolocator: speed m/s, altitude meters
+            final mph = speedUnit.name == 'mph';
+            final speedValue = mph
+                ? pos.speed * 2.23693629
+                : pos.speed * 3.6; // -> mph or km/h
+            final speed = SpeedValue(speedValue, mph ? 'mph' : 'km/h');
+
+            final isMeter = altitudeUnit.name == 'meter';
+            final altitudeValue = isMeter
+                ? pos.altitude
+                : pos.altitude * 3.28084; // -> m or ft
+            final altitude = AltitudeValue(altitudeValue, isMeter ? 'm' : 'ft');
+
             final gps = GpsData(
               latitude: pos.latitude,
               longitude: pos.longitude,
-              altitude: pos.altitude, // meters
-              speed: pos.speed, // m/s
+              altitude: altitude,
+              speed: speed,
               course: pos.heading, // degrees
               accuracy: pos.accuracy, // meters
             );

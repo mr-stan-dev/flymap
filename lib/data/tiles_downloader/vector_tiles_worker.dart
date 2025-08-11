@@ -33,8 +33,8 @@ void downloadWorker(WorkerInit init) async {
         .replaceAll('{x}', tile.x.toString())
         .replaceAll('{y}', tile.y.toString());
 
-    // Debug first few URLs
-    if (downloaded < 3) {
+    // Debug first URL
+    if (downloaded < 1) {
       _isolateLog('Downloading from URL: $url');
     }
 

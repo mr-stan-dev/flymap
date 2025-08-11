@@ -9,13 +9,14 @@ class MapsService {
 
   /// Insert or update map data for a flight
   Future<void> insertMapData(FlightMap mapData) async {
-    final key = mapData.layer;
+    final key = mapData
+        .layer; // we use layer as the unique key (equals flightId for now)
     await _database.mapsStore
         .record(key)
         .put(_database.database, mapData.toMap());
   }
 
-  /// Get map data for a specific flight and map type
+  /// Get map data for a specific flight and map type (keyed by "flightId_mapType")
   Future<FlightMap?> getMapData(String flightId, String mapType) async {
     final key = '${flightId}_$mapType';
     final map = await _database.mapsStore.record(key).get(_database.database);
@@ -23,11 +24,11 @@ class MapsService {
     return FlightMap.fromMap(map);
   }
 
-  /// Get all map data for a flight
+  /// Get all map data for a flight (key equals flightId or starts with it)
   Future<List<FlightMap>> getFlightMaps(String flightId) async {
     final records = await _database.mapsStore.find(_database.database);
     return records
-        .where((record) => record.value['flightId'] == flightId)
+        .where((record) => record.key.toString().startsWith(flightId))
         .map((record) => FlightMap.fromMap(record.value))
         .toList();
   }
@@ -61,7 +62,6 @@ class MapsService {
         .record(key)
         .get(_database.database);
     if (existing == null) return false;
-
     await _database.mapsStore.record(key).delete(_database.database);
     return true;
   }
@@ -69,12 +69,10 @@ class MapsService {
   /// Delete all map data for a flight
   Future<void> deleteFlightMaps(String flightId) async {
     final records = await _database.mapsStore.find(_database.database);
-    final flightRecords = records.where(
-      (record) => record.value['flightId'] == flightId,
-    );
-
-    for (final record in flightRecords) {
-      await _database.mapsStore.record(record.key).delete(_database.database);
+    for (final record in records) {
+      if (record.key.toString().startsWith(flightId)) {
+        await _database.mapsStore.record(record.key).delete(_database.database);
+      }
     }
   }
 
@@ -115,12 +113,12 @@ class MapsService {
     return records.map((record) => FlightMap.fromMap(record.value)).toList();
   }
 
-  /// Get maps by type
+  /// Get maps by type (keys that end with "_mapType")
   Future<List<FlightMap>> getMapsByType(String mapType) async {
-    final records = await _database.mapsStore.find(
-      _database.database,
-      finder: Finder(filter: Filter.equals('mapType', mapType)),
-    );
-    return records.map((record) => FlightMap.fromMap(record.value)).toList();
+    final records = await _database.mapsStore.find(_database.database);
+    return records
+        .where((record) => record.key.toString().endsWith('_$mapType'))
+        .map((record) => FlightMap.fromMap(record.value))
+        .toList();
   }
 }

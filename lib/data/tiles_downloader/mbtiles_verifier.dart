@@ -21,23 +21,6 @@ class MbtilesVerifier {
     try {
       final db = await openDatabase(filePath, readOnly: true);
 
-      // Check if tables exist
-      final tables = await db.query(
-        'sqlite_master',
-        where: 'type = ?',
-        whereArgs: ['table'],
-        columns: ['name'],
-      );
-
-      _logger.log('Tables found: ${tables.map((t) => t['name']).join(', ')}');
-
-      // Check tiles table structure
-      final tilesColumns = await db.rawQuery('PRAGMA table_info(tiles)');
-      _logger.log('Tiles table columns:');
-      for (final col in tilesColumns) {
-        _logger.log('  - ${col['name']} (${col['type']})');
-      }
-
       // Count total tiles
       final tileCount = Sqflite.firstIntValue(
         await db.rawQuery('SELECT COUNT(*) FROM tiles'),
@@ -55,27 +38,6 @@ class MbtilesVerifier {
       _logger.log('Tiles by zoom level:');
       for (final stat in zoomStats) {
         _logger.log('  - Zoom ${stat['zoom_level']}: ${stat['count']} tiles');
-      }
-
-      // Show sample tile data
-      final sampleTile = await db.query(
-        'tiles',
-        limit: 1,
-        columns: [
-          'zoom_level',
-          'tile_column',
-          'tile_row',
-          'length(tile_data) as data_size',
-        ],
-      );
-
-      if (sampleTile.isNotEmpty) {
-        final tile = sampleTile.first;
-        _logger.log('Sample tile:');
-        _logger.log('  - Zoom: ${tile['zoom_level']}');
-        _logger.log('  - Column: ${tile['tile_column']}');
-        _logger.log('  - Row: ${tile['tile_row']}');
-        _logger.log('  - Data size: ${tile['data_size']} bytes');
       }
 
       // Check metadata table
