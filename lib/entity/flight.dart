@@ -25,9 +25,8 @@ class Flight extends Equatable {
 
   FlightMap? get flightMap => maps.isNotEmpty ? maps[0] : null;
 
-  /// Get the route description (e.g., "New York(US) - London(GB)")
   String get route =>
-      '${departure.city}(${departure.countryCode}) - ${arrival.city}(${arrival.countryCode})';
+      '${departure.city}, ${departure.countryCode} - ${arrival.city}, ${arrival.countryCode}';
 
   double get distanceInKm {
     return MapUtils.distance(departure: departure, arrival: arrival);

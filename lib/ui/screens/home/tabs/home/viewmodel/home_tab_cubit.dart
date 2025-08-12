@@ -103,12 +103,6 @@ class HomeTabCubit extends Cubit<HomeTabState> {
     }
   }
 
-  /// Format flight date for display
-  String formatFlightDate(Flight flight) {
-    // No time info, so show airport codes as a placeholder
-    return '${flight.departure.code} → ${flight.arrival.code}';
-  }
-
   /// Retry loading data after error
   Future<void> retry() async {
     await _loadData();

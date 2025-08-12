@@ -48,8 +48,7 @@ class HomeFlightsList extends StatelessWidget {
             context,
             flight: flight,
             title: flight.route,
-            subtitle: '${flight.departure.code}-${flight.arrival.code}',
-            date: cubit.formatFlightDate(flight),
+            subtitle: '${flight.departure.code} - ${flight.arrival.code}',
           ),
         );
       },
@@ -61,7 +60,6 @@ class HomeFlightsList extends StatelessWidget {
     required Flight flight,
     required String title,
     required String subtitle,
-    required String date,
   }) {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
@@ -113,14 +111,6 @@ class HomeFlightsList extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         color: onSurface.withOpacity(0.8),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      date,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
