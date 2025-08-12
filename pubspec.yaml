@@ -36,6 +36,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
@@ -50,3 +51,12 @@ flutter:
     - assets/glyphs/Noto Sans Regular/
     - assets/glyphs/Noto Sans Medium/
     - assets/glyphs/Noto Sans Bold/
+    - assets/app_icon.png
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: assets/app_icon.png
+  # Optional adaptive icon background color to match brand
+  # adaptive_icon_background: "#0D234A"
