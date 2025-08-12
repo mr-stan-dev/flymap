@@ -1,7 +1,7 @@
 name: flymap
 description: "Offline maps for flights"
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 0.0.1
+version: 0.0.2
 
 environment:
   sdk: ^3.8.1
