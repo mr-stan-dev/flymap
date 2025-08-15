@@ -18,6 +18,11 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Home'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () => AppRouter.goToAbout(context),
+            tooltip: 'About',
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
               AppRouter.goToSettings(context);

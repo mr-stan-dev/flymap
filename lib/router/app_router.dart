@@ -5,6 +5,7 @@ import 'package:flymap/ui/screens/create_flight/flight_search/flight_search_scre
 import 'package:flymap/ui/screens/home/home_screen.dart';
 import 'package:flymap/ui/screens/flight/flight_screen.dart';
 import 'package:flymap/ui/screens/settings/settings_screen.dart';
+import 'package:flymap/ui/screens/about/about_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,6 +16,7 @@ class AppRouter {
   static const String flightSearchRoute = '/flight-number';
   static const String flightRoute = '/flight';
   static const String settingsRoute = '/settings';
+  static const String aboutRoute = '/about';
 
   /// Create the router configuration
   static GoRouter createRouter() {
@@ -72,6 +74,13 @@ class AppRouter {
           name: 'settings',
           builder: (context, state) => const SettingsScreen(),
         ),
+
+        // About
+        GoRoute(
+          path: aboutRoute,
+          name: 'about',
+          builder: (context, state) => const AboutScreen(),
+        ),
       ],
     );
   }
@@ -97,5 +106,10 @@ class AppRouter {
   /// Navigate to settings
   static void goToSettings(BuildContext context) {
     context.push(settingsRoute);
+  }
+
+  /// Navigate to about
+  static void goToAbout(BuildContext context) {
+    context.push(aboutRoute);
   }
 }
