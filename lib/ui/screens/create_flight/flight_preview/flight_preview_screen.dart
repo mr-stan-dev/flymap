@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_cubit.dart';
@@ -6,8 +8,6 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_do
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_info.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_map_preview.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 class FlightPreviewScreen extends StatelessWidget {
@@ -152,12 +152,7 @@ class FlightPreviewScreen extends StatelessWidget {
   Widget _previewLoaded(BuildContext context, FlightMapPreviewLoaded state) {
     return Column(
       children: [
-        Expanded(
-          child: FlightMapPreview(
-            departure: airports.departure,
-            arrival: airports.arrival,
-          ),
-        ),
+        Expanded(child: FlightMapPreview(flightPreview: state.flightPreview)),
         FlightInfo(airports: airports),
         Padding(
           padding: const EdgeInsets.all(16.0),

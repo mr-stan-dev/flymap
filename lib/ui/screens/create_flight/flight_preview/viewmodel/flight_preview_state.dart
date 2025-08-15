@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flymap/entity/flight_preview.dart';
 import 'package:latlong2/latlong.dart';
 
 sealed class FlightPreviewState extends Equatable {
@@ -15,22 +16,19 @@ final class FlightMapPreviewLoading extends FlightPreviewState {
 
 /// Route and corridor calculated successfully
 final class FlightMapPreviewLoaded extends FlightPreviewState {
-  final List<LatLng> flightRoute;
-  final List<LatLng> flightCorridor;
+  final FlightPreview flightPreview;
   final double currentZoom;
   final bool isTooLongFlight;
 
   const FlightMapPreviewLoaded({
-    required this.flightRoute,
-    required this.flightCorridor,
+    required this.flightPreview,
     required this.currentZoom,
     required this.isTooLongFlight,
   });
 
   @override
   List<Object?> get props => [
-    flightRoute,
-    flightCorridor,
+    flightPreview,
     currentZoom,
     isTooLongFlight,
   ];

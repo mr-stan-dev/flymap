@@ -1,4 +1,4 @@
-enum MapLayer {
+enum MapType {
   outdoors,
   satellite,
   terrain

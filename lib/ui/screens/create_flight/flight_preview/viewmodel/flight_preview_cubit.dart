@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:flymap/data/great_circle_route_provider.dart';
 import 'package:flymap/data/route_corridor_provider.dart';
-import 'package:flymap/ui/map_utils.dart';
+import 'package:flymap/entity/flight_preview.dart';
+import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 import 'package:flymap/usecase/download_map_use_case.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
 
-/// Cubit for managing create_flight map preview state
 class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   final FlightPreviewAirports params;
   final DownloadMapUseCase downloadMapUseCase;
@@ -69,8 +69,12 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
 
       emit(
         FlightMapPreviewLoaded(
-          flightRoute: route,
-          flightCorridor: corridor,
+          flightPreview: FlightPreview(
+            departure: airports.departure,
+            arrival: airports.arrival,
+            waypoints: route,
+            corridor: corridor,
+          ),
           currentZoom: zoomLevel,
           isTooLongFlight: isTooLong,
         ),
@@ -86,8 +90,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     if (currentState is FlightMapPreviewLoaded) {
       emit(
         FlightMapPreviewLoaded(
-          flightRoute: currentState.flightRoute,
-          flightCorridor: currentState.flightCorridor,
+          flightPreview: currentState.flightPreview,
           currentZoom: zoom,
           isTooLongFlight: currentState.isTooLongFlight,
         ),

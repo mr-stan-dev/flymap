@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:flymap/ui/map_utils.dart';
+import 'package:flymap/ui/map/map_utils.dart';
 import 'package:latlong2/latlong.dart';
 
 /// Provider for calculating great circle routes between two points

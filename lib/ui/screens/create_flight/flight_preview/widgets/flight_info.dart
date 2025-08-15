@@ -1,6 +1,6 @@
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight.dart';
-import 'package:flymap/ui/map_utils.dart';
+import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
 import 'package:flutter/material.dart';
 

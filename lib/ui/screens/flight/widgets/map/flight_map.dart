@@ -1,16 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flymap/entity/flight.dart';
-import 'package:flymap/logger.dart';
-import 'package:flymap/ui/map_utils.dart';
-import 'package:flymap/ui/widgets/map/map_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:latlong2/latlong.dart' as latlong;
-import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/gps_data.dart';
+import 'package:flymap/logger.dart';
+import 'package:flymap/ui/map/layers/airports_layer.dart';
+import 'package:flymap/ui/map/layers/corridor_layer.dart';
+import 'package:flymap/ui/map/layers/dimming_layer.dart';
+import 'package:flymap/ui/map/layers/user_layer.dart';
+import 'package:flymap/ui/map/layers/waypoints_layer.dart';
+import 'package:flymap/ui/map/map_utils.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+
 import '../../viewmodel/flight_screen_cubit.dart';
 import '../../viewmodel/flight_screen_state.dart';
 
@@ -128,20 +132,22 @@ class _FlightMapState extends State<FlightMap> {
       Future.delayed(const Duration(milliseconds: 200), () {
         if (mounted) {
           _fitMapToAirports();
-          _addRouteAndCorridor();
+          _addFlightMapLayers();
         }
       });
     }
   }
 
-  void _addRouteAndCorridor() {
-    _mapController?.showRoute(_waypoints);
-    _mapController?.showCorridor(_corridor);
-    _mapController?.showDimmingLayer(_corridor);
-    _mapController?.showAirports(
-      widget.flight.departure,
-      widget.flight.arrival,
-    );
+  void _addFlightMapLayers() {
+    [
+      CorridorLayer(_corridor),
+      WaypointsLayer(_waypoints),
+      DimmingLayer(_corridor),
+      AirportsLayer(
+        departure: widget.flight.departure,
+        arrival: widget.flight.arrival,
+      ),
+    ].forEach((layer) => layer.add(_mapController!));
   }
 
   Future<void> _updateUserLocation(GpsData data) async {
@@ -150,17 +156,9 @@ class _FlightMapState extends State<FlightMap> {
     final lon = data.longitude;
     if (lat == null || lon == null) return;
     final pos = LatLng(lat, lon);
-
     if (_userCircle == null) {
       _userCircle = await _mapController!.addCircle(
-        CircleOptions(
-          geometry: pos,
-          circleColor: '#2E7DFF',
-          circleRadius: 6.0,
-          circleOpacity: 0.9,
-          circleStrokeColor: '#FFFFFF',
-          circleStrokeWidth: 2.0,
-        ),
+        UserLayer(pos).userOptions
       );
     } else {
       await _mapController!.updateCircle(

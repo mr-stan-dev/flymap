@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'map_layer.dart';
+import 'map_type.dart';
 
 class MapFile extends Equatable {
-  final MapLayer layer;
+  final MapType layer;
   final String filePath;
 
   const MapFile({required this.layer, required this.filePath});
@@ -13,9 +13,9 @@ class MapFile extends Equatable {
 
   factory MapFile.fromMap(Map<String, dynamic> map) {
     return MapFile(
-      layer: MapLayer.values.firstWhere(
+      layer: MapType.values.firstWhere(
         (layer) => layer.name == map['layer'],
-        orElse: () => MapLayer.outdoors,
+        orElse: () => MapType.outdoors,
       ),
       filePath: map['filePath'] as String,
     );

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flymap/ui/map_utils.dart';
+import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
