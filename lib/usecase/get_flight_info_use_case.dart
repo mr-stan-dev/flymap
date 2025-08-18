@@ -13,6 +13,9 @@ class GetFlightInfoUseCase {
   Future<List<FlightPoi>> call({required List<LatLng> coordinates}) async {
     try {
       final result = await _getPoiApi.getPoiCallable(coordinates);
+      result.forEach((key, value) {
+        print('key: $key, value: $value');
+      });
       final dynamic list = result['poi'];
       if (list is List) {
         return list

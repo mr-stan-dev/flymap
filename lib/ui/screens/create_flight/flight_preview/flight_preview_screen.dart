@@ -24,8 +24,10 @@ class FlightPreviewScreen extends StatelessWidget {
         getFlightInfoUseCase: GetIt.I.get(),
       ),
       child: Scaffold(
-        appBar: AppBar(title: const Text('Flight preview')),
+        appBar: null,
         body: SafeArea(
+          top: false,
+          bottom: false,
           child: BlocConsumer<FlightPreviewCubit, FlightPreviewState>(
             listener: (context, state) {
               // Check if database save is complete
@@ -153,30 +155,146 @@ class FlightPreviewScreen extends StatelessWidget {
   Widget _previewLoaded(BuildContext context, FlightMapPreviewLoaded state) {
     return Column(
       children: [
-        Expanded(child: FlightMapPreview(flightPreview: state.flightPreview)),
-        FlightInfo(airports: airports),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
+        Expanded(
+          child: Stack(
             children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: state.isTooLongFlight
-                      ? null
-                      : () {
-                          context.read<FlightPreviewCubit>().startDownload();
-                        },
-                  child: Text(
-                    state.isTooLongFlight
-                        ? 'Too long flight (> 5000km)'
-                        : 'Download',
-                  ),
-                ),
+              // Fullscreen map preview
+              Positioned.fill(
+                child: FlightMapPreview(flightPreview: state.flightPreview),
+              ),
+
+              // Top overlay app bar (transparent with gradient)
+              _buildTopAppBar(context, state),
+
+              // Draggable bottom sheet with flight info
+              DraggableScrollableSheet(
+                initialChildSize: 0.3,
+                minChildSize: 0.1,
+                maxChildSize: 0.9,
+                builder: (context, scrollController) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, -2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 8),
+                        Container(
+                          width: 40,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade400,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            controller: scrollController,
+                            child: FlightInfo(airports: airports),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),
         ),
+        Container(
+          width: double.infinity,
+          color: Theme.of(context).colorScheme.surface,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: state.isTooLongFlight
+                  ? null
+                  : () {
+                      context.read<FlightPreviewCubit>().startDownload();
+                    },
+              child: Text(
+                state.isTooLongFlight
+                    ? 'Too long flight (> 5000km)'
+                    : 'Download',
+              ),
+            ),
+          ),
+        ),
       ],
+    );
+  }
+
+  Widget _buildTopAppBar(BuildContext context, FlightMapPreviewLoaded state) {
+    const Color overlayTextColor = Colors.white;
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.black.withOpacity(0.7), Colors.transparent],
+          ),
+        ),
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${state.flightPreview.departure.code}-${state.flightPreview.arrival.code}',
+                        style: const TextStyle(
+                          color: overlayTextColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Flight preview',
+                        style: TextStyle(
+                          color: overlayTextColor.withOpacity(0.85),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
