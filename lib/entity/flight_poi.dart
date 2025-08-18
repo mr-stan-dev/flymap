@@ -5,15 +5,22 @@ class FlightPoi extends Equatable {
   final LatLng coordinates;
   final String type;
   final String description;
+  final String name;
+  final String flyView;
+  final String wiki;
 
   const FlightPoi({
     required this.coordinates,
     required this.type,
     required this.description,
+    required this.name,
+    required this.flyView,
+    required this.wiki,
   });
 
   factory FlightPoi.fromMap(Map<String, dynamic> map) {
-    final dynamic coordValue = map['poi_coordinates'];
+    // coordinates can be provided as 'coordinates' (new) or 'poi_coordinates' (legacy)
+    final dynamic coordValue = map['coordinates'] ?? map['poi_coordinates'];
     LatLng coords;
     if (coordValue is String) {
       final parts = coordValue.split(',');
@@ -34,8 +41,12 @@ class FlightPoi extends Equatable {
 
     return FlightPoi(
       coordinates: coords,
-      type: (map['poi_type'] ?? '').toString(),
-      description: (map['poi_description'] ?? '').toString(),
+      type: (map['type'] ?? map['poi_type'] ?? '').toString(),
+      description: (map['description'] ?? map['poi_description'] ?? '')
+          .toString(),
+      name: (map['name'] ?? map['poi_name'] ?? '').toString(),
+      flyView: (map['fly_view'] ?? '').toString(),
+      wiki: (map['wiki'] ?? '').toString(),
     );
   }
 
@@ -51,5 +62,8 @@ class FlightPoi extends Equatable {
     coordinates.longitude,
     type,
     description,
+    name,
+    flyView,
+    wiki,
   ];
 }

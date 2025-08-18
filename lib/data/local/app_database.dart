@@ -6,7 +6,6 @@ class AppDatabase {
   static AppDatabase? _instance;
   static Database? _database;
   static StoreRef<String, Map<String, dynamic>>? _flightsStore;
-  static StoreRef<String, Map<String, dynamic>>? _mapsStore;
 
   AppDatabase._();
 
@@ -24,7 +23,6 @@ class AppDatabase {
 
       // Initialize stores
       _flightsStore = stringMapStoreFactory.store('flights');
-      _mapsStore = stringMapStoreFactory.store('maps');
     }
   }
 
@@ -44,19 +42,10 @@ class AppDatabase {
     return _flightsStore!;
   }
 
-  /// Get the maps store
-  StoreRef<String, Map<String, dynamic>> get mapsStore {
-    if (_mapsStore == null) {
-      throw StateError('Database not initialized. Call initialize() first.');
-    }
-    return _mapsStore!;
-  }
-
   /// Close the database
   Future<void> close() async {
     await _database?.close();
     _database = null;
     _flightsStore = null;
-    _mapsStore = null;
   }
 }

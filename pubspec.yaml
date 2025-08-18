@@ -45,7 +45,6 @@ flutter:
   assets:
     - assets/data/iata_airlines.csv # source: https://github.com/benct/iata-utils/blob/master/data/iata_airport_list.csv
     - assets/data/airports.csv # source: https://ourairports.com/data/ filtered by large and medium size in chatgpt
-    - assets/styles/openfreemap_style.json
     - assets/styles/openfreemap_offline_style.json
     - assets/sprites/
     - assets/glyphs/Noto Sans Italic/

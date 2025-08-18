@@ -74,6 +74,7 @@ class _BottomSheetLoadedState extends State<BottomSheetLoaded> {
                           ? TabFlightInfo(
                               departure: widget.state.flight.departure,
                               arrival: widget.state.flight.arrival,
+                              flightInfo: widget.state.flight.flightInfo,
                             )
                           : TabGpsData(state: widget.state),
                     ),

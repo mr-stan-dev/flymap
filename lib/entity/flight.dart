@@ -1,10 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flymap/ui/map/map_utils.dart';
-import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'airport.dart';
 import 'map/flight_map.dart';
+import 'flight_info.dart';
 
 class Flight extends Equatable {
   final String id;
@@ -13,6 +13,7 @@ class Flight extends Equatable {
   final List<LatLng> waypoints;
   final List<LatLng> corridor;
   final List<FlightMap> maps;
+  final FlightInfo flightInfo;
 
   const Flight({
     required this.id,
@@ -21,6 +22,7 @@ class Flight extends Equatable {
     this.waypoints = const [],
     this.corridor = const [],
     this.maps = const [],
+    required this.flightInfo,
   });
 
   FlightMap? get flightMap => maps.isNotEmpty ? maps[0] : null;
@@ -37,8 +39,9 @@ class Flight extends Equatable {
     id,
     departure,
     arrival,
-    waypoints,
-    corridor,
+    waypoints.length,
+    corridor.length,
     maps,
+    flightInfo,
   ];
 }

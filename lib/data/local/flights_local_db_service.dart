@@ -1,14 +1,24 @@
-import 'package:flymap/entity/flight.dart';
+import 'package:flymap/data/local/flight_info_mapper.dart';
 import 'package:flymap/entity/airport.dart';
+import 'package:flymap/entity/flight.dart';
+import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/map/flight_map.dart';
+import 'package:flymap/logger.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sembast/sembast_io.dart';
+
 import 'app_database.dart';
 
-class FlightsService {
+class FlightsLocalDBService {
   final AppDatabase _database;
+  final FlightInfoMapper _flightInfoMapper;
+  final _logger = Logger('FlightsLocalDBService');
 
-  FlightsService({required AppDatabase database}) : _database = database;
+  FlightsLocalDBService({
+    required AppDatabase database,
+    required FlightInfoMapper flightInfoMapper,
+  }) : _database = database,
+       _flightInfoMapper = flightInfoMapper;
 
   /// Convert Flight entity to Map for storage
   Map<String, dynamic> _flightToMap(Flight flight) {
@@ -54,6 +64,9 @@ class FlightsService {
       // Maps (list)
       'maps': flight.maps.map((m) => m.toMap()).toList(),
 
+      // Flight info
+      'flightInfo': _flightInfoMapper.toMap(flight.flightInfo),
+
       // Metadata
       'createdAt': DateTime.now().toIso8601String(),
       'updatedAt': DateTime.now().toIso8601String(),
@@ -69,6 +82,11 @@ class FlightsService {
     if (mapsList.isEmpty && map['flightMap'] != null) {
       mapsList.add(FlightMap.fromMap(map['flightMap'] as Map<String, dynamic>));
     }
+
+    // Flight info
+    final FlightInfo info = (map['flightInfo'] is Map)
+        ? _flightInfoMapper.fromMap((map['flightInfo'] as Map).cast<String, dynamic>())
+        : FlightInfo.empty;
 
     return Flight(
       id: map['id'] as String,
@@ -109,30 +127,18 @@ class FlightsService {
           )
           .toList(),
       maps: mapsList,
+      flightInfo: info,
     );
   }
 
   /// Insert a new flight
   Future<String> insertFlight(Flight flight) async {
     final key = flight.id;
+    _logger.log('Saving new flight info: ${flight.flightInfo}');
     final map = _flightToMap(flight);
+    _logger.log('Saving new flight: ${map['flightInfo']}');
     await _database.flightsStore.record(key).put(_database.database, map);
     return key;
-  }
-
-  /// Update an existing flight
-  Future<bool> updateFlight(Flight flight) async {
-    final key = flight.id;
-    final map = _flightToMap(flight);
-    map['updatedAt'] = DateTime.now().toIso8601String();
-
-    final existing = await _database.flightsStore
-        .record(key)
-        .get(_database.database);
-    if (existing == null) return false;
-
-    await _database.flightsStore.record(key).put(_database.database, map);
-    return true;
   }
 
   /// Get flight by ID

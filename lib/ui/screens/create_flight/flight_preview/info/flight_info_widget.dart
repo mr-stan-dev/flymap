@@ -1,13 +1,19 @@
+import 'package:flutter/material.dart';
 import 'package:flymap/entity/airport.dart';
-import 'package:flymap/entity/flight.dart';
+import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
-import 'package:flutter/material.dart';
+import 'package:flymap/ui/theme/app_theme_ext.dart';
 
-class FlightInfo extends StatelessWidget {
+class FlightInfoWidget extends StatelessWidget {
   final FlightPreviewAirports airports;
+  final FlightInfo flightInfo;
 
-  const FlightInfo({super.key, required this.airports});
+  const FlightInfoWidget({
+    super.key,
+    required this.airports,
+    required this.flightInfo,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +26,7 @@ class FlightInfo extends StatelessWidget {
         children: [
           Text(
             'Flight route (~ ${MapUtils.distanceFormatted(departure: airports.departure, arrival: airports.arrival)})',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: context.textTheme.title24Medium,
           ),
           const SizedBox(height: 16),
           Row(
@@ -58,8 +62,60 @@ class FlightInfo extends StatelessWidget {
               ),
             ],
           ),
+          flightInfo.isEmpty
+              ? _flightPoiLoading(context)
+              : _flightPoi(context, flightInfo),
         ],
       ),
+    );
+  }
+
+  Widget _flightPoiLoading(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const SizedBox(height: 24),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Building route overview..',
+              style: context.textTheme.body18Regular,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(width: 8),
+            SizedBox.square(dimension: 12, child: CircularProgressIndicator()),
+          ],
+        ),
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+
+  Widget _flightPoi(BuildContext context, FlightInfo info) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (((flightInfo.overview)).trim().isNotEmpty) ...[
+          const SizedBox(height: 24),
+          Text('Overview', style: context.textTheme.title24Medium),
+          const SizedBox(height: 8),
+          Text(flightInfo.overview, style: context.textTheme.body18Regular),
+        ],
+        if ((flightInfo.poi.isNotEmpty)) ...[
+          const SizedBox(height: 24),
+          Text('You\'ll fly over', style: context.textTheme.title24Medium),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final poi in flightInfo.poi)
+                if (poi.name.trim().isNotEmpty) Chip(label: Text(poi.name)),
+            ],
+          ),
+        ],
+      ],
     );
   }
 
@@ -86,20 +142,14 @@ class FlightInfo extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: color,
-                ),
+                style: context.textTheme.body16Medium.copyWith(color: color),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
             '${airport.airportName}\n', // For 2 lines
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            style: context.textTheme.body16Regular,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),

@@ -106,14 +106,14 @@ class _FlightMapState extends State<FlightMap> {
     }
   }
 
-  void _fitMapToAirports() {
-    double zoomLevel = MapUtils.calculateZoomLevel(
-      departure: widget.flight.departure,
-      arrival: widget.flight.arrival,
+  // To avoid covering by bottom sheet
+  Future<void> _moveCameraToTop() async {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double shiftPx = screenHeight * 0.2;
+    await _mapController?.animateCamera(
+      CameraUpdate.scrollBy(0.0, -shiftPx),
+      duration: Duration(milliseconds: 0),
     );
-    final pos = CameraPosition(target: _center, zoom: zoomLevel);
-    final update = CameraUpdate.newCameraPosition(pos);
-    _mapController?.animateCamera(update);
   }
 
   void _onMapCreated(MapLibreMapController controller) {
@@ -124,17 +124,12 @@ class _FlightMapState extends State<FlightMap> {
     });
   }
 
-  void _onStyleLoaded() {
+  void _onStyleLoaded() async {
     _logger.log('Style loaded successfully');
     // Style loaded, can now add custom layers
     if (_mapReady) {
-      // Add a small delay to ensure style is fully loaded
-      Future.delayed(const Duration(milliseconds: 200), () {
-        if (mounted) {
-          _fitMapToAirports();
-          _addFlightMapLayers();
-        }
-      });
+      await _moveCameraToTop();
+      _addFlightMapLayers();
     }
   }
 

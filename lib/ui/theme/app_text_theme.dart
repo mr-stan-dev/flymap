@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 
 class AppTextTheme extends ThemeExtension<AppTextTheme> {
   const AppTextTheme({
-    required this.h1Bold,
-    required this.h2Bold,
     required this.h3Semibold,
     required this.h3Medium,
+    required this.title24Medium,
     required this.button18Bold,
     required this.body18Regular,
     required this.body16Semibold,
@@ -14,10 +13,9 @@ class AppTextTheme extends ThemeExtension<AppTextTheme> {
     required this.caption14Regular,
   });
 
-  final TextStyle h1Bold;
-  final TextStyle h2Bold;
   final TextStyle h3Semibold;
   final TextStyle h3Medium;
+  final TextStyle title24Medium;
   final TextStyle button18Bold;
   final TextStyle body18Regular;
   final TextStyle body16Semibold;
@@ -31,20 +29,6 @@ class AppTextTheme extends ThemeExtension<AppTextTheme> {
   //lineheight=fontSize * height so the height values
   //below are the style guide lineheight/fontSize
   static const textTheme = AppTextTheme(
-    h1Bold: TextStyle(
-      fontFamily: _textThemeArchivo,
-      fontWeight: FontWeight.w900,
-      fontSize: 74,
-      height: 80 / 74,
-      letterSpacing: 0.5,
-    ),
-    h2Bold: TextStyle(
-      fontFamily: _textThemeArchivo,
-      fontWeight: FontWeight.w900,
-      fontSize: 64,
-      height: 74 / 64,
-      letterSpacing: 0.5,
-    ),
     h3Semibold: TextStyle(
       fontFamily: _textFontRaleway,
       fontWeight: FontWeight.w600,
@@ -58,6 +42,13 @@ class AppTextTheme extends ThemeExtension<AppTextTheme> {
       fontSize: 28,
       height: 33 / 28,
       letterSpacing: 0.33,
+    ),
+    title24Medium: TextStyle(
+      fontFamily: _textFontRaleway,
+      fontWeight: FontWeight.w500,
+      fontSize: 24,
+      height: 28 / 24,
+      letterSpacing: 0.3,
     ),
     button18Bold: TextStyle(
       fontFamily: _textFontRaleway,
@@ -105,10 +96,9 @@ class AppTextTheme extends ThemeExtension<AppTextTheme> {
 
   @override
   ThemeExtension<AppTextTheme> copyWith({
-    TextStyle? h1Bold,
-    TextStyle? h2Bold,
     TextStyle? h3Semibold,
     TextStyle? h3Medium,
+    TextStyle? title24Medium,
     TextStyle? button18Bold,
     TextStyle? body18Regular,
     TextStyle? body16Semibold,
@@ -117,10 +107,9 @@ class AppTextTheme extends ThemeExtension<AppTextTheme> {
     TextStyle? caption14Regular,
   }) {
     return AppTextTheme(
-      h1Bold: h1Bold ?? this.h1Bold,
-      h2Bold: h2Bold ?? this.h2Bold,
       h3Semibold: h3Semibold ?? this.h3Semibold,
       h3Medium: h3Medium ?? this.h3Medium,
+      title24Medium: title24Medium ?? this.title24Medium,
       button18Bold: button18Bold ?? this.button18Bold,
       body18Regular: body18Regular ?? this.body18Regular,
       body16Semibold: body16Semibold ?? this.body16Semibold,
@@ -136,20 +125,32 @@ class AppTextTheme extends ThemeExtension<AppTextTheme> {
       return this;
     }
     return AppTextTheme(
-      h1Bold: TextStyle.lerp(h1Bold, other.h1Bold, t) ?? textTheme.h1Bold,
-      h2Bold: TextStyle.lerp(h2Bold, other.h2Bold, t) ?? textTheme.h2Bold,
-      h3Semibold: TextStyle.lerp(h3Semibold, other.h3Semibold, t) ?? textTheme.h3Semibold,
-      h3Medium: TextStyle.lerp(h3Medium, other.h3Medium, t) ?? textTheme.h3Medium,
-      button18Bold: TextStyle.lerp(button18Bold, other.button18Bold, t) ?? textTheme.button18Bold,
+      h3Semibold:
+          TextStyle.lerp(h3Semibold, other.h3Semibold, t) ??
+          textTheme.h3Semibold,
+      h3Medium:
+          TextStyle.lerp(h3Medium, other.h3Medium, t) ?? textTheme.h3Medium,
+      title24Medium:
+          TextStyle.lerp(title24Medium, other.title24Medium, t) ??
+          textTheme.title24Medium,
+      button18Bold:
+          TextStyle.lerp(button18Bold, other.button18Bold, t) ??
+          textTheme.button18Bold,
       body18Regular:
-          TextStyle.lerp(body18Regular, other.body18Regular, t) ?? textTheme.body18Regular,
+          TextStyle.lerp(body18Regular, other.body18Regular, t) ??
+          textTheme.body18Regular,
       body16Semibold:
-          TextStyle.lerp(body16Semibold, other.body16Semibold, t) ?? textTheme.body16Semibold,
-      body16Medium: TextStyle.lerp(body16Medium, other.body16Medium, t) ?? textTheme.body16Medium,
+          TextStyle.lerp(body16Semibold, other.body16Semibold, t) ??
+          textTheme.body16Semibold,
+      body16Medium:
+          TextStyle.lerp(body16Medium, other.body16Medium, t) ??
+          textTheme.body16Medium,
       body16Regular:
-          TextStyle.lerp(body16Regular, other.body16Regular, t) ?? textTheme.body16Regular,
+          TextStyle.lerp(body16Regular, other.body16Regular, t) ??
+          textTheme.body16Regular,
       caption14Regular:
-          TextStyle.lerp(caption14Regular, other.caption14Regular, t) ?? textTheme.caption14Regular,
+          TextStyle.lerp(caption14Regular, other.caption14Regular, t) ??
+          textTheme.caption14Regular,
     );
   }
 }

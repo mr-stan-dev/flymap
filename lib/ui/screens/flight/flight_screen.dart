@@ -171,8 +171,8 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
   Widget _buildBottomSheet(BuildContext context) {
     return DraggableScrollableSheet(
       controller: _bottomSheetController,
-      initialChildSize: 0.3,
-      minChildSize: 0.1,
+      initialChildSize: 0.5,
+      minChildSize: 0.2,
       maxChildSize: 0.9,
       builder: (context, scrollController) {
         return FlightBottomSheet(scrollController: scrollController);

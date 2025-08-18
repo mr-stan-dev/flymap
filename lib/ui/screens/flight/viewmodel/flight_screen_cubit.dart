@@ -18,6 +18,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   Timer? _gpsCheckTimer;
 
   FlightScreenCubit({required this.flight}) : super(FlightScreenLoading()) {
+    _logger.log('flight flightInfo: ${flight.flightInfo}');
     load();
   }
 
@@ -46,9 +47,6 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
           await file.delete();
         }
       }
-
-      // Delete map records from DB
-      await _repository.deleteMapsForFlight(flight.id);
 
       // Delete flight record from DB
       final ok = await _repository.deleteFlight(flight.id);

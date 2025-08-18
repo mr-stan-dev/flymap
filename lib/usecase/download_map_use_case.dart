@@ -3,15 +3,15 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flymap/data/great_circle_route_provider.dart';
-import 'package:flymap/data/local/app_database.dart';
-import 'package:flymap/data/local/flights_service.dart';
-import 'package:flymap/data/local/maps_service.dart';
+import 'package:flymap/data/local/flights_local_db_service.dart';
 import 'package:flymap/data/route_corridor_provider.dart';
 import 'package:flymap/data/tiles_downloader/vector_tiles_downloader.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight.dart';
+import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/map/flight_map.dart';
 import 'package:latlong2/latlong.dart';
+
 import '../logger.dart';
 
 sealed class DownloadMapEvent extends Equatable {
@@ -85,14 +85,12 @@ class DownloadMapVerifying extends DownloadMapEvent {
 }
 
 class DownloadMapUseCase {
-  final FlightsService _flightsService;
-  final MapsService _mapsService;
+  final FlightsLocalDBService _flightsService;
   final _logger = Logger('DownloadMapUseCase');
   VectorTilesDownloader? _currentDownloader;
 
-  DownloadMapUseCase({required AppDatabase database})
-    : _flightsService = FlightsService(database: database),
-      _mapsService = MapsService(database: database);
+  DownloadMapUseCase({required FlightsLocalDBService service})
+    : _flightsService = service;
 
   static const double defaultWidthKm = 100;
 
@@ -103,6 +101,7 @@ class DownloadMapUseCase {
   Stream<DownloadMapEvent> call({
     required Airport departure,
     required Airport arrival,
+    required FlightInfo flightInfo,
   }) async* {
     try {
       // Generate route and corridor
@@ -133,6 +132,7 @@ class DownloadMapUseCase {
             arrival: arrival,
             route: route,
             corridor: corridor,
+            flightInfo: flightInfo,
           );
 
           if (result.isSuccess) {
@@ -156,37 +156,35 @@ class DownloadMapUseCase {
     required Airport arrival,
     required List<LatLng> route,
     required List<LatLng> corridor,
+    required FlightInfo flightInfo,
   }) async {
     try {
       final mapFile = File(localFilePath);
       final mapSizeBytes = await mapFile.length();
 
       final mapData = FlightMap(
-        layer:
-            '${departure.code}_${arrival.code}_${DateTime.now().millisecondsSinceEpoch}',
+        layer: 'openfreemap_vector',
         sizeBytes: mapSizeBytes,
         downloadedAt: DateTime.now(),
         filePath: localFilePath,
       );
 
+      final id =
+          '${departure.code}_${arrival.code}_${DateTime.now().millisecondsSinceEpoch}';
       final flight = Flight(
-        id: mapData.layer,
+        id: id,
         departure: departure,
         arrival: arrival,
         waypoints: route,
         corridor: corridor,
         maps: [mapData],
+        flightInfo: flightInfo,
       );
 
       await _flightsService.insertFlight(flight);
-      await _mapsService.insertMapData(mapData);
 
       _logger.log('Flight saved successfully: \'${flight.id}\'');
-      _logger.log('Flight details: ${departure.code} to ${arrival.code}');
-      _logger.log('Map data saved: ${mapData.layer}');
-      _logger.log(
-        'MBTiles file: $localFilePath (${(mapSizeBytes / (1024 * 1024)).toStringAsFixed(2)}MB)',
-      );
+      _logger.log('Flight info: $flightInfo');
       return Result.success(flight: flight);
     } catch (e) {
       return Result.error('Failed to save flight data: $e');

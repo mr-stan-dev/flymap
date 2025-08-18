@@ -40,11 +40,6 @@ final class FlightScreenLoaded extends FlightScreenState {
   }
 
   @override
-  String toString() {
-    return 'Flight: ${flight.id}, gpsStatus: ${gpsStatus.name}';
-  }
-
-  @override
   List<Object?> get props => [flight, gpsStatus, gpsData];
 }
 

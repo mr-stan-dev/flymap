@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/info/flight_info_widget.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/map/flight_map_preview_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_cubit.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_downloading.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_info.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_map_preview.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
+import 'package:flymap/ui/theme/app_theme_ext.dart';
 import 'package:get_it/get_it.dart';
 
 class FlightPreviewScreen extends StatelessWidget {
@@ -27,7 +29,6 @@ class FlightPreviewScreen extends StatelessWidget {
         appBar: null,
         body: SafeArea(
           top: false,
-          bottom: false,
           child: BlocConsumer<FlightPreviewCubit, FlightPreviewState>(
             listener: (context, state) {
               // Check if database save is complete
@@ -70,6 +71,11 @@ class FlightPreviewScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'Calculating flight route...',
+            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Searching for interesting places...',
             style: TextStyle(fontSize: 16, color: Colors.grey[600]),
           ),
           const SizedBox(height: 8),
@@ -160,7 +166,10 @@ class FlightPreviewScreen extends StatelessWidget {
             children: [
               // Fullscreen map preview
               Positioned.fill(
-                child: FlightMapPreview(flightPreview: state.flightPreview),
+                child: FlightMapPreviewWidget(
+                  flightPreview: state.flightPreview,
+                  flightInfo: state.flightInfo,
+                ),
               ),
 
               // Top overlay app bar (transparent with gradient)
@@ -168,7 +177,7 @@ class FlightPreviewScreen extends StatelessWidget {
 
               // Draggable bottom sheet with flight info
               DraggableScrollableSheet(
-                initialChildSize: 0.3,
+                initialChildSize: 0.5,
                 minChildSize: 0.1,
                 maxChildSize: 0.9,
                 builder: (context, scrollController) {
@@ -202,7 +211,10 @@ class FlightPreviewScreen extends StatelessWidget {
                         Expanded(
                           child: SingleChildScrollView(
                             controller: scrollController,
-                            child: FlightInfo(airports: airports),
+                            child: FlightInfoWidget(
+                              airports: airports,
+                              flightInfo: state.flightInfo!,
+                            ),
                           ),
                         ),
                       ],
@@ -224,15 +236,18 @@ class FlightPreviewScreen extends StatelessWidget {
                   : () {
                       context.read<FlightPreviewCubit>().startDownload();
                     },
-              child: Text(
-                state.isTooLongFlight
-                    ? 'Too long flight (> 5000km)'
-                    : 'Download',
-              ),
+              child: _mainActionButton(context, state),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _mainActionButton(BuildContext context, FlightMapPreviewLoaded state) {
+    return Text(
+      state.isTooLongFlight ? 'Too long flight (> 5000km)' : 'Download',
+      style: context.textTheme.button18Bold,
     );
   }
 

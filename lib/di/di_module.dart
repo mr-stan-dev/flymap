@@ -1,6 +1,8 @@
 import 'package:flymap/data/api/get_poi_api.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/local/app_database.dart';
+import 'package:flymap/data/local/flight_info_mapper.dart';
+import 'package:flymap/data/local/flights_local_db_service.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/usecase/download_map_use_case.dart';
 import 'package:flymap/usecase/get_flight_info_use_case.dart';
@@ -15,23 +17,23 @@ class DiModule {
     // Register database
     i.registerLazySingleton<AppDatabase>(() => AppDatabase.instance);
 
-    i.registerLazySingleton<GetPoiApi>(
-          () => GetPoiApi(),
+    i.registerLazySingleton<GetPoiApi>(() => GetPoiApi());
+
+    i.registerLazySingleton<FlightInfoMapper>(() => FlightInfoMapper());
+
+    i.registerLazySingleton<FlightsLocalDBService>(
+      () => FlightsLocalDBService(database: i.get(), flightInfoMapper: i.get()),
     );
 
     i.registerLazySingleton<DownloadMapUseCase>(
-      () => DownloadMapUseCase(
-        database: GetIt.I.get(),
-      ),
+      () => DownloadMapUseCase(service: GetIt.I.get()),
     );
     i.registerLazySingleton<GetFlightInfoUseCase>(
-          () => GetFlightInfoUseCase(
-        getPoiApi: GetIt.I.get(),
-      ),
+      () => GetFlightInfoUseCase(getPoiApi: GetIt.I.get()),
     );
 
     i.registerLazySingleton<FlightRepository>(
-      () => FlightRepository(database: GetIt.I.get()),
+      () => FlightRepository(service: GetIt.I.get()),
     );
   }
 }

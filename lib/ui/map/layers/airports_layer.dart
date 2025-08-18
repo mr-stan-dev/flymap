@@ -5,7 +5,6 @@ import 'package:flymap/entity/airport.dart';
 import 'package:flymap/ui/map/layers/latlon_utils.dart';
 import 'package:flymap/ui/map/layers/map_layer.dart';
 import 'package:flymap/ui/theme/app_colours.dart';
-import 'package:latlong2/latlong.dart' as ll;
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 class AirportsLayer extends MapLayer {
@@ -32,7 +31,7 @@ class AirportsLayer extends MapLayer {
     textSize: 12.0,
     textOffset: const Offset(0, -1.5),
     textColor: Colors.white.toHexStringRGB(),
-    textHaloColor: Colors.black.toHexStringRGB(),
+    textHaloColor: AppColoursCommon.accentBlue.toHexStringRGB(),
     textHaloWidth: 2,
   );
 }

@@ -1,15 +1,16 @@
 import 'dart:async';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/great_circle_route_provider.dart';
 import 'package:flymap/data/route_corridor_provider.dart';
-import 'package:flymap/entity/flight_preview.dart';
+import 'package:flymap/entity/flight_info.dart';
+import 'package:flymap/entity/flight_route_preview.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 import 'package:flymap/usecase/download_map_use_case.dart';
 import 'package:flymap/usecase/get_flight_info_use_case.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
 
 /// Cubit for managing create_flight map preview state
@@ -66,12 +67,6 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
         widthKm: 100.0,
       );
 
-      final pois = await _getFlightInfoUseCase.call(coordinates: route);
-
-      pois.forEach((poi) {
-        _logger.log('poi: ${poi}');
-      });
-
       // Calculate appropriate zoom level
       final zoomLevel = MapUtils.calculateZoomLevel(
         departure: airports.departure,
@@ -85,14 +80,18 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
       );
       final isTooLong = routeDistanceKm > 5000.0;
 
+      if (!isTooLong) {
+        unawaited(_loadPoi(airports, route));
+      }
       emit(
         FlightMapPreviewLoaded(
-          flightPreview: FlightPreview(
+          flightPreview: FlightRoutePreview(
             departure: airports.departure,
             arrival: airports.arrival,
             waypoints: route,
             corridor: corridor,
           ),
+          flightInfo: FlightInfo.empty,
           currentZoom: zoomLevel,
           isTooLongFlight: isTooLong,
         ),
@@ -103,29 +102,50 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     }
   }
 
+  Future<void> _loadPoi(
+    FlightPreviewAirports airports,
+    List<LatLng> waypoints,
+  ) async {
+    try {
+      final flightInfo = await _getFlightInfoUseCase.call(
+        airportArrival: airports.arrival.name,
+        airportDeparture: airports.departure.name,
+        waypoints: waypoints,
+      );
+      _logger.log('Flight overview: ${flightInfo.overview}');
+      final currentState = state;
+      if (currentState is FlightMapPreviewLoaded && !isClosed) {
+        emit(currentState.copyWith(flightInfo: flightInfo));
+      }
+    } catch (e) {
+      _logger.error('_loadPoi error: $e');
+    }
+  }
+
   /// Update zoom level
   void updateZoom(double zoom) {
     final currentState = state;
     if (currentState is FlightMapPreviewLoaded) {
-      emit(
-        FlightMapPreviewLoaded(
-          flightPreview: currentState.flightPreview,
-          currentZoom: zoom,
-          isTooLongFlight: currentState.isTooLongFlight,
-        ),
-      );
+      emit(currentState.copyWith(currentZoom: zoom));
     }
   }
 
   /// Start the download process
   void startDownload() async {
     try {
+      final currentState = state as FlightMapPreviewLoaded;
+
       // Reset state and start creation phase
       emit(MapDownloadingState(progress: 0.0));
+      _logger.log('flightInfo (to save): ${currentState.flightInfo}');
 
       // Initialize offline manager
       _downloadSubscription = downloadMapUseCase
-          .call(departure: params.departure, arrival: params.arrival)
+          .call(
+            departure: params.departure,
+            arrival: params.arrival,
+            flightInfo: currentState.flightInfo,
+          )
           .listen((event) {
             // Handle different download events
             switch (event) {
