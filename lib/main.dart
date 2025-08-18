@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flymap/cubit_state_observer.dart';
 import 'package:flymap/data/local/app_database.dart';
 import 'package:flymap/data/glyphs_service.dart';
@@ -13,6 +14,7 @@ import 'ui/screens/settings/viewmodel/settings_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   // Register dependencies
   DiModule().register();
   await GlyphsService().copyGlyphsToCacheDir();

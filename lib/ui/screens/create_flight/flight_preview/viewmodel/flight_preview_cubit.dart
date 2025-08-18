@@ -3,21 +3,32 @@ import 'dart:async';
 import 'package:flymap/data/great_circle_route_provider.dart';
 import 'package:flymap/data/route_corridor_provider.dart';
 import 'package:flymap/entity/flight_preview.dart';
+import 'package:flymap/logger.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 import 'package:flymap/usecase/download_map_use_case.dart';
+import 'package:flymap/usecase/get_flight_info_use_case.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
 
+/// Cubit for managing create_flight map preview state
 class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   final FlightPreviewAirports params;
   final DownloadMapUseCase downloadMapUseCase;
+  final GetFlightInfoUseCase getFlightInfoUseCase;
+  final GetFlightInfoUseCase _getFlightInfoUseCase;
 
   StreamSubscription? _downloadSubscription;
 
-  FlightPreviewCubit({required this.params, required this.downloadMapUseCase})
-    : super(const FlightMapPreviewLoading()) {
+  final _logger = Logger('FlightPreviewCubit');
+
+  FlightPreviewCubit({
+    required this.params,
+    required this.downloadMapUseCase,
+    required this.getFlightInfoUseCase,
+  }) : _getFlightInfoUseCase = getFlightInfoUseCase,
+       super(const FlightMapPreviewLoading()) {
     _initialize(params);
   }
 
@@ -29,6 +40,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
       switch (params) {
         case FlightPreviewAirports():
           await _calculateRouteAndCorridor(params);
+          break;
       }
     } catch (e) {
       emit(FlightMapPreviewError('Error initializing: $e'));
@@ -54,13 +66,19 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
         widthKm: 100.0,
       );
 
+      final pois = await _getFlightInfoUseCase.call(coordinates: route);
+
+      pois.forEach((poi) {
+        _logger.log('poi: ${poi}');
+      });
+
       // Calculate appropriate zoom level
       final zoomLevel = MapUtils.calculateZoomLevel(
         departure: airports.departure,
         arrival: airports.arrival,
       );
 
-      // Calculate route length (km) using MapUtils (Haversine)
+      // Calculate route length (km)
       final routeDistanceKm = MapUtils.distance(
         departure: airports.departure,
         arrival: airports.arrival,
@@ -80,7 +98,8 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
         ),
       );
     } catch (e) {
-      emit(FlightMapPreviewError('Error calculating route: $e'));
+      _logger.error(e);
+      emit(FlightMapPreviewError('Error during flight preview'));
     }
   }
 

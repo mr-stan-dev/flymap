@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "719946747567",
+    "project_id": "flymap-app",
+    "storage_bucket": "flymap-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719946747567:android:77bfab4ecd8e0c3f338e5a",
+        "android_client_info": {
+          "package_name": "app.flymap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB83Fsr2PpcDc-T_gcGg6IK4LP9U-LAqYU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -21,6 +21,7 @@ class FlightPreviewScreen extends StatelessWidget {
       create: (context) => FlightPreviewCubit(
         params: airports,
         downloadMapUseCase: GetIt.I.get(),
+        getFlightInfoUseCase: GetIt.I.get(),
       ),
       child: Scaffold(
         appBar: AppBar(title: const Text('Flight preview')),
