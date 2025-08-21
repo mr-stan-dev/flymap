@@ -43,7 +43,7 @@ class HomeTabLoaded extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Your personal flight companion',
+                    'Discover as you fly - offline maps for flights',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: onSurface.withOpacity(0.6),
                     ),

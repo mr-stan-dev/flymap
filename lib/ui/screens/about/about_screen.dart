@@ -20,7 +20,7 @@ class AboutScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Offline maps for flights. Plan a route between airports and download vector tiles for seamless offline navigation during your flight.',
+              'Offline maps for flights. Plan a route between airports and download map for seamless offline navigation during your flight.',
               style: TextStyle(color: onSurface.withOpacity(0.8)),
             ),
             const SizedBox(height: 24),
@@ -34,7 +34,8 @@ class AboutScreen extends StatelessWidget {
             const Text('• Open the + button to create a flight.'),
             const Text('• Pick departure and arrival airports.'),
             const Text('• Preview the route and corridor on the map.'),
-            const Text('• Tap Download to save tiles for offline use.'),
+            const Text('• Read a short overview of what to expect to see.'),
+            const Text('• Tap Download to save map for offline use.'),
             const Text('• Open the flight from Home to view the offline map.'),
           ],
         ),

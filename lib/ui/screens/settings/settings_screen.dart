@@ -27,8 +27,22 @@ class _SettingsView extends StatelessWidget {
           if (state.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
+          final theme = Theme.of(context);
+          final sectionBg = theme.colorScheme.surfaceVariant;
           return ListView(
             children: [
+              // Appearance section
+              Container(
+                width: double.infinity,
+                color: sectionBg,
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                child: Text(
+                  'Appearance',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
               _SettingItem(
                 title: 'Theme',
                 subtitle: state.themeMode == ThemeMode.dark ? 'Dark' : 'Light',
@@ -50,6 +64,19 @@ class _SettingsView extends StatelessWidget {
                 },
               ),
               const Divider(height: 1),
+
+              // Units section
+              Container(
+                width: double.infinity,
+                color: sectionBg,
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                child: Text(
+                  'Units',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
               _SettingItem(
                 title: 'Altitude',
                 subtitle: state.altitudeUnit,
@@ -100,7 +127,19 @@ class _SettingsView extends StatelessWidget {
                   }
                 },
               ),
-              const Divider(height: 1),
+
+              // About section
+              Container(
+                width: double.infinity,
+                color: sectionBg,
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                child: Text(
+                  'About',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
               _SettingItem(
                 title: 'About',
                 subtitle: 'Learn more about the app',
