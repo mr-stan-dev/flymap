@@ -36,6 +36,7 @@ class _FlightMapState extends State<FlightMap> {
   final _logger = const Logger('FlightMapLoaded');
   bool _is3D = false;
   Circle? _userCircle;
+  bool _followUser = false;
 
   late final LatLng _center = LatLng(
     MapUtils.center(
@@ -97,11 +98,13 @@ class _FlightMapState extends State<FlightMap> {
     }
   }
 
-  void _animateToUserLocation() {
+  void _goToUserLocationAndFollow() {
     final userLoc = _userCircle?.options.geometry;
+    setState(() {
+      _followUser = true;
+    });
     if (userLoc != null) {
-      final pos = CameraPosition(target: userLoc, zoom: 5);
-      final update = CameraUpdate.newCameraPosition(pos);
+      final update = CameraUpdate.newLatLng(userLoc);
       _mapController?.animateCamera(update);
     }
   }
@@ -149,6 +152,7 @@ class _FlightMapState extends State<FlightMap> {
     if (!_mapReady || _mapController == null) return;
     final lat = data.latitude;
     final lon = data.longitude;
+    _logger.log('updateUserLocation lat: $lat, lon: $lon');
     if (lat == null || lon == null) return;
     final pos = LatLng(lat, lon);
     if (_userCircle == null) {
@@ -158,6 +162,9 @@ class _FlightMapState extends State<FlightMap> {
         _userCircle!,
         CircleOptions(geometry: pos),
       );
+    }
+    if (_followUser) {
+      await _mapController?.animateCamera(CameraUpdate.newLatLng(pos));
     }
   }
 
@@ -191,11 +198,22 @@ class _FlightMapState extends State<FlightMap> {
       },
       child: Stack(
         children: [
-          MapLibreMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(target: _center, zoom: zoom),
-            styleString: _styleString!,
-            onStyleLoadedCallback: _onStyleLoaded,
+          Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (_) {
+              if (_followUser) {
+                setState(() => _followUser = false);
+              }
+            },
+            child: MapLibreMap(
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: _center,
+                zoom: zoom,
+              ),
+              styleString: _styleString!,
+              onStyleLoadedCallback: _onStyleLoaded,
+            ),
           ),
 
           // Zoom/3D controls
@@ -217,7 +235,7 @@ class _FlightMapState extends State<FlightMap> {
                     } else {
                       // Switch to 3D with a modest tilt
                       await _mapController?.animateCamera(
-                        CameraUpdate.tiltTo(30),
+                        CameraUpdate.tiltTo(45),
                       );
                     }
                     if (mounted) setState(() => _is3D = !_is3D);
@@ -233,8 +251,10 @@ class _FlightMapState extends State<FlightMap> {
                   backgroundColor: Colors.black.withValues(alpha: 0.3),
                   foregroundColor: Colors.white,
                   mini: true,
-                  onPressed: _animateToUserLocation,
-                  child: const Icon(Icons.my_location),
+                  onPressed: _goToUserLocationAndFollow,
+                  child: Icon(
+                    _followUser ? Icons.gps_fixed : Icons.gps_not_fixed,
+                  ),
                 ),
               ],
             ),
