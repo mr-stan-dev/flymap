@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flymap/entity/airport.dart';
+import 'package:flymap/entity/flight_route.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapUtils {
@@ -58,6 +59,18 @@ class MapUtils {
     } else {
       return 14.0; // Building level
     }
+  }
+
+  static LatLng routeCenter(FlightRoute route) {
+    final lat = (route.departure.latLon.latitude + route.arrival.latLon.latitude) / 2;
+
+    // Handle longitude wrapping for antimeridian crossing
+    final lon = _calculateCenterLongitude(
+      route.departure.latLon.longitude,
+      route.arrival.latLon.longitude,
+    );
+
+    return LatLng(lat, lon);
   }
 
   /// Calculate center point between two airports, handling antimeridian crossing

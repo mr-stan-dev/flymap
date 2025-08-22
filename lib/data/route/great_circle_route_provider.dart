@@ -1,21 +1,38 @@
 import 'dart:math';
+
+import 'package:flymap/data/route/flight_route_provider.dart';
+import 'package:flymap/data/route/route_corridor_provider.dart';
+import 'package:flymap/entity/airport.dart';
+import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:latlong2/latlong.dart';
 
 /// Provider for calculating great circle routes between two points
-class GreatCircleRouteProvider {
-  /// Calculate a great circle route between two points
-  ///
-  /// [start] - Starting point coordinates
-  /// [end] - Ending point coordinates
-  /// [segments] - Number of segments to divide the route into
-  /// Returns a list of coordinates representing the route
+class GreatCircleRouteProvider implements FlightRouteProvider {
+  final corridorProvider = RouteCorridorProvider();
+  static const _wayPointDensityKm = 100;
+
+  @override
+  FlightRoute getRoute({required Airport departure, required Airport arrival}) {
+    final waypoints = calculateRoute(departure.latLon, arrival.latLon);
+    final corridor = corridorProvider.calculateCorridor(
+      waypoints,
+      widthKm: 100,
+    );
+    return FlightRoute(
+      departure: departure,
+      arrival: arrival,
+      waypoints: waypoints,
+      corridor: corridor,
+    );
+  }
+
   List<LatLng> calculateRoute(LatLng start, LatLng end) {
     List<LatLng> route = [];
 
     final distanceKm = MapUtils.distanceKm(departure: start, arrival: end);
 
-    final segments = (distanceKm / 100).round(); // 1 point per 100 km
+    final segments = (distanceKm / _wayPointDensityKm).round();
 
     for (int i = 0; i <= segments; i++) {
       final fraction = i / segments;

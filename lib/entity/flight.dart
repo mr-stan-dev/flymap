@@ -31,10 +31,6 @@ class Flight extends Equatable {
   String get routeName =>
       '${departure.city}, ${departure.countryCode} - ${arrival.city}, ${arrival.countryCode}';
 
-  double get distanceInKm {
-    return MapUtils.distance(departure: departure, arrival: arrival);
-  }
-
   @override
   List<Object?> get props => [id, route, maps, info];
 }

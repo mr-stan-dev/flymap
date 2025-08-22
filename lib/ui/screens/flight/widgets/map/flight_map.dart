@@ -122,9 +122,21 @@ class _FlightMapState extends State<FlightMap> {
   void _onMapCreated(MapLibreMapController controller) {
     _logger.log('Map created successfully');
     _mapController = controller;
+
+    _mapController!.onSymbolTapped.add(_onSymbolTapped);
+
     setState(() {
       _mapReady = true;
     });
+  }
+
+  void _onSymbolTapped(Symbol symbol) {
+    // Example: stop follow and log tapped airport
+    if (_followUser) setState(() => _followUser = false);
+
+    _logger.log(
+      'Symbol tapped: id=${symbol.id} text=${symbol.options.textField}',
+    );
   }
 
   void _onStyleLoaded() async {
@@ -266,6 +278,7 @@ class _FlightMapState extends State<FlightMap> {
 
   @override
   void dispose() {
+    _mapController?.onSymbolTapped.remove(_onSymbolTapped);
     // Properly dispose of the map controller to close connections
     if (_mapController != null) {
       _mapController!.dispose();

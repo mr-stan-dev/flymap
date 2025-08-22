@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flymap/data/great_circle_route_provider.dart';
-import 'package:flymap/data/route_corridor_provider.dart';
+import 'package:flymap/data/route/flight_route_provider.dart';
+import 'package:flymap/data/route/great_circle_route_provider.dart';
+import 'package:flymap/data/route/route_corridor_provider.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/logger.dart';
@@ -16,6 +17,7 @@ import 'package:latlong2/latlong.dart';
 /// Cubit for managing create_flight map preview state
 class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   final FlightPreviewAirports params;
+  final FlightRouteProvider _routeProvider;
   final DownloadMapUseCase downloadMapUseCase;
   final GetFlightInfoUseCase getFlightInfoUseCase;
   final GetFlightInfoUseCase _getFlightInfoUseCase;
@@ -26,9 +28,11 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
 
   FlightPreviewCubit({
     required this.params,
+    required FlightRouteProvider routeProvider,
     required this.downloadMapUseCase,
     required this.getFlightInfoUseCase,
-  }) : _getFlightInfoUseCase = getFlightInfoUseCase,
+  }) : _routeProvider = routeProvider,
+       _getFlightInfoUseCase = getFlightInfoUseCase,
        super(const FlightMapPreviewLoading()) {
     _initialize(params);
   }
@@ -53,45 +57,30 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     FlightPreviewAirports airports,
   ) async {
     try {
-      // Generate great circle route
-      final routeProvider = GreatCircleRouteProvider();
-      final route = routeProvider.calculateRoute(
-        airports.departure.latLon,
-        airports.arrival.latLon,
+      final route = _routeProvider.getRoute(
+        departure: airports.departure,
+        arrival: airports.arrival,
       );
 
-      // Generate corridor
-      final corridorProvider = RouteCorridorProvider();
-      final corridor = corridorProvider.calculateCorridor(
-        route,
-        widthKm: 100.0,
-      );
-
-      // Calculate appropriate zoom level
       final zoomLevel = MapUtils.calculateZoomLevel(
         departure: airports.departure,
         arrival: airports.arrival,
       );
 
-      // Calculate route length (km)
-      final routeDistanceKm = MapUtils.distance(
-        departure: airports.departure,
-        arrival: airports.arrival,
-      );
-      final isTooLong = routeDistanceKm > 5000.0;
+      final isTooLong = route.distanceInKm > 5000.0;
 
       if (!isTooLong) {
-        unawaited(_loadFlightOverview(airports, route));
+        unawaited(_loadFlightOverview(route));
       }
       emit(
         FlightMapPreviewLoaded(
-          flightPreview: FlightRoute(
-            departure: airports.departure,
-            arrival: airports.arrival,
-            waypoints: route,
-            corridor: corridor,
-          ),
-          flightInfo: isTooLong ? FlightInfo('Right now, flights longer than 5,000 km aren’t calculated as accurately as we’d like - but we’re working hard to make sure long flights are supported soon!', []) : FlightInfo.empty,
+          flightRoute: route,
+          flightInfo: isTooLong
+              ? FlightInfo(
+                  'Right now, flights longer than 5,000 km aren’t calculated as accurately as we’d like - but we’re working hard to make sure long flights are supported soon!',
+                  [],
+                )
+              : FlightInfo.empty,
           currentZoom: zoomLevel,
           isTooLongFlight: isTooLong,
         ),
@@ -102,15 +91,12 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     }
   }
 
-  Future<void> _loadFlightOverview(
-    FlightPreviewAirports airports,
-    List<LatLng> waypoints,
-  ) async {
+  Future<void> _loadFlightOverview(FlightRoute route) async {
     try {
       final flightInfo = await _getFlightInfoUseCase.call(
-        airportArrival: airports.arrival.name,
-        airportDeparture: airports.departure.name,
-        waypoints: waypoints,
+        airportArrival: route.arrival.name,
+        airportDeparture: route.departure.name,
+        waypoints: route.waypoints,
       );
       _logger.log('Flight overview: ${flightInfo.overview}');
       final currentState = state;

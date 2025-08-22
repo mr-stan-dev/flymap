@@ -17,26 +17,26 @@ final class FlightMapPreviewLoading extends FlightPreviewState {
 
 /// Route and corridor calculated successfully
 final class FlightMapPreviewLoaded extends FlightPreviewState {
-  final FlightRoute flightPreview;
+  final FlightRoute flightRoute;
   final FlightInfo flightInfo;
   final double currentZoom;
   final bool isTooLongFlight;
 
   const FlightMapPreviewLoaded({
-    required this.flightPreview,
+    required this.flightRoute,
     required this.flightInfo,
     required this.currentZoom,
     required this.isTooLongFlight,
   });
 
   FlightMapPreviewLoaded copyWith({
-    FlightRoute? flightPreview,
+    FlightRoute? flightRoute,
     FlightInfo? flightInfo,
     double? currentZoom,
     bool? isTooLongFlight,
   }) {
     return FlightMapPreviewLoaded(
-      flightPreview: flightPreview ?? this.flightPreview,
+      flightRoute: flightRoute ?? this.flightRoute,
       flightInfo: flightInfo ?? this.flightInfo,
       currentZoom: currentZoom ?? this.currentZoom,
       isTooLongFlight: isTooLongFlight ?? this.isTooLongFlight,
@@ -45,7 +45,7 @@ final class FlightMapPreviewLoaded extends FlightPreviewState {
 
   @override
   List<Object?> get props => [
-    flightPreview,
+    flightRoute,
     flightInfo,
     currentZoom,
     isTooLongFlight,

@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:latlong2/latlong.dart';
-import '../logger.dart';
+import '../../logger.dart';
 
 /// Provider for calculating route corridors around create_flight paths
 class RouteCorridorProvider {

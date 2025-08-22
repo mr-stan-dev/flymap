@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
-import 'package:flymap/data/great_circle_route_provider.dart';
+import 'package:flymap/data/route/great_circle_route_provider.dart';
 import 'package:flymap/data/local/flights_local_db_service.dart';
-import 'package:flymap/data/route_corridor_provider.dart';
+import 'package:flymap/data/route/route_corridor_provider.dart';
 import 'package:flymap/data/tiles_downloader/vector_tiles_downloader.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight.dart';

@@ -5,6 +5,7 @@ import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/ui/map/layers/airports_layer.dart';
 import 'package:flymap/ui/map/layers/corridor_layer.dart';
 import 'package:flymap/ui/map/layers/dimming_layer.dart';
+import 'package:flymap/ui/map/layers/latlon_utils.dart';
 import 'package:flymap/ui/map/layers/poi_layer.dart';
 import 'package:flymap/ui/map/layers/waypoints_layer.dart';
 import 'package:flymap/ui/map/map_utils.dart';
@@ -13,12 +14,12 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 class FlightMapPreviewWidget extends StatefulWidget {
-  final FlightRoute flightPreview;
+  final FlightRoute flightRoute;
   final FlightInfo flightInfo;
 
   const FlightMapPreviewWidget({
     super.key,
-    required this.flightPreview,
+    required this.flightRoute,
     required this.flightInfo,
   });
 
@@ -29,18 +30,9 @@ class FlightMapPreviewWidget extends StatefulWidget {
 class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
   MapLibreMapController? _mapController;
   bool _mapReady = false;
-  late final FlightRoute preview = widget.flightPreview;
+  late final FlightRoute route = widget.flightRoute;
 
-  late final LatLng _center = LatLng(
-    MapUtils.center(
-      departure: preview.departure,
-      arrival: preview.arrival,
-    ).latitude,
-    MapUtils.center(
-      departure: preview.departure,
-      arrival: preview.arrival,
-    ).longitude,
-  );
+  late final LatLng _center = MapUtils.routeCenter(widget.flightRoute).toMapLatLon();
 
   // To avoid covering by bottom sheet
   Future<void> _moveCameraToTop() async {
@@ -74,18 +66,18 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
 
   Future<void> _addFlightMapLayers(MapLibreMapController controller) async {
     [
-      CorridorLayer(preview.corridor),
-      WaypointsLayer(preview.waypoints),
-      DimmingLayer(preview.corridor),
-      AirportsLayer(departure: preview.departure, arrival: preview.arrival),
+      CorridorLayer(route.corridor),
+      WaypointsLayer(route.waypoints),
+      DimmingLayer(route.corridor),
+      AirportsLayer(departure: route.departure, arrival: route.arrival),
     ].forEach((layer) => layer.add(controller));
   }
 
   @override
   Widget build(BuildContext context) {
     double zoom = MapUtils.calculateZoomLevel(
-      departure: preview.departure,
-      arrival: preview.arrival,
+      departure: route.departure,
+      arrival: route.arrival,
     );
     return BlocListener<FlightPreviewCubit, FlightPreviewState>(
       listener: (context, state) {

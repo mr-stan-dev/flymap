@@ -22,6 +22,7 @@ class FlightPreviewScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => FlightPreviewCubit(
         params: airports,
+        routeProvider: GetIt.I.get(),
         downloadMapUseCase: GetIt.I.get(),
         getFlightInfoUseCase: GetIt.I.get(),
       ),
@@ -167,7 +168,7 @@ class FlightPreviewScreen extends StatelessWidget {
               // Fullscreen map preview
               Positioned.fill(
                 child: FlightMapPreviewWidget(
-                  flightPreview: state.flightPreview,
+                  flightRoute: state.flightRoute,
                   flightInfo: state.flightInfo,
                 ),
               ),
@@ -288,7 +289,7 @@ class FlightPreviewScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '${state.flightPreview.departure.displayCode}-${state.flightPreview.arrival.displayCode}',
+                        '${state.flightRoute.departure.displayCode}-${state.flightRoute.arrival.displayCode}',
                         style: const TextStyle(
                           color: overlayTextColor,
                           fontSize: 18,
