@@ -119,7 +119,7 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '${state.flight.departure.code}-${state.flight.arrival.code}',
+                        '${state.flight.departure.displayCode}-${state.flight.arrival.displayCode}',
                         style: const TextStyle(
                           color: overlayTextColor,
                           fontSize: 18,
@@ -127,7 +127,7 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
                         ),
                       ),
                       Text(
-                        state.flight.route,
+                        state.flight.routeName,
                         style: TextStyle(
                           color: overlayTextColor.withOpacity(0.85),
                           fontSize: 14,

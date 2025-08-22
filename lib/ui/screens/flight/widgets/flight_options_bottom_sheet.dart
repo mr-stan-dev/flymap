@@ -90,7 +90,7 @@ class FlightOptionsBottomSheet extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: const Text('Delete Flight'),
         content: Text(
-          'Are you sure you want to delete this flight (${flight.departure.code}-${flight.arrival.code})? This action cannot be undone.',
+          'Are you sure you want to delete this flight (${flight.departure.displayCode}-${flight.arrival.displayCode})? This action cannot be undone.',
         ),
         actions: [
           TextButton(

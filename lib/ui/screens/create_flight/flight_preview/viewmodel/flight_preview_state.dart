@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flymap/entity/flight_info.dart';
-import 'package:flymap/entity/flight_route_preview.dart';
+import 'package:flymap/entity/flight_route.dart';
 import 'package:latlong2/latlong.dart';
 
 sealed class FlightPreviewState extends Equatable {
@@ -17,7 +17,7 @@ final class FlightMapPreviewLoading extends FlightPreviewState {
 
 /// Route and corridor calculated successfully
 final class FlightMapPreviewLoaded extends FlightPreviewState {
-  final FlightRoutePreview flightPreview;
+  final FlightRoute flightPreview;
   final FlightInfo flightInfo;
   final double currentZoom;
   final bool isTooLongFlight;
@@ -30,7 +30,7 @@ final class FlightMapPreviewLoaded extends FlightPreviewState {
   });
 
   FlightMapPreviewLoaded copyWith({
-    FlightRoutePreview? flightPreview,
+    FlightRoute? flightPreview,
     FlightInfo? flightInfo,
     double? currentZoom,
     bool? isTooLongFlight,

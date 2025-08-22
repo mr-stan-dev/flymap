@@ -182,7 +182,7 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
                 color: Theme.of(context).colorScheme.primary,
               ),
               label: Text(
-                '${departure.city} (${departure.code}) → ${arrival.city} (${arrival.code})',
+                '${departure.city} (${departure.displayCode}) → ${arrival.city} (${arrival.displayCode})',
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -206,8 +206,8 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
 
   void _fillTextFieldsAndContinue(Airport departure, Airport arrival) {
     // Fill the text fields with the airports
-    _departureController.text = '${departure.name} (${departure.code})';
-    _arrivalController.text = '${arrival.name} (${arrival.code})';
+    _departureController.text = '${departure.name} (${departure.displayCode})';
+    _arrivalController.text = '${arrival.name} (${arrival.displayCode})';
 
     // Update selected airports
     setState(() {
@@ -263,7 +263,7 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
             ),
             const SizedBox(height: 8),
             Text(
-              'From ${state.departure.code} to ${state.arrival.code}',
+              'From ${state.departure.displayCode} to ${state.arrival.displayCode}',
               style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
             ),
           ],

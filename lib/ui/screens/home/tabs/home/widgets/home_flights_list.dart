@@ -47,8 +47,9 @@ class HomeFlightsList extends StatelessWidget {
           child: _buildActivityCard(
             context,
             flight: flight,
-            title: flight.route,
-            subtitle: '${flight.departure.code} - ${flight.arrival.code}',
+            title: flight.routeName,
+            subtitle:
+                '${flight.departure.displayCode} - ${flight.arrival.displayCode}',
           ),
         );
       },

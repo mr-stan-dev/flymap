@@ -61,7 +61,7 @@ class FlightDownloading extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  '${airports.departure.code}-${airports.arrival.code}',
+                  '${airports.departure.displayCode}-${airports.arrival.displayCode}',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

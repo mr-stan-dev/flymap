@@ -40,7 +40,7 @@ class _AirportAutocompleteFieldState extends State<AirportAutocompleteField> {
 
     if (widget.initialAirport != null) {
       _controller.text =
-          '${widget.initialAirport!.airportName} (${widget.initialAirport!.code})';
+          '${widget.initialAirport!.airportName} (${widget.initialAirport!.displayCode})';
     }
 
     _controller.addListener(() {
@@ -137,10 +137,11 @@ class _AirportAutocompleteFieldState extends State<AirportAutocompleteField> {
                 return const Iterable<Airport>.empty();
               },
               displayStringForOption: (Airport airport) {
-                return '${airport.airportName} (${airport.code}) - ${airport.city}, ${airport.countryCode}';
+                return '${airport.airportName} (${airport.displayCode}) - ${airport.city}, ${airport.countryCode}';
               },
               onSelected: (Airport airport) {
-                _controller.text = '${airport.airportName} (${airport.code})';
+                _controller.text =
+                    '${airport.airportName} (${airport.displayCode})';
                 widget.onAirportSelected(airport);
               },
               optionsViewBuilder: (context, onSelected, options) {
@@ -169,7 +170,7 @@ class _AirportAutocompleteFieldState extends State<AirportAutocompleteField> {
                         final airport = state.airports[index];
                         return ListTile(
                           title: Text(
-                            '${airport.airportName} (${airport.code})',
+                            '${airport.airportName} (${airport.displayCode})',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(

@@ -54,7 +54,7 @@ class HomeTabCubit extends Cubit<HomeTabState> {
   Future<List<Flight>> _loadFlights() async {
     try {
       final flights = await _repository.getAllFlights();
-      _logger.log('flightInfo: ${flights.first.flightInfo}');
+      _logger.log('flightInfo: ${flights.first.info}');
       _logger.log('Loaded ${flights.length} flights from database');
       // Just return all flights; optionally sort by id (timestamp-based) descending
       final sorted = [...flights]..sort((a, b) => b.id.compareTo(a.id));

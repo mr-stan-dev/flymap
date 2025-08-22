@@ -3,31 +3,32 @@ import 'package:flymap/ui/map/map_utils.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'airport.dart';
-import 'map/flight_map.dart';
+import 'flight_map.dart';
 import 'flight_info.dart';
+import 'flight_route.dart';
 
 class Flight extends Equatable {
   final String id;
-  final Airport departure;
-  final Airport arrival;
-  final List<LatLng> waypoints;
-  final List<LatLng> corridor;
+  final FlightRoute route;
   final List<FlightMap> maps;
-  final FlightInfo flightInfo;
+  final FlightInfo info;
 
   const Flight({
     required this.id,
-    required this.departure,
-    required this.arrival,
-    this.waypoints = const [],
-    this.corridor = const [],
+    required this.route,
     this.maps = const [],
-    required this.flightInfo,
+    required this.info,
   });
 
   FlightMap? get flightMap => maps.isNotEmpty ? maps[0] : null;
 
-  String get route =>
+  // Convenience getters to reduce refactor blast radius
+  Airport get departure => route.departure;
+  Airport get arrival => route.arrival;
+  List<LatLng> get waypoints => route.waypoints;
+  List<LatLng> get corridor => route.corridor;
+
+  String get routeName =>
       '${departure.city}, ${departure.countryCode} - ${arrival.city}, ${arrival.countryCode}';
 
   double get distanceInKm {
@@ -35,13 +36,5 @@ class Flight extends Equatable {
   }
 
   @override
-  List<Object?> get props => [
-    id,
-    departure,
-    arrival,
-    waypoints.length,
-    corridor.length,
-    maps,
-    flightInfo,
-  ];
+  List<Object?> get props => [id, route, maps, info];
 }

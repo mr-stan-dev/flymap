@@ -152,9 +152,7 @@ class _FlightMapState extends State<FlightMap> {
     if (lat == null || lon == null) return;
     final pos = LatLng(lat, lon);
     if (_userCircle == null) {
-      _userCircle = await _mapController!.addCircle(
-        UserLayer(pos).userOptions
-      );
+      _userCircle = await _mapController!.addCircle(UserLayer(pos).userOptions);
     } else {
       await _mapController!.updateCircle(
         _userCircle!,
@@ -219,20 +217,24 @@ class _FlightMapState extends State<FlightMap> {
                     } else {
                       // Switch to 3D with a modest tilt
                       await _mapController?.animateCamera(
-                        CameraUpdate.tiltTo(50.0),
+                        CameraUpdate.tiltTo(30),
                       );
                     }
                     if (mounted) setState(() => _is3D = !_is3D);
                   },
-                  child: Text(_is3D ? '2D' : '3D'),
+                  child: Icon(
+                    _is3D
+                        ? Icons.threed_rotation
+                        : Icons.threed_rotation_outlined,
+                  ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 FloatingActionButton(
                   backgroundColor: Colors.black.withValues(alpha: 0.3),
                   foregroundColor: Colors.white,
                   mini: true,
                   onPressed: _animateToUserLocation,
-                  child: Icon(Icons.my_location),
+                  child: const Icon(Icons.my_location),
                 ),
               ],
             ),

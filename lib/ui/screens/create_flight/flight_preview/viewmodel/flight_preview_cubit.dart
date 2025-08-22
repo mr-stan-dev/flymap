@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/great_circle_route_provider.dart';
 import 'package:flymap/data/route_corridor_provider.dart';
 import 'package:flymap/entity/flight_info.dart';
-import 'package:flymap/entity/flight_route_preview.dart';
+import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
@@ -85,7 +85,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
       }
       emit(
         FlightMapPreviewLoaded(
-          flightPreview: FlightRoutePreview(
+          flightPreview: FlightRoute(
             departure: airports.departure,
             arrival: airports.arrival,
             waypoints: route,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight_info.dart';
-import 'package:flymap/entity/flight_route_preview.dart';
+import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/ui/map/layers/airports_layer.dart';
 import 'package:flymap/ui/map/layers/corridor_layer.dart';
 import 'package:flymap/ui/map/layers/dimming_layer.dart';
@@ -13,7 +13,7 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 class FlightMapPreviewWidget extends StatefulWidget {
-  final FlightRoutePreview flightPreview;
+  final FlightRoute flightPreview;
   final FlightInfo flightInfo;
 
   const FlightMapPreviewWidget({
@@ -29,7 +29,7 @@ class FlightMapPreviewWidget extends StatefulWidget {
 class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
   MapLibreMapController? _mapController;
   bool _mapReady = false;
-  late final FlightRoutePreview preview = widget.flightPreview;
+  late final FlightRoute preview = widget.flightPreview;
 
   late final LatLng _center = LatLng(
     MapUtils.center(

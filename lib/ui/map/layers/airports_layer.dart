@@ -27,7 +27,7 @@ class AirportsLayer extends MapLayer {
     iconImage: 'airport',
     iconSize: 1.0,
     fontNames: ['Noto Sans Bold'],
-    textField: airport.code,
+    textField: airport.displayCode,
     textSize: 12.0,
     textOffset: const Offset(0, -1.5),
     textColor: Colors.white.toHexStringRGB(),

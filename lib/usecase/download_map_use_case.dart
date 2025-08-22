@@ -9,8 +9,9 @@ import 'package:flymap/data/tiles_downloader/vector_tiles_downloader.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/flight_info.dart';
-import 'package:flymap/entity/map/flight_map.dart';
+import 'package:flymap/entity/flight_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:flymap/entity/flight_route.dart';
 
 import '../logger.dart';
 
@@ -170,15 +171,17 @@ class DownloadMapUseCase {
       );
 
       final id =
-          '${departure.code}_${arrival.code}_${DateTime.now().millisecondsSinceEpoch}';
+          '${departure.icaoCode}_${arrival.icaoCode}_${DateTime.now().millisecondsSinceEpoch}';
       final flight = Flight(
         id: id,
-        departure: departure,
-        arrival: arrival,
-        waypoints: route,
-        corridor: corridor,
+        route: FlightRoute(
+          departure: departure,
+          arrival: arrival,
+          waypoints: route,
+          corridor: corridor,
+        ),
         maps: [mapData],
-        flightInfo: flightInfo,
+        info: flightInfo,
       );
 
       await _flightsService.insertFlight(flight);

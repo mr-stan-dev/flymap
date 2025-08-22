@@ -18,7 +18,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   Timer? _gpsCheckTimer;
 
   FlightScreenCubit({required this.flight}) : super(FlightScreenLoading()) {
-    _logger.log('flight flightInfo: ${flight.flightInfo}');
+    _logger.log('flight flightInfo: ${flight.info}');
     load();
   }
 

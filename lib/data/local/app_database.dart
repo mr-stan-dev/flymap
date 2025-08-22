@@ -22,7 +22,7 @@ class AppDatabase {
       _database = await databaseFactoryIo.openDatabase(dbPath);
 
       // Initialize stores
-      _flightsStore = stringMapStoreFactory.store('flights');
+      _flightsStore = stringMapStoreFactory.store('flights_v1');
     }
   }
 

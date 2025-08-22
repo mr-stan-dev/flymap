@@ -80,7 +80,7 @@ class FlightPreviewScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '${airports.departure.code} → ${airports.arrival.code}',
+            '${airports.departure.displayCode} → ${airports.arrival.displayCode}',
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
         ],
@@ -288,7 +288,7 @@ class FlightPreviewScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '${state.flightPreview.departure.code}-${state.flightPreview.arrival.code}',
+                        '${state.flightPreview.departure.displayCode}-${state.flightPreview.arrival.displayCode}',
                         style: const TextStyle(
                           color: overlayTextColor,
                           fontSize: 18,

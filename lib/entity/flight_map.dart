@@ -23,9 +23,7 @@ class FlightMap extends Equatable {
   }
 
   factory FlightMap.fromMap(Map<String, dynamic> map) {
-    // Backward compatibility: older records may use 'flightId' and store files in 'mapFiles'
-    final String resolvedLayer =
-        (map['layer'] as String?) ?? (map['flightId'] as String);
+    final String resolvedLayer = map['layer'] as String;
 
     String? resolvedFilePath = map['filePath'] as String?;
     if (resolvedFilePath == null) {
