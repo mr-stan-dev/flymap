@@ -81,7 +81,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
       final isTooLong = routeDistanceKm > 5000.0;
 
       if (!isTooLong) {
-        unawaited(_loadPoi(airports, route));
+        unawaited(_loadFlightOverview(airports, route));
       }
       emit(
         FlightMapPreviewLoaded(
@@ -91,7 +91,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
             waypoints: route,
             corridor: corridor,
           ),
-          flightInfo: FlightInfo.empty,
+          flightInfo: isTooLong ? FlightInfo('Right now, flights longer than 5,000 km aren’t calculated as accurately as we’d like - but we’re working hard to make sure long flights are supported soon!', []) : FlightInfo.empty,
           currentZoom: zoomLevel,
           isTooLongFlight: isTooLong,
         ),
@@ -102,7 +102,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     }
   }
 
-  Future<void> _loadPoi(
+  Future<void> _loadFlightOverview(
     FlightPreviewAirports airports,
     List<LatLng> waypoints,
   ) async {

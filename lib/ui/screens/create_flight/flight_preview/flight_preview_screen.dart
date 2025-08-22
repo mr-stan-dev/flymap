@@ -213,7 +213,7 @@ class FlightPreviewScreen extends StatelessWidget {
                             controller: scrollController,
                             child: FlightInfoWidget(
                               airports: airports,
-                              flightInfo: state.flightInfo!,
+                              flightInfo: state.flightInfo,
                             ),
                           ),
                         ),
