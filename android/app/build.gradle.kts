@@ -35,8 +35,8 @@ android {
         applicationId = "app.flymap"
         minSdk = 23
         targetSdk = 35
-        versionCode = 3
-        versionName = "0.0.3"
+        versionCode = 4
+        versionName = "0.0.4"
         ndkVersion = "28.1.13356709"
     }
 
