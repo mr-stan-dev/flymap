@@ -81,7 +81,7 @@ class AirportsDatabase implements IAirportsDb {
             name: name,
             latLon: LatLng(lat, lon),
             city: city,
-            country: country,
+            countryCode: country,
             iataCode: iata,
             icaoCode: icao,
             wikipediaUrl: wiki,
@@ -117,7 +117,7 @@ class AirportsDatabase implements IAirportsDb {
     final results = <Airport>[];
 
     for (final airport in _airports) {
-      if (airport.airportName.toUpperCase().contains(upperQuery) ||
+      if (airport.name.toUpperCase().contains(upperQuery) ||
           airport.city.toUpperCase().contains(upperQuery) ||
           airport.displayCode.toUpperCase().contains(upperQuery)) {
         results.add(airport);

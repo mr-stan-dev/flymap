@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_info.dart';
+import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/ui/map/map_utils.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
 
 class FlightInfoWidget extends StatelessWidget {
-  final FlightPreviewAirports airports;
-  final FlightInfo flightInfo;
+  final FlightRoute route;
+  final FlightInfo info;
 
   const FlightInfoWidget({
     super.key,
-    required this.airports,
-    required this.flightInfo,
+    required this.route,
+    required this.info,
   });
 
   @override
@@ -25,7 +25,7 @@ class FlightInfoWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Flight route (~ ${MapUtils.distanceFormatted(departure: airports.departure, arrival: airports.arrival)})',
+            'Flight route (~ ${MapUtils.distanceFormatted(departure: route.departure, arrival: route.arrival)})',
             style: context.textTheme.title24Medium,
           ),
           const SizedBox(height: 16),
@@ -35,7 +35,7 @@ class FlightInfoWidget extends StatelessWidget {
               Expanded(
                 child: _buildAirportInfo(
                   context,
-                  airports.departure,
+                  route.departure,
                   'Departure',
                   Icons.flight_takeoff,
                   primary,
@@ -54,7 +54,7 @@ class FlightInfoWidget extends StatelessWidget {
               Expanded(
                 child: _buildAirportInfo(
                   context,
-                  airports.arrival,
+                  route.arrival,
                   'Arrival',
                   Icons.flight_land,
                   primary,
@@ -62,9 +62,9 @@ class FlightInfoWidget extends StatelessWidget {
               ),
             ],
           ),
-          flightInfo.isEmpty
+          info.isEmpty
               ? _flightPoiLoading(context)
-              : _flightPoi(context, flightInfo),
+              : _flightPoi(context, info),
         ],
       ),
     );
@@ -96,13 +96,13 @@ class FlightInfoWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (((flightInfo.overview)).trim().isNotEmpty) ...[
+        if (((info.overview)).trim().isNotEmpty) ...[
           const SizedBox(height: 24),
           Text('Overview', style: context.textTheme.title24Medium),
           const SizedBox(height: 8),
-          Text(flightInfo.overview, style: context.textTheme.body18Regular),
+          Text(info.overview, style: context.textTheme.body18Regular),
         ],
-        if ((flightInfo.poi.isNotEmpty)) ...[
+        if ((info.poi.isNotEmpty)) ...[
           const SizedBox(height: 24),
           Text('You\'ll fly over', style: context.textTheme.title24Medium),
           const SizedBox(height: 8),
@@ -110,7 +110,7 @@ class FlightInfoWidget extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              for (final poi in flightInfo.poi)
+              for (final poi in info.poi)
                 if (poi.name.trim().isNotEmpty) Chip(label: Text(poi.name)),
             ],
           ),
@@ -148,7 +148,7 @@ class FlightInfoWidget extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '${airport.airportName}\n', // For 2 lines
+            '${airport.name}\n', // For 2 lines
             style: context.textTheme.body16Regular,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

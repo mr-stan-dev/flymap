@@ -1,11 +1,12 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/widgets/bottom_sheet/flight_bottom_sheet.dart';
+import 'package:flymap/ui/screens/flight/widgets/flight_app_bar.dart';
 import 'package:flymap/ui/screens/flight/widgets/flight_map_view.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 
 class FlightScreen extends StatelessWidget {
@@ -32,6 +33,7 @@ class _FlightScreenView extends StatefulWidget {
 class _FlightScreenViewState extends State<_FlightScreenView> {
   final DraggableScrollableController _bottomSheetController =
       DraggableScrollableController();
+  double _hideProgress = 0.0; // 0..1
 
   @override
   void dispose() {
@@ -65,7 +67,15 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
               FlightMapView(bottomSheetController: _bottomSheetController),
 
               if (state is FlightScreenLoaded)
-                _buildTopAppBar(context, state, onSurface),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: FlightAppBar(
+                    route: state.flight.route,
+                    hideProgress: _hideProgress,
+                  ),
+                ),
 
               // Draggable bottom sheet
               _buildBottomSheet(context),
@@ -76,107 +86,31 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
     );
   }
 
-  Widget _buildTopAppBar(
-    BuildContext context,
-    FlightScreenLoaded state,
-    Color onSurface,
-  ) {
-    // Always use light content over dimming overlay
-    const Color overlayTextColor = Colors.white;
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.black.withOpacity(0.7), Colors.transparent],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ),
-
-                const SizedBox(width: 12),
-
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${state.flight.departure.displayCode}-${state.flight.arrival.displayCode}',
-                        style: const TextStyle(
-                          color: overlayTextColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        state.flight.routeName,
-                        style: TextStyle(
-                          color: overlayTextColor.withOpacity(0.85),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: Colors.white),
-                    onSelected: (value) async {
-                      switch (value) {
-                        case 'delete_flight':
-                          await context
-                              .read<FlightScreenCubit>()
-                              .deleteFlight();
-                          break;
-                      }
-                    },
-                    itemBuilder: (context) => const [
-                      PopupMenuItem(
-                        value: 'delete_flight',
-                        child: Text('Delete flight'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildBottomSheet(BuildContext context) {
-    return DraggableScrollableSheet(
-      controller: _bottomSheetController,
-      initialChildSize: 0.5,
-      minChildSize: 0.2,
-      maxChildSize: 0.9,
-      builder: (context, scrollController) {
-        return FlightBottomSheet(scrollController: scrollController);
+    return NotificationListener<DraggableScrollableNotification>(
+      onNotification: (n) {
+        final min = n.minExtent;
+        final max = n.maxExtent;
+        final extent = n.extent;
+        // Hide only when snapped to top (near max)
+        const epsilon = 0.22; // tolerance for snap vicinity
+        final hide = extent >= (max - epsilon);
+        if (hide != (_hideProgress == 1.0)) {
+          setState(() => _hideProgress = hide ? 1.0 : 0.0);
+        }
+        return false;
       },
+      child: DraggableScrollableSheet(
+        controller: _bottomSheetController,
+        initialChildSize: 0.5,
+        minChildSize: 0.1,
+        maxChildSize: 0.95,
+        snap: true,
+        snapSizes: const [0.1, 0.5, 0.95],
+        builder: (context, scrollController) {
+          return FlightBottomSheet(scrollController: scrollController);
+        },
+      ),
     );
   }
 }

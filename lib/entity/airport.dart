@@ -4,7 +4,7 @@ import 'package:latlong2/latlong.dart';
 class Airport extends Equatable {
   final String name;
   final String city;
-  final String country;
+  final String countryCode;
   final LatLng latLon;
   final String iataCode;
   final String icaoCode;
@@ -13,7 +13,7 @@ class Airport extends Equatable {
   const Airport({
     required this.name,
     required this.city,
-    required this.country,
+    required this.countryCode,
     required this.latLon,
     required this.iataCode,
     required this.icaoCode,
@@ -27,20 +27,19 @@ class Airport extends Equatable {
   String get displayCode => iataCode.isNotEmpty ? iataCode : icaoCode;
 
   /// Get the full airport name with code
-  String get fullName => '$name (${displayCode})';
+  String get fullName => '$name ($displayCode)';
 
   /// Get the city with airport code
-  String get cityWithCode => '$city (${displayCode})';
+  String get cityWithCode => '$city ($displayCode)';
 
-  // Backward compatibility getters
-  String get airportName => name;
-  String get countryCode => country;
+  /// Get the city with country code
+  String get cityWithCountryCode => '$city, $countryCode';
 
   @override
   List<Object?> get props => [
     name,
     city,
-    country,
+    countryCode,
     latLon,
     iataCode,
     icaoCode,

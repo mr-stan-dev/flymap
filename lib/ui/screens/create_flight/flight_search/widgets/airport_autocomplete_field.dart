@@ -1,7 +1,8 @@
-import 'package:flymap/ui/theme/app_theme_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/airport.dart';
+import 'package:flymap/ui/theme/app_theme_ext.dart';
+
 import '../viewmodel/flight_search_screen_cubit.dart';
 import '../viewmodel/flight_search_screen_state.dart';
 
@@ -40,7 +41,7 @@ class _AirportAutocompleteFieldState extends State<AirportAutocompleteField> {
 
     if (widget.initialAirport != null) {
       _controller.text =
-          '${widget.initialAirport!.airportName} (${widget.initialAirport!.displayCode})';
+          '${widget.initialAirport!.name} (${widget.initialAirport!.displayCode})';
     }
 
     _controller.addListener(() {
@@ -137,11 +138,11 @@ class _AirportAutocompleteFieldState extends State<AirportAutocompleteField> {
                 return const Iterable<Airport>.empty();
               },
               displayStringForOption: (Airport airport) {
-                return '${airport.airportName} (${airport.displayCode}) - ${airport.city}, ${airport.countryCode}';
+                return '${airport.name} (${airport.displayCode}) - ${airport.city}, ${airport.countryCode}';
               },
               onSelected: (Airport airport) {
                 _controller.text =
-                    '${airport.airportName} (${airport.displayCode})';
+                    '${airport.name} (${airport.displayCode})';
                 widget.onAirportSelected(airport);
               },
               optionsViewBuilder: (context, onSelected, options) {
@@ -170,7 +171,7 @@ class _AirportAutocompleteFieldState extends State<AirportAutocompleteField> {
                         final airport = state.airports[index];
                         return ListTile(
                           title: Text(
-                            '${airport.airportName} (${airport.displayCode})',
+                            '${airport.name} (${airport.displayCode})',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(

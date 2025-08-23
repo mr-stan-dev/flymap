@@ -6,7 +6,7 @@ class AirportDbMapper {
     return Airport(
       name: (map['name'] ?? '').toString(),
       city: (map['city'] ?? '').toString(),
-      country: (map['country'] ?? 'Unknown').toString(),
+      countryCode: (map['country'] ?? 'Unknown').toString(),
       latLon: LatLng(
         (map['latitude'] as num).toDouble(),
         (map['longitude'] as num).toDouble(),
@@ -18,9 +18,9 @@ class AirportDbMapper {
   }
 
   Map<String, dynamic> toDb(Airport airport) => <String, dynamic>{
-    'name': airport.airportName,
+    'name': airport.name,
     'city': airport.city,
-    'country': airport.country,
+    'country': airport.countryCode,
     'latitude': airport.latLon.latitude,
     'longitude': airport.latLon.longitude,
     'iata': airport.iataCode,

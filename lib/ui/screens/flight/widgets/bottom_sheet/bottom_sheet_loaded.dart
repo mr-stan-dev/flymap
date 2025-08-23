@@ -1,14 +1,8 @@
-import 'package:flymap/entity/gps_data.dart';
+import 'package:flutter/material.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/info/flight_info_widget.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
-import 'package:flymap/ui/screens/flight/widgets/bottom_sheet/flight_status/gps_active.dart';
-import 'package:flymap/ui/screens/flight/widgets/bottom_sheet/flight_status/searching_gps_view.dart';
-import 'package:flymap/ui/screens/flight/widgets/bottom_sheet/tabs/tab_flight_info.dart';
 import 'package:flymap/ui/screens/flight/widgets/bottom_sheet/tabs/tab_gps_data.dart';
 import 'package:flymap/ui/screens/flight/widgets/bottom_sheet/tabs/tab_header.dart';
-import 'package:flutter/material.dart';
-
-import 'flight_status/gps_not_granted_state.dart';
-import 'flight_status/gps_off_state.dart';
 
 class BottomSheetLoaded extends StatefulWidget {
   const BottomSheetLoaded(this.scrollController, this.state, {super.key});
@@ -71,10 +65,9 @@ class _BottomSheetLoadedState extends State<BottomSheetLoaded> {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: _tabIndex == 0
-                          ? TabFlightInfo(
-                              departure: widget.state.flight.departure,
-                              arrival: widget.state.flight.arrival,
-                              flightInfo: widget.state.flight.info,
+                          ? FlightInfoWidget(
+                              route: widget.state.flight.route,
+                              info: widget.state.flight.info,
                             )
                           : TabGpsData(state: widget.state),
                     ),
