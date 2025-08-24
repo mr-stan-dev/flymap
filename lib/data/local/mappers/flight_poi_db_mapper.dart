@@ -1,38 +1,39 @@
 import 'package:flymap/entity/flight_poi.dart';
 import 'package:latlong2/latlong.dart';
+import 'mapper_utils.dart';
+
+class FlightPoiDBKeys {
+  static const latitude = 'latitude';
+  static const longitude = 'longitude';
+  static const type = 'type';
+  static const name = 'name';
+  static const description = 'description';
+  static const flyView = 'fly_view';
+  static const wiki = 'wiki';
+}
 
 class FlightPoiDbMapper {
   FlightPoi? fromDb(Map<String, dynamic> map) {
-    final dynamic coordinates = map['coordinates'];
-    if (coordinates is List && coordinates.length >= 2) {
-      final double? lat = _toDouble(coordinates[0]);
-      final double? lon = _toDouble(coordinates[1]);
-      if (lat != null && lon != null) {
-        return FlightPoi(
-          coordinates: LatLng(lat, lon),
-          type: (map['type'] ?? '').toString(),
-          description: (map['description'] ?? '').toString(),
-          name: (map['name'] ?? '').toString(),
-          flyView: (map['fly_view'] ?? '').toString(),
-          wiki: (map['wiki'] ?? '').toString(),
-        );
-      }
-    }
-    return null;
+    final latNum = map.getDouble(FlightPoiDBKeys.latitude);
+    final lonNum = map.getDouble(FlightPoiDBKeys.longitude);
+
+    return FlightPoi(
+      coordinates: LatLng(latNum.toDouble(), lonNum.toDouble()),
+      type: map.getString(FlightPoiDBKeys.type),
+      description: map.getString(FlightPoiDBKeys.description),
+      name: map.getString(FlightPoiDBKeys.name),
+      flyView: map.getString(FlightPoiDBKeys.flyView),
+      wiki: map.getString(FlightPoiDBKeys.wiki),
+    );
   }
 
   Map<String, dynamic> toDb(FlightPoi poi) => <String, dynamic>{
-    'coordinates': '${poi.coordinates.latitude},${poi.coordinates.longitude}',
-    'type': poi.type,
-    'name': poi.name,
-    'description': poi.description,
-    'fly_view': poi.flyView,
-    'wiki': poi.wiki,
+    FlightPoiDBKeys.latitude: poi.coordinates.latitude,
+    FlightPoiDBKeys.longitude: poi.coordinates.longitude,
+    FlightPoiDBKeys.type: poi.type,
+    FlightPoiDBKeys.name: poi.name,
+    FlightPoiDBKeys.description: poi.description,
+    FlightPoiDBKeys.flyView: poi.flyView,
+    FlightPoiDBKeys.wiki: poi.wiki,
   };
-
-  double? _toDouble(dynamic value) {
-    if (value is num) return value.toDouble();
-    if (value is String) return double.tryParse(value);
-    return null;
-  }
 }

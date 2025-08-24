@@ -1,11 +1,11 @@
 import 'package:flymap/data/local/app_database.dart';
-import 'package:flymap/data/local/flights_local_db_service.dart';
+import 'package:flymap/data/local/flights_db_service.dart';
 import 'package:flymap/entity/flight.dart';
 
 class FlightRepository {
-  final FlightsLocalDBService _flightsService;
+  final FlightsDBService _flightsService;
 
-  FlightRepository({required FlightsLocalDBService service})
+  FlightRepository({required FlightsDBService service})
     : _flightsService = service;
 
   /// Insert a new flight

@@ -1,14 +1,13 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// Cubit for managing flight_search screen state
 class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
-  FlightSearchScreenCubit({IAirportsDb? airportsDb})
-    : _airportsDb = airportsDb ?? AirportsDatabase.instance,
+  FlightSearchScreenCubit({required AirportsDatabase airportsDb})
+    : _airportsDb = airportsDb,
       super(const FlightSearchInitial());
 
-  final IAirportsDb _airportsDb;
+  final AirportsDatabase _airportsDb;
 
   /// Search airports by query (name, city, or code)
   void searchAirports(String query) async {
@@ -20,10 +19,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     emit(const AirportSearchLoading());
 
     try {
-      // Ensure database is initialized
-      if (!_airportsDb.isInitialized) {
-        await _airportsDb.initialize();
-      }
+      await _airportsDb.initialize();
 
       final results = _airportsDb.search(query);
 

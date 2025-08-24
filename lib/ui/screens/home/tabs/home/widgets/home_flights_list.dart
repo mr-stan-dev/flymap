@@ -69,8 +69,7 @@ class HomeFlightsList extends StatelessWidget {
         context.push(AppRouter.flightRoute, extra: {'flight': flight});
       },
       child: Card(
-        child: Container(
-          width: double.infinity,
+        child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [

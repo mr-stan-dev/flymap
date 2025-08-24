@@ -6,6 +6,8 @@ class AppDatabase {
   static AppDatabase? _instance;
   static Database? _database;
   static StoreRef<String, Map<String, dynamic>>? _flightsStore;
+  static const _dbName = 'flymap.db';
+  static const _flightsStoreName = 'flights';
 
   AppDatabase._();
 
@@ -14,19 +16,16 @@ class AppDatabase {
     return _instance!;
   }
 
-  /// Initialize the database
   Future<void> initialize() async {
     if (_database == null) {
       final appDocDir = await getApplicationDocumentsDirectory();
-      final dbPath = join(appDocDir.path, 'flymap.db');
+      final dbPath = join(appDocDir.path, _dbName);
       _database = await databaseFactoryIo.openDatabase(dbPath);
 
-      // Initialize stores
-      _flightsStore = stringMapStoreFactory.store('flights_v1');
+      _flightsStore = stringMapStoreFactory.store(_flightsStoreName);
     }
   }
 
-  /// Get the database instance
   Database get database {
     if (_database == null) {
       throw StateError('Database not initialized. Call initialize() first.');
@@ -34,7 +33,6 @@ class AppDatabase {
     return _database!;
   }
 
-  /// Get the flights store
   StoreRef<String, Map<String, dynamic>> get flightsStore {
     if (_flightsStore == null) {
       throw StateError('Database not initialized. Call initialize() first.');
@@ -42,7 +40,6 @@ class AppDatabase {
     return _flightsStore!;
   }
 
-  /// Close the database
   Future<void> close() async {
     await _database?.close();
     _database = null;

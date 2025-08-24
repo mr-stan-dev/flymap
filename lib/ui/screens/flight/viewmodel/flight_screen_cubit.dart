@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/gps_data.dart';
 import 'package:flymap/repository/flight_repository.dart';
@@ -39,16 +38,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   Future<void> deleteFlight() async {
     emit(const FlightScreenLoading());
     try {
-      // Delete associated map files from disk
-      final mapFiles = flight.maps;
-      for (final mf in mapFiles) {
-        final file = File(mf.filePath);
-        if (await file.exists()) {
-          await file.delete();
-        }
-      }
-
-      // Delete flight record from DB
+      // Delete flight record (service handles file cleanup)
       final ok = await _repository.deleteFlight(flight.id);
       if (!ok) {
         emit(FlightScreenError('Failed to delete flight', flight: flight));

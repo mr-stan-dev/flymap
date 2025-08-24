@@ -1,26 +1,12 @@
 import 'package:flutter/services.dart';
+import 'package:flymap/entity/airport.dart';
+import 'package:flymap/logger.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../entity/airport.dart';
-import '../../logger.dart';
-
-/// Interface for airports database operations
-abstract class IAirportsDb {
-  /// Initialize the airports database by loading CSV data
-  Future<void> initialize();
-
-  /// Search airports by name or city (case-insensitive)
-  List<Airport> search(String query);
-
-  /// Check if database is initialized
-  bool get isInitialized;
-}
-
-/// Local airports database for offline airport data lookup
-class AirportsDatabase implements IAirportsDb {
+class AirportsDatabase {
   static AirportsDatabase? _instance;
   final _logger = Logger('AirportsDatabase');
-  List<Airport> _airports = [];
+  final List<Airport> _airports = [];
   bool _isInitialized = false;
 
   AirportsDatabase._();
@@ -31,8 +17,6 @@ class AirportsDatabase implements IAirportsDb {
     return _instance!;
   }
 
-  /// Initialize the airports database by loading CSV data
-  @override
   Future<void> initialize() async {
     if (_isInitialized) return;
 
@@ -105,8 +89,6 @@ class AirportsDatabase implements IAirportsDb {
     }
   }
 
-  /// Search airports by name or city (case-insensitive)
-  @override
   List<Airport> search(String query) {
     if (!_isInitialized) {
       _logger.log('Database not initialized, call initialize() first');
@@ -127,8 +109,4 @@ class AirportsDatabase implements IAirportsDb {
     _logger.log('Search for "$query" returned ${results.length} results');
     return results;
   }
-
-  /// Check if database is initialized
-  @override
-  bool get isInitialized => _isInitialized;
 }

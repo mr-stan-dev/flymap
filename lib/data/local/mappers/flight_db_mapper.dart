@@ -5,10 +5,26 @@ import 'package:latlong2/latlong.dart';
 
 import 'airport_db_mapper.dart';
 import 'flight_info_db_mapper.dart';
+import 'flight_map_mapper.dart';
+
+class FlightDBKeys {
+  static const flightMaps = 'maps';
+  static const id = 'id';
+  static const flightInfo = 'flightInfo';
+  static const createdAt = 'createdAt';
+  static const updatedAt = 'updatedAt';
+  static const departure = 'departure';
+  static const arrival = 'arrival';
+  static const waypoints = 'waypoints';
+  static const corridor = 'corridor';
+  static const latitude = 'latitude';
+  static const longitude = 'longitude';
+}
 
 class FlightDbMapper {
   final AirportDbMapper _airportMapper;
   final FlightInfoDbMapper _infoMapper;
+  final FlightMapDbMapper _mapMapper = FlightMapDbMapper();
 
   FlightDbMapper({
     AirportDbMapper? airportMapper,
@@ -18,29 +34,31 @@ class FlightDbMapper {
 
   Map<String, dynamic> toDb(Flight flight) {
     final out = <String, dynamic>{
-      'id': flight.id,
-      'maps': flight.maps.map((m) => m.toMap()).toList(),
-      'flightInfo': _infoMapper.toFlightInfoMap(flight.info),
-      'createdAt': DateTime.now().toIso8601String(),
-      'updatedAt': DateTime.now().toIso8601String(),
+      FlightDBKeys.id: flight.id,
+      FlightDBKeys.flightMaps: flight.maps
+          .map((m) => _mapMapper.toDb(m))
+          .toList(),
+      FlightDBKeys.flightInfo: _infoMapper.toFlightInfoMap(flight.info),
+      FlightDBKeys.createdAt: DateTime.now().toIso8601String(),
+      FlightDBKeys.updatedAt: DateTime.now().toIso8601String(),
     };
 
-    out['departure'] = _airportMapper.toDb(flight.route.departure);
-    out['arrival'] = _airportMapper.toDb(flight.route.arrival);
+    out[FlightDBKeys.departure] = _airportMapper.toDb(flight.route.departure);
+    out[FlightDBKeys.arrival] = _airportMapper.toDb(flight.route.arrival);
 
-    out['waypoints'] = flight.route.waypoints
+    out[FlightDBKeys.waypoints] = flight.route.waypoints
         .map(
           (p) => <String, dynamic>{
-            'latitude': p.latitude,
-            'longitude': p.longitude,
+            FlightDBKeys.latitude: p.latitude,
+            FlightDBKeys.longitude: p.longitude,
           },
         )
         .toList();
-    out['corridor'] = flight.route.corridor
+    out[FlightDBKeys.corridor] = flight.route.corridor
         .map(
           (p) => <String, dynamic>{
-            'latitude': p.latitude,
-            'longitude': p.longitude,
+            FlightDBKeys.latitude: p.latitude,
+            FlightDBKeys.longitude: p.longitude,
           },
         )
         .toList();
@@ -49,49 +67,44 @@ class FlightDbMapper {
   }
 
   Flight fromDb(Map<String, dynamic> map) {
-    final mapsList = ((map['maps'] as List<dynamic>?) ?? [])
-        .map((e) => FlightMap.fromMap(e as Map<String, dynamic>))
+    final mapsList = ((map[FlightDBKeys.flightMaps] as List<dynamic>?) ?? [])
+        .map((e) => _mapMapper.fromDb(e as Map<String, dynamic>))
         .toList();
-    if (mapsList.isEmpty && map['flightMap'] != null) {
-      mapsList.add(FlightMap.fromMap(map['flightMap'] as Map<String, dynamic>));
-    }
 
     final route = FlightRoute(
       departure: _airportMapper.fromDb(
-        (map['departure'] as Map).cast<String, dynamic>(),
+        (map[FlightDBKeys.departure] as Map).cast<String, dynamic>(),
       ),
       arrival: _airportMapper.fromDb(
-        (map['arrival'] as Map).cast<String, dynamic>(),
+        (map[FlightDBKeys.arrival] as Map<String, dynamic>),
       ),
-      waypoints: (map['waypoints'] as List<dynamic>? ?? [])
+      waypoints: (map[FlightDBKeys.waypoints] as List<dynamic>? ?? [])
           .map(
             (point) => LatLng(
-              point['latitude'] as double,
-              point['longitude'] as double,
+              point[FlightDBKeys.latitude] as double,
+              point[FlightDBKeys.longitude] as double,
             ),
           )
           .toList(),
-      corridor: (map['corridor'] as List<dynamic>? ?? [])
+      corridor: (map[FlightDBKeys.corridor] as List<dynamic>? ?? [])
           .map(
             (point) => LatLng(
-              point['latitude'] as double,
-              point['longitude'] as double,
+              point[FlightDBKeys.latitude] as double,
+              point[FlightDBKeys.longitude] as double,
             ),
           )
           .toList(),
     );
 
-    final info = (map['flightInfo'] is Map)
-        ? _infoMapper.toFlightInfo(
-            (map['flightInfo'] as Map).cast<String, dynamic>(),
-          )
-        : null;
+    final info = _infoMapper.toFlightInfo(
+      (map[FlightDBKeys.flightInfo] as Map<String, dynamic>),
+    );
 
     return Flight(
-      id: (map['id'] ?? '').toString(),
+      id: (map[FlightDBKeys.id] ?? '').toString(),
       route: route,
       maps: mapsList,
-      info: info ?? _infoMapper.toFlightInfo({}),
+      info: info,
     );
   }
 }

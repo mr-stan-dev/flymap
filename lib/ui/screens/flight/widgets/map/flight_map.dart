@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/data/local/mappers/flight_map_db_mapper.dart';
+import 'package:flymap/data/local/mappers/flight_map_mapper.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/gps_data.dart';
 import 'package:flymap/logger.dart';
@@ -37,6 +39,7 @@ class _FlightMapState extends State<FlightMap> {
   bool _is3D = false;
   Circle? _userCircle;
   bool _followUser = false;
+  final _styleMapper = FlightMapStyleMapper();
 
   late final LatLng _center = LatLng(
     MapUtils.center(
@@ -79,19 +82,14 @@ class _FlightMapState extends State<FlightMap> {
       final styleString = await rootBundle.loadString(
         'assets/styles/openfreemap_offline_style.json',
       );
-      final style = jsonDecode(styleString) as Map<String, dynamic>;
 
-      // Replace the URL with our local mbtiles file path
-      // Use absolute path with proper mbtiles:// protocol
-      if (style['sources'] != null &&
-          style['sources']['openmaptiles'] != null) {
-        final absolutePath = file.absolute.path;
-        style['sources']['openmaptiles']['url'] = 'mbtiles://$absolutePath';
-        _logger.log('Updated mbtiles URL to: mbtiles://$absolutePath');
-      }
+      final updated = _styleMapper.mapStyleWithMbtiles(
+        styleString,
+        file.absolute.path,
+      );
 
       setState(() {
-        _styleString = jsonEncode(style);
+        _styleString = updated;
       });
     } catch (e) {
       _logger.error('Error loading style from assets: $e');
