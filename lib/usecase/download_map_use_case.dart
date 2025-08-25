@@ -94,8 +94,6 @@ class DownloadMapUseCase {
   DownloadMapUseCase({required FlightsDBService service})
     : _flightsService = service;
 
-  static const double defaultWidthKm = 100;
-
   void cancel() {
     _currentDownloader?.cancel();
   }

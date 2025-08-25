@@ -11,13 +11,14 @@ import 'package:latlong2/latlong.dart';
 class GreatCircleRouteProvider implements FlightRouteProvider {
   final corridorProvider = RouteCorridorProvider();
   static const _wayPointDensityKm = 100;
+  static const _corridorWidthKm = 100.0;
 
   @override
   FlightRoute getRoute({required Airport departure, required Airport arrival}) {
     final waypoints = calculateRoute(departure.latLon, arrival.latLon);
     final corridor = corridorProvider.calculateCorridor(
       waypoints,
-      widthKm: 100,
+      widthKm: _corridorWidthKm,
     );
     return FlightRoute(
       departure: departure,

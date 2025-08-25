@@ -18,7 +18,7 @@ class AirportDbMapper {
     return Airport(
       name: map.getString(AirportDBKeys.name),
       city: map.getString(AirportDBKeys.city),
-      countryCode: map.getString(AirportDBKeys.country, defVal: 'Unknown'),
+      countryCode: map.getString(AirportDBKeys.country),
       latLon: LatLng(
         map.getDouble(AirportDBKeys.latitude),
         map.getDouble(AirportDBKeys.longitude),

@@ -84,7 +84,7 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
                           // Title
                           const SizedBox(height: 20),
                           Text(
-                            'Ready for the next flight?',
+                            'Where are you flying?',
                             style: Theme.of(context).textTheme.headlineMedium
                                 ?.copyWith(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
