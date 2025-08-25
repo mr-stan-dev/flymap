@@ -29,6 +29,16 @@ class Airport extends Equatable {
   /// Get the full airport name with code
   String get fullName => '$name ($displayCode)';
 
+  /// Airport name without the trailing word "Airport"
+  String get nameShort {
+    final cleaned = name
+        .replaceAll(RegExp(r'\bInternational\b', caseSensitive: false), '')
+        .replaceAll(RegExp(r'\bAirport\b', caseSensitive: false), '')
+        .replaceAll(RegExp(r'\s{2,}'), ' ')
+        .trim();
+    return cleaned.isEmpty ? name : cleaned;
+  }
+
   /// Get the city with airport code
   String get cityWithCode => '$city ($displayCode)';
 

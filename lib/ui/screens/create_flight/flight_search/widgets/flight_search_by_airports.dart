@@ -4,6 +4,7 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_pa
 import 'package:flymap/ui/screens/create_flight/flight_search/widgets/popular_flights.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/ui/theme/app_theme_ext.dart';
 
 import '../viewmodel/flight_search_screen_cubit.dart';
 import '../viewmodel/flight_search_screen_state.dart';
@@ -21,6 +22,8 @@ class FlightSearchByAirports extends StatefulWidget {
 class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
   Airport? _selectedDeparture;
   Airport? _selectedArrival;
+  List<Map<String, Airport>> _popular = const [];
+  bool _popularLoading = true;
 
   // Controllers for the text fields
   final TextEditingController _departureController = TextEditingController();
@@ -29,7 +32,16 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
   @override
   void initState() {
     super.initState();
-    setState(() {});
+    _loadPopular();
+  }
+
+  Future<void> _loadPopular() async {
+    final data = await loadPopularFlights();
+    if (!mounted) return;
+    setState(() {
+      _popular = data;
+      _popularLoading = false;
+    });
   }
 
   @override
@@ -165,6 +177,9 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
   }
 
   Widget _buildSampleFlightsChips() {
+    if (_popularLoading) {
+      return Center(child: const CircularProgressIndicator());
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -172,7 +187,7 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
         const SizedBox(height: 12),
         Wrap(
           spacing: 4,
-          children: popularFlights.map((pair) {
+          children: _popular.map((pair) {
             final departure = pair['departure'] as Airport;
             final arrival = pair['arrival'] as Airport;
             return ActionChip(
@@ -182,11 +197,8 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
                 color: Theme.of(context).colorScheme.primary,
               ),
               label: Text(
-                '${departure.city} (${departure.displayCode}) → ${arrival.city} (${arrival.displayCode})',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
+                '${departure.nameShort} → ${arrival.nameShort}',
+                style: context.textTheme.caption14Regular,
               ),
               backgroundColor: Theme.of(
                 context,

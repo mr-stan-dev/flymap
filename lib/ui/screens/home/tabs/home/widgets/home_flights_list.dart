@@ -1,12 +1,12 @@
+import 'package:flutter/material.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/router/app_router.dart';
-import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_cubit.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/ui/theme/app_theme_ext.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeFlightsList extends StatelessWidget {
   const HomeFlightsList(this.flights, {super.key});
+
   final List<Flight> flights;
 
   @override
@@ -41,7 +41,6 @@ class HomeFlightsList extends StatelessWidget {
       itemCount: flights.length,
       itemBuilder: (context, index) {
         final flight = flights[index];
-        final cubit = context.read<HomeTabCubit>();
         return Padding(
           padding: EdgeInsets.only(bottom: index < flights.length - 1 ? 12 : 0),
           child: _buildActivityCard(
@@ -49,7 +48,7 @@ class HomeFlightsList extends StatelessWidget {
             flight: flight,
             title: flight.routeName,
             subtitle:
-                '${flight.departure.displayCode} - ${flight.arrival.displayCode}',
+                '${flight.departure.cityWithCountryCode} - ${flight.arrival.cityWithCountryCode}',
           ),
         );
       },
@@ -63,7 +62,6 @@ class HomeFlightsList extends StatelessWidget {
     required String subtitle,
   }) {
     final theme = Theme.of(context);
-    final onSurface = theme.colorScheme.onSurface;
     return GestureDetector(
       onTap: () {
         context.push(AppRouter.flightRoute, extra: {'flight': flight});
@@ -92,27 +90,15 @@ class HomeFlightsList extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: onSurface,
-                          ),
-                        ),
-                        const Spacer(),
-                      ],
+                    Text(
+                      title,
+                      style: context.textTheme.body18Regular.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: onSurface.withOpacity(0.8),
-                      ),
-                    ),
+                    Text(subtitle, style: context.textTheme.caption14Regular),
                   ],
                 ),
               ),

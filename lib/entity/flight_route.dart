@@ -16,6 +16,8 @@ class FlightRoute extends Equatable {
     required this.corridor,
   });
 
+  String get routeCode => '${departure.primaryCode}_${arrival.primaryCode}';
+
   double get distanceInKm {
     return MapUtils.distance(departure: departure, arrival: arrival);
   }

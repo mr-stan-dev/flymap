@@ -128,8 +128,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
       // Initialize offline manager
       _downloadSubscription = downloadMapUseCase
           .call(
-            departure: params.departure,
-            arrival: params.arrival,
+            flightRoute: currentState.flightRoute,
             flightInfo: currentState.flightInfo,
           )
           .listen((event) {

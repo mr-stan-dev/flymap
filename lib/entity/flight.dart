@@ -1,10 +1,9 @@
 import 'package:equatable/equatable.dart';
-import 'package:flymap/ui/map/map_utils.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'airport.dart';
-import 'flight_map.dart';
 import 'flight_info.dart';
+import 'flight_map.dart';
 import 'flight_route.dart';
 
 class Flight extends Equatable {
@@ -24,12 +23,14 @@ class Flight extends Equatable {
 
   // Convenience getters to reduce refactor blast radius
   Airport get departure => route.departure;
+
   Airport get arrival => route.arrival;
+
   List<LatLng> get waypoints => route.waypoints;
+
   List<LatLng> get corridor => route.corridor;
 
-  String get routeName =>
-      '${departure.city}, ${departure.countryCode} - ${arrival.city}, ${arrival.countryCode}';
+  String get routeName => '${departure.nameShort} -> ${arrival.nameShort}';
 
   @override
   List<Object?> get props => [id, route, maps, info];

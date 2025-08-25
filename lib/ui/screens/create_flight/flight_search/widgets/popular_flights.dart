@@ -1,106 +1,28 @@
+import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/entity/airport.dart';
-import 'package:latlong2/latlong.dart';
 
-const popularFlights = [
-  {
-    'departure': Airport(
-      name: 'London Luton Airport',
-      latLon: const LatLng(51.8747, -0.3683),
-      city: 'London',
-      countryCode: 'GB',
-      iataCode: 'LTN',
-      icaoCode: '',
-      wikipediaUrl: '',
-    ),
-    'arrival': Airport(
-      name: 'Berlin Brandenburg Airport',
-      latLon: const LatLng(52.3667, 13.5033),
-      city: 'Berlin',
-      countryCode: 'DE',
-      iataCode: 'BER',
-      icaoCode: '',
-      wikipediaUrl: '',
-    ),
-  },
-  {
-    'departure': Airport(
-      name: 'Charles de Gaulle Airport',
-      latLon: const LatLng(49.0097, 2.5479),
-      city: 'Paris',
-      countryCode: 'FR',
-      iataCode: 'CDG',
-      icaoCode: '',
-      wikipediaUrl: '',
-    ),
-    'arrival': Airport(
-      name: 'Leonardo da Vinci International Airport',
-      latLon: const LatLng(41.8045, 12.2508),
-      city: 'Rome',
-      countryCode: 'IT',
-      iataCode: 'FCO',
-      icaoCode: '',
-      wikipediaUrl: '',
-    ),
-  },
-  {
-    'departure': Airport(
-      name: 'Amsterdam Airport Schiphol',
-      latLon: const LatLng(52.3086, 4.7639),
-      city: 'Amsterdam',
-      countryCode: 'NL',
-      iataCode: 'AMS',
-      icaoCode: '',
-      wikipediaUrl: '',
-    ),
-    'arrival': Airport(
-      name: 'Adolfo Suárez Madrid–Barajas Airport',
-      latLon: const LatLng(40.4983, -3.5676),
-      city: 'Madrid',
-      countryCode: 'ES',
-      iataCode: 'MAD',
-      icaoCode: '',
-      wikipediaUrl: '',
-    ),
-  },
-  // USA flights
-  {
-    'departure': Airport(
-      name: 'Los Angeles International Airport',
-      latLon: const LatLng(33.9416, -118.4085),
-      city: 'Los Angeles',
-      countryCode: 'US',
-      iataCode: 'LAX',
-      icaoCode: '',
-      wikipediaUrl: '',
-    ),
-    'arrival': Airport(
-      name: 'San Francisco International Airport',
-      latLon: const LatLng(37.6213, -122.3790),
-      city: 'San Francisco',
-      countryCode: 'US',
-      iataCode: 'SFO',
-      icaoCode: '',
-      wikipediaUrl: '',
-    ),
-  },
-  {
-    'departure': Airport(
-      name: 'John F. Kennedy International Airport',
-      latLon: const LatLng(40.6413, -73.7781),
-      city: 'New York',
-      countryCode: 'US',
-      iataCode: 'JFK',
-      icaoCode: '',
-      wikipediaUrl: '',
-    ),
-    'arrival': Airport(
-      name: 'Miami International Airport',
-      latLon: const LatLng(25.7959, -80.2870),
-      city: 'Miami',
-      countryCode: 'US',
-      iataCode: 'MIA',
-      icaoCode: '',
-      wikipediaUrl: '',
-    ),
-  },
-];
+Future<List<Map<String, Airport>>> loadPopularFlights() async {
+  final db = AirportsDatabase.instance;
+  await db.initialize();
+
+  // Define pairs by IATA codes primarily (unique and user-facing)
+  const pairs = <List<String>>[
+    ['LTN', 'BER'],
+    ['CDG', 'FCO'],
+    ['AMS', 'MAD'],
+    ['LAX', 'SFO'],
+    ['JFK', 'MIA'],
+  ];
+
+  final result = <Map<String, Airport>>[];
+  for (final pair in pairs) {
+    final dep = db.findByCode(pair[0]);
+    final arr = db.findByCode(pair[1]);
+    print("dep: ${pair[0]} ${dep?.name}");
+    print("arr: ${pair[1]} ${arr?.name}");
+    if (dep != null && arr != null) {
+      result.add({'departure': dep, 'arrival': arr});
+    }
+  }
+  return result;
+}

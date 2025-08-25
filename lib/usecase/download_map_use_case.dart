@@ -2,16 +2,16 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
-import 'package:flymap/data/route/great_circle_route_provider.dart';
 import 'package:flymap/data/local/flights_db_service.dart';
+import 'package:flymap/data/route/great_circle_route_provider.dart';
 import 'package:flymap/data/route/route_corridor_provider.dart';
 import 'package:flymap/data/tiles_downloader/vector_tiles_downloader.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../logger.dart';
 
@@ -30,11 +30,12 @@ class DownloadMapProgress extends DownloadMapEvent {
 
 class DownloadMapDone extends DownloadMapEvent {
   final String filePath;
+  final int fileSize;
 
-  const DownloadMapDone(this.filePath);
+  const DownloadMapDone(this.filePath, this.fileSize);
 
   @override
-  List<Object?> get props => [filePath];
+  List<Object?> get props => [filePath, fileSize];
 }
 
 class DownloadMapError extends DownloadMapEvent {
@@ -100,39 +101,38 @@ class DownloadMapUseCase {
   }
 
   Stream<DownloadMapEvent> call({
-    required Airport departure,
-    required Airport arrival,
+    required FlightRoute flightRoute,
     required FlightInfo flightInfo,
   }) async* {
     try {
-      // Generate route and corridor
-      final route = GreatCircleRouteProvider().calculateRoute(
-        departure.latLon,
-        arrival.latLon,
-      );
-      final corridor = RouteCorridorProvider().calculateCorridor(
-        route,
-        widthKm: defaultWidthKm,
-      );
-
       // Create and start the vector tiles downloader
       final downloader = VectorTilesDownloader(
-        polygon: corridor,
+        polygon: flightRoute.corridor,
         minZoom: 0,
         maxZoom: 10,
       );
       _currentDownloader = downloader;
 
+      final id =
+          '${flightRoute.routeCode}_${DateTime.now().millisecondsSinceEpoch}';
+      final mapLayer = 'ofm_vector'; // openfreemap_vector
+      final fileName = '${flightRoute.routeCode}_$mapLayer';
+
       // Forward the download stream and handle completion
-      await for (final event in downloader.download()) {
+      await for (final event in downloader.download(fileName)) {
         if (event is DownloadMapDone) {
           // Save flight data with the MBTiles file
+          final mapData = FlightMap(
+            layer: mapLayer,
+            sizeBytes: event.fileSize,
+            downloadedAt: DateTime.now(),
+            filePath: event.filePath,
+          );
+
           final result = await _saveFlightData(
-            localFilePath: event.filePath,
-            departure: departure,
-            arrival: arrival,
-            route: route,
-            corridor: corridor,
+            flightId: id,
+            flightMap: mapData,
+            flightRoute: flightRoute,
             flightInfo: flightInfo,
           );
 
@@ -152,40 +152,19 @@ class DownloadMapUseCase {
   }
 
   Future<Result> _saveFlightData({
-    required String localFilePath,
-    required Airport departure,
-    required Airport arrival,
-    required List<LatLng> route,
-    required List<LatLng> corridor,
+    required String flightId,
+    required FlightMap flightMap,
+    required FlightRoute flightRoute,
     required FlightInfo flightInfo,
   }) async {
     try {
-      final mapFile = File(localFilePath);
-      final mapSizeBytes = await mapFile.length();
-
-      final mapData = FlightMap(
-        layer: 'openfreemap_vector',
-        sizeBytes: mapSizeBytes,
-        downloadedAt: DateTime.now(),
-        filePath: localFilePath,
-      );
-
-      final id =
-          '${departure.icaoCode}_${arrival.icaoCode}_${DateTime.now().millisecondsSinceEpoch}';
       final flight = Flight(
-        id: id,
-        route: FlightRoute(
-          departure: departure,
-          arrival: arrival,
-          waypoints: route,
-          corridor: corridor,
-        ),
-        maps: [mapData],
+        id: flightId,
+        route: flightRoute,
+        maps: [flightMap],
         info: flightInfo,
       );
-
       await _flightsService.insertFlight(flight);
-
       _logger.log('Flight saved successfully: \'${flight.id}\'');
       _logger.log('Flight info: $flightInfo');
       return Result.success(flight: flight);

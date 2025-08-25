@@ -4,6 +4,7 @@ import 'package:flymap/ui/screens/home/tabs/home/widgets/home_flights_list.dart'
 import 'package:flymap/ui/screens/home/tabs/home/widgets/home_stats_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/ui/theme/app_theme_ext.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeTabLoaded extends StatelessWidget {
@@ -43,7 +44,7 @@ class HomeTabLoaded extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Discover as you fly - offline maps for flights',
+                    'Explore as you fly - offline maps for flights',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: onSurface.withOpacity(0.6),
                     ),
@@ -55,10 +56,7 @@ class HomeTabLoaded extends StatelessWidget {
                   const SizedBox(height: 40),
                   Text(
                     'Flights',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: onSurface,
-                    ),
+                    style: context.textTheme.title24Medium,
                   ),
                   const SizedBox(height: 16),
                   HomeFlightsList(state.flights),

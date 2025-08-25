@@ -43,7 +43,6 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
 
   @override
   Widget build(BuildContext context) {
-    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Scaffold(
       body: BlocConsumer<FlightScreenCubit, FlightScreenState>(
         listener: (context, state) {
@@ -87,29 +86,31 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
   }
 
   Widget _buildBottomSheet(BuildContext context) {
-    return NotificationListener<DraggableScrollableNotification>(
-      onNotification: (n) {
-        final min = n.minExtent;
-        final max = n.maxExtent;
-        final extent = n.extent;
-        // Hide only when snapped to top (near max)
-        const epsilon = 0.22; // tolerance for snap vicinity
-        final hide = extent >= (max - epsilon);
-        if (hide != (_hideProgress == 1.0)) {
-          setState(() => _hideProgress = hide ? 1.0 : 0.0);
-        }
-        return false;
-      },
-      child: DraggableScrollableSheet(
-        controller: _bottomSheetController,
-        initialChildSize: 0.5,
-        minChildSize: 0.1,
-        maxChildSize: 0.95,
-        snap: true,
-        snapSizes: const [0.1, 0.5, 0.95],
-        builder: (context, scrollController) {
-          return FlightBottomSheet(scrollController: scrollController);
+    return SafeArea(
+      child: NotificationListener<DraggableScrollableNotification>(
+        onNotification: (n) {
+          final min = n.minExtent;
+          final max = n.maxExtent;
+          final extent = n.extent;
+          // Hide only when snapped to top (near max)
+          const epsilon = 0.22; // tolerance for snap vicinity
+          final hide = extent >= (max - epsilon);
+          if (hide != (_hideProgress == 1.0)) {
+            setState(() => _hideProgress = hide ? 1.0 : 0.0);
+          }
+          return false;
         },
+        child: DraggableScrollableSheet(
+          controller: _bottomSheetController,
+          initialChildSize: 0.5,
+          minChildSize: 0.1,
+          maxChildSize: 0.95,
+          snap: true,
+          snapSizes: const [0.1, 0.5, 0.95],
+          builder: (context, scrollController) {
+            return FlightBottomSheet(scrollController: scrollController);
+          },
+        ),
       ),
     );
   }

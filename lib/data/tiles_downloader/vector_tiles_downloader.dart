@@ -46,14 +46,15 @@ class VectorTilesDownloader {
     _controllerRef?.close();
   }
 
-  Stream<DownloadMapEvent> download() {
+  Stream<DownloadMapEvent> download(String fileName) {
     final controller = StreamController<DownloadMapEvent>();
     _controllerRef = controller;
-    _performDownload(controller);
+    _performDownload(fileName, controller);
     return controller.stream;
   }
 
   Future<void> _performDownload(
+    String fileName,
     StreamController<DownloadMapEvent> controller,
   ) async {
     Database? db;
@@ -76,10 +77,7 @@ class VectorTilesDownloader {
       final appDir = await getApplicationCacheDirectory();
       final targetDirPath = p.join(appDir.path, 'mbtiles');
 
-      // Prepare MBTiles file path
-      final fileName =
-          'region_${DateTime.now().millisecondsSinceEpoch}.mbtiles';
-      final mbtilesPath = p.join(targetDirPath, fileName);
+      final mbtilesPath = p.join(targetDirPath, '$fileName.mbtiles');
       _logger.log('MBTiles file: $mbtilesPath');
 
       // Ensure target directory exists
@@ -255,41 +253,15 @@ class VectorTilesDownloader {
         );
       }
 
-      // Get file info
-      final file = File(mbtilesPath);
-      if (await file.exists()) {
-        final fileSize = await file.length();
-        final fileSizeMB = (fileSize / (1024 * 1024)).toStringAsFixed(2);
-        _logger.log('MBTiles file created successfully:');
-        _logger.log('Path: $mbtilesPath');
-        _logger.log('Size: ${fileSizeMB}MB (${fileSize} bytes)');
-      } else {
-        _logger.log('Warning: MBTiles file not found at: $mbtilesPath');
-        // Check if directory exists
-        final dir = Directory(targetDirPath);
-        if (await dir.exists()) {
-          _logger.log('Target directory exists: $targetDirPath');
-          // List files in directory
-          final files = await dir.list().toList();
-          _logger.log(
-            'Files in directory: ${files.map((f) => f.path.split('/').last).join(', ')}',
-          );
-        } else {
-          _logger.log('Target directory does not exist: $targetDirPath');
-        }
-      }
-
       // Verify the MBTiles file
       _logger.log('Verifying MBTiles file...');
       controller.add(const DownloadMapVerifying());
 
-      final verificationResult = await MbtilesVerifier.verifyMbtilesFile(
-        mbtilesPath,
-      );
+      final fileSize = await MbtilesVerifier.verifyMbtilesFile(mbtilesPath);
 
-      if (verificationResult) {
+      if (fileSize > 0) {
         _logger.log('File verification successful, yielding success event');
-        controller.add(DownloadMapDone(mbtilesPath));
+        controller.add(DownloadMapDone(mbtilesPath, fileSize));
       } else {
         _logger.log('File verification failed, yielding error event');
         controller.add(const DownloadMapError('Failed to verify MBTiles file'));

@@ -60,20 +60,6 @@ class FlightsDBService {
     return true;
   }
 
-  void _deleteSidecars(String mainPath) {
-    for (final suffix in const ['-wal', '-shm', '-journal']) {
-      final sidecar = File('$mainPath$suffix');
-      if (sidecar.existsSync()) {
-        try {
-          sidecar.deleteSync();
-          _logger.log('Deleted sidecar file: ${sidecar.path}');
-        } catch (e) {
-          _logger.error('Failed to delete sidecar ${sidecar.path}: $e');
-        }
-      }
-    }
-  }
-
   Future<void> _deleteMapFiles(dynamic flight) async {
     // Remove associated map files from disk if present
     try {
@@ -101,6 +87,20 @@ class FlightsDBService {
       }
     } catch (e) {
       _logger.error('Error deleting map files for flight $flight: $e');
+    }
+  }
+
+  void _deleteSidecars(String mainPath) {
+    for (final suffix in const ['-wal', '-shm', '-journal']) {
+      final sidecar = File('$mainPath$suffix');
+      if (sidecar.existsSync()) {
+        try {
+          sidecar.deleteSync();
+          _logger.log('Deleted sidecar file: ${sidecar.path}');
+        } catch (e) {
+          _logger.error('Failed to delete sidecar ${sidecar.path}: $e');
+        }
+      }
     }
   }
 }

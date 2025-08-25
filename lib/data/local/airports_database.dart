@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:csv/csv.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/logger.dart';
 import 'package:latlong2/latlong.dart';
@@ -17,6 +18,9 @@ class AirportsDatabase {
     return _instance!;
   }
 
+  /// Read-only view of loaded airports
+  Iterable<Airport> get allAirports => List.unmodifiable(_airports);
+
   Future<void> initialize() async {
     if (_isInitialized) return;
 
@@ -27,59 +31,61 @@ class AirportsDatabase {
       final String csvData = await rootBundle.loadString(
         'assets/data/airports.csv',
       );
-      final lines = csvData.split('\n');
-      _logger.log('Found ${lines.length} lines in airports CSV');
 
-      // Skip header line
-      for (int i = 1; i < lines.length; i++) {
-        try {
-          final line = lines[i].trim();
-          if (line.isEmpty) continue;
+      // Parse CSV robustly (handles quotes and commas in fields)
+      final rows = const CsvToListConverter(
+        eol: '\n',
+        shouldParseNumbers: false,
+      ).convert(csvData);
+      _logger.log('Found ${rows.length} rows in airports CSV');
+      if (rows.isEmpty) {
+        _isInitialized = true;
+        return;
+      }
 
-          final parts = line.split(',');
-          if (parts.length < 18) {
-            _logger.log(
-              'Skipping invalid line $i: insufficient data (${parts.length} columns, need at least 18)',
-            );
-            continue;
-          }
+      // OurAirports header columns reference
+      // [0:id, 1:ident, 2:type, 3:name, 4:latitude_deg, 5:longitude_deg,
+      //  6:elevation_ft, 7:continent, 8:iso_country, 9:iso_region,
+      // 10:municipality, 11:scheduled_service, 12:icao_code, 13:iata_code,
+      // 14:gps_code, 15:local_code, 16:home_link, 17:wikipedia_link, 18:keywords]
+      for (int i = 1; i < rows.length; i++) {
+        final parts = rows[i].map((e) => (e ?? '').toString().trim()).toList();
 
-          // Parse CSV columns: id,ident,type,name,latitude_deg,longitude_deg,elevation_ft,continent,iso_country,iso_region,municipality,scheduled_service,icao_code,iata_code,gps_code,local_code,home_link,wikipedia_link,keywords
-          final iata = parts[13].trim().toUpperCase(); // iata_code column
-          final icao = parts[12].trim().toUpperCase(); // icao_code column
-          final name = parts[3].trim(); // name column
-          final city = parts[10].trim(); // municipality column
-          final country = parts[8].trim(); // iso_country column
-          final lat = double.tryParse(parts[4].trim()); // latitude_deg column
-          final lon = double.tryParse(parts[5].trim()); // longitude_deg column
-          final wiki = parts[17].trim(); // wikipedia_link column
+        final ident = parts[1].toUpperCase(); // e.g., EGGW
+        final name = parts[3];
+        final latStr = parts[4];
+        final lonStr = parts[5];
+        final isoCountry = parts[8].toUpperCase();
+        final municipality = parts[10];
+        final icaoFromCol = parts[12].toUpperCase(); // icao_code column
+        final iata = parts[13].toUpperCase();
+        final gpsCode = parts[14].toUpperCase(); // gps_code column
+        final wiki = parts[17]; // wikipedia_link column
 
-          if (name.isEmpty || lat == null || lon == null) {
-            _logger.log(
-              'Skipping invalid line $i: missing required data (Name: "$name", Lat: $lat, Lon: $lon)',
-            );
-            continue;
-          }
+        final lat = double.parse(latStr);
+        final lon = double.parse(lonStr);
 
-          final airport = Airport(
-            name: name,
-            latLon: LatLng(lat, lon),
-            city: city,
-            countryCode: country,
-            iataCode: iata,
-            icaoCode: icao,
-            wikipediaUrl: wiki,
-          );
-
-          _airports.add(airport);
-
-          if (i % 1000 == 0) {
-            _logger.log('Processed $i airports...');
-          }
-        } catch (e) {
-          _logger.error('Error parsing line $i: $e');
-          continue;
+        // Prefer ICAO from 'icao_code' (column 12), then 'ident' (column 1), then 'gps_code' (column 14)
+        String icao = '';
+        if (icaoFromCol.length == 4) {
+          icao = icaoFromCol;
+        } else if (ident.length == 4) {
+          icao = ident;
+        } else if (gpsCode.length == 4) {
+          icao = gpsCode;
         }
+
+        final airport = Airport(
+          name: name,
+          latLon: LatLng(lat, lon),
+          city: municipality,
+          countryCode: isoCountry,
+          iataCode: iata,
+          icaoCode: icao,
+          wikipediaUrl: wiki,
+        );
+
+        _airports.add(airport);
       }
 
       _isInitialized = true;
@@ -92,7 +98,6 @@ class AirportsDatabase {
   List<Airport> search(String query) {
     if (!_isInitialized) {
       _logger.log('Database not initialized, call initialize() first');
-      return [];
     }
 
     final upperQuery = query.toUpperCase();
@@ -108,5 +113,17 @@ class AirportsDatabase {
 
     _logger.log('Search for "$query" returned ${results.length} results');
     return results;
+  }
+
+  Airport? findByCode(String code) {
+    if (!_isInitialized) return null;
+    final upper = code.toUpperCase();
+    for (final a in _airports) {
+      if (a.iataCode.toUpperCase() == upper ||
+          a.icaoCode.toUpperCase() == upper) {
+        return a;
+      }
+    }
+    return null;
   }
 }
