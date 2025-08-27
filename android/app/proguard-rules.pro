@@ -63,6 +63,10 @@
 -dontwarn okhttp3.**
 -dontwarn okio.**
 
+# Keep sqflite and path_provider plugins
+-keep class com.tekartik.sqflite.** { *; }
+-keep class io.flutter.plugins.pathprovider.** { *; }
+
 # Ignore Play Core (since we're not using dynamic features)
 -dontwarn com.google.android.play.core.**
 -dontwarn com.google.android.play.core.splitcompat.**

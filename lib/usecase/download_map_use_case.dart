@@ -155,6 +155,9 @@ class DownloadMapUseCase {
     required FlightRoute flightRoute,
     required FlightInfo flightInfo,
   }) async {
+    _logger.log(
+      "_saveFlightData start: id='$flightId', mapPath='${flightMap.filePath}', mapSize=${flightMap.sizeBytes}, route='${flightRoute.routeCode}', infoEmpty=${flightInfo.isEmpty}",
+    );
     try {
       final flight = Flight(
         id: flightId,
@@ -162,11 +165,13 @@ class DownloadMapUseCase {
         maps: [flightMap],
         info: flightInfo,
       );
+      _logger.log('Inserting flight into DB: id=${flight.id}');
       await _flightsService.insertFlight(flight);
       _logger.log('Flight saved successfully: \'${flight.id}\'');
-      _logger.log('Flight info: $flightInfo');
+      _logger.log('Flight map path: ${flightMap.filePath}');
       return Result.success(flight: flight);
     } catch (e) {
+      _logger.error('Failed to save flight data: $e');
       return Result.error('Failed to save flight data: $e');
     }
   }

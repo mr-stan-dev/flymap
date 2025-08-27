@@ -39,6 +39,7 @@ class HomeTabCubit extends Cubit<HomeTabState> {
       final totalFlights = await _repository.getTotalFlights();
       final totalDownloadedMaps = await _repository.getTotalDownloadedMaps();
       final totalMapSize = await _repository.getTotalMapSize();
+      print('total flights: $totalFlights');
 
       return FlightStatistics(
         totalFlights: totalFlights,
@@ -46,6 +47,7 @@ class HomeTabCubit extends Cubit<HomeTabState> {
         totalMapSize: totalMapSize,
       );
     } catch (e) {
+      print('load statistics error: $e');
       return FlightStatistics.zero();
     }
   }
@@ -61,6 +63,7 @@ class HomeTabCubit extends Cubit<HomeTabState> {
       return sorted;
     } catch (e) {
       _logger.error('Error loading flights: $e');
+      print('load flights error: $e');
       return <Flight>[];
     }
   }

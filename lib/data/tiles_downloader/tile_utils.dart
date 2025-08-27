@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
 
 class MapTile {
@@ -58,7 +59,9 @@ class TileUtils {
         }
       }
     }
-    print('[VectorTilesDownloader] Zoom $zoom: $tileCount tiles selected');
+    if (kDebugMode) {
+      print('[VectorTilesDownloader] Zoom $zoom: $tileCount tiles selected');
+    }
   }
 
   static LatLng latLonFromTileCenter(int x, int y, int z) {
