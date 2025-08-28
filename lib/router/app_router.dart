@@ -8,6 +8,7 @@ import 'package:flymap/ui/screens/settings/settings_screen.dart';
 import 'package:flymap/ui/screens/about/about_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 /// App router configuration using go_router
 class AppRouter {
@@ -23,6 +24,9 @@ class AppRouter {
     return GoRouter(
       initialLocation: homeRoute,
       debugLogDiagnostics: true,
+      observers: [
+        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+      ],
       routes: [
         // Home route - HomeScreen
         GoRoute(

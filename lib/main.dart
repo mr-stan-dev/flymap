@@ -11,10 +11,11 @@ import 'di/di_module.dart';
 import 'router/app_router.dart';
 import 'ui/screens/settings/viewmodel/settings_cubit.dart';
 import 'ui/screens/settings/viewmodel/settings_state.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // Register dependencies
   DiModule().register();
   await GlyphsService().copyGlyphsToCacheDir();
