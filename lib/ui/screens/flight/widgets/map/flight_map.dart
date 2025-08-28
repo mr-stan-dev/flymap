@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flymap/data/local/mappers/flight_map_db_mapper.dart';
 import 'package:flymap/data/local/mappers/flight_map_mapper.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/gps_data.dart';

@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'package:geolocator/geolocator.dart';
+
 import 'package:flymap/entity/gps_data.dart';
 import 'package:flymap/repository/metric_units_repository.dart';
+import 'package:geolocator/geolocator.dart';
 
 /// Provides GPS data updates and status changes
 class GpsDataProvider {

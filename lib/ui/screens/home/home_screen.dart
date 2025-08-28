@@ -1,7 +1,6 @@
-import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 import 'package:flutter/material.dart';
-import 'package:flymap/ui/screens/settings/settings_screen.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
-import 'package:flymap/data/route/great_circle_route_provider.dart';
-import 'package:flymap/data/route/route_corridor_provider.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/logger.dart';

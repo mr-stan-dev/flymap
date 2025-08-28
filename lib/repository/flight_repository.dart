@@ -1,4 +1,3 @@
-import 'package:flymap/data/local/app_database.dart';
 import 'package:flymap/data/local/flights_db_service.dart';
 import 'package:flymap/entity/flight.dart';
 

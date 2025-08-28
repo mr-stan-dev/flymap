@@ -1,5 +1,4 @@
 import 'package:flymap/entity/flight.dart';
-import 'package:flymap/entity/flight_map.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:latlong2/latlong.dart';
 

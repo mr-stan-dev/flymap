@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/widgets/map/flight_map.dart';
 import 'package:flymap/ui/screens/flight/widgets/map/flight_map_loading.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../viewmodel/flight_screen_cubit.dart';
 

@@ -1,9 +1,8 @@
-import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 import 'package:flutter/material.dart';
-import 'package:flymap/entity/airport.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_cubit.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 
 class FlightDownloading extends StatelessWidget {
   final FlightPreviewAirports airports;

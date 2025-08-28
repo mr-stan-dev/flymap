@@ -1,5 +1,5 @@
-import 'package:flymap/ui/theme/app_colours.dart';
 import 'package:flutter/material.dart';
+import 'package:flymap/ui/theme/app_colours.dart';
 
 class AppColourTheme extends ThemeExtension<AppColourTheme> {
   const AppColourTheme({

@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:flymap/entity/airport.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:flymap/entity/airport.dart';
 
 class FlightRoute extends Equatable {
   final Airport departure;

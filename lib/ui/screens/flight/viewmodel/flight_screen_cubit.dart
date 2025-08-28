@@ -1,13 +1,13 @@
 import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/data/gps_data_provider.dart';
 import 'package:flymap/entity/flight.dart';
-import 'package:flymap/entity/gps_data.dart';
+import 'package:flymap/logger.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flymap/logger.dart';
-import 'package:get_it/get_it.dart';
-import 'package:flymap/data/gps_data_provider.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get_it/get_it.dart';
 
 class FlightScreenCubit extends Cubit<FlightScreenState> {
   final _logger = Logger('FlightScreenCubit');

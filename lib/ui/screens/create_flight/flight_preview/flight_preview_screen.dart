@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/router/app_router.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_download_completion.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_preview_loaded.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_cubit.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_download_completion.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_downloading.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_preview_loaded.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 import 'package:get_it/get_it.dart';
 

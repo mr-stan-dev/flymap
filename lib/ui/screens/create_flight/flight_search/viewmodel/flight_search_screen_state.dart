@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/airport.dart';
+import 'package:flymap/entity/flight.dart';
 
 sealed class FlightSearchScreenState extends Equatable {
   const FlightSearchScreenState();

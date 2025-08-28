@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flymap/entity/units.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MetricUnitsRepository {
   static const _kAltitude = 'settings.altitudeUnit';

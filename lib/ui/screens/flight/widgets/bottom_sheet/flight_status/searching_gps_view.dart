@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
-import 'package:flymap/ui/screens/flight/widgets/bottom_sheet/flight_status/gps_active.dart';
 
 class SearchingGpsView extends StatelessWidget {
 

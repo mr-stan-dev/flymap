@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_preview_app_bar.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/info/flight_info_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/map/flight_map_preview_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_cubit.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_preview_app_bar.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
 
 class FlightPreviewLoadedWidget extends StatefulWidget {

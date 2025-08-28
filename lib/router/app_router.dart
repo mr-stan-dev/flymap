@@ -1,14 +1,14 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/material.dart';
 import 'package:flymap/entity/flight.dart';
+import 'package:flymap/ui/screens/about/about_screen.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_screen.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/flight_search_screen.dart';
-import 'package:flymap/ui/screens/home/home_screen.dart';
 import 'package:flymap/ui/screens/flight/flight_screen.dart';
+import 'package:flymap/ui/screens/home/home_screen.dart';
 import 'package:flymap/ui/screens/settings/settings_screen.dart';
-import 'package:flymap/ui/screens/about/about_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 
 /// App router configuration using go_router
 class AppRouter {

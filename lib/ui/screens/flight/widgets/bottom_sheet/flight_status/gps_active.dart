@@ -1,7 +1,7 @@
-import 'package:flymap/ui/theme/app_colours.dart';
 import 'package:flutter/material.dart';
-import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/entity/gps_data.dart';
+import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
+import 'package:flymap/ui/theme/app_colours.dart';
 
 class GpsActive extends StatelessWidget {
   final FlightScreenLoaded state;

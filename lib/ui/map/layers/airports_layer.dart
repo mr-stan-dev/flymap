@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/ui/map/layers/latlon_utils.dart';

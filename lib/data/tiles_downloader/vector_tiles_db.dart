@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:sqflite/sqflite.dart';
 
 import '../../logger.dart';

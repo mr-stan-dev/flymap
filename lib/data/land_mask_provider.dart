@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:latlong2/latlong.dart';
 
 /// Provider for determining if geographic areas contain land

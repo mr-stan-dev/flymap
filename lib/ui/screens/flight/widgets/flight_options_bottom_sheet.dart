@@ -1,7 +1,5 @@
-import 'package:flymap/entity/flight.dart';
-import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/entity/flight.dart';
 
 class FlightOptionsBottomSheet extends StatelessWidget {
   const FlightOptionsBottomSheet(this.flight, this.onDelete, {super.key});

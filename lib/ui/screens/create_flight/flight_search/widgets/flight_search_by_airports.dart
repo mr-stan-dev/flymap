@@ -1,9 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/widgets/popular_flights.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
 
 import '../viewmodel/flight_search_screen_cubit.dart';

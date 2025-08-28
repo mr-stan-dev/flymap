@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flymap/repository/settings_repository.dart';
-import 'package:flymap/repository/metric_units_repository.dart';
 import 'package:flymap/entity/units.dart';
+import 'package:flymap/repository/metric_units_repository.dart';
+import 'package:flymap/repository/settings_repository.dart';
 
 import 'settings_state.dart';
 

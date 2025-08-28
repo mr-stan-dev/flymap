@@ -1,17 +1,18 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flymap/cubit_state_observer.dart';
-import 'package:flymap/data/local/app_database.dart';
-import 'package:flymap/data/glyphs_service.dart';
-import 'package:flymap/data/sprite_service.dart';
-import 'package:flymap/ui/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/cubit_state_observer.dart';
+import 'package:flymap/data/glyphs_service.dart';
+import 'package:flymap/data/local/app_database.dart';
+import 'package:flymap/data/sprite_service.dart';
+import 'package:flymap/ui/theme/app_theme.dart';
 import 'package:get_it/get_it.dart';
+
 import 'di/di_module.dart';
+import 'firebase_options.dart';
 import 'router/app_router.dart';
 import 'ui/screens/settings/viewmodel/settings_cubit.dart';
 import 'ui/screens/settings/viewmodel/settings_state.dart';
-import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

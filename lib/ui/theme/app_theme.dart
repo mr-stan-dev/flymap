@@ -1,5 +1,5 @@
-import 'package:flymap/ui/theme/app_colours.dart';
 import 'package:flutter/material.dart';
+import 'package:flymap/ui/theme/app_colours.dart';
 
 import 'app_colour_theme.dart';
 import 'app_text_theme.dart';

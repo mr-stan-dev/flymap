@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
-import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/entity/flight.dart';
-import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_state.dart';
 import 'package:flymap/logger.dart';
+import 'package:flymap/repository/flight_repository.dart';
+import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_state.dart';
+import 'package:get_it/get_it.dart';
 
 /// Cubit for managing home tab state
 class HomeTabCubit extends Cubit<HomeTabState> {

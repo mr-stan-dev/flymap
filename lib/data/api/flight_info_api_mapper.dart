@@ -1,9 +1,5 @@
-import 'dart:convert';
-
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_poi.dart';
-import 'package:flymap/logger.dart';
 import 'package:latlong2/latlong.dart';
 
 class FlightInfoApiMapper {

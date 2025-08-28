@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
-import 'package:latlong2/latlong.dart';
 
 sealed class FlightPreviewState extends Equatable {
   const FlightPreviewState();
