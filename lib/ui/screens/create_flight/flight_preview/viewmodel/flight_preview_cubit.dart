@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
@@ -19,6 +20,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   final DownloadMapUseCase downloadMapUseCase;
   final GetFlightInfoUseCase getFlightInfoUseCase;
   final GetFlightInfoUseCase _getFlightInfoUseCase;
+  final ConnectivityChecker _connectivity;
 
   StreamSubscription? _downloadSubscription;
 
@@ -29,8 +31,10 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     required FlightRouteProvider routeProvider,
     required this.downloadMapUseCase,
     required this.getFlightInfoUseCase,
+    required ConnectivityChecker connectivity,
   }) : _routeProvider = routeProvider,
        _getFlightInfoUseCase = getFlightInfoUseCase,
+       _connectivity = connectivity,
        super(const FlightMapPreviewLoading()) {
     _initialize(params);
   }
@@ -38,6 +42,14 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   /// Initialize the cubit and calculate route/corridor
   Future<void> _initialize(FlightPreviewParams params) async {
     emit(const FlightMapPreviewLoading());
+
+    final hasInternet = await _connectivity.hasInternetConnectivity();
+
+    if (!hasInternet) {
+      final msg = 'No internet connection. Please check your connection and try again.';
+      emit(FlightMapPreviewError(msg));
+      return;
+    }
 
     try {
       switch (params) {
@@ -71,7 +83,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
         unawaited(_loadFlightOverview(route));
       }
       emit(
-        FlightMapPreviewLoaded(
+        FlightMapPreviewMapState(
           flightRoute: route,
           flightInfo: isTooLong
               ? FlightInfo(
@@ -98,7 +110,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
       );
       _logger.log('Flight overview: ${flightInfo.overview}');
       final currentState = state;
-      if (currentState is FlightMapPreviewLoaded && !isClosed) {
+      if (currentState is FlightMapPreviewMapState && !isClosed) {
         emit(currentState.copyWith(flightInfo: flightInfo));
       }
     } catch (e) {
@@ -109,7 +121,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   /// Update zoom level
   void updateZoom(double zoom) {
     final currentState = state;
-    if (currentState is FlightMapPreviewLoaded) {
+    if (currentState is FlightMapPreviewMapState) {
       emit(currentState.copyWith(currentZoom: zoom));
     }
   }
@@ -117,7 +129,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   /// Start the download process
   void startDownload() async {
     try {
-      final currentState = state as FlightMapPreviewLoaded;
+      final currentState = state as FlightMapPreviewMapState;
 
       // Reset state and start creation phase
       emit(MapDownloadingState(progress: 0.0));

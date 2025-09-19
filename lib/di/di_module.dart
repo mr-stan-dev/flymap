@@ -4,6 +4,7 @@ import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/local/app_database.dart';
 import 'package:flymap/data/local/flights_db_service.dart';
 import 'package:flymap/data/local/mappers/flight_db_mapper.dart';
+import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/data/route/great_circle_route_provider.dart';
 import 'package:flymap/repository/flight_repository.dart';
@@ -32,8 +33,16 @@ class DiModule {
 
     i.registerFactory<FlightRouteProvider>(() => GreatCircleRouteProvider());
 
+    // Connectivity checker
+    i.registerLazySingleton<ConnectivityChecker>(
+      () => const ConnectivityChecker(),
+    );
+
     i.registerLazySingleton<DownloadMapUseCase>(
-      () => DownloadMapUseCase(service: GetIt.I.get()),
+      () => DownloadMapUseCase(
+        service: GetIt.I.get(),
+        connectivity: GetIt.I.get(),
+      ),
     );
     i.registerLazySingleton<GetFlightInfoUseCase>(
       () => GetFlightInfoUseCase(flightInfoApi: GetIt.I.get()),

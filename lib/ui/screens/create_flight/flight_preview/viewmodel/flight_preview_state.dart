@@ -15,26 +15,26 @@ final class FlightMapPreviewLoading extends FlightPreviewState {
 }
 
 /// Route and corridor calculated successfully
-final class FlightMapPreviewLoaded extends FlightPreviewState {
+final class FlightMapPreviewMapState extends FlightPreviewState {
   final FlightRoute flightRoute;
   final FlightInfo flightInfo;
   final double currentZoom;
   final bool isTooLongFlight;
 
-  const FlightMapPreviewLoaded({
+  const FlightMapPreviewMapState({
     required this.flightRoute,
     required this.flightInfo,
     required this.currentZoom,
     required this.isTooLongFlight,
   });
 
-  FlightMapPreviewLoaded copyWith({
+  FlightMapPreviewMapState copyWith({
     FlightRoute? flightRoute,
     FlightInfo? flightInfo,
     double? currentZoom,
     bool? isTooLongFlight,
   }) {
-    return FlightMapPreviewLoaded(
+    return FlightMapPreviewMapState(
       flightRoute: flightRoute ?? this.flightRoute,
       flightInfo: flightInfo ?? this.flightInfo,
       currentZoom: currentZoom ?? this.currentZoom,

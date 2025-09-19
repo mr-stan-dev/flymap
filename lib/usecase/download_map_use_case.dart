@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flymap/data/local/flights_db_service.dart';
+import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/tiles_downloader/vector_tiles_downloader.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/flight_info.dart';
@@ -83,11 +85,15 @@ class DownloadMapVerifying extends DownloadMapEvent {
 
 class DownloadMapUseCase {
   final FlightsDBService _flightsService;
+  final ConnectivityChecker _connectivity;
   final _logger = Logger('DownloadMapUseCase');
   VectorTilesDownloader? _currentDownloader;
 
-  DownloadMapUseCase({required FlightsDBService service})
-    : _flightsService = service;
+  DownloadMapUseCase({
+    required FlightsDBService service,
+    required ConnectivityChecker connectivity,
+  }) : _flightsService = service,
+       _connectivity = connectivity;
 
   void cancel() {
     _currentDownloader?.cancel();
@@ -98,6 +104,14 @@ class DownloadMapUseCase {
     required FlightInfo flightInfo,
   }) async* {
     try {
+      // Check internet connectivity before starting
+      if (!await _connectivity.hasInternetConnectivity()) {
+        yield const DownloadMapError(
+          'No internet connection. Please check your connection and try again.',
+        );
+        return;
+      }
+
       // Create and start the vector tiles downloader
       final downloader = VectorTilesDownloader(
         polygon: flightRoute.corridor,
@@ -162,7 +176,7 @@ class DownloadMapUseCase {
       );
       _logger.log('Inserting flight into DB: id=${flight.id}');
       await _flightsService.insertFlight(flight);
-      _logger.log('Flight saved successfully: \'${flight.id}\'');
+      _logger.log("Flight saved successfully: '${flight.id}'");
       _logger.log('Flight map path: ${flightMap.filePath}');
       return Result.success(flight: flight);
     } catch (e) {

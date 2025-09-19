@@ -81,12 +81,12 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
     );
     return BlocListener<FlightPreviewCubit, FlightPreviewState>(
       listener: (context, state) {
-        if (state is FlightMapPreviewLoaded && _mapController != null) {
+        if (state is FlightMapPreviewMapState && _mapController != null) {
           PoiLayer(poi: state.flightInfo.poi).add(_mapController!);
         }
       },
       listenWhen: (oldState, newState) {
-        final newLoaded = newState as FlightMapPreviewLoaded?;
+        final newLoaded = newState as FlightMapPreviewMapState?;
         return newLoaded != null && !newLoaded.flightInfo.isEmpty;
       },
       child: MapLibreMap(

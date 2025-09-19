@@ -6,7 +6,9 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_download_completion.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_downloading.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_preview_loaded.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_preview_map.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_preview_loading.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_preview_error.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 import 'package:get_it/get_it.dart';
 
@@ -23,6 +25,7 @@ class FlightPreviewScreen extends StatelessWidget {
         routeProvider: GetIt.I.get(),
         downloadMapUseCase: GetIt.I.get(),
         getFlightInfoUseCase: GetIt.I.get(),
+        connectivity: GetIt.I.get(),
       ),
       child: Scaffold(
         body: SafeArea(
@@ -39,9 +42,9 @@ class FlightPreviewScreen extends StatelessWidget {
             builder: (context, state) {
               switch (state) {
                 case FlightMapPreviewLoading():
-                  return _buildLoadingState();
-                case FlightMapPreviewLoaded():
-                  return FlightPreviewLoadedWidget(state: state);
+                  return FlightPreviewLoadingWidget(airports: airports);
+                case FlightMapPreviewMapState():
+                  return FlightPreviewMapWidget(state: state);
                 case MapDownloadingState():
                   return state.isDownloaded
                       ? FlightDownloadCompletion()
@@ -50,69 +53,14 @@ class FlightPreviewScreen extends StatelessWidget {
                           downloadingState: state,
                         );
                 case FlightMapPreviewError():
-                  return _buildErrorState(context, state);
+                  return FlightPreviewErrorWidget(
+                    message: state.message,
+                    onRetry: () => context.read<FlightPreviewCubit>().retry(),
+                  );
               }
             },
           ),
         ),
-      ),
-    );
-  }
-
-  /// Build loading state UI
-  Widget _buildLoadingState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(),
-          const SizedBox(height: 16),
-          Text(
-            'Calculating flight route...',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '${airports.departure.displayCode} → ${airports.arrival.displayCode}',
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Build error state UI
-  Widget _buildErrorState(BuildContext context, FlightMapPreviewError state) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, color: Colors.red, size: 64),
-          const SizedBox(height: 16),
-          Text(
-            'Something went wrong',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            state.message,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey[400]),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () {
-              // Retry by calling the public retry method
-              context.read<FlightPreviewCubit>().retry();
-            },
-            icon: const Icon(Icons.refresh),
-            label: const Text('Try Again'),
-          ),
-        ],
       ),
     );
   }

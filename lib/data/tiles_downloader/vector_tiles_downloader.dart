@@ -247,6 +247,31 @@ class VectorTilesDownloader {
       );
       _logger.log('Success rate: $successRate% ($tilesDownloaded/$totalTiles)');
 
+      // Enforce minimum success rate of 70%
+      final successFraction = totalTiles == 0
+          ? 0.0
+          : tilesDownloaded / totalTiles;
+      if (successFraction < 0.7) {
+        _logger.log(
+          'Success rate below threshold (70%). Failing download and deleting MBTiles.',
+        );
+        try {
+          final f = File(mbtilesPath);
+          if (await f.exists()) {
+            await f.delete();
+          }
+        } catch (e) {
+          _logger.error('Failed to delete MBTiles after low success rate: $e');
+        }
+        controller.add(
+          DownloadMapError(
+            'Only ${(successFraction * 100).toStringAsFixed(1)}% of tiles downloaded. Please try again.',
+          ),
+        );
+        controller.close();
+        return;
+      }
+
       if (tilesDownloaded < totalTiles) {
         _logger.log(
           'Warning: Some tiles failed to download. The map may have gaps.',

@@ -7,16 +7,16 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_preview_app_bar.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
 
-class FlightPreviewLoadedWidget extends StatefulWidget {
-  final FlightMapPreviewLoaded state;
+class FlightPreviewMapWidget extends StatefulWidget {
+  final FlightMapPreviewMapState state;
 
-  const FlightPreviewLoadedWidget({super.key, required this.state});
+  const FlightPreviewMapWidget({super.key, required this.state});
 
   @override
-  State<FlightPreviewLoadedWidget> createState() => _FlightPreviewLoadedWidgetState();
+  State<FlightPreviewMapWidget> createState() => _FlightPreviewMapWidgetState();
 }
 
-class _FlightPreviewLoadedWidgetState extends State<FlightPreviewLoadedWidget> {
+class _FlightPreviewMapWidgetState extends State<FlightPreviewMapWidget> {
   double _hideProgress = 0.0; // 0..1
 
   @override
