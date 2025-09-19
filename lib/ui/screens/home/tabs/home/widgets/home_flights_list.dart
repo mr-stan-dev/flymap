@@ -43,7 +43,7 @@ class HomeFlightsList extends StatelessWidget {
         final flight = flights[index];
         return Padding(
           padding: EdgeInsets.only(bottom: index < flights.length - 1 ? 12 : 0),
-          child: _buildActivityCard(
+          child: _buildFlightCard(
             context,
             flight: flight,
             title: flight.routeName,
@@ -55,7 +55,7 @@ class HomeFlightsList extends StatelessWidget {
     );
   }
 
-  Widget _buildActivityCard(
+  Widget _buildFlightCard(
     BuildContext context, {
     required Flight flight,
     required String title,

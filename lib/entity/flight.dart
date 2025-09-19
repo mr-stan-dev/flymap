@@ -11,12 +11,14 @@ class Flight extends Equatable {
   final FlightRoute route;
   final List<FlightMap> maps;
   final FlightInfo info;
+  final DateTime createdAt;
 
   const Flight({
     required this.id,
     required this.route,
     this.maps = const [],
     required this.info,
+    required this.createdAt,
   });
 
   FlightMap? get flightMap => maps.isNotEmpty ? maps[0] : null;
@@ -33,5 +35,5 @@ class Flight extends Equatable {
   String get routeName => '${departure.nameShort} -> ${arrival.nameShort}';
 
   @override
-  List<Object?> get props => [id, route, maps, info];
+  List<Object?> get props => [id, route, maps, info, createdAt];
 }

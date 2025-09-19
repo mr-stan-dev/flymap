@@ -32,14 +32,15 @@ class FlightDbMapper {
        _infoMapper = infoMapper ?? FlightInfoDbMapper();
 
   Map<String, dynamic> toDb(Flight flight) {
+    final nowIso = DateTime.now().toIso8601String();
     final out = <String, dynamic>{
       FlightDBKeys.id: flight.id,
       FlightDBKeys.flightMaps: flight.maps
           .map((m) => _mapMapper.toDb(m))
           .toList(),
       FlightDBKeys.flightInfo: _infoMapper.toFlightInfoMap(flight.info),
-      FlightDBKeys.createdAt: DateTime.now().toIso8601String(),
-      FlightDBKeys.updatedAt: DateTime.now().toIso8601String(),
+      FlightDBKeys.createdAt: flight.createdAt.toIso8601String(),
+      FlightDBKeys.updatedAt: nowIso,
     };
 
     out[FlightDBKeys.departure] = _airportMapper.toDb(flight.route.departure);
@@ -99,11 +100,17 @@ class FlightDbMapper {
       (map[FlightDBKeys.flightInfo] as Map<String, dynamic>),
     );
 
+    final createdAtStr = (map[FlightDBKeys.createdAt] ?? '').toString();
+    final createdAt = createdAtStr.isNotEmpty
+        ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
+        : DateTime.now();
+
     return Flight(
       id: (map[FlightDBKeys.id] ?? '').toString(),
       route: route,
       maps: mapsList,
       info: info,
+      createdAt: createdAt,
     );
   }
 }

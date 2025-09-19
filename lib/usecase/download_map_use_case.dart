@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flymap/data/local/flights_db_service.dart';
@@ -173,6 +172,7 @@ class DownloadMapUseCase {
         route: flightRoute,
         maps: [flightMap],
         info: flightInfo,
+        createdAt: DateTime.now(),
       );
       _logger.log('Inserting flight into DB: id=${flight.id}');
       await _flightsService.insertFlight(flight);
