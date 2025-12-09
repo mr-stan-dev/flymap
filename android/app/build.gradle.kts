@@ -33,7 +33,7 @@ android {
 
     defaultConfig {
         applicationId = "app.flymap"
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = 9
         versionName = "0.1.3"
