@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -47,18 +47,16 @@ class GlyphsService {
     }
   }
 
-  Future<List<String>> _getGlyphAssets() {
-    return rootBundle.loadString('AssetManifest.json').then<List<String>>((
-      String manifestJson,
-    ) {
-      Map<String, dynamic> manifestMap = jsonDecode(manifestJson);
-      return manifestMap.keys
-          .where(
-            (String key) =>
-                key.contains('assets/glyphs') && !key.contains('.DS_Store'),
-          )
-          .toList();
-    });
+  Future<List<String>> _getGlyphAssets() async {
+    final AssetManifest assetManifest =
+        await AssetManifest.loadFromAssetBundle(rootBundle);
+    final List<String> assets = assetManifest.listAssets();
+    return assets
+        .where(
+          (String key) =>
+              key.contains('assets/glyphs') && !key.contains('.DS_Store'),
+        )
+        .toList();
   }
 
   Future<void> _writeAssetToFile(ByteData data, String path) {

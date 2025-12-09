@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -46,18 +46,16 @@ class SpriteService {
     }
   }
 
-  Future<List<String>> _getSpriteAssets() {
-    return rootBundle.loadString('AssetManifest.json').then<List<String>>((
-      String manifestJson,
-    ) {
-      Map<String, dynamic> manifestMap = jsonDecode(manifestJson);
-      return manifestMap.keys
-          .where(
-            (String key) =>
-                key.contains('assets/sprites') && !key.contains('.DS_Store'),
-          )
-          .toList();
-    });
+  Future<List<String>> _getSpriteAssets() async {
+    final AssetManifest assetManifest =
+        await AssetManifest.loadFromAssetBundle(rootBundle);
+    final List<String> assets = assetManifest.listAssets();
+    return assets
+        .where(
+          (String key) =>
+              key.contains('assets/sprites') && !key.contains('.DS_Store'),
+        )
+        .toList();
   }
 
   Future<void> _writeAssetToFile(ByteData data, String path) {

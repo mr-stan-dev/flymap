@@ -18,8 +18,8 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "app.forkee"
-    compileSdk = 35
+    namespace = "app.flymap"
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -34,7 +34,7 @@ android {
     defaultConfig {
         applicationId = "app.flymap"
         minSdk = 23
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 9
         versionName = "0.1.3"
         ndkVersion = "28.1.13356709"
