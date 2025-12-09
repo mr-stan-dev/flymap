@@ -35,8 +35,8 @@ android {
         applicationId = "app.flymap"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
-        versionCode = 9
-        versionName = "0.1.3"
+        versionCode = 10
+        versionName = "0.1.4"
         ndkVersion = "28.1.13356709"
     }
 
