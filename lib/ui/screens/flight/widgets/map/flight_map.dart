@@ -40,6 +40,7 @@ class _FlightMapState extends State<FlightMap> {
   Circle? _userCircle;
   bool _followUser = false;
   final _styleMapper = FlightMapStyleMapper();
+  bool _isMapInitialized = false;
 
   late final LatLng _center = LatLng(
     MapUtils.center(
@@ -154,11 +155,18 @@ class _FlightMapState extends State<FlightMap> {
     if (!_mapReady || !mounted) return;
 
     // Delay camera operations until the native map view has a valid frame.
-    // mapView.convert() crashes with std::domain_error if frame is zero.
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    // simple delay is sufficient to avoid std::domain_error
+    Future.delayed(const Duration(milliseconds: 1000), () async {
       if (!mounted || _mapController == null) return;
+      
       await _moveCameraToTop();
       _addFlightMapLayers();
+      
+      if (mounted) {
+        setState(() {
+          _isMapInitialized = true;
+        });
+      }
     });
   }
 
@@ -285,6 +293,22 @@ class _FlightMapState extends State<FlightMap> {
               ],
             ),
           ),
+          if (!_isMapInitialized)
+            Positioned.fill(
+              child: Container(
+                color: Theme.of(context).colorScheme.surface,
+                child: const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text('Initializing map...'),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

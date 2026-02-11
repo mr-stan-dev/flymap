@@ -117,10 +117,26 @@ class MBTilesURLProtocol: URLProtocol {
     // MARK: - Helpers
     
     private func sendResponse(data: Data, mimeType: String) {
-        let response = URLResponse(url: request.url!, mimeType: mimeType, expectedContentLength: data.count, textEncodingName: nil)
-        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-        client?.urlProtocol(self, didLoad: data)
-        client?.urlProtocolDidFinishLoading(self)
+        var headers = ["Content-Type": mimeType, "Content-Length": String(data.count)]
+        if isGzipped(data) {
+            headers["Content-Encoding"] = "gzip"
+        }
+        
+        if let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: "1.1", headerFields: headers) {
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: data)
+            client?.urlProtocolDidFinishLoading(self)
+        } else {
+            // Fallback
+             let response = URLResponse(url: request.url!, mimeType: mimeType, expectedContentLength: data.count, textEncodingName: nil)
+             client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+             client?.urlProtocol(self, didLoad: data)
+             client?.urlProtocolDidFinishLoading(self)
+        }
+    }
+    
+    private func isGzipped(_ data: Data) -> Bool {
+        return data.count >= 2 && data[0] == 0x1f && data[1] == 0x8b
     }
     
     private func parseTileURL(_ url: URL) -> (String, Int, Int, Int)? {
