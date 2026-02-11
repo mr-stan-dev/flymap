@@ -40,19 +40,21 @@ class _BottomSheetLoadedState extends State<BottomSheetLoaded> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildDragHandle(theme),
-            _buildGpsAccuracyRow(context, theme),
             Expanded(
               child: CustomScrollView(
                 controller: widget.scrollController,
                 slivers: [
+                  SliverToBoxAdapter(child: _buildDragHandle(theme)),
+                  SliverToBoxAdapter(
+                    child: _buildGpsAccuracyRow(context, theme),
+                  ),
                   SliverPersistentHeader(
                     pinned: true,
                     delegate: PinnedTabBarHeader(
                       backgroundColor: theme.colorScheme.surface,
                       tabBar: TabBar(
                         labelColor: onSurface,
-                        unselectedLabelColor: onSurface.withOpacity(0.5),
+                        unselectedLabelColor: onSurface.withValues(alpha: 0.5),
                         indicatorColor: theme.colorScheme.primary,
                         onTap: (idx) => setState(() => _tabIndex = idx),
                         tabs: const [
@@ -92,13 +94,15 @@ class _BottomSheetLoadedState extends State<BottomSheetLoaded> {
   }
 
   Widget _buildDragHandle(ThemeData theme) {
-    return Container(
-      margin: const EdgeInsets.only(top: 8),
-      width: 40,
-      height: 4,
-      decoration: BoxDecoration(
-        color: theme.dividerColor,
-        borderRadius: BorderRadius.circular(2),
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.only(top: 8),
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: theme.dividerColor,
+          borderRadius: BorderRadius.circular(2),
+        ),
       ),
     );
   }
