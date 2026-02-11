@@ -59,13 +59,7 @@ class PoiLayer extends MapLayer {
       _sourceId,
       _iconsLayerId,
       SymbolLayerProperties(
-        iconImage: [
-          'coalesce',
-          ['image', 'poi-generic'],
-          ['image', 'marker_11'],
-          ['image', 'circle_11'],
-          ['image', 'dot_11'],
-        ],
+        iconImage: 'poi-generic',
         iconSize: 2.0,
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
@@ -79,13 +73,10 @@ class PoiLayer extends MapLayer {
       SymbolLayerProperties(
         textField: ['get', 'name'],
         textSize: [
-          'case',
-          [
-            '<',
-            ['zoom'],
-            8,
-          ],
-          0.01,
+          'step',
+          ['zoom'],
+          0.0,
+          8,
           12.0,
         ],
         textColor: Colors.white.toHexStringRGB(),

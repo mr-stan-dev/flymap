@@ -31,17 +31,25 @@ class FlightMapDbMapper {
 
 class FlightMapStyleMapper {
   /// Injects an mbtiles URL into the style JSON for the 'openmaptiles' source.
+  /// Also updates sprite and glyph paths to point to the current cache directory.
   /// Returns the updated JSON string; if not applicable, returns the original.
-  String mapStyleWithMbtiles(String styleJson, String absoluteMbtilesPath) {
+  String mapStyleWithMbtiles(
+    String styleJson,
+    String absoluteMbtilesPath, {
+    required String cacheDir,
+  }) {
     try {
       final style = jsonDecode(styleJson) as Map<String, dynamic>;
       final sources = style['sources'];
       if (sources is Map && sources['openmaptiles'] is Map) {
         (sources['openmaptiles'] as Map)['url'] =
             'mbtiles://$absoluteMbtilesPath';
-        return jsonEncode(style);
       }
-      return styleJson;
+      // Fix sprite/glyph paths to point to the current platform cache directory
+      style['sprite'] = 'file://$cacheDir/assets/sprites/sprite';
+      style['glyphs'] =
+          'file://$cacheDir/assets/glyphs/{fontstack}/{range}.pbf';
+      return jsonEncode(style);
     } catch (_) {
       return styleJson;
     }

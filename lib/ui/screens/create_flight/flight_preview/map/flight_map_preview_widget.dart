@@ -91,7 +91,7 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
       },
       child: MapLibreMap(
         onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(target: _center, zoom: zoom),
+        initialCameraPosition: CameraPosition(target: _center, zoom: zoom.isFinite ? zoom : 1.0),
         styleString: "https://tiles.openfreemap.org/styles/liberty",
         onStyleLoadedCallback: _onStyleLoaded,
       ),

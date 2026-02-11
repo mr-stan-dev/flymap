@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/logger.dart';
 import 'package:sembast/sembast_io.dart';
@@ -67,12 +70,15 @@ class FlightsDBService {
       final dynamic mapsRaw = map[FlightDBKeys.flightMaps];
       _logger.log('Deleted map list: ${mapsRaw is List}');
       if (mapsRaw is List) {
+        final appDir = await getApplicationCacheDirectory();
         for (final m in mapsRaw.whereType<Map>()) {
-          final filePath = (m[FlightMapDBKeys.filePath])?.toString();
-          _logger.log('Deleted map filePath: $filePath');
-          if (filePath != null && filePath.isNotEmpty) {
+          final storedPath = (m[FlightMapDBKeys.filePath])?.toString();
+          if (storedPath != null && storedPath.isNotEmpty) {
+            // DB stores only the filename; construct full path
+            final fileName = p.basename(storedPath);
+            final filePath = p.join(appDir.path, 'mbtiles', fileName);
+            _logger.log('Deleting map file: $filePath');
             final f = File(filePath);
-            _logger.log('Deleted map existsSync: ${f.existsSync()}');
             if (f.existsSync()) {
               try {
                 f.deleteSync();

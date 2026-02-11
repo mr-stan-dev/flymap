@@ -17,28 +17,6 @@
       }
     },
     {
-      "id": "natural_earth",
-      "type": "raster",
-      "source": "ne2_shaded",
-      "maxzoom": 7,
-      "paint": {
-        "raster-opacity": [
-          "interpolate",
-          [
-            "exponential",
-            1.5
-          ],
-          [
-            "zoom"
-          ],
-          0,
-          0.6,
-          6,
-          0.1
-        ]
-      }
-    },
-    {
       "id": "park",
       "type": "fill",
       "source": "openmaptiles",
@@ -3975,11 +3953,12 @@
           1
         ],
         [
-          "!",
+          "==",
           [
-            "has",
+            "get",
             "claimed_by"
-          ]
+          ],
+          null
         ]
       ],
       "paint": {
@@ -4036,11 +4015,12 @@
           1
         ],
         [
-          "!",
+          "==",
           [
-            "has",
+            "get",
             "claimed_by"
-          ]
+          ],
+          null
         ]
       ],
       "layout": {
@@ -4150,8 +4130,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -4211,8 +4195,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -4286,8 +4274,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -4379,8 +4371,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -4484,8 +4480,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -4589,8 +4589,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -4665,8 +4669,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -4728,8 +4736,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -4819,8 +4831,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -4896,8 +4912,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -5197,8 +5217,12 @@
       "filter": [
         "all",
         [
-          "has",
-          "iata"
+          "!=",
+          [
+            "get",
+            "iata"
+          ],
+          null
         ]
       ],
       "layout": {
@@ -5208,8 +5232,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -5281,8 +5309,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -5366,8 +5398,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -5450,8 +5486,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -5522,8 +5562,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -5618,8 +5662,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -5719,8 +5767,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -5808,8 +5860,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -5889,8 +5945,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",
@@ -5970,8 +6030,12 @@
         "text-field": [
           "case",
           [
-            "has",
-            "name:nonlatin"
+            "!=",
+            [
+              "get",
+              "name:nonlatin"
+            ],
+            null
           ],
           [
             "concat",

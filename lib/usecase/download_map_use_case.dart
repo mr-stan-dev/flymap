@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:path/path.dart' as p;
+
 import 'package:equatable/equatable.dart';
 import 'package:flymap/data/local/flights_db_service.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
@@ -119,20 +121,20 @@ class DownloadMapUseCase {
       );
       _currentDownloader = downloader;
 
-      final id =
-          '${flightRoute.routeCode}_${DateTime.now().millisecondsSinceEpoch}';
       final mapLayer = 'ofm_vector'; // openfreemap_vector
       final fileName = '${flightRoute.routeCode}_$mapLayer';
+      final id = fileName; // Same key for DB record and MBTiles file
 
       // Forward the download stream and handle completion
       await for (final event in downloader.download(fileName)) {
         if (event is DownloadMapDone) {
-          // Save flight data with the MBTiles file
+          // Store only the filename — absolute paths break on iOS when
+          // the container UUID changes between launches.
           final mapData = FlightMap(
             layer: mapLayer,
             sizeBytes: event.fileSize,
             downloadedAt: DateTime.now(),
-            filePath: event.filePath,
+            filePath: p.basename(event.filePath),
           );
 
           final result = await _saveFlightData(

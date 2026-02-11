@@ -14,6 +14,8 @@ import 'package:flymap/ui/map/layers/user_layer.dart';
 import 'package:flymap/ui/map/layers/waypoints_layer.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 import '../../viewmodel/flight_screen_cubit.dart';
 import '../../viewmodel/flight_screen_state.dart';
@@ -58,22 +60,24 @@ class _FlightMapState extends State<FlightMap> {
 
   /// Load style from assets and replace URL with local mbtiles path
   Future<void> _loadStyle() async {
-    final path = widget.flight.flightMap?.filePath ?? '';
-    _logger.log('Loading mbtiles style with path: $path');
-
-    if (path.isEmpty) {
+    final storedPath = widget.flight.flightMap?.filePath ?? '';
+    if (storedPath.isEmpty) {
       _logger.log('No MBTiles file path found');
       return;
     }
 
-    // Check if file exists
-    final file = File(path);
+    // Construct full path from filename (DB stores only the filename to avoid
+    // iOS container UUID staleness)
+    final fileName = p.basename(storedPath);
+    final appDir = await getApplicationCacheDirectory();
+    final resolvedPath = p.join(appDir.path, 'mbtiles', fileName);
+    final file = File(resolvedPath);
+
     if (!await file.exists()) {
-      _logger.log('MBTiles file does not exist: $path');
+      _logger.error('MBTiles file not found: $resolvedPath');
       return;
     }
-
-    _logger.log('MBTiles file exists, loading style from assets');
+    _logger.log('Loading mbtiles: $fileName');
 
     try {
       // Load the style from assets
@@ -81,9 +85,11 @@ class _FlightMapState extends State<FlightMap> {
         'assets/styles/openfreemap_offline_style.json',
       );
 
+      final cacheDir = (await getApplicationCacheDirectory()).path;
       final updated = _styleMapper.mapStyleWithMbtiles(
         styleString,
         file.absolute.path,
+        cacheDir: cacheDir,
       );
 
       setState(() {
@@ -107,12 +113,16 @@ class _FlightMapState extends State<FlightMap> {
 
   // To avoid covering by bottom sheet
   Future<void> _moveCameraToTop() async {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double shiftPx = screenHeight * 0.2;
-    await _mapController?.animateCamera(
-      CameraUpdate.scrollBy(0.0, -shiftPx),
-      duration: Duration(milliseconds: 0),
-    );
+    if (_mapController == null || !mounted) return;
+    try {
+      final double screenHeight = MediaQuery.of(context).size.height;
+      final double shiftPx = screenHeight * 0.2;
+      await _mapController?.moveCamera(
+        CameraUpdate.scrollBy(0.0, -shiftPx),
+      );
+    } catch (e) {
+      _logger.error('Error moving camera to top: $e');
+    }
   }
 
   void _onMapCreated(MapLibreMapController controller) {
@@ -135,13 +145,17 @@ class _FlightMapState extends State<FlightMap> {
     );
   }
 
-  void _onStyleLoaded() async {
+  void _onStyleLoaded() {
     _logger.log('Style loaded successfully');
-    // Style loaded, can now add custom layers
-    if (_mapReady) {
+    if (!_mapReady || !mounted) return;
+
+    // Delay camera operations until the native map view has a valid frame.
+    // mapView.convert() crashes with std::domain_error if frame is zero.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted || _mapController == null) return;
       await _moveCameraToTop();
       _addFlightMapLayers();
-    }
+    });
   }
 
   void _addFlightMapLayers() {
@@ -217,7 +231,7 @@ class _FlightMapState extends State<FlightMap> {
               onMapCreated: _onMapCreated,
               initialCameraPosition: CameraPosition(
                 target: _center,
-                zoom: zoom,
+                zoom: zoom.isFinite ? zoom : 1.0,
               ),
               styleString: _styleString!,
               onStyleLoadedCallback: _onStyleLoaded,
