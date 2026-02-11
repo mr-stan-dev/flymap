@@ -12,21 +12,19 @@ class FlightBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: BlocBuilder<FlightScreenCubit, FlightScreenState>(
-        builder: (BuildContext context, state) {
-          switch (state) {
-            case FlightScreenLoading():
-              return BottomSheetLoading();
-            case FlightScreenLoaded():
-              return BottomSheetLoaded(scrollController, state);
-            case FlightScreenError():
-              return BottomSheetLoading();
-            case FlightScreenDeleted():
-              return BottomSheetLoading();
-          }
-        },
-      ),
+    return BlocBuilder<FlightScreenCubit, FlightScreenState>(
+      builder: (BuildContext context, state) {
+        switch (state) {
+          case FlightScreenLoading():
+            return BottomSheetLoading();
+          case FlightScreenLoaded():
+            return BottomSheetLoaded(scrollController, state);
+          case FlightScreenError():
+            return BottomSheetLoading();
+          case FlightScreenDeleted():
+            return BottomSheetLoading();
+        }
+      },
     );
   }
 }

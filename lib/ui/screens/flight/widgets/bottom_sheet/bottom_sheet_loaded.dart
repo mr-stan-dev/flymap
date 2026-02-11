@@ -38,7 +38,6 @@ class _BottomSheetLoadedState extends State<BottomSheetLoaded> {
           ],
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(
               child: CustomScrollView(
@@ -68,6 +67,11 @@ class _BottomSheetLoadedState extends State<BottomSheetLoaded> {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: _buildTabContent(),
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).padding.bottom + 16,
                     ),
                   ),
                 ],
