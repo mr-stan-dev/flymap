@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight_info.dart';
@@ -36,10 +37,15 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
 
   // To avoid covering by bottom sheet
   Future<void> _moveCameraToTop() async {
+    if (!mounted) return;
     final double screenHeight = MediaQuery.of(context).size.height;
-    final double shiftPx = screenHeight * 0.2;
+    final double shiftPx = screenHeight * 0.15;
+    // On iOS, scrollBy(0, y) moves camera down (content up) given positive y.
+    // On Android, negative y seems to produce the desired effect (user report).
+    final double yShift = Platform.isIOS ? shiftPx : -shiftPx;
+    
     await _mapController?.animateCamera(
-      CameraUpdate.scrollBy(0.0, -shiftPx),
+      CameraUpdate.scrollBy(0.0, yShift),
       duration: Duration(milliseconds: 500),
     );
   }
@@ -86,8 +92,10 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
         }
       },
       listenWhen: (oldState, newState) {
-        final newLoaded = newState as FlightMapPreviewMapState?;
-        return newLoaded != null && !newLoaded.flightInfo.isEmpty;
+        if (newState is FlightMapPreviewMapState) {
+          return !newState.flightInfo.isEmpty;
+        }
+        return false;
       },
       child: MapLibreMap(
         onMapCreated: _onMapCreated,

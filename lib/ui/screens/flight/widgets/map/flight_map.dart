@@ -116,9 +116,13 @@ class _FlightMapState extends State<FlightMap> {
     if (_mapController == null || !mounted) return;
     try {
       final double screenHeight = MediaQuery.of(context).size.height;
-      final double shiftPx = screenHeight * 0.2;
+      final double shiftPx = screenHeight * 0.15;
+      // On iOS, scrollBy(0, y) moves camera down (content up) given positive y.
+      // On Android, negative y seems to produce the desired effect.
+      final double yShift = Platform.isIOS ? shiftPx : -shiftPx;
+
       await _mapController?.moveCamera(
-        CameraUpdate.scrollBy(0.0, -shiftPx),
+        CameraUpdate.scrollBy(0.0, yShift),
       );
     } catch (e) {
       _logger.error('Error moving camera to top: $e');
