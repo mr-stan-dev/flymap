@@ -31,7 +31,7 @@ class VectorTilesDownloader {
   });
 
   static const _urlTemplate =
-      'https://tiles.openfreemap.org/planet/20250730_001001_pt/{z}/{x}/{y}.pbf';
+      'https://tiles.openfreemap.org/planet/20260304_001001_pt/{z}/{x}/{y}.pbf';
 
   final List<Isolate> _isolates = [];
   ReceivePort? _receivePort;
