@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
+import 'package:flymap/ui/screens/flight/widgets/delete_flight_confirmation_dialog.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/route_copy_builder.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
 
@@ -74,31 +75,7 @@ class FlightAppBar extends StatelessWidget {
                     child: PopupMenuButton<String>(
                       icon: const Icon(Icons.more_vert),
                       onSelected: (value) async {
-                        switch (value) {
-                          case 'share_route':
-                            AppRouter.goToShareFlight(context, flight: flight);
-                            break;
-                          case 'copy_route':
-                            final routeSummary = RouteCopyBuilder.build(
-                              flight.route,
-                            );
-                            await Clipboard.setData(
-                              ClipboardData(text: routeSummary),
-                            );
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Route summary copied'),
-                                ),
-                              );
-                            }
-                            break;
-                          case 'delete_flight':
-                            await context
-                                .read<FlightScreenCubit>()
-                                .deleteFlight();
-                            break;
-                        }
+                        await _handleMenuAction(context, value);
                       },
                       itemBuilder: (context) => const [
                         PopupMenuItem(
@@ -124,5 +101,35 @@ class FlightAppBar extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _handleMenuAction(BuildContext context, String value) async {
+    switch (value) {
+      case 'share_route':
+        AppRouter.goToShareFlight(context, flight: flight);
+        break;
+      case 'copy_route':
+        final routeSummary = RouteCopyBuilder.build(flight.route);
+        await Clipboard.setData(ClipboardData(text: routeSummary));
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Route summary copied')));
+        }
+        break;
+      case 'delete_flight':
+        final confirmed = await DeleteFlightConfirmationDialog.show(
+          context,
+          reclaimedBytes: _mapSizeBytes(),
+        );
+        if (confirmed != true || !context.mounted) return;
+        await context.read<FlightScreenCubit>().deleteFlight();
+        break;
+    }
+  }
+
+  int _mapSizeBytes() {
+    if (flight.maps.isEmpty) return 0;
+    return flight.maps.fold<int>(0, (sum, map) => sum + map.sizeBytes);
   }
 }
