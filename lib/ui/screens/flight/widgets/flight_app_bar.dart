@@ -5,11 +5,21 @@ import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
 
 class FlightAppBar extends StatelessWidget {
-  const FlightAppBar({
-    required this.route,
-    this.hideProgress = 0,
-    super.key,
-  });
+  const FlightAppBar({required this.route, this.hideProgress = 0, super.key});
+
+  static const double _outerPadding = 16;
+  static const double _innerPadding = 8;
+  static const double _buttonSize = 48;
+
+  /// Total occupied height when rendered at the top of screen, including
+  /// status-bar inset and internal paddings.
+  static double totalOverlayHeight(BuildContext context) {
+    return MediaQuery.of(context).padding.top +
+        (_outerPadding * 2) +
+        (_innerPadding * 2) +
+        _buttonSize;
+  }
+
   final FlightRoute route;
   final double hideProgress; // 0..1 where 1 = fully hidden (pushed up)
 
@@ -23,14 +33,16 @@ class FlightAppBar extends StatelessWidget {
         // Slide a bit more than full height to fully hide any residual edge
         offset: Offset(0, -1.1 * hideProgress),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(_outerPadding),
           child: Container(
             decoration: BoxDecoration(
-              color: context.colorTheme.backgroundPrimary.withValues(alpha: 0.7),
+              color: context.colorTheme.backgroundPrimary.withValues(
+                alpha: 0.7,
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(_innerPadding),
               child: Row(
                 children: [
                   Container(
@@ -45,19 +57,9 @@ class FlightAppBar extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '${route.departure.displayCode}-${route.arrival.displayCode}',
-                          style: context.textTheme.button18Bold,
-                        ),
-                        Text(
-                          '${route.departure.cityWithCountryCode}-${route.arrival.cityWithCountryCode}',
-                          style: context.textTheme.body16Regular,
-                        ),
-                      ],
+                    child: Text(
+                      '${route.departure.displayCode}-${route.arrival.displayCode}',
+                      style: context.textTheme.button18Bold,
                     ),
                   ),
                   const SizedBox(width: 12),

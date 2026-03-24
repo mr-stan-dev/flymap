@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
-import 'package:flymap/ui/screens/flight/widgets/map/flight_map.dart';
-import 'package:flymap/ui/screens/flight/widgets/map/flight_map_loading.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/map/flight_map.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_tab_loading.dart';
 
-import '../viewmodel/flight_screen_cubit.dart';
-
-class FlightMapView extends StatelessWidget {
-  final DraggableScrollableController bottomSheetController;
-
-  const FlightMapView({super.key, required this.bottomSheetController});
+class FlightMapTabView extends StatelessWidget {
+  const FlightMapTabView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,13 +14,13 @@ class FlightMapView extends StatelessWidget {
       builder: (BuildContext context, state) {
         switch (state) {
           case FlightScreenLoading():
-            return FlightMapLoading();
+            return const FlightMapTabLoading();
           case FlightScreenLoaded():
             return FlightMap(flight: state.flight);
           case FlightScreenError():
-            return FlightMapLoading();
+            return const FlightMapTabLoading();
           case FlightScreenDeleted():
-            return FlightMapLoading();
+            return const FlightMapTabLoading();
         }
       },
     );

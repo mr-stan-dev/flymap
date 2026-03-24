@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/gps_data_provider.dart';
 import 'package:flymap/entity/flight.dart';
+import 'package:flymap/entity/gps_data.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
@@ -11,10 +12,13 @@ import 'package:get_it/get_it.dart';
 
 class FlightScreenCubit extends Cubit<FlightScreenState> {
   final _logger = Logger('FlightScreenCubit');
+  static const _gpsStaleThreshold = Duration(seconds: 20);
   final Flight flight;
   final FlightRepository _repository = GetIt.I.get();
   final GpsDataProvider _gpsProvider = GpsDataProvider();
   Timer? _gpsCheckTimer;
+  int _gpsUpdateTick = 0;
+  DateTime? _lastGpsEventAt;
 
   FlightScreenCubit({required this.flight}) : super(FlightScreenLoading()) {
     _logger.log('flight flightInfo: ${flight.info}');
@@ -24,13 +28,30 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   Future<void> load() async {
     await _gpsProvider.start(
       onUpdate: (status, {data}) {
+        switch (status) {
+          case GpsStatus.gpsActive:
+          case GpsStatus.weakSignal:
+          case GpsStatus.searching:
+            _lastGpsEventAt = DateTime.now();
+            break;
+          case GpsStatus.off:
+          case GpsStatus.permissionsNotGranted:
+            _lastGpsEventAt = null;
+            break;
+        }
+        _gpsUpdateTick++;
         emit(
-          FlightScreenLoaded(flight: flight, gpsStatus: status, gpsData: data),
+          FlightScreenLoaded(
+            flight: flight,
+            gpsStatus: status,
+            gpsData: data,
+            gpsUpdateTick: _gpsUpdateTick,
+          ),
         );
       },
     );
     _gpsCheckTimer = Timer.periodic(
-      const Duration(seconds: 30),
+      const Duration(seconds: 5),
       (_) => _checkGpsStatus(),
     );
   }
@@ -52,7 +73,26 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   }
 
   Future<void> _checkGpsStatus() async {
-    // Provider emits status updates continuously; nothing to do here for now
+    final current = state;
+    if (current is! FlightScreenLoaded) return;
+
+    if (current.gpsStatus == GpsStatus.off ||
+        current.gpsStatus == GpsStatus.permissionsNotGranted) {
+      return;
+    }
+
+    final lastEventAt = _lastGpsEventAt;
+    if (lastEventAt == null) {
+      if (current.gpsStatus != GpsStatus.searching) {
+        emit(current.copyWith(gpsStatus: GpsStatus.searching));
+      }
+      return;
+    }
+
+    final stale = DateTime.now().difference(lastEventAt) > _gpsStaleThreshold;
+    if (stale && current.gpsStatus != GpsStatus.searching) {
+      emit(current.copyWith(gpsStatus: GpsStatus.searching));
+    }
   }
 
   Future<void> requestLocationPermission() async {

@@ -40,7 +40,7 @@ class GpsDataProvider {
 
     const settings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 10,
+      distanceFilter: 0,
     );
 
     final speedUnit = await _unitsRepository.getSpeedUnit();
@@ -70,13 +70,13 @@ class GpsDataProvider {
               course: pos.heading, // degrees
               accuracy: pos.accuracy, // meters
             );
-            onUpdate(GpsStatus.gpsActive, data: gps);
+            final status = pos.accuracy <= 40
+                ? GpsStatus.gpsActive
+                : GpsStatus.weakSignal;
+            onUpdate(status, data: gps);
           },
           onError: (err) {
-            onUpdate(
-              GpsStatus.weakSignal,
-              data: const GpsData(accuracy: 100.0),
-            );
+            onUpdate(GpsStatus.searching);
           },
         );
   }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -13,12 +14,14 @@ import 'package:flymap/ui/map/layers/dimming_layer.dart';
 import 'package:flymap/ui/map/layers/user_layer.dart';
 import 'package:flymap/ui/map/layers/waypoints_layer.dart';
 import 'package:flymap/ui/map/map_utils.dart';
+import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
+import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_controls.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_initializing_overlay.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_style_loading_view.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-
-import '../../viewmodel/flight_screen_cubit.dart';
-import '../../viewmodel/flight_screen_state.dart';
 
 class FlightMap extends StatefulWidget {
   final Flight flight;
@@ -38,7 +41,10 @@ class _FlightMapState extends State<FlightMap> {
   final _logger = const Logger('FlightMapLoaded');
   bool _is3D = false;
   Circle? _userCircle;
+  Symbol? _userHeadingSymbol;
   bool _followUser = false;
+  bool _showControls = true;
+  Timer? _controlsHideTimer;
   final _styleMapper = FlightMapStyleMapper();
   bool _isMapInitialized = false;
 
@@ -57,6 +63,7 @@ class _FlightMapState extends State<FlightMap> {
   void initState() {
     super.initState();
     _loadStyle();
+    _scheduleControlsAutoHide();
   }
 
   /// Load style from assets and replace URL with local mbtiles path
@@ -102,7 +109,9 @@ class _FlightMapState extends State<FlightMap> {
   }
 
   void _goToUserLocationAndFollow() {
-    final userLoc = _userCircle?.options.geometry;
+    _showControlsTemporarily();
+    final userLoc =
+        _userCircle?.options.geometry ?? _userHeadingSymbol?.options.geometry;
     setState(() {
       _followUser = true;
     });
@@ -112,22 +121,36 @@ class _FlightMapState extends State<FlightMap> {
     }
   }
 
-  // To avoid covering by bottom sheet
-  Future<void> _moveCameraToTop() async {
-    if (_mapController == null || !mounted) return;
-    try {
-      final double screenHeight = MediaQuery.of(context).size.height;
-      final double shiftPx = screenHeight * 0.15;
-      // On iOS, scrollBy(0, y) moves camera down (content up) given positive y.
-      // On Android, negative y seems to produce the desired effect.
-      final double yShift = Platform.isIOS ? shiftPx : -shiftPx;
-
-      await _mapController?.moveCamera(
-        CameraUpdate.scrollBy(0.0, yShift),
-      );
-    } catch (e) {
-      _logger.error('Error moving camera to top: $e');
+  Future<void> _toggle3D() async {
+    _showControlsTemporarily();
+    if (_is3D) {
+      await _mapController?.animateCamera(CameraUpdate.tiltTo(0));
+    } else {
+      await _mapController?.animateCamera(CameraUpdate.tiltTo(45));
     }
+    if (mounted) {
+      setState(() => _is3D = !_is3D);
+    }
+  }
+
+  void _showControlsTemporarily() {
+    if (!mounted) return;
+    if (!_showControls) {
+      setState(() {
+        _showControls = true;
+      });
+    }
+    _scheduleControlsAutoHide();
+  }
+
+  void _scheduleControlsAutoHide() {
+    _controlsHideTimer?.cancel();
+    _controlsHideTimer = Timer(const Duration(seconds: 4), () {
+      if (!mounted || _followUser) return;
+      setState(() {
+        _showControls = false;
+      });
+    });
   }
 
   void _onMapCreated(MapLibreMapController controller) {
@@ -142,7 +165,6 @@ class _FlightMapState extends State<FlightMap> {
   }
 
   void _onSymbolTapped(Symbol symbol) {
-    // Example: stop follow and log tapped airport
     if (_followUser) setState(() => _followUser = false);
 
     _logger.log(
@@ -158,10 +180,8 @@ class _FlightMapState extends State<FlightMap> {
     // simple delay is sufficient to avoid std::domain_error
     Future.delayed(const Duration(milliseconds: 1000), () async {
       if (!mounted || _mapController == null) return;
-      
-      await _moveCameraToTop();
       _addFlightMapLayers();
-      
+
       if (mounted) {
         setState(() {
           _isMapInitialized = true;
@@ -193,14 +213,30 @@ class _FlightMapState extends State<FlightMap> {
     _logger.log('updateUserLocation lat: $lat, lon: $lon');
     if (lat == null || lon == null) return;
     final pos = LatLng(lat, lon);
+    final heading = data.course ?? 0;
+
     if (_userCircle == null) {
-      _userCircle = await _mapController!.addCircle(UserLayer(pos).userOptions);
+      _userCircle = await _mapController!.addCircle(
+        UserLayer.markerCircle(pos),
+      );
     } else {
       await _mapController!.updateCircle(
         _userCircle!,
         CircleOptions(geometry: pos),
       );
     }
+
+    if (_userHeadingSymbol == null) {
+      _userHeadingSymbol = await _mapController!.addSymbol(
+        UserLayer.headingArrow(pos, heading),
+      );
+    } else {
+      await _mapController!.updateSymbol(
+        _userHeadingSymbol!,
+        UserLayer.headingArrow(pos, heading),
+      );
+    }
+
     if (_followUser) {
       await _mapController?.animateCamera(CameraUpdate.newLatLng(pos));
     }
@@ -209,19 +245,10 @@ class _FlightMapState extends State<FlightMap> {
   @override
   Widget build(BuildContext context) {
     if (_styleString == null) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Loading map style...'),
-          ],
-        ),
-      );
+      return const MapStyleLoadingView();
     }
 
-    double zoom = MapUtils.calculateZoomLevel(
+    final double zoom = MapUtils.calculateZoomLevel(
       departure: widget.flight.departure,
       arrival: widget.flight.arrival,
     );
@@ -239,6 +266,7 @@ class _FlightMapState extends State<FlightMap> {
           Listener(
             behavior: HitTestBehavior.translucent,
             onPointerDown: (_) {
+              _showControlsTemporarily();
               if (_followUser) {
                 setState(() => _followUser = false);
               }
@@ -253,68 +281,15 @@ class _FlightMapState extends State<FlightMap> {
               onStyleLoadedCallback: _onStyleLoaded,
             ),
           ),
-
-          // Zoom/3D controls
-          Positioned(
-            top: controlsTopOffset,
-            right: 8,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                FloatingActionButton(
-                  heroTag: 'flight_map_3d_fab',
-                  backgroundColor: Colors.black.withValues(alpha: 0.3),
-                  foregroundColor: Colors.white,
-                  mini: true,
-                  onPressed: () async {
-                    if (_is3D) {
-                      await _mapController?.animateCamera(
-                        CameraUpdate.tiltTo(0),
-                      );
-                    } else {
-                      // Switch to 3D with a modest tilt
-                      await _mapController?.animateCamera(
-                        CameraUpdate.tiltTo(45),
-                      );
-                    }
-                    if (mounted) setState(() => _is3D = !_is3D);
-                  },
-                  child: Icon(
-                    _is3D
-                        ? Icons.threed_rotation
-                        : Icons.threed_rotation_outlined,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                FloatingActionButton(
-                  heroTag: 'flight_map_follow_fab',
-                  backgroundColor: Colors.black.withValues(alpha: 0.3),
-                  foregroundColor: Colors.white,
-                  mini: true,
-                  onPressed: _goToUserLocationAndFollow,
-                  child: Icon(
-                    _followUser ? Icons.gps_fixed : Icons.gps_not_fixed,
-                  ),
-                ),
-              ],
-            ),
+          FlightMapControls(
+            topOffset: controlsTopOffset,
+            visible: _showControls || _followUser,
+            is3D: _is3D,
+            followUser: _followUser,
+            onToggle3D: _toggle3D,
+            onToggleFollowUser: _goToUserLocationAndFollow,
           ),
-          if (!_isMapInitialized)
-            Positioned.fill(
-              child: Container(
-                color: Theme.of(context).colorScheme.surface,
-                child: const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 16),
-                      Text('Initializing map...'),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          if (!_isMapInitialized) const MapInitializingOverlay(),
         ],
       ),
     );
@@ -322,7 +297,10 @@ class _FlightMapState extends State<FlightMap> {
 
   @override
   void dispose() {
+    _controlsHideTimer?.cancel();
     _mapController?.onSymbolTapped.remove(_onSymbolTapped);
+    _userCircle = null;
+    _userHeadingSymbol = null;
     _mapController = null;
     _mapReady = false;
     super.dispose();

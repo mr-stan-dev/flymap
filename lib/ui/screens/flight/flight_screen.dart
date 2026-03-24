@@ -4,9 +4,10 @@ import 'package:flymap/entity/flight.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
-import 'package:flymap/ui/screens/flight/widgets/bottom_sheet/flight_bottom_sheet.dart';
 import 'package:flymap/ui/screens/flight/widgets/flight_app_bar.dart';
-import 'package:flymap/ui/screens/flight/widgets/flight_map_view.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/dashboard_tab_view.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/info/info_tab_view.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_tab.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 
 class FlightScreen extends StatelessWidget {
@@ -31,19 +32,32 @@ class _FlightScreenView extends StatefulWidget {
 }
 
 class _FlightScreenViewState extends State<_FlightScreenView> {
-  final DraggableScrollableController _bottomSheetController =
-      DraggableScrollableController();
-  double _hideProgress = 0.0; // 0..1
-
-  @override
-  void dispose() {
-    _bottomSheetController.dispose();
-    super.dispose();
-  }
+  int _tabIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _tabIndex,
+        onTap: (index) => setState(() => _tabIndex = index),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map_outlined),
+            activeIcon: Icon(Icons.map),
+            label: 'Map',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.speed_outlined),
+            activeIcon: Icon(Icons.speed),
+            label: 'Dashboard',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.info_outline),
+            activeIcon: Icon(Icons.info),
+            label: 'Info',
+          ),
+        ],
+      ),
       body: BlocConsumer<FlightScreenCubit, FlightScreenState>(
         listener: (context, state) {
           if (state is FlightScreenError) {
@@ -60,24 +74,33 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
           }
         },
         builder: (context, state) {
+          final flight = _extractFlight(state);
+
           return Stack(
             children: [
-              // Map view taking full screen
-              FlightMapView(bottomSheetController: _bottomSheetController),
-
-              if (state is FlightScreenLoaded)
+              Positioned.fill(
+                child: IndexedStack(
+                  index: _tabIndex,
+                  children: [
+                    const FlightMapTabView(),
+                    FlightDashboardTabView(
+                      state: state,
+                      topPadding: _tabTopPadding(context),
+                    ),
+                    FlightInfoTabView(
+                      state: state,
+                      topPadding: _tabTopPadding(context),
+                    ),
+                  ],
+                ),
+              ),
+              if (flight != null)
                 Positioned(
                   top: 0,
                   left: 0,
                   right: 0,
-                  child: FlightAppBar(
-                    route: state.flight.route,
-                    hideProgress: _hideProgress,
-                  ),
+                  child: FlightAppBar(route: flight.route, hideProgress: 0.0),
                 ),
-
-              // Draggable bottom sheet
-              _buildBottomSheet(context),
             ],
           );
         },
@@ -85,31 +108,17 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
     );
   }
 
-  Widget _buildBottomSheet(BuildContext context) {
-    return NotificationListener<DraggableScrollableNotification>(
-      onNotification: (n) {
-        final min = n.minExtent;
-        final max = n.maxExtent;
-        final extent = n.extent;
-        // Hide only when snapped to top (near max)
-        const epsilon = 0.22; // tolerance for snap vicinity
-        final hide = extent >= (max - epsilon);
-        if (hide != (_hideProgress == 1.0)) {
-          setState(() => _hideProgress = hide ? 1.0 : 0.0);
-        }
-        return false;
-      },
-      child: DraggableScrollableSheet(
-        controller: _bottomSheetController,
-        initialChildSize: 0.5,
-        minChildSize: 0.1,
-        maxChildSize: 0.95,
-        snap: true,
-        snapSizes: const [0.1, 0.5, 0.95],
-        builder: (context, scrollController) {
-          return FlightBottomSheet(scrollController: scrollController);
-        },
-      ),
-    );
+  Flight? _extractFlight(FlightScreenState state) {
+    if (state is FlightScreenLoaded) {
+      return state.flight;
+    }
+    if (state is FlightScreenError) {
+      return state.flight;
+    }
+    return null;
+  }
+
+  double _tabTopPadding(BuildContext context) {
+    return FlightAppBar.totalOverlayHeight(context) + 8;
   }
 }

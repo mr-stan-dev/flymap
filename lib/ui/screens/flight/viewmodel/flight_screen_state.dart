@@ -20,27 +20,31 @@ final class FlightScreenLoaded extends FlightScreenState {
   final Flight flight;
   final GpsStatus gpsStatus;
   final GpsData? gpsData;
+  final int gpsUpdateTick;
 
   const FlightScreenLoaded({
     required this.flight,
     this.gpsStatus = GpsStatus.off,
     this.gpsData,
+    this.gpsUpdateTick = 0,
   });
 
   FlightScreenLoaded copyWith({
     Flight? flight,
     GpsStatus? gpsStatus,
     GpsData? gpsData,
+    int? gpsUpdateTick,
   }) {
     return FlightScreenLoaded(
       flight: flight ?? this.flight,
       gpsStatus: gpsStatus ?? this.gpsStatus,
       gpsData: gpsData ?? this.gpsData,
+      gpsUpdateTick: gpsUpdateTick ?? this.gpsUpdateTick,
     );
   }
 
   @override
-  List<Object?> get props => [flight, gpsStatus, gpsData];
+  List<Object?> get props => [flight, gpsStatus, gpsData, gpsUpdateTick];
 }
 
 /// Deleted/Completed state to notify UI
