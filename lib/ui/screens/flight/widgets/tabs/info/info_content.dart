@@ -1,23 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/airports_section.dart';
-import 'package:flymap/ui/screens/flight/widgets/tabs/info/info_action_bar.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/overview_section.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/route_facts_wrap.dart';
 
 class FlightInfoContent extends StatelessWidget {
   const FlightInfoContent({
     required this.topPadding,
-    required this.flight,
     required this.route,
     required this.info,
     super.key,
   });
 
   final double topPadding;
-  final Flight flight;
   final FlightRoute route;
   final FlightInfo info;
 
@@ -30,8 +26,6 @@ class FlightInfoContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InfoActionBar(flight: flight),
-            const SizedBox(height: 12),
             RouteFactsWrap(route: route),
             const SizedBox(height: 12),
             AirportsSection(route: route),

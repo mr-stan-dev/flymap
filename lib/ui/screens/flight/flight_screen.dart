@@ -99,7 +99,7 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
                   top: 0,
                   left: 0,
                   right: 0,
-                  child: FlightAppBar(route: flight.route, hideProgress: 0.0),
+                  child: FlightAppBar(flight: flight, hideProgress: 0.0),
                 ),
             ],
           );

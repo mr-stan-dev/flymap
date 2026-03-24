@@ -30,6 +30,7 @@ class VectorTilesDownloader {
     this.isolatesCount = 6,
   });
 
+  // TODO: Make 20260304_001001_pt part configurable
   static const _urlTemplate =
       'https://tiles.openfreemap.org/planet/20260304_001001_pt/{z}/{x}/{y}.pbf';
 

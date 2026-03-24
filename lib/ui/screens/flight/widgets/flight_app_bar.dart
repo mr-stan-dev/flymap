@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/entity/flight.dart';
+import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/info/route_copy_builder.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
 
 class FlightAppBar extends StatelessWidget {
-  const FlightAppBar({required this.route, this.hideProgress = 0, super.key});
+  const FlightAppBar({required this.flight, this.hideProgress = 0, super.key});
 
   static const double _outerPadding = 16;
   static const double _innerPadding = 8;
@@ -20,7 +23,7 @@ class FlightAppBar extends StatelessWidget {
         _buttonSize;
   }
 
-  final FlightRoute route;
+  final Flight flight;
   final double hideProgress; // 0..1 where 1 = fully hidden (pushed up)
 
   @override
@@ -58,7 +61,7 @@ class FlightAppBar extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      '${route.departure.displayCode}-${route.arrival.displayCode}',
+                      '${flight.route.departure.displayCode}-${flight.route.arrival.displayCode}',
                       style: context.textTheme.button18Bold,
                     ),
                   ),
@@ -72,6 +75,24 @@ class FlightAppBar extends StatelessWidget {
                       icon: const Icon(Icons.more_vert),
                       onSelected: (value) async {
                         switch (value) {
+                          case 'share_route':
+                            AppRouter.goToShareFlight(context, flight: flight);
+                            break;
+                          case 'copy_route':
+                            final routeSummary = RouteCopyBuilder.build(
+                              flight.route,
+                            );
+                            await Clipboard.setData(
+                              ClipboardData(text: routeSummary),
+                            );
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Route summary copied'),
+                                ),
+                              );
+                            }
+                            break;
                           case 'delete_flight':
                             await context
                                 .read<FlightScreenCubit>()
@@ -80,6 +101,15 @@ class FlightAppBar extends StatelessWidget {
                         }
                       },
                       itemBuilder: (context) => const [
+                        PopupMenuItem(
+                          value: 'share_route',
+                          child: Text('Share route'),
+                        ),
+                        PopupMenuItem(
+                          value: 'copy_route',
+                          child: Text('Copy route'),
+                        ),
+                        PopupMenuDivider(),
                         PopupMenuItem(
                           value: 'delete_flight',
                           child: Text('Delete flight'),
