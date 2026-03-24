@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
@@ -22,6 +23,12 @@ class TileData {
   TileData(this.z, this.x, this.y, this.bytes);
 }
 
+const _requestTimeout = Duration(seconds: 12);
+const _maxAttempts = 3;
+const _retryDelayBaseMs = 300;
+
+/// Worker entrypoint executed in a background isolate.
+/// Downloads assigned tiles and sends successful payloads back to main isolate.
 void downloadWorker(WorkerInit init) async {
   _isolateLog('Worker started with ${init.tiles.length} tiles');
   final client = http.Client();
@@ -39,27 +46,17 @@ void downloadWorker(WorkerInit init) async {
       _isolateLog('Downloading from URL: $url');
     }
 
-    try {
-      final resp = await client.get(Uri.parse(url));
-      if (resp.statusCode == 200) {
-        final bodyBytes = resp.bodyBytes;
-
-        // Check if response is not empty
-        if (bodyBytes.isNotEmpty) {
-          init.sendPort.send(TileData(tile.z, tile.x, tile.y, bodyBytes));
-          downloaded++;
-        } else {
-          _isolateLog('Empty response for tile ${tile.z}/${tile.x}/${tile.y}');
-          failed++;
-        }
-      } else {
-        _isolateLog(
-          'HTTP ${resp.statusCode} for tile ${tile.z}/${tile.x}/${tile.y}',
-        );
-        failed++;
-      }
-    } catch (e) {
-      _isolateLog('Error downloading tile ${tile.z}/${tile.x}/${tile.y}: $e');
+    final bytes = await _downloadTileWithRetry(
+      client,
+      Uri.parse(url),
+      z: tile.z,
+      x: tile.x,
+      y: tile.y,
+    );
+    if (bytes != null) {
+      init.sendPort.send(TileData(tile.z, tile.x, tile.y, bytes));
+      downloaded++;
+    } else {
       failed++;
     }
   }
@@ -68,6 +65,53 @@ void downloadWorker(WorkerInit init) async {
   _isolateLog('Worker completed: $downloaded downloaded, $failed failed');
 
   init.sendPort.send('done');
+}
+
+/// Downloads one tile with timeout + limited retries for transient failures.
+Future<Uint8List?> _downloadTileWithRetry(
+  http.Client client,
+  Uri uri, {
+  required int z,
+  required int x,
+  required int y,
+}) async {
+  for (int attempt = 1; attempt <= _maxAttempts; attempt++) {
+    try {
+      final resp = await client.get(uri).timeout(_requestTimeout);
+      if (resp.statusCode == 200) {
+        final bytes = resp.bodyBytes;
+        if (bytes.isNotEmpty) {
+          return bytes;
+        }
+        _isolateLog('Empty response for tile $z/$x/$y');
+      } else {
+        _isolateLog('HTTP ${resp.statusCode} for tile $z/$x/$y');
+        if (!_isRetryableStatus(resp.statusCode)) {
+          return null;
+        }
+      }
+    } on TimeoutException {
+      _isolateLog('Timeout for tile $z/$x/$y (attempt $attempt/$_maxAttempts)');
+    } catch (e) {
+      _isolateLog(
+        'Error downloading tile $z/$x/$y (attempt $attempt/$_maxAttempts): $e',
+      );
+    }
+
+    if (attempt < _maxAttempts) {
+      final backoff = Duration(milliseconds: _retryDelayBaseMs * attempt);
+      await Future.delayed(backoff);
+    }
+  }
+
+  return null;
+}
+
+/// Returns true for HTTP codes where retrying is usually useful.
+bool _isRetryableStatus(int statusCode) {
+  return statusCode == 408 ||
+      statusCode == 429 ||
+      (statusCode >= 500 && statusCode <= 599);
 }
 
 /// Helper method for isolate logging that only prints in debug mode

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math' as math;
@@ -33,36 +34,50 @@ class VectorTilesDownloader {
       'https://tiles.openfreemap.org/planet/20250730_001001_pt/{z}/{x}/{y}.pbf';
 
   final List<Isolate> _isolates = [];
+  ReceivePort? _receivePort;
+  StreamSubscription<dynamic>? _receiveSubscription;
+  Completer<void>? _cancelCompleter;
   bool _canceled = false;
-  StreamController<DownloadMapEvent>? _controllerRef;
 
+  /// Cancels an in-flight download and unblocks all waiting async paths.
+  /// Safe to call multiple times.
   void cancel() {
+    if (_canceled) return;
     _canceled = true;
     for (final iso in _isolates) {
       iso.kill(priority: Isolate.immediate);
     }
     _isolates.clear();
-    _controllerRef?.add(const DownloadMapError('Canceled'));
-    _controllerRef?.close();
+    _receiveSubscription?.cancel();
+    _receiveSubscription = null;
+    _receivePort?.close();
+    _receivePort = null;
+    final cancelCompleter = _cancelCompleter;
+    if (cancelCompleter != null && !cancelCompleter.isCompleted) {
+      cancelCompleter.complete();
+    }
   }
 
+  /// Starts a new download stream for the given output file name.
   Stream<DownloadMapEvent> download(String fileName) {
     final controller = StreamController<DownloadMapEvent>();
-    _controllerRef = controller;
     _performDownload(fileName, controller);
     return controller.stream;
   }
 
+  /// Main orchestration flow:
+  /// 1) create MBTiles DB, 2) compute/filter tiles, 3) download with isolates,
+  /// 4) write tiles with backpressure, 5) verify and emit final event.
   Future<void> _performDownload(
     String fileName,
     StreamController<DownloadMapEvent> controller,
   ) async {
     Database? db;
-    ReceivePort? receivePort;
+    _cancelCompleter = Completer<void>();
     try {
       if (_canceled) {
-        controller.add(const DownloadMapError('Canceled'));
-        controller.close();
+        _safeAdd(controller, const DownloadMapError('Canceled'));
+        await _safeClose(controller);
         return;
       }
 
@@ -97,8 +112,8 @@ class VectorTilesDownloader {
 
       if (_canceled) {
         await db.close();
-        controller.add(const DownloadMapError('Canceled'));
-        controller.close();
+        _safeAdd(controller, const DownloadMapError('Canceled'));
+        await _safeClose(controller);
         return;
       }
 
@@ -119,25 +134,39 @@ class VectorTilesDownloader {
       // Computing tiles event
       controller.add(DownloadMapComputingTiles(filteredTiles.length));
 
+      if (filteredTiles.isEmpty) {
+        _logger.log('No tiles selected for download.');
+        _safeAdd(
+          controller,
+          const DownloadMapError('No tiles found for the selected area.'),
+        );
+        await _safeClose(controller);
+        return;
+      }
+
       // Split tiles into chunks
-      final chunks = _splitList(filteredTiles, isolatesCount);
+      final chunks = _splitList(filteredTiles, math.max(1, isolatesCount));
       _logger.log(
-        'Split into ${chunks.length} chunks with ${isolatesCount} isolates',
+        'Split into ${chunks.length} chunks with $isolatesCount isolates',
       );
 
       // Starting workers event
       controller.add(DownloadMapStartingWorkers(chunks.length));
 
-      // Receive port for worker communication
-      receivePort = ReceivePort();
+      // Receive port for worker communication.
+      _receivePort = ReceivePort();
+      final receivePort = _receivePort!;
       final totalWorkers = chunks.length;
       int completed = 0;
       int tilesDownloaded = 0;
       final completer = Completer<void>();
-      final tileQueue = <TileData>[];
+      final tileQueue = Queue<TileData>();
+      const maxQueueSize = 600;
+      const resumeQueueSize = 250;
       bool isProcessingQueue = false;
 
-      // Process tile queue sequentially to avoid database conflicts
+      // Processes the in-memory tile queue on a single async lane.
+      // We serialize DB inserts to avoid sqlite write contention.
       Future<void> processTileQueue() async {
         if (isProcessingQueue) return;
         isProcessingQueue = true;
@@ -147,7 +176,7 @@ class VectorTilesDownloader {
             isProcessingQueue = false;
             return;
           }
-          final tile = tileQueue.removeAt(0);
+          final tile = tileQueue.removeFirst();
           try {
             // Check if database is still open
             if (db == null || !db.isOpen) {
@@ -171,11 +200,16 @@ class VectorTilesDownloader {
           } catch (e) {
             _logger.error('Error inserting tile: $e');
           }
+
+          if (_receiveSubscription?.isPaused == true &&
+              tileQueue.length <= resumeQueueSize) {
+            _receiveSubscription?.resume();
+          }
         }
         isProcessingQueue = false;
       }
 
-      // Wait for queue to be completely empty
+      // Waits until all queued tile writes are finished.
       Future<void> waitForQueueEmpty() async {
         int waitCount = 0;
         while (tileQueue.isNotEmpty || isProcessingQueue) {
@@ -192,12 +226,18 @@ class VectorTilesDownloader {
         _logger.log('Queue is now empty');
       }
 
-      receivePort.listen((message) async {
+      // Listen for worker output. Backpressure is applied by pausing this
+      // subscription when queue grows too much, then resuming after drain.
+      _receiveSubscription = receivePort.listen((message) async {
         if (_canceled) return;
         if (message is TileData) {
           // Add to queue and process
-          tileQueue.add(message);
-          await processTileQueue();
+          tileQueue.addLast(message);
+          if (_receiveSubscription?.isPaused == false &&
+              tileQueue.length >= maxQueueSize) {
+            _receiveSubscription?.pause();
+          }
+          unawaited(processTileQueue());
         } else if (message == 'done') {
           completed++;
           _logger.log('Worker $completed/$totalWorkers completed');
@@ -213,27 +253,39 @@ class VectorTilesDownloader {
               await processTileQueue();
             }
             _logger.log('All tiles processed, closing database...');
-            receivePort?.close();
+            _receiveSubscription?.cancel();
+            _receiveSubscription = null;
+            _receivePort?.close();
+            _receivePort = null;
             await db?.close();
-            completer.complete();
+            if (!completer.isCompleted) {
+              completer.complete();
+            }
           }
         }
       });
 
-      // Spawn isolates
+      // Spawn one worker isolate per chunk.
       _logger.log('Spawning $totalWorkers isolates...');
-      for (final chunk in chunks) {
-        final iso = await Isolate.spawn<WorkerInit>(
-          downloadWorker,
-          WorkerInit(chunk, _urlTemplate, receivePort.sendPort),
-        );
-        _isolates.add(iso);
+      try {
+        for (final chunk in chunks) {
+          final iso = await Isolate.spawn<WorkerInit>(
+            downloadWorker,
+            WorkerInit(chunk, _urlTemplate, receivePort.sendPort),
+          );
+          _isolates.add(iso);
+        }
+      } catch (e) {
+        _logger.error('Failed to spawn worker isolate: $e');
+        if (!completer.isCompleted) {
+          completer.completeError(e);
+        }
       }
 
-      await completer.future;
+      await Future.any<void>([completer.future, _cancelCompleter!.future]);
       if (_canceled) {
-        controller.add(const DownloadMapError('Canceled'));
-        controller.close();
+        _safeAdd(controller, const DownloadMapError('Canceled'));
+        await _safeClose(controller);
         return;
       }
       _logger.log(
@@ -292,24 +344,59 @@ class VectorTilesDownloader {
         controller.add(const DownloadMapError('Failed to verify MBTiles file'));
       }
 
-      controller.close();
+      await _safeClose(controller);
     } catch (e) {
       _logger.error('Error during download: $e');
-      controller.add(DownloadMapError('Download failed: $e'));
-      controller.close();
+      if (_canceled) {
+        _safeAdd(controller, const DownloadMapError('Canceled'));
+      } else {
+        _safeAdd(controller, DownloadMapError('Download failed: $e'));
+      }
+      await _safeClose(controller);
     } finally {
+      _receiveSubscription?.cancel();
+      _receiveSubscription = null;
+      _receivePort?.close();
+      _receivePort = null;
+      for (final iso in _isolates) {
+        iso.kill(priority: Isolate.immediate);
+      }
+      _isolates.clear();
+      _cancelCompleter = null;
       try {
         await db?.close();
       } catch (_) {}
     }
   }
 
+  /// Splits the input into near-even chunks for worker fan-out.
   List<List<MapTile>> _splitList(List<MapTile> list, int parts) {
+    if (list.isEmpty) return const [];
+    final safeParts = math.max(1, parts);
     final res = <List<MapTile>>[];
-    final chunkSize = (list.length / parts).ceil();
+    final chunkSize = (list.length / safeParts).ceil();
     for (int i = 0; i < list.length; i += chunkSize) {
       res.add(list.sublist(i, math.min(i + chunkSize, list.length)));
     }
     return res;
+  }
+
+  /// Adds an event only if the controller is still open.
+  void _safeAdd(
+    StreamController<DownloadMapEvent> controller,
+    DownloadMapEvent event,
+  ) {
+    if (controller.isClosed) return;
+    try {
+      controller.add(event);
+    } catch (_) {}
+  }
+
+  /// Closes the controller defensively (ignores close races).
+  Future<void> _safeClose(StreamController<DownloadMapEvent> controller) async {
+    if (controller.isClosed) return;
+    try {
+      await controller.close();
+    } catch (_) {}
   }
 }

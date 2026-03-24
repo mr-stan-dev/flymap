@@ -40,13 +40,13 @@ class SeaTilesFilter {
     final west = x / n * 360.0 - 180.0;
     final east = (x + 1) / n * 360.0 - 180.0;
 
-    double _latFromY(int ty) {
+    double latFromY(int ty) {
       final latRad = math.atan(_sinh(math.pi * (1 - 2 * ty / n)));
       return latRad * 180.0 / math.pi;
     }
 
-    final north = _latFromY(y);
-    final south = _latFromY(y + 1);
+    final north = latFromY(y);
+    final south = latFromY(y + 1);
 
     // LandMaskProvider expects [minLat, minLon, maxLat, maxLon]
     return [south, west, north, east];
