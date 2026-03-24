@@ -16,7 +16,7 @@ class FlightMapControls extends StatefulWidget {
   final bool is3D;
   final bool followUser;
   final Future<void> Function() onToggle3D;
-  final VoidCallback onToggleFollowUser;
+  final Future<void> Function() onToggleFollowUser;
 
   @override
   State<FlightMapControls> createState() => _FlightMapControlsState();
@@ -81,13 +81,17 @@ class _FlightMapControlsState extends State<FlightMapControls>
                 backgroundColor: Colors.black.withValues(alpha: 0.3),
                 foregroundColor: Colors.white,
                 mini: true,
+                tooltip: widget.is3D ? 'Switch to 2D' : 'Switch to 3D',
                 onPressed: () {
                   widget.onToggle3D();
                 },
-                child: Icon(
-                  widget.is3D
-                      ? Icons.threed_rotation
-                      : Icons.threed_rotation_outlined,
+                child: Text(
+                  widget.is3D ? '2D' : '3D',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.2,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
@@ -100,6 +104,7 @@ class _FlightMapControlsState extends State<FlightMapControls>
                       : Colors.black.withValues(alpha: 0.3),
                   foregroundColor: Colors.white,
                   mini: true,
+                  tooltip: widget.followUser ? 'Uncenter map' : 'Center on me',
                   onPressed: widget.onToggleFollowUser,
                   child: Icon(
                     widget.followUser ? Icons.gps_fixed : Icons.gps_not_fixed,

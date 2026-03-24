@@ -104,17 +104,25 @@ class _FlightMapState extends State<FlightMap> {
     }
   }
 
-  void _goToUserLocationAndFollow() {
+  Future<void> _toggleUserFollow() async {
     _showControlsTemporarily();
+
+    if (_followUser) {
+      setState(() {
+        _followUser = false;
+      });
+      return;
+    }
+
     final userLoc =
         _userCircle?.options.geometry ?? _userHeadingSymbol?.options.geometry;
+    if (userLoc == null) return;
+
     setState(() {
       _followUser = true;
     });
-    if (userLoc != null) {
-      final update = CameraUpdate.newLatLng(userLoc);
-      _mapController?.animateCamera(update);
-    }
+    final update = CameraUpdate.newLatLng(userLoc);
+    await _mapController?.animateCamera(update);
   }
 
   Future<void> _toggle3D() async {
@@ -278,7 +286,7 @@ class _FlightMapState extends State<FlightMap> {
             is3D: _is3D,
             followUser: _followUser,
             onToggle3D: _toggle3D,
-            onToggleFollowUser: _goToUserLocationAndFollow,
+            onToggleFollowUser: _toggleUserFollow,
           ),
           if (!_isMapInitialized) const MapInitializingOverlay(),
         ],
