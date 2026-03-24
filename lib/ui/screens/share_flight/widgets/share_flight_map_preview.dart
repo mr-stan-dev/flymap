@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/ui/map/layers/flight_route_map_layers.dart';
 import 'package:flymap/ui/map/layers/latlon_utils.dart';
@@ -83,6 +84,8 @@ class _ShareFlightMapPreviewState extends State<ShareFlightMapPreview> {
             zoom: zoom.isFinite ? zoom : 1.0,
           ),
           styleString: widget.styleString,
+          compassViewPosition: CompassViewPosition.bottomRight,
+          compassViewMargins: const Point(16, 16),
           onStyleLoadedCallback: _onStyleLoaded,
         ),
         if (!_isMapInitialized) const MapInitializingOverlay(),

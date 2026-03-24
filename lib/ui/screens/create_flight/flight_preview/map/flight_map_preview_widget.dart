@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight_info.dart';
@@ -98,6 +99,8 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
           zoom: zoom.isFinite ? zoom : 1.0,
         ),
         styleString: "https://tiles.openfreemap.org/styles/liberty",
+        compassViewPosition: CompassViewPosition.bottomRight,
+        compassViewMargins: const Point(16, 16),
         onStyleLoadedCallback: _onStyleLoaded,
       ),
     );

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -266,6 +267,8 @@ class _FlightMapState extends State<FlightMap> {
                 zoom: zoom.isFinite ? zoom : 1.0,
               ),
               styleString: _styleString!,
+              compassViewPosition: CompassViewPosition.bottomRight,
+              compassViewMargins: const Point(16, 16),
               onStyleLoadedCallback: _onStyleLoaded,
             ),
           ),
