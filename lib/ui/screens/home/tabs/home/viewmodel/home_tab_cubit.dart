@@ -8,6 +8,8 @@ import 'package:get_it/get_it.dart';
 /// Cubit for managing home tab state
 class HomeTabCubit extends Cubit<HomeTabState> {
   final _logger = Logger('HomeTabCubit');
+  HomeFlightsSort _sort = HomeFlightsSort.mostRecent;
+  List<Flight> _allFlights = const [];
 
   HomeTabCubit() : super(const HomeTabLoading()) {
     _repository = GetIt.I<FlightRepository>();
@@ -26,8 +28,15 @@ class HomeTabCubit extends Cubit<HomeTabState> {
 
       final statistics = results[0] as FlightStatistics;
       final flights = results[1] as List<Flight>;
+      _allFlights = flights;
 
-      emit(HomeTabSuccess(statistics: statistics, flights: flights));
+      emit(
+        HomeTabSuccess(
+          statistics: statistics,
+          flights: _sortedFlights(),
+          sort: _sort,
+        ),
+      );
     } catch (e) {
       emit(HomeTabError('Failed to load data: $e'));
     }
@@ -39,7 +48,6 @@ class HomeTabCubit extends Cubit<HomeTabState> {
       final totalFlights = await _repository.getTotalFlights();
       final totalDownloadedMaps = await _repository.getTotalDownloadedMaps();
       final totalMapSize = await _repository.getTotalMapSize();
-      print('total flights: $totalFlights');
 
       return FlightStatistics(
         totalFlights: totalFlights,
@@ -47,7 +55,7 @@ class HomeTabCubit extends Cubit<HomeTabState> {
         totalMapSize: totalMapSize,
       );
     } catch (e) {
-      print('load statistics error: $e');
+      _logger.error('Error loading statistics: $e');
       return FlightStatistics.zero();
     }
   }
@@ -81,12 +89,14 @@ class HomeTabCubit extends Cubit<HomeTabState> {
 
       final statistics = results[0] as FlightStatistics;
       final flights = results[1] as List<Flight>;
+      _allFlights = flights;
 
       _logger.log('Refresh completed: ${flights.length} flights loaded');
       emit(
         HomeTabSuccess(
           statistics: statistics,
-          flights: flights,
+          flights: _sortedFlights(),
+          sort: _sort,
           isRefreshing: false,
         ),
       );
@@ -148,5 +158,45 @@ class HomeTabCubit extends Cubit<HomeTabState> {
       return currentState.message;
     }
     return null;
+  }
+
+  Future<void> setSort(HomeFlightsSort sort) async {
+    if (_sort == sort) return;
+    _sort = sort;
+    final currentState = state;
+    if (currentState is! HomeTabSuccess) return;
+
+    emit(currentState.copyWith(flights: _sortedFlights(), sort: _sort));
+  }
+
+  Future<bool> deleteFlight(String flightId) async {
+    try {
+      final ok = await _repository.deleteFlight(flightId);
+      if (!ok) return false;
+
+      await refresh();
+      return true;
+    } catch (e) {
+      _logger.error('Failed to delete flight $flightId: $e');
+      return false;
+    }
+  }
+
+  List<Flight> _sortedFlights() {
+    final sorted = [..._allFlights];
+    switch (_sort) {
+      case HomeFlightsSort.mostRecent:
+        sorted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        break;
+      case HomeFlightsSort.longestDistance:
+        sorted.sort(
+          (a, b) => b.route.distanceInKm.compareTo(a.route.distanceInKm),
+        );
+        break;
+      case HomeFlightsSort.alphabetical:
+        sorted.sort((a, b) => a.routeName.compareTo(b.routeName));
+        break;
+    }
+    return sorted;
   }
 }
