@@ -4,7 +4,6 @@ import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/compass_widget.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/gps_not_granted_state.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/gps_off_state.dart';
-import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/searching_gps_view.dart';
 
 class FlightDashboardPanel extends StatelessWidget {
   const FlightDashboardPanel({required this.state, super.key});
@@ -23,7 +22,6 @@ class FlightDashboardPanel extends StatelessWidget {
       case GpsStatus.permissionsNotGranted:
         return const GpsNotGrantedState();
       case GpsStatus.searching:
-        return const SearchingGpsView();
       case GpsStatus.gpsActive:
       case GpsStatus.weakSignal:
         return Column(

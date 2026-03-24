@@ -4,6 +4,7 @@ import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/dashboard_panel.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/gps_live_status_card.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/route_progress_card.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/telemetry_searching_overlay.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/shared/tab_state_placeholder.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/weak_signal_banner.dart';
 
@@ -49,6 +50,8 @@ class _LoadedDashboardTab extends StatelessWidget {
   bool get _hasLiveTelemetry =>
       state.gpsStatus == GpsStatus.gpsActive ||
       state.gpsStatus == GpsStatus.weakSignal;
+  bool get _isSearching => state.gpsStatus == GpsStatus.searching;
+  bool get _showTelemetryCards => _hasLiveTelemetry || _isSearching;
 
   @override
   Widget build(BuildContext context) {
@@ -64,15 +67,24 @@ class _LoadedDashboardTab extends StatelessWidget {
               gpsData: state.gpsData,
               gpsUpdateTick: state.gpsUpdateTick,
             ),
-            if (_hasLiveTelemetry) ...[
+            if (_showTelemetryCards) ...[
               const SizedBox(height: 12),
-              RouteProgressCard(
-                route: state.flight.route,
-                gpsData: state.gpsData,
+              TelemetrySearchingOverlay(
+                enabled: _isSearching,
+                child: RouteProgressCard(
+                  route: state.flight.route,
+                  gpsData: state.gpsData,
+                ),
               ),
             ],
             const SizedBox(height: 12),
-            FlightDashboardPanel(state: state),
+            if (_showTelemetryCards)
+              TelemetrySearchingOverlay(
+                enabled: _isSearching,
+                child: FlightDashboardPanel(state: state),
+              )
+            else
+              FlightDashboardPanel(state: state),
             if (state.gpsStatus == GpsStatus.weakSignal) ...[
               const SizedBox(height: 12),
               const WeakSignalBanner(),

@@ -11,13 +11,15 @@ class RouteProgressCard extends StatelessWidget {
     super.key,
   });
 
+  static const _betweenAirportsToleranceMultiplier = 1.3;
+
   final FlightRoute route;
   final GpsData? gpsData;
 
   @override
   Widget build(BuildContext context) {
-    final progress = _estimateProgress();
     final totalKm = route.distanceInKm;
+    final progress = _estimateProgress();
     final coveredKm = progress * totalKm;
     final remainingKm = (totalKm - coveredKm).clamp(0, totalKm);
     final colorScheme = Theme.of(context).colorScheme;
@@ -107,14 +109,26 @@ class RouteProgressCard extends StatelessWidget {
     final lon = gpsData?.longitude;
     if (lat == null || lon == null) return 0;
 
-    final total = route.distanceInKm;
-    if (total <= 0) return 0;
+    final airportToAirportDistanceKm = route.distanceInKm;
+    if (airportToAirportDistanceKm <= 0) return 0;
 
-    final covered = MapUtils.distanceKm(
+    final current = LatLng(lat, lon);
+    final distanceToDepartureKm = MapUtils.distanceKm(
       departure: route.departure.latLon,
-      arrival: LatLng(lat, lon),
+      arrival: current,
     );
-    return (covered / total).clamp(0, 1);
+    final distanceToArrivalKm = MapUtils.distanceKm(
+      departure: current,
+      arrival: route.arrival.latLon,
+    );
+
+    final span = distanceToDepartureKm + distanceToArrivalKm;
+    if (span <= 0) return 0;
+    final maxAllowedSpanKm =
+        airportToAirportDistanceKm * _betweenAirportsToleranceMultiplier;
+    if (span > maxAllowedSpanKm) return 0;
+
+    return (distanceToDepartureKm / span).clamp(0.0, 1.0);
   }
 }
 

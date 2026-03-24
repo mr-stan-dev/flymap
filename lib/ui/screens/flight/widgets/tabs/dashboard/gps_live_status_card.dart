@@ -147,7 +147,7 @@ class _GpsLiveStatusCardState extends State<GpsLiveStatusCard> {
           color: Color(0xFF2472D6),
           icon: Icons.gps_not_fixed_rounded,
           title: 'Searching for GPS',
-          subtitle: 'Looking for a reliable satellite fix.',
+          subtitle: 'Looking for a reliable signal',
         );
       case GpsStatus.weakSignal:
         return _GpsStatusViewData(
