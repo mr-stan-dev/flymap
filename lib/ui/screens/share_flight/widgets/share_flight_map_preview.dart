@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/ui/map/layers/airports_layer.dart';
+import 'package:flymap/ui/map/layers/corridor_layer.dart';
+import 'package:flymap/ui/map/layers/dimming_layer.dart';
+import 'package:flymap/ui/map/layers/latlon_utils.dart';
+import 'package:flymap/ui/map/map_utils.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_initializing_overlay.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+
+class ShareFlightMapPreview extends StatefulWidget {
+  const ShareFlightMapPreview({
+    required this.route,
+    required this.styleString,
+    super.key,
+  });
+
+  final FlightRoute route;
+  final String styleString;
+
+  @override
+  State<ShareFlightMapPreview> createState() => _ShareFlightMapPreviewState();
+}
+
+class _ShareFlightMapPreviewState extends State<ShareFlightMapPreview> {
+  MapLibreMapController? _mapController;
+  bool _mapReady = false;
+  bool _isMapInitialized = false;
+  bool _layersAdded = false;
+
+  late final LatLng _center = MapUtils.routeCenter(widget.route).toMapLatLon();
+
+  @override
+  void didUpdateWidget(covariant ShareFlightMapPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.styleString != widget.styleString) {
+      _layersAdded = false;
+      _isMapInitialized = false;
+    }
+  }
+
+  void _onMapCreated(MapLibreMapController controller) {
+    _mapController = controller;
+    setState(() {
+      _mapReady = true;
+    });
+  }
+
+  void _onStyleLoaded() {
+    if (!_mapReady || !mounted || _layersAdded) return;
+    _layersAdded = true;
+
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (!mounted || _mapController == null) return;
+      _addLayers(_mapController!);
+      if (mounted) {
+        setState(() {
+          _isMapInitialized = true;
+        });
+      }
+    });
+  }
+
+  void _addLayers(MapLibreMapController controller) {
+    final layers = [
+      CorridorLayer(widget.route.corridor),
+      DimmingLayer(widget.route.corridor),
+      AirportsLayer(
+        departure: widget.route.departure,
+        arrival: widget.route.arrival,
+      ),
+    ];
+    for (final layer in layers) {
+      layer.add(controller);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final zoom = MapUtils.calculateZoomLevel(
+      departure: widget.route.departure,
+      arrival: widget.route.arrival,
+    );
+    return Stack(
+      children: [
+        MapLibreMap(
+          onMapCreated: _onMapCreated,
+          initialCameraPosition: CameraPosition(
+            target: _center,
+            zoom: zoom.isFinite ? zoom : 1.0,
+          ),
+          styleString: widget.styleString,
+          onStyleLoadedCallback: _onStyleLoaded,
+        ),
+        if (!_isMapInitialized) const MapInitializingOverlay(),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    _mapController = null;
+    _mapReady = false;
+    super.dispose();
+  }
+}

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/entity/flight.dart';
+import 'package:flymap/router/app_router.dart';
 
 class InfoActionBar extends StatelessWidget {
-  const InfoActionBar({required this.route, super.key});
+  const InfoActionBar({required this.flight, super.key});
 
-  final FlightRoute route;
+  final Flight flight;
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +15,7 @@ class InfoActionBar extends StatelessWidget {
       runSpacing: 8,
       children: [
         FilledButton.icon(
-          onPressed: () => _shareRoutePlaceholder(context),
+          onPressed: () => _openShareRouteScreen(context),
           icon: const Icon(Icons.share, size: 16),
           label: const Text('Share route'),
         ),
@@ -27,14 +28,12 @@ class InfoActionBar extends StatelessWidget {
     );
   }
 
-  void _shareRoutePlaceholder(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Share route will be added soon')),
-    );
+  void _openShareRouteScreen(BuildContext context) {
+    AppRouter.goToShareFlight(context, flight: flight);
   }
 
   Future<void> _copyRouteCode(BuildContext context) async {
-    await Clipboard.setData(ClipboardData(text: route.routeCode));
+    await Clipboard.setData(ClipboardData(text: flight.route.routeCode));
     if (context.mounted) {
       ScaffoldMessenger.of(
         context,

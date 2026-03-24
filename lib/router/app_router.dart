@@ -7,6 +7,7 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_sc
 import 'package:flymap/ui/screens/create_flight/flight_search/flight_search_screen.dart';
 import 'package:flymap/ui/screens/flight/flight_screen.dart';
 import 'package:flymap/ui/screens/home/home_screen.dart';
+import 'package:flymap/ui/screens/share_flight/share_flight_screen.dart';
 import 'package:flymap/ui/screens/settings/settings_screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -16,6 +17,7 @@ class AppRouter {
   static const String flightMapPreviewRoute = '/flightPreview';
   static const String flightSearchRoute = '/flight-number';
   static const String flightRoute = '/flight';
+  static const String shareFlightRoute = '/share-flight';
   static const String settingsRoute = '/settings';
   static const String aboutRoute = '/about';
 
@@ -72,6 +74,18 @@ class AppRouter {
           },
         ),
 
+        // Share Flight Screen route
+        GoRoute(
+          path: shareFlightRoute,
+          name: 'share-flight',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>?;
+            final flight = extra?['flight'] as Flight;
+
+            return ShareFlightScreen(flight: flight);
+          },
+        ),
+
         // Settings route
         GoRoute(
           path: settingsRoute,
@@ -105,6 +119,11 @@ class AppRouter {
   /// Navigate to flight screen with flight
   static void goToFlight(BuildContext context, {required Flight flight}) {
     context.push(flightRoute, extra: {'flight': flight});
+  }
+
+  /// Navigate to share flight screen with flight
+  static void goToShareFlight(BuildContext context, {required Flight flight}) {
+    context.push(shareFlightRoute, extra: {'flight': flight});
   }
 
   /// Navigate to settings

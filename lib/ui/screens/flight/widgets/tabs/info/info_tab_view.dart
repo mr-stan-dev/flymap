@@ -19,6 +19,7 @@ class FlightInfoTabView extends StatelessWidget {
       final loaded = state as FlightScreenLoaded;
       return FlightInfoContent(
         topPadding: topPadding,
+        flight: loaded.flight,
         route: loaded.flight.route,
         info: loaded.flight.info,
       );
@@ -29,6 +30,7 @@ class FlightInfoTabView extends StatelessWidget {
       if (error.flight != null) {
         return FlightInfoContent(
           topPadding: topPadding,
+          flight: error.flight!,
           route: error.flight!.route,
           info: error.flight!.info,
         );
