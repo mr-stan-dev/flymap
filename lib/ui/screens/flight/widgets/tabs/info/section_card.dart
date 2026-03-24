@@ -15,11 +15,16 @@ class InfoSectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: ExpansionTile(
-        title: Text(title),
-        initiallyExpanded: initiallyExpanded,
-        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        children: [child],
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          title: Text(title),
+          initiallyExpanded: initiallyExpanded,
+          shape: const Border(),
+          collapsedShape: const Border(),
+          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          children: [child],
+        ),
       ),
     );
   }

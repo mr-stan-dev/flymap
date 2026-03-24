@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/info/route_copy_builder.dart';
 
 class InfoActionBar extends StatelessWidget {
   const InfoActionBar({required this.flight, super.key});
@@ -20,7 +21,7 @@ class InfoActionBar extends StatelessWidget {
           label: const Text('Share route'),
         ),
         OutlinedButton.icon(
-          onPressed: () => _copyRouteCode(context),
+          onPressed: () => _copyRouteSummary(context),
           icon: const Icon(Icons.route, size: 16),
           label: const Text('Copy Route'),
         ),
@@ -32,12 +33,13 @@ class InfoActionBar extends StatelessWidget {
     AppRouter.goToShareFlight(context, flight: flight);
   }
 
-  Future<void> _copyRouteCode(BuildContext context) async {
-    await Clipboard.setData(ClipboardData(text: flight.route.routeCode));
+  Future<void> _copyRouteSummary(BuildContext context) async {
+    final routeSummary = RouteCopyBuilder.build(flight.route);
+    await Clipboard.setData(ClipboardData(text: routeSummary));
     if (context.mounted) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Route code copied')));
+      ).showSnackBar(const SnackBar(content: Text('Route summary copied')));
     }
   }
 }

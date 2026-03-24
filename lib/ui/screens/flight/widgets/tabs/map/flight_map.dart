@@ -8,11 +8,8 @@ import 'package:flymap/data/local/mappers/flight_map_mapper.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/gps_data.dart';
 import 'package:flymap/logger.dart';
-import 'package:flymap/ui/map/layers/airports_layer.dart';
-import 'package:flymap/ui/map/layers/corridor_layer.dart';
-import 'package:flymap/ui/map/layers/dimming_layer.dart';
+import 'package:flymap/ui/map/layers/flight_route_map_layers.dart';
 import 'package:flymap/ui/map/layers/user_layer.dart';
-import 'package:flymap/ui/map/layers/waypoints_layer.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
@@ -35,8 +32,6 @@ class FlightMap extends StatefulWidget {
 class _FlightMapState extends State<FlightMap> {
   MapLibreMapController? _mapController;
   bool _mapReady = false;
-  late final _waypoints = widget.flight.waypoints;
-  late final _corridor = widget.flight.corridor;
   String? _styleString;
   final _logger = const Logger('FlightMapLoaded');
   bool _is3D = false;
@@ -180,7 +175,7 @@ class _FlightMapState extends State<FlightMap> {
     // simple delay is sufficient to avoid std::domain_error
     Future.delayed(const Duration(milliseconds: 1000), () async {
       if (!mounted || _mapController == null) return;
-      _addFlightMapLayers();
+      await _addFlightMapLayers();
 
       if (mounted) {
         setState(() {
@@ -190,20 +185,13 @@ class _FlightMapState extends State<FlightMap> {
     });
   }
 
-  void _addFlightMapLayers() {
-    final layers = [
-      CorridorLayer(_corridor),
-      WaypointsLayer(_waypoints),
-      DimmingLayer(_corridor),
-      AirportsLayer(
-        departure: widget.flight.departure,
-        arrival: widget.flight.arrival,
-      ),
-    ];
-
-    for (final layer in layers) {
-      layer.add(_mapController!);
-    }
+  Future<void> _addFlightMapLayers() async {
+    final controller = _mapController;
+    if (controller == null) return;
+    await FlightRouteMapLayers.add(
+      controller: controller,
+      route: widget.flight.route,
+    );
   }
 
   Future<void> _updateUserLocation(GpsData data) async {

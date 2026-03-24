@@ -3,12 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
-import 'package:flymap/ui/map/layers/airports_layer.dart';
-import 'package:flymap/ui/map/layers/corridor_layer.dart';
-import 'package:flymap/ui/map/layers/dimming_layer.dart';
+import 'package:flymap/ui/map/layers/flight_route_map_layers.dart';
 import 'package:flymap/ui/map/layers/latlon_utils.dart';
 import 'package:flymap/ui/map/layers/poi_layer.dart';
-import 'package:flymap/ui/map/layers/waypoints_layer.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_cubit.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
@@ -33,7 +30,9 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
   bool _mapReady = false;
   late final FlightRoute route = widget.flightRoute;
 
-  late final LatLng _center = MapUtils.routeCenter(widget.flightRoute).toMapLatLon();
+  late final LatLng _center = MapUtils.routeCenter(
+    widget.flightRoute,
+  ).toMapLatLon();
 
   // To avoid covering by bottom sheet
   Future<void> _moveCameraToTop() async {
@@ -43,7 +42,7 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
     // On iOS, scrollBy(0, y) moves camera down (content up) given positive y.
     // On Android, negative y seems to produce the desired effect (user report).
     final double yShift = Platform.isIOS ? shiftPx : -shiftPx;
-    
+
     await _mapController?.animateCamera(
       CameraUpdate.scrollBy(0.0, yShift),
       duration: Duration(milliseconds: 500),
@@ -71,16 +70,7 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
   }
 
   Future<void> _addFlightMapLayers(MapLibreMapController controller) async {
-    final layers = [
-      CorridorLayer(route.corridor),
-      WaypointsLayer(route.waypoints),
-      DimmingLayer(route.corridor),
-      AirportsLayer(departure: route.departure, arrival: route.arrival),
-    ];
-
-    for (final layer in layers) {
-      layer.add(controller);
-    }
+    await FlightRouteMapLayers.add(controller: controller, route: route);
   }
 
   @override
@@ -103,7 +93,10 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
       },
       child: MapLibreMap(
         onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(target: _center, zoom: zoom.isFinite ? zoom : 1.0),
+        initialCameraPosition: CameraPosition(
+          target: _center,
+          zoom: zoom.isFinite ? zoom : 1.0,
+        ),
         styleString: "https://tiles.openfreemap.org/styles/liberty",
         onStyleLoadedCallback: _onStyleLoaded,
       ),

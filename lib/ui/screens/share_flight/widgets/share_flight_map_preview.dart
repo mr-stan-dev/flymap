@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/flight_route.dart';
-import 'package:flymap/ui/map/layers/airports_layer.dart';
-import 'package:flymap/ui/map/layers/corridor_layer.dart';
-import 'package:flymap/ui/map/layers/dimming_layer.dart';
+import 'package:flymap/ui/map/layers/flight_route_map_layers.dart';
 import 'package:flymap/ui/map/layers/latlon_utils.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_initializing_overlay.dart';
@@ -50,9 +48,9 @@ class _ShareFlightMapPreviewState extends State<ShareFlightMapPreview> {
     if (!_mapReady || !mounted || _layersAdded) return;
     _layersAdded = true;
 
-    Future.delayed(const Duration(milliseconds: 300), () {
+    Future.delayed(const Duration(milliseconds: 300), () async {
       if (!mounted || _mapController == null) return;
-      _addLayers(_mapController!);
+      await _addLayers(_mapController!);
       if (mounted) {
         setState(() {
           _isMapInitialized = true;
@@ -61,18 +59,13 @@ class _ShareFlightMapPreviewState extends State<ShareFlightMapPreview> {
     });
   }
 
-  void _addLayers(MapLibreMapController controller) {
-    final layers = [
-      CorridorLayer(widget.route.corridor),
-      DimmingLayer(widget.route.corridor),
-      AirportsLayer(
-        departure: widget.route.departure,
-        arrival: widget.route.arrival,
-      ),
-    ];
-    for (final layer in layers) {
-      layer.add(controller);
-    }
+  Future<void> _addLayers(MapLibreMapController controller) async {
+    await FlightRouteMapLayers.add(
+      controller: controller,
+      route: widget.route,
+      dashedPathSourceId: 'share-route-source',
+      dashedPathLayerId: 'share-route-layer',
+    );
   }
 
   @override

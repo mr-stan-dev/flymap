@@ -8,7 +8,10 @@ import 'package:flymap/entity/flight.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/shared/tab_state_placeholder.dart';
 import 'package:flymap/ui/screens/share_flight/viewmodel/share_flight_cubit.dart';
 import 'package:flymap/ui/screens/share_flight/viewmodel/share_flight_state.dart';
+import 'package:flymap/ui/screens/share_flight/widgets/share_distance_chip.dart';
 import 'package:flymap/ui/screens/share_flight/widgets/share_flight_map_preview.dart';
+import 'package:flymap/ui/screens/share_flight/widgets/share_flymap_watermark.dart';
+import 'package:flymap/ui/screens/share_flight/widgets/share_route_cities_chip.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -35,6 +38,9 @@ class _ShareFlightView extends StatefulWidget {
 
 class _ShareFlightViewState extends State<_ShareFlightView> {
   final GlobalKey _mapCaptureKey = GlobalKey();
+  static const double _overlayPadding = 12;
+  Offset _distanceChipOffset = const Offset(16, 16);
+  Offset? _routeCitiesChipOffset;
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +70,112 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
                       )
                     : RepaintBoundary(
                         key: _mapCaptureKey,
-                        child: ShareFlightMapPreview(
-                          route: state.flight.route,
-                          styleString: style,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final mapSize = constraints.biggest;
+                            final distanceKm = state.flight.route.distanceInKm;
+                            final maxLeft =
+                                (mapSize.width -
+                                        shareDistanceChipWidth -
+                                        _overlayPadding)
+                                    .clamp(_overlayPadding, double.infinity);
+                            final maxTop =
+                                (mapSize.height -
+                                        shareDistanceChipHeight -
+                                        _overlayPadding)
+                                    .clamp(_overlayPadding, double.infinity);
+                            final chipLeft = _distanceChipOffset.dx.clamp(
+                              _overlayPadding,
+                              maxLeft,
+                            );
+                            final chipTop = _distanceChipOffset.dy.clamp(
+                              _overlayPadding,
+                              maxTop,
+                            );
+                            final routeMaxLeft =
+                                (mapSize.width -
+                                        shareRouteCitiesChipWidth -
+                                        _overlayPadding)
+                                    .clamp(_overlayPadding, double.infinity);
+                            final routeMaxTop =
+                                (mapSize.height -
+                                        shareRouteCitiesChipHeight -
+                                        _overlayPadding)
+                                    .clamp(_overlayPadding, double.infinity);
+                            final routeBaseOffset =
+                                _routeCitiesChipOffset ??
+                                Offset(_overlayPadding, routeMaxTop);
+                            final routeChipLeft = routeBaseOffset.dx.clamp(
+                              _overlayPadding,
+                              routeMaxLeft,
+                            );
+                            final routeChipTop = routeBaseOffset.dy.clamp(
+                              _overlayPadding,
+                              routeMaxTop,
+                            );
+
+                            return Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: ShareFlightMapPreview(
+                                    route: state.flight.route,
+                                    styleString: style,
+                                  ),
+                                ),
+                                Positioned(
+                                  left: chipLeft,
+                                  top: chipTop,
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.translucent,
+                                    onPanUpdate: (details) {
+                                      _updateDistanceChipOffset(
+                                        delta: details.delta,
+                                        mapSize: mapSize,
+                                      );
+                                    },
+                                    child: ShareDistanceChip(
+                                      distanceKm: distanceKm,
+                                    ),
+                                  ),
+                                ),
+                                const Positioned(
+                                  right: _overlayPadding,
+                                  top: _overlayPadding,
+                                  child: ShareFlymapWatermark(),
+                                ),
+                                Positioned(
+                                  left: routeChipLeft,
+                                  top: routeChipTop,
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.translucent,
+                                    onPanUpdate: (details) {
+                                      _updateRouteCitiesChipOffset(
+                                        delta: details.delta,
+                                        mapSize: mapSize,
+                                        currentLeft: routeChipLeft,
+                                        currentTop: routeChipTop,
+                                      );
+                                    },
+                                    child: ShareRouteCitiesChip(
+                                      fromCity:
+                                          state.flight.route.departure.city,
+                                      toCity: state.flight.route.arrival.city,
+                                      fromCode: state
+                                          .flight
+                                          .route
+                                          .departure
+                                          .displayCode,
+                                      toCode: state
+                                          .flight
+                                          .route
+                                          .arrival
+                                          .displayCode,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
               ),
@@ -110,6 +219,54 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
       captureScreenshot: () =>
           _captureMapScreenshot(pixelRatio: pixelRatio, routeCode: routeCode),
     );
+  }
+
+  void _updateDistanceChipOffset({
+    required Offset delta,
+    required Size mapSize,
+  }) {
+    final maxLeft = (mapSize.width - shareDistanceChipWidth - _overlayPadding)
+        .clamp(_overlayPadding, double.infinity);
+    final maxTop = (mapSize.height - shareDistanceChipHeight - _overlayPadding)
+        .clamp(_overlayPadding, double.infinity);
+
+    final nextLeft = (_distanceChipOffset.dx + delta.dx).clamp(
+      _overlayPadding,
+      maxLeft,
+    );
+    final nextTop = (_distanceChipOffset.dy + delta.dy).clamp(
+      _overlayPadding,
+      maxTop,
+    );
+
+    setState(() {
+      _distanceChipOffset = Offset(nextLeft, nextTop);
+    });
+  }
+
+  void _updateRouteCitiesChipOffset({
+    required Offset delta,
+    required Size mapSize,
+    required double currentLeft,
+    required double currentTop,
+  }) {
+    final maxLeft =
+        (mapSize.width - shareRouteCitiesChipWidth - _overlayPadding).clamp(
+          _overlayPadding,
+          double.infinity,
+        );
+    final maxTop =
+        (mapSize.height - shareRouteCitiesChipHeight - _overlayPadding).clamp(
+          _overlayPadding,
+          double.infinity,
+        );
+
+    final nextLeft = (currentLeft + delta.dx).clamp(_overlayPadding, maxLeft);
+    final nextTop = (currentTop + delta.dy).clamp(_overlayPadding, maxTop);
+
+    setState(() {
+      _routeCitiesChipOffset = Offset(nextLeft, nextTop);
+    });
   }
 
   Future<String?> _captureMapScreenshot({
