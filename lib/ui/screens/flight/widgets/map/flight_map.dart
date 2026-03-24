@@ -171,7 +171,7 @@ class _FlightMapState extends State<FlightMap> {
   }
 
   void _addFlightMapLayers() {
-    [
+    final layers = [
       CorridorLayer(_corridor),
       WaypointsLayer(_waypoints),
       DimmingLayer(_corridor),
@@ -179,7 +179,11 @@ class _FlightMapState extends State<FlightMap> {
         departure: widget.flight.departure,
         arrival: widget.flight.arrival,
       ),
-    ].forEach((layer) => layer.add(_mapController!));
+    ];
+
+    for (final layer in layers) {
+      layer.add(_mapController!);
+    }
   }
 
   Future<void> _updateUserLocation(GpsData data) async {
@@ -258,6 +262,7 @@ class _FlightMapState extends State<FlightMap> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 FloatingActionButton(
+                  heroTag: 'flight_map_3d_fab',
                   backgroundColor: Colors.black.withValues(alpha: 0.3),
                   foregroundColor: Colors.white,
                   mini: true,
@@ -282,6 +287,7 @@ class _FlightMapState extends State<FlightMap> {
                 ),
                 const SizedBox(height: 8),
                 FloatingActionButton(
+                  heroTag: 'flight_map_follow_fab',
                   backgroundColor: Colors.black.withValues(alpha: 0.3),
                   foregroundColor: Colors.white,
                   mini: true,
@@ -317,11 +323,8 @@ class _FlightMapState extends State<FlightMap> {
   @override
   void dispose() {
     _mapController?.onSymbolTapped.remove(_onSymbolTapped);
-    // Properly dispose of the map controller to close connections
-    if (_mapController != null) {
-      _mapController!.dispose();
-      _mapController = null;
-    }
+    _mapController = null;
+    _mapReady = false;
     super.dispose();
   }
 }

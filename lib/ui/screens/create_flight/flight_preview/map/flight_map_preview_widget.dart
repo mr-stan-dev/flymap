@@ -71,12 +71,16 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
   }
 
   Future<void> _addFlightMapLayers(MapLibreMapController controller) async {
-    [
+    final layers = [
       CorridorLayer(route.corridor),
       WaypointsLayer(route.waypoints),
       DimmingLayer(route.corridor),
       AirportsLayer(departure: route.departure, arrival: route.arrival),
-    ].forEach((layer) => layer.add(controller));
+    ];
+
+    for (final layer in layers) {
+      layer.add(controller);
+    }
   }
 
   @override
@@ -108,10 +112,8 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
 
   @override
   void dispose() {
-    if (_mapController != null) {
-      _mapController!.dispose();
-      _mapController = null;
-    }
+    _mapController = null;
+    _mapReady = false;
     super.dispose();
   }
 }
