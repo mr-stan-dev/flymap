@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -35,21 +34,6 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
     widget.flightRoute,
   ).toMapLatLon();
 
-  // To avoid covering by bottom sheet
-  Future<void> _moveCameraToTop() async {
-    if (!mounted) return;
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double shiftPx = screenHeight * 0.15;
-    // On iOS, scrollBy(0, y) moves camera down (content up) given positive y.
-    // On Android, negative y seems to produce the desired effect (user report).
-    final double yShift = Platform.isIOS ? shiftPx : -shiftPx;
-
-    await _mapController?.animateCamera(
-      CameraUpdate.scrollBy(0.0, yShift),
-      duration: Duration(milliseconds: 500),
-    );
-  }
-
   void _onMapCreated(MapLibreMapController controller) {
     _mapController = controller;
     setState(() {
@@ -63,7 +47,6 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
       // Add a small delay to ensure style is fully loaded
       Future.delayed(const Duration(milliseconds: 200), () async {
         if (mounted && _mapController != null) {
-          await _moveCameraToTop();
           await _addFlightMapLayers(_mapController!);
           await _syncPoiLayer();
         }
