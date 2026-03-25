@@ -82,6 +82,7 @@ class ShareFlightCubit extends Cubit<ShareFlightState> {
 
   Future<void> shareRouteScreenshot({
     required Future<String?> Function() captureScreenshot,
+    required Rect sharePositionOrigin,
   }) async {
     if (state.isSharing) return;
     emit(state.copyWith(status: ShareFlightStatus.sharing, clearError: true));
@@ -103,6 +104,7 @@ class ShareFlightCubit extends Cubit<ShareFlightState> {
         [XFile(screenshotPath)],
         text:
             'Flight route ${route.departure.displayCode}-${route.arrival.displayCode}',
+        sharePositionOrigin: sharePositionOrigin,
       );
       emit(state.copyWith(status: ShareFlightStatus.ready, clearError: true));
     } catch (e) {

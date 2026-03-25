@@ -64,7 +64,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         label: 'Skip',
                         onPressed: _isFinishing ? null : _finishOnboarding,
                         expand: false,
-                        height: 40,
                       ),
               ),
               Expanded(

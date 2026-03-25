@@ -223,7 +223,6 @@ class _SettingsView extends StatelessWidget {
               label: 'Cancel',
               onPressed: () => Navigator.of(ctx).pop(),
               expand: false,
-              height: 40,
             ),
           ],
         );

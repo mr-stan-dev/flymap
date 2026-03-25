@@ -39,6 +39,7 @@ class _ShareFlightView extends StatefulWidget {
 
 class _ShareFlightViewState extends State<_ShareFlightView> {
   final GlobalKey _mapCaptureKey = GlobalKey();
+  final GlobalKey _shareButtonKey = GlobalKey();
   static const double _overlayPadding = 12;
   Offset _distanceChipOffset = const Offset(16, 16);
   Offset _routeCitiesChipOffset = const Offset(16, 84);
@@ -176,6 +177,7 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                   child: PrimaryButton(
+                    key: _shareButtonKey,
                     label: state.isSharing
                         ? 'Preparing screenshot...'
                         : 'Share',
@@ -198,11 +200,41 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
     final cubit = context.read<ShareFlightCubit>();
     final pixelRatio = MediaQuery.of(context).devicePixelRatio.clamp(1.0, 3.0);
     final routeCode = cubit.state.flight.route.routeCode;
+    final shareOrigin = _resolveShareOrigin(context);
 
     await cubit.shareRouteScreenshot(
       captureScreenshot: () =>
           _captureMapScreenshot(pixelRatio: pixelRatio, routeCode: routeCode),
+      sharePositionOrigin: shareOrigin,
     );
+  }
+
+  Rect _resolveShareOrigin(BuildContext context) {
+    final buttonBox =
+        _shareButtonKey.currentContext?.findRenderObject() as RenderBox?;
+    if (buttonBox != null &&
+        buttonBox.hasSize &&
+        buttonBox.size.width > 0 &&
+        buttonBox.size.height > 0) {
+      final origin = buttonBox.localToGlobal(Offset.zero);
+      return origin & buttonBox.size;
+    }
+
+    final screenBox = context.findRenderObject() as RenderBox?;
+    if (screenBox != null &&
+        screenBox.hasSize &&
+        screenBox.size.width > 0 &&
+        screenBox.size.height > 0) {
+      final center = Offset(
+        screenBox.size.width / 2,
+        screenBox.size.height / 2,
+      );
+      final origin = screenBox.localToGlobal(center);
+      return Rect.fromCenter(center: origin, width: 1, height: 1);
+    }
+
+    // Final fallback: non-zero rect inside a typical visible coordinate space.
+    return const Rect.fromLTWH(1, 1, 1, 1);
   }
 
   void _updateDistanceChipOffset({

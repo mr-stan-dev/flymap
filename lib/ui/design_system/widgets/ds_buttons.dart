@@ -45,7 +45,6 @@ class SecondaryButton extends StatelessWidget {
     this.trailingIcon,
     this.isLoading = false,
     this.expand = true,
-    this.height = 52,
     super.key,
   });
 
@@ -55,13 +54,12 @@ class SecondaryButton extends StatelessWidget {
   final IconData? trailingIcon;
   final bool isLoading;
   final bool expand;
-  final double height;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: expand ? double.infinity : null,
-      height: height,
+      height: 52,
       child: OutlinedButton(
         onPressed: isLoading ? null : onPressed,
         child: _ButtonContent(
@@ -83,7 +81,6 @@ class TertiaryButton extends StatelessWidget {
     this.trailingIcon,
     this.isLoading = false,
     this.expand = true,
-    this.height = 52,
     super.key,
   });
 
@@ -93,13 +90,12 @@ class TertiaryButton extends StatelessWidget {
   final IconData? trailingIcon;
   final bool isLoading;
   final bool expand;
-  final double height;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: expand ? double.infinity : null,
-      height: height,
+      height: 52,
       child: TextButton(
         onPressed: isLoading ? null : onPressed,
         child: _ButtonContent(

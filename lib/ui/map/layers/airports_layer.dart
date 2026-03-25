@@ -15,9 +15,16 @@ class AirportsLayer extends MapLayer {
   }
 
   @override
-  void add(MapLibreMapController controller) {
-    controller.addSymbol(departureOptions);
-    controller.addSymbol(arrivalOptions);
+  void add(MapLibreMapController controller) async {
+    // First symbol creation initializes SymbolManager.
+    await controller.addSymbol(departureOptions);
+    await controller.addSymbol(arrivalOptions);
+
+    // Then force airport symbol visibility regardless of label collisions.
+    await controller.setSymbolIconAllowOverlap(true);
+    await controller.setSymbolTextAllowOverlap(true);
+    await controller.setSymbolIconIgnorePlacement(true);
+    await controller.setSymbolTextIgnorePlacement(true);
   }
 
   SymbolOptions _airport(Airport airport) => SymbolOptions(
@@ -31,5 +38,6 @@ class AirportsLayer extends MapLayer {
     textColor: Colors.white.toHexStringRGB(),
     textHaloColor: AppColoursCommon.accentBlue.toHexStringRGB(),
     textHaloWidth: 2,
+    zIndex: 100,
   );
 }
