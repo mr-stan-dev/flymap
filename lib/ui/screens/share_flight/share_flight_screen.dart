@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
@@ -38,6 +39,9 @@ class _ShareFlightView extends StatefulWidget {
 }
 
 class _ShareFlightViewState extends State<_ShareFlightView> {
+  static const MethodChannel _nativeCaptureChannel = MethodChannel(
+    'app.flymap/native_capture',
+  );
   final GlobalKey _mapCaptureKey = GlobalKey();
   final GlobalKey _shareButtonKey = GlobalKey();
   static const double _overlayPadding = 12;
@@ -290,6 +294,61 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
   }
 
   Future<String?> _captureMapScreenshot({
+    required double pixelRatio,
+    required String routeCode,
+  }) async {
+    final nativePath = await _captureMapScreenshotNative(routeCode: routeCode);
+    if (nativePath != null) {
+      return nativePath;
+    }
+    return _captureMapScreenshotFlutterFallback(
+      pixelRatio: pixelRatio,
+      routeCode: routeCode,
+    );
+  }
+
+  Future<String?> _captureMapScreenshotNative({
+    required String routeCode,
+  }) async {
+    final mapBox =
+        _mapCaptureKey.currentContext?.findRenderObject() as RenderBox?;
+    if (mapBox == null || !mapBox.hasSize || mapBox.size.isEmpty) {
+      return null;
+    }
+
+    final origin = mapBox.localToGlobal(Offset.zero);
+    final width = mapBox.size.width;
+    final height = mapBox.size.height;
+    if (width <= 0 || height <= 0) return null;
+
+    try {
+      final bytes = await _nativeCaptureChannel.invokeMethod<Uint8List>(
+        'captureRectPng',
+        <String, dynamic>{
+          'left': origin.dx,
+          'top': origin.dy,
+          'width': width,
+          'height': height,
+        },
+      );
+      if (bytes == null || bytes.isEmpty) return null;
+
+      final tempDir = await getTemporaryDirectory();
+      final filePath = p.join(
+        tempDir.path,
+        'flight_route_${routeCode}_${DateTime.now().millisecondsSinceEpoch}.png',
+      );
+      final output = File(filePath);
+      await output.writeAsBytes(bytes, flush: true);
+      return output.path;
+    } on PlatformException {
+      return null;
+    } on MissingPluginException {
+      return null;
+    }
+  }
+
+  Future<String?> _captureMapScreenshotFlutterFallback({
     required double pixelRatio,
     required String routeCode,
   }) async {

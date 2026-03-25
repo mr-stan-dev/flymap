@@ -4,6 +4,8 @@ import MapLibre
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
+  private let nativeCaptureDelegate = NativeCaptureDelegate()
+
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -18,6 +20,11 @@ import MapLibre
     MLNNetworkConfiguration.sharedManager.sessionConfiguration = config
 
     GeneratedPluginRegistrant.register(with: self)
+
+    if let controller = window?.rootViewController as? FlutterViewController {
+      nativeCaptureDelegate.register(with: controller)
+    }
+
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
