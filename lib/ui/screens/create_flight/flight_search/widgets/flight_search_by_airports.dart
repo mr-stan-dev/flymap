@@ -2,333 +2,600 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/router/app_router.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
-import 'package:flymap/ui/screens/create_flight/flight_search/widgets/popular_flights.dart';
-import 'package:flymap/ui/theme/app_theme_ext.dart';
-
-import '../viewmodel/flight_search_screen_cubit.dart';
-import '../viewmodel/flight_search_screen_state.dart';
-import 'airport_autocomplete_field.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/info/flight_info_widget.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/map/flight_map_preview_widget.dart';
+import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_cubit.dart';
+import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
+import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 
 class FlightSearchByAirports extends StatefulWidget {
-  final Function(Airport departure, Airport arrival)? onAirportsSelected;
-
-  const FlightSearchByAirports({super.key, this.onAirportsSelected});
+  const FlightSearchByAirports({super.key});
 
   @override
   State<FlightSearchByAirports> createState() => _FlightSearchByAirportsState();
 }
 
 class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
-  Airport? _selectedDeparture;
-  Airport? _selectedArrival;
-  List<Map<String, Airport>> _popular = const [];
-  bool _popularLoading = true;
-
-  // Controllers for the text fields
-  final TextEditingController _departureController = TextEditingController();
-  final TextEditingController _arrivalController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPopular();
-  }
-
-  Future<void> _loadPopular() async {
-    final data = await loadPopularFlights();
-    if (!mounted) return;
-    setState(() {
-      _popular = data;
-      _popularLoading = false;
-    });
-  }
+  final TextEditingController _searchController = TextEditingController();
+  int _previousStepIndex = 0;
+  double _stepEnterFrom = 0.0;
 
   @override
   void dispose() {
-    _departureController.dispose();
-    _arrivalController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final primary = theme.colorScheme.primary;
-    return Scaffold(
-      appBar: AppBar(title: const Text('Search by Airports')),
-      body: SafeArea(
-        child: BlocConsumer<FlightSearchScreenCubit, FlightSearchScreenState>(
-          listener: (context, state) {
-            if (state is FlightSearchError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
+    return BlocConsumer<FlightSearchScreenCubit, FlightSearchScreenState>(
+      listenWhen: (previous, current) {
+        return previous.errorMessage != current.errorMessage ||
+            previous.downloadErrorMessage != current.downloadErrorMessage ||
+            previous.downloadDone != current.downloadDone ||
+            previous.searchQuery != current.searchQuery ||
+            previous.step != current.step;
+      },
+      listener: (context, state) {
+        final nextStepIndex = _stepIndex(state.step);
+        if (nextStepIndex != _previousStepIndex) {
+          setState(() {
+            _stepEnterFrom = nextStepIndex > _previousStepIndex ? 1.0 : -1.0;
+            _previousStepIndex = nextStepIndex;
+          });
+        }
+
+        if (_searchController.text != state.searchQuery) {
+          _searchController.value = TextEditingValue(
+            text: state.searchQuery,
+            selection: TextSelection.collapsed(
+              offset: state.searchQuery.length,
+            ),
+          );
+        }
+
+        if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+        }
+
+        if (state.downloadErrorMessage != null &&
+            state.downloadErrorMessage!.isNotEmpty) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.downloadErrorMessage!)));
+        }
+
+        if (state.downloadDone) {
+          homeRefreshNotifier.value = true;
+          AppRouter.goHome(context);
+        }
+      },
+      builder: (context, state) {
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, _) async {
+            if (didPop) return;
+            final shouldPop = await context
+                .read<FlightSearchScreenCubit>()
+                .handleBackAction();
+            if (shouldPop && context.mounted) {
+              Navigator.of(context).pop();
             }
           },
-          builder: (context, state) {
-            return Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                children: [
-                  // Scrollable content
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Title
-                          const SizedBox(height: 20),
-                          Text(
-                            'Where are you flying?',
-                            style: Theme.of(context).textTheme.headlineMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 40),
-
-                          // Departure airport field
-                          AirportAutocompleteField(
-                            label: 'Departure Airport',
-                            hint: 'Enter departure airport',
-                            icon: Icons.flight_takeoff,
-                            cubit: context.read<FlightSearchScreenCubit>(),
-                            onAirportSelected: (airport) {
-                              setState(() {
-                                _selectedDeparture = airport;
-                              });
-                            },
-                            onAirportClear: () {
-                              setState(() {
-                                _selectedDeparture = null;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Arrival airport field
-                          AirportAutocompleteField(
-                            label: 'Arrival Airport',
-                            hint: 'Enter arrival airport',
-                            icon: Icons.flight_land,
-                            cubit: context.read<FlightSearchScreenCubit>(),
-                            onAirportSelected: (airport) {
-                              setState(() {
-                                _selectedArrival = airport;
-                              });
-                            },
-                            onAirportClear: () {
-                              setState(() {
-                                _selectedArrival = null;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 30),
-                          _buildSampleFlightsChips(),
-
-                          const SizedBox(height: 20),
-
-                          // Search results or status
-                          _buildSearchResults(state),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Fixed search button at bottom
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: _bothAirportsSelected()
-                          ? () {
-                              AppRouter.goToFlightPreviewScreen(
-                                context,
-                                params: FlightPreviewAirports(
-                                  departure: _selectedDeparture!,
-                                  arrival: _selectedArrival!,
-                                ),
-                              );
-                            }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primary,
-                        foregroundColor: theme.colorScheme.onPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: _buildSearchButtonContent(state),
-                    ),
-                  ),
-                ],
+          child: Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () async {
+                  final shouldPop = await context
+                      .read<FlightSearchScreenCubit>()
+                      .handleBackAction();
+                  if (shouldPop && context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                },
               ),
-            );
-          },
-        ),
-      ),
+              title: Text(_titleForStep(state.step)),
+            ),
+            body: TweenAnimationBuilder<double>(
+              key: ValueKey(state.step.name),
+              tween: Tween<double>(begin: _stepEnterFrom, end: 0),
+              duration: const Duration(milliseconds: 260),
+              curve: Curves.easeOutCubic,
+              builder: (context, value, child) {
+                return Transform.translate(
+                  offset: Offset(value * MediaQuery.sizeOf(context).width, 0),
+                  child: child,
+                );
+              },
+              child: _buildBody(context, state),
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildSampleFlightsChips() {
-    if (_popularLoading) {
-      return Center(child: const CircularProgressIndicator());
+  Widget _buildBody(BuildContext context, FlightSearchScreenState state) {
+    if (state.isDownloading) {
+      return _buildDownloadingView(state);
     }
+
+    switch (state.step) {
+      case CreateFlightStep.departure:
+      case CreateFlightStep.arrival:
+        return _buildAirportSelectionStep(context, state);
+      case CreateFlightStep.mapPreview:
+        return _buildMapPreviewStep(context, state);
+      case CreateFlightStep.overview:
+        return _buildOverviewStep(context, state);
+    }
+  }
+
+  Widget _buildAirportSelectionStep(
+    BuildContext context,
+    FlightSearchScreenState state,
+  ) {
+    final cubit = context.read<FlightSearchScreenCubit>();
+    final theme = Theme.of(context);
+    final selectedAirport = state.step == CreateFlightStep.departure
+        ? state.selectedDeparture
+        : state.selectedArrival;
+    final favorites = _filterAirportsForCurrentStep(
+      state.favoriteAirports,
+      state,
+    );
+    final favoriteCodes = favorites.map(_airportCode).toSet();
+    final popular = _filterAirportsForCurrentStep(state.popularAirports, state)
+        .where((airport) => !favoriteCodes.contains(_airportCode(airport)))
+        .toList();
+    final results = _filterAirportsForCurrentStep(state.searchResults, state);
+    final showPopularAirports = state.searchQuery.trim().isEmpty;
+    const gpsActiveColor = Color(0xFF14824A);
+    final borderColor = selectedAirport != null
+        ? gpsActiveColor
+        : theme.colorScheme.outline.withValues(alpha: 0.45);
+    final focusedBorderColor = selectedAirport != null
+        ? gpsActiveColor
+        : theme.colorScheme.primary;
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Popular Routes', style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 4,
-          children: _popular.map((pair) {
-            final departure = pair['departure'] as Airport;
-            final arrival = pair['arrival'] as Airport;
-            return ActionChip(
-              avatar: Icon(
-                Icons.flight,
-                size: 16,
-                color: Theme.of(context).colorScheme.primary,
+        Expanded(
+          child: SafeArea(
+            bottom: false,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      if (selectedAirport != null) {
+                        cubit.clearSelectedAirportForCurrentStep();
+                      }
+                      cubit.searchAirports(value);
+                    },
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: selectedAirport != null ? gpsActiveColor : null,
+                      ),
+                      suffixIcon: selectedAirport != null
+                          ? SizedBox(
+                              width: 96,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      state.selectedAirportIsFavorite
+                                          ? Icons.star
+                                          : Icons.star_border,
+                                      color: state.selectedAirportIsFavorite
+                                          ? Colors.amber
+                                          : null,
+                                    ),
+                                    tooltip: state.selectedAirportIsFavorite
+                                        ? 'Remove favorite'
+                                        : 'Add to favorite',
+                                    onPressed:
+                                        cubit.toggleFavoriteForSelectedAirport,
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.close),
+                                    tooltip: 'Remove selected airport',
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      cubit
+                                          .clearSelectedAirportForCurrentStep();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            )
+                          : state.searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                _searchController.clear();
+                                cubit.searchAirports('');
+                              },
+                            )
+                          : null,
+                      hintText: state.step == CreateFlightStep.departure
+                          ? 'Search departure airport'
+                          : 'Search arrival airport',
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: borderColor,
+                          width: selectedAirport != null ? 2 : 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: focusedBorderColor,
+                          width: selectedAirport != null ? 2.4 : 1.8,
+                        ),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  if (state.isSearchLoading && selectedAirport == null)
+                    const Center(child: CircularProgressIndicator())
+                  else if (state.searchQuery.isNotEmpty &&
+                      results.isEmpty &&
+                      selectedAirport == null)
+                    _EmptySearchResults(step: state.step)
+                  else if (results.isNotEmpty && selectedAirport == null)
+                    _SearchResultList(
+                      airports: results,
+                      onSelectAirport: cubit.selectAirport,
+                    ),
+                  if (favorites.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      'Favorites',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _AirportChipWrap(
+                      airports: favorites,
+                      onSelectAirport: cubit.selectAirport,
+                      showFavoriteTrailingIcon: true,
+                      onToggleFavorite: cubit.toggleFavoriteForAirport,
+                    ),
+                  ],
+                  if (showPopularAirports) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      'Popular airports',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _AirportChipWrap(
+                      airports: popular,
+                      onSelectAirport: cubit.selectAirport,
+                    ),
+                  ],
+                ],
               ),
-              label: Text(
-                '${departure.nameShort} → ${arrival.nameShort}',
-                style: context.textTheme.caption14Regular,
-              ),
-              backgroundColor: Theme.of(
-                context,
-              ).colorScheme.primary.withValues(alpha: 0.1),
-              side: BorderSide(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.3),
-              ),
-              onPressed: () => _fillTextFieldsAndContinue(departure, arrival),
-            );
-          }).toList(),
+            ),
+          ),
+        ),
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: FilledButton(
+                    onPressed: selectedAirport == null
+                        ? null
+                        : () => cubit.continueFromAirportStep(),
+                    child: const Text('Continue'),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );
   }
 
-  void _fillTextFieldsAndContinue(Airport departure, Airport arrival) {
-    // Fill the text fields with the airports
-    _departureController.text = '${departure.name} (${departure.displayCode})';
-    _arrivalController.text = '${arrival.name} (${arrival.displayCode})';
-
-    // Update selected airports
-    setState(() {
-      _selectedDeparture = departure;
-      _selectedArrival = arrival;
-    });
-
-    // Trigger the continue button action
-    AppRouter.goToFlightPreviewScreen(
-      context,
-      params: FlightPreviewAirports(departure: departure, arrival: arrival),
-    );
-  }
-
-  Widget _buildSearchResults(FlightSearchScreenState state) {
-    if (state is FlightSearchByAirportsLoading) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Row(
-          children: [
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            SizedBox(width: 12),
-            Text('Searching for flights...'),
-          ],
-        ),
-      );
+  Widget _buildMapPreviewStep(
+    BuildContext context,
+    FlightSearchScreenState state,
+  ) {
+    final route = state.flightRoute;
+    if (state.isPreviewLoading || route == null) {
+      return const Center(child: CircularProgressIndicator());
     }
 
-    if (state is FlightSearchByAirportsResults) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.green.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
+    return Column(
+      children: [
+        Expanded(
+          child: FlightMapPreviewWidget(
+            flightRoute: route,
+            flightInfo: state.flightInfo,
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Found ${state.flights.length} flights',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+        if (state.isTooLongFlight)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+            child: Text(
+              'Downloading routes over 5,000 km is not supported yet.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.error,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            child: SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: FilledButton(
+                onPressed: state.canContinueFromMap
+                    ? () => context
+                          .read<FlightSearchScreenCubit>()
+                          .continueFromMap()
+                    : null,
+                child: const Text('Continue'),
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'From ${state.departure.displayCode} to ${state.arrival.displayCode}',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (state is FlightSearchByAirportsNoResults) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.orange.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Text(
-          'No flights found for this route',
-          style: TextStyle(color: Colors.white),
-        ),
-      );
-    }
-
-    return const SizedBox.shrink();
-  }
-
-  Widget _buildSearchButtonContent(FlightSearchScreenState state) {
-    if (state is FlightSearchByAirportsLoading) {
-      return const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            ),
           ),
-          SizedBox(width: 12),
-          Text(
-            'Searching...',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ],
-      );
-    }
-
-    return const Text(
-      'Search Flights',
-      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+      ],
     );
   }
 
-  bool _bothAirportsSelected() {
-    return _selectedDeparture != null && _selectedArrival != null;
+  Widget _buildOverviewStep(
+    BuildContext context,
+    FlightSearchScreenState state,
+  ) {
+    final route = state.flightRoute;
+    if (route == null) {
+      return const Center(child: Text('Route is not ready yet.'));
+    }
+
+    final isDownloadEnabled = !state.isTooLongFlight;
+    final buttonText = state.isTooLongFlight
+        ? 'Too long flight (> 5000km)'
+        : 'Download map';
+
+    return Column(
+      children: [
+        Expanded(
+          child: SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (state.isOverviewLoading) ...[
+                    Row(
+                      children: const [
+                        SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        SizedBox(width: 10),
+                        Text('Building route overview...'),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  FlightInfoWidget(route: route, info: state.flightInfo),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            child: SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: FilledButton(
+                onPressed: isDownloadEnabled
+                    ? () => context
+                          .read<FlightSearchScreenCubit>()
+                          .startDownload()
+                    : null,
+                child: Text(buttonText),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDownloadingView(FlightSearchScreenState state) {
+    final percent = (state.downloadProgress * 100).clamp(0, 100).toInt();
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Downloading offline map...',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 12),
+            LinearProgressIndicator(value: state.downloadProgress),
+            const SizedBox(height: 8),
+            Text('$percent%'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _titleForStep(CreateFlightStep step) {
+    switch (step) {
+      case CreateFlightStep.departure:
+        return 'Choose departure airport';
+      case CreateFlightStep.arrival:
+        return 'Choose arrival airport';
+      case CreateFlightStep.mapPreview:
+        return 'Map preview';
+      case CreateFlightStep.overview:
+        return 'Route overview';
+    }
+  }
+
+  int _stepIndex(CreateFlightStep step) {
+    switch (step) {
+      case CreateFlightStep.departure:
+        return 0;
+      case CreateFlightStep.arrival:
+        return 1;
+      case CreateFlightStep.mapPreview:
+        return 2;
+      case CreateFlightStep.overview:
+        return 3;
+    }
+  }
+
+  List<Airport> _filterAirportsForCurrentStep(
+    List<Airport> airports,
+    FlightSearchScreenState state,
+  ) {
+    if (state.step != CreateFlightStep.arrival) return airports;
+    final departureCode = _airportCode(state.selectedDeparture);
+    if (departureCode.isEmpty) return airports;
+    return airports
+        .where((airport) => _airportCode(airport) != departureCode)
+        .toList();
+  }
+
+  String _airportCode(Airport? airport) {
+    if (airport == null) return '';
+    final primary = airport.primaryCode.trim().toUpperCase();
+    if (primary.isNotEmpty) return primary;
+    return airport.displayCode.trim().toUpperCase();
+  }
+}
+
+class _AirportChipWrap extends StatelessWidget {
+  const _AirportChipWrap({
+    required this.airports,
+    required this.onSelectAirport,
+    this.showFavoriteTrailingIcon = false,
+    this.onToggleFavorite,
+  });
+
+  final List<Airport> airports;
+  final Future<void> Function(Airport airport) onSelectAirport;
+  final bool showFavoriteTrailingIcon;
+  final Future<void> Function(Airport airport)? onToggleFavorite;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: airports.map((airport) {
+        return InputChip(
+          label: Text('${airport.displayCode} · ${airport.city}'),
+          selected: false,
+          onPressed: () => onSelectAirport(airport),
+          onDeleted: showFavoriteTrailingIcon && onToggleFavorite != null
+              ? () => onToggleFavorite!(airport)
+              : null,
+          deleteIcon: showFavoriteTrailingIcon
+              ? const Icon(Icons.star, color: Colors.amber, size: 18)
+              : null,
+          deleteButtonTooltipMessage: showFavoriteTrailingIcon
+              ? 'Remove from favorites'
+              : null,
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _SearchResultList extends StatelessWidget {
+  const _SearchResultList({
+    required this.airports,
+    required this.onSelectAirport,
+  });
+
+  final List<Airport> airports;
+  final Future<void> Function(Airport airport) onSelectAirport;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: airports.length,
+      separatorBuilder: (_, __) => const Divider(height: 1),
+      itemBuilder: (context, index) {
+        final airport = airports[index];
+        return ListTile(
+          onTap: () => onSelectAirport(airport),
+          dense: true,
+          visualDensity: const VisualDensity(vertical: -2),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+          title: Text(
+            '${airport.name} (${airport.displayCode})',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _EmptySearchResults extends StatelessWidget {
+  const _EmptySearchResults({required this.step});
+
+  final CreateFlightStep step;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = step == CreateFlightStep.departure
+        ? 'No departure airports found.'
+        : 'No arrival airports found.';
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
   }
 }

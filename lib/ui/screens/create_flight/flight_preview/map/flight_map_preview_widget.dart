@@ -1,15 +1,13 @@
 import 'dart:io';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/ui/map/layers/flight_route_map_layers.dart';
 import 'package:flymap/ui/map/layers/latlon_utils.dart';
 import 'package:flymap/ui/map/layers/poi_layer.dart';
 import 'package:flymap/ui/map/map_utils.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_cubit.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 class FlightMapPreviewWidget extends StatefulWidget {
@@ -30,6 +28,8 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
   MapLibreMapController? _mapController;
   bool _mapReady = false;
   late final FlightRoute route = widget.flightRoute;
+  bool _routeLayersAdded = false;
+  int _poiSignature = 0;
 
   late final LatLng _center = MapUtils.routeCenter(
     widget.flightRoute,
@@ -65,6 +65,7 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
         if (mounted && _mapController != null) {
           await _moveCameraToTop();
           await _addFlightMapLayers(_mapController!);
+          await _syncPoiLayer();
         }
       });
     }
@@ -72,6 +73,28 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
 
   Future<void> _addFlightMapLayers(MapLibreMapController controller) async {
     await FlightRouteMapLayers.add(controller: controller, route: route);
+    _routeLayersAdded = true;
+  }
+
+  @override
+  void didUpdateWidget(covariant FlightMapPreviewWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.flightInfo != widget.flightInfo) {
+      _syncPoiLayer();
+    }
+  }
+
+  Future<void> _syncPoiLayer() async {
+    final controller = _mapController;
+    if (!_routeLayersAdded || controller == null) return;
+
+    final nextSignature = Object.hashAll(
+      widget.flightInfo.poi.map((poi) => poi.name),
+    );
+    if (_poiSignature == nextSignature) return;
+    _poiSignature = nextSignature;
+
+    PoiLayer(poi: widget.flightInfo.poi).add(controller);
   }
 
   @override
@@ -80,29 +103,16 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
       departure: route.departure,
       arrival: route.arrival,
     );
-    return BlocListener<FlightPreviewCubit, FlightPreviewState>(
-      listener: (context, state) {
-        if (state is FlightMapPreviewMapState && _mapController != null) {
-          PoiLayer(poi: state.flightInfo.poi).add(_mapController!);
-        }
-      },
-      listenWhen: (oldState, newState) {
-        if (newState is FlightMapPreviewMapState) {
-          return !newState.flightInfo.isEmpty;
-        }
-        return false;
-      },
-      child: MapLibreMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: _center,
-          zoom: zoom.isFinite ? zoom : 1.0,
-        ),
-        styleString: "https://tiles.openfreemap.org/styles/liberty",
-        compassViewPosition: CompassViewPosition.bottomRight,
-        compassViewMargins: const Point(16, 16),
-        onStyleLoadedCallback: _onStyleLoaded,
+    return MapLibreMap(
+      onMapCreated: _onMapCreated,
+      initialCameraPosition: CameraPosition(
+        target: _center,
+        zoom: zoom.isFinite ? zoom : 1.0,
       ),
+      styleString: "https://tiles.openfreemap.org/styles/liberty",
+      compassViewPosition: CompassViewPosition.bottomRight,
+      compassViewMargins: const Point(16, 16),
+      onStyleLoadedCallback: _onStyleLoaded,
     );
   }
 
@@ -110,6 +120,7 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
   void dispose() {
     _mapController = null;
     _mapReady = false;
+    _routeLayersAdded = false;
     super.dispose();
   }
 }
