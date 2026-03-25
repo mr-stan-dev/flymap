@@ -15,6 +15,7 @@ import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_controls.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_gps_status_badge.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_initializing_overlay.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_style_loading_view.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -287,6 +288,30 @@ class _FlightMapState extends State<FlightMap> {
             followUser: _followUser,
             onToggle3D: _toggle3D,
             onToggleFollowUser: _toggleUserFollow,
+          ),
+          Positioned(
+            left: 8,
+            bottom: 16,
+            child: BlocBuilder<FlightScreenCubit, FlightScreenState>(
+              buildWhen: (previous, current) {
+                if (previous is FlightScreenLoaded &&
+                    current is FlightScreenLoaded) {
+                  return previous.gpsStatus != current.gpsStatus ||
+                      previous.gpsUpdateTick != current.gpsUpdateTick ||
+                      previous.gpsData?.accuracy != current.gpsData?.accuracy;
+                }
+                return previous.runtimeType != current.runtimeType;
+              },
+              builder: (context, state) {
+                if (state is! FlightScreenLoaded) {
+                  return const SizedBox.shrink();
+                }
+                return MapGpsStatusBadge(
+                  gpsStatus: state.gpsStatus,
+                  gpsData: state.gpsData,
+                );
+              },
+            ),
           ),
           if (!_isMapInitialized) const MapInitializingOverlay(),
         ],

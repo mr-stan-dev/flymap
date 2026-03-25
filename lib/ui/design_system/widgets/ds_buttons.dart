@@ -8,7 +8,6 @@ class PrimaryButton extends StatelessWidget {
     this.trailingIcon,
     this.isLoading = false,
     this.expand = true,
-    this.height = 52,
     super.key,
   });
 
@@ -18,7 +17,6 @@ class PrimaryButton extends StatelessWidget {
   final IconData? trailingIcon;
   final bool isLoading;
   final bool expand;
-  final double height;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +28,7 @@ class PrimaryButton extends StatelessWidget {
     );
     return SizedBox(
       width: expand ? double.infinity : null,
-      height: height,
+      height: 52,
       child: FilledButton(
         onPressed: isLoading ? null : onPressed,
         child: child,

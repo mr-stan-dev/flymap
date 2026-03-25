@@ -44,7 +44,6 @@ class GpsNotGrantedState extends StatelessWidget {
           leadingIcon: Icons.location_on,
           label: 'Grant permission',
           expand: false,
-          height: 44,
         ),
       ],
     );

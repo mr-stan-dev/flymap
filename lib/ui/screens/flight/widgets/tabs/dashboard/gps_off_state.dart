@@ -39,7 +39,6 @@ class GpsOffState extends StatelessWidget {
           leadingIcon: Icons.settings,
           label: 'Open location settings',
           expand: false,
-          height: 44,
         ),
       ],
     );
