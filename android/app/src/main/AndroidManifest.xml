@@ -5,7 +5,7 @@
     <!-- Internet permission for map tiles -->
     <uses-permission android:name="android.permission.INTERNET" />
     <application
-        android:label="flymap"
+        android:label="Flyway"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

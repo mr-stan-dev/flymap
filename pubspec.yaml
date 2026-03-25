@@ -55,6 +55,9 @@ flutter:
     - assets/glyphs/Noto Sans Medium/
     - assets/glyphs/Noto Sans Bold/
     - assets/app_icon.png
+    - assets/images/onboarding1.webp
+    - assets/images/onboarding2.webp
+    - assets/images/onboarding3.webp
 
 flutter_launcher_icons:
   android: true

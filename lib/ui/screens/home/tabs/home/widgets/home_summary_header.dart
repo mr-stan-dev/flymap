@@ -18,8 +18,8 @@ class HomeSummaryHeader extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
           colors: [
-            colorScheme.primary.withValues(alpha: 0.16),
-            colorScheme.secondary.withValues(alpha: 0.1),
+            colorScheme.primary.withValues(alpha: 0.15),
+            colorScheme.primary.withValues(alpha: 0.3),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -37,7 +37,7 @@ class HomeSummaryHeader extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Offline maps for flights, explore as you fly.',
+            'Offline maps for flights.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),

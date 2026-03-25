@@ -9,6 +9,7 @@ import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/data/route/great_circle_route_provider.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/repository/flight_repository.dart';
+import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/usecase/download_map_use_case.dart';
 import 'package:flymap/usecase/get_flight_info_use_case.dart';
 import 'package:get_it/get_it.dart';
@@ -56,5 +57,7 @@ class DiModule {
     i.registerLazySingleton<FavoriteAirportsRepository>(
       () => FavoriteAirportsRepository(),
     );
+
+    i.registerLazySingleton<OnboardingRepository>(() => OnboardingRepository());
   }
 }

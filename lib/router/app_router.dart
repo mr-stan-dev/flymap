@@ -7,6 +7,7 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_sc
 import 'package:flymap/ui/screens/create_flight/flight_search/flight_search_screen.dart';
 import 'package:flymap/ui/screens/flight/flight_screen.dart';
 import 'package:flymap/ui/screens/home/home_screen.dart';
+import 'package:flymap/ui/screens/onboarding/onboarding_screen.dart';
 import 'package:flymap/ui/screens/share_flight/share_flight_screen.dart';
 import 'package:flymap/ui/screens/settings/settings_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -20,11 +21,12 @@ class AppRouter {
   static const String shareFlightRoute = '/share-flight';
   static const String settingsRoute = '/settings';
   static const String aboutRoute = '/about';
+  static const String onboardingRoute = '/onboarding';
 
   /// Create the router configuration
-  static GoRouter createRouter() {
+  static GoRouter createRouter({required bool showOnboarding}) {
     return GoRouter(
-      initialLocation: homeRoute,
+      initialLocation: showOnboarding ? onboardingRoute : homeRoute,
       debugLogDiagnostics: true,
       observers: [
         FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
@@ -35,6 +37,12 @@ class AppRouter {
           path: homeRoute,
           name: 'flight_search',
           builder: (context, state) => const HomeScreen(),
+        ),
+
+        GoRoute(
+          path: onboardingRoute,
+          name: 'onboarding',
+          builder: (context, state) => const OnboardingScreen(),
         ),
 
         // Flight Number Screen route

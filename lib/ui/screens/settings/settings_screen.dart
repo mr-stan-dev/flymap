@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flymap/router/app_router.dart';
 
 import 'viewmodel/settings_cubit.dart';
 import 'viewmodel/settings_state.dart';
@@ -149,8 +150,8 @@ class _SettingsView extends StatelessWidget {
                 title: 'About',
                 subtitle: 'Learn more about the app',
                 leading: const Icon(Icons.info_outline),
-                onTap: () async {
-                  await _openExternalUrl(context, 'https://flymap.app/');
+                onTap: () {
+                  AppRouter.goToAbout(context);
                 },
               ),
               const Divider(height: 1),
