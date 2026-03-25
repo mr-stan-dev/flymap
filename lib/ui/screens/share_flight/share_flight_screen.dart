@@ -41,7 +41,7 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
   final GlobalKey _mapCaptureKey = GlobalKey();
   static const double _overlayPadding = 12;
   Offset _distanceChipOffset = const Offset(16, 16);
-  Offset? _routeCitiesChipOffset;
+  Offset _routeCitiesChipOffset = const Offset(16, 84);
 
   @override
   Widget build(BuildContext context) {
@@ -103,17 +103,10 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
                                         shareRouteCitiesChipHeight -
                                         _overlayPadding)
                                     .clamp(_overlayPadding, double.infinity);
-                            final routeBaseOffset =
-                                _routeCitiesChipOffset ??
-                                Offset(_overlayPadding, routeMaxTop);
-                            final routeChipLeft = routeBaseOffset.dx.clamp(
-                              _overlayPadding,
-                              routeMaxLeft,
-                            );
-                            final routeChipTop = routeBaseOffset.dy.clamp(
-                              _overlayPadding,
-                              routeMaxTop,
-                            );
+                            final routeChipLeft = _routeCitiesChipOffset.dx
+                                .clamp(_overlayPadding, routeMaxLeft);
+                            final routeChipTop = _routeCitiesChipOffset.dy
+                                .clamp(_overlayPadding, routeMaxTop);
 
                             return Stack(
                               children: [
@@ -153,8 +146,6 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
                                       _updateRouteCitiesChipOffset(
                                         delta: details.delta,
                                         mapSize: mapSize,
-                                        currentLeft: routeChipLeft,
-                                        currentTop: routeChipTop,
                                       );
                                     },
                                     child: ShareRouteCitiesChip(
@@ -240,8 +231,6 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
   void _updateRouteCitiesChipOffset({
     required Offset delta,
     required Size mapSize,
-    required double currentLeft,
-    required double currentTop,
   }) {
     final maxLeft =
         (mapSize.width - shareRouteCitiesChipWidth - _overlayPadding).clamp(
@@ -254,8 +243,14 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
           double.infinity,
         );
 
-    final nextLeft = (currentLeft + delta.dx).clamp(_overlayPadding, maxLeft);
-    final nextTop = (currentTop + delta.dy).clamp(_overlayPadding, maxTop);
+    final nextLeft = (_routeCitiesChipOffset.dx + delta.dx).clamp(
+      _overlayPadding,
+      maxLeft,
+    );
+    final nextTop = (_routeCitiesChipOffset.dy + delta.dy).clamp(
+      _overlayPadding,
+      maxTop,
+    );
 
     setState(() {
       _routeCitiesChipOffset = Offset(nextLeft, nextTop);

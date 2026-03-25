@@ -21,8 +21,8 @@ class ShareDistanceChip extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            colorScheme.primaryContainer.withValues(alpha: 0.9),
-            colorScheme.primary.withValues(alpha: 0.88),
+            colorScheme.primary.withValues(alpha: 0.8),
+            colorScheme.primary.withValues(alpha: 0.5),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

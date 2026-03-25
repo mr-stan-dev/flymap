@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 const double shareRouteCitiesChipWidth = 260;
-const double shareRouteCitiesChipHeight = 56;
+const double shareRouteCitiesChipHeight = 58;
 
 class ShareRouteCitiesChip extends StatelessWidget {
   const ShareRouteCitiesChip({
@@ -24,25 +24,25 @@ class ShareRouteCitiesChip extends StatelessWidget {
     return Container(
       width: shareRouteCitiesChipWidth,
       height: shareRouteCitiesChipHeight,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            colorScheme.tertiaryContainer.withValues(alpha: 0.9),
-            colorScheme.tertiary.withValues(alpha: 0.84),
+            colorScheme.primary.withValues(alpha: 0.8),
+            colorScheme.primary.withValues(alpha: 0.5),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: colorScheme.onTertiary.withValues(alpha: 0.24),
+          color: colorScheme.onPrimary.withValues(alpha: 0.24),
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: colorScheme.shadow.withValues(alpha: 0.22),
+            blurRadius: 12,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -52,7 +52,7 @@ class ShareRouteCitiesChip extends StatelessWidget {
           Text(
             'Route',
             style: textTheme.labelSmall?.copyWith(
-              color: colorScheme.onTertiary.withValues(alpha: 0.78),
+              color: colorScheme.onPrimary.withValues(alpha: 0.82),
               fontWeight: FontWeight.w600,
               letterSpacing: 0.2,
             ),
@@ -63,7 +63,7 @@ class ShareRouteCitiesChip extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: textTheme.labelLarge?.copyWith(
-              color: colorScheme.onTertiary,
+              color: colorScheme.onPrimary,
               fontWeight: FontWeight.w700,
             ),
           ),
