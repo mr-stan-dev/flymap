@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_download_completion.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/info/flight_info_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/map/flight_map_preview_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_cubit.dart';
@@ -19,6 +20,7 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
   final TextEditingController _searchController = TextEditingController();
   int _previousStepIndex = 0;
   double _stepEnterFrom = 0.0;
+  bool _showDownloadSuccess = false;
 
   @override
   void dispose() {
@@ -36,7 +38,7 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
             previous.searchQuery != current.searchQuery ||
             previous.step != current.step;
       },
-      listener: (context, state) {
+      listener: (listenerContext, state) {
         final nextStepIndex = _stepIndex(state.step);
         if (nextStepIndex != _previousStepIndex) {
           setState(() {
@@ -56,20 +58,26 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
 
         if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
           ScaffoldMessenger.of(
-            context,
+            listenerContext,
           ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
         }
 
         if (state.downloadErrorMessage != null &&
             state.downloadErrorMessage!.isNotEmpty) {
           ScaffoldMessenger.of(
-            context,
+            listenerContext,
           ).showSnackBar(SnackBar(content: Text(state.downloadErrorMessage!)));
         }
 
         if (state.downloadDone) {
-          homeRefreshNotifier.value = true;
-          AppRouter.goHome(context);
+          setState(() {
+            _showDownloadSuccess = true;
+          });
+          Future<void>.delayed(const Duration(milliseconds: 900), () {
+            if (!mounted) return;
+            homeRefreshNotifier.value = true;
+            AppRouter.goHome(this.context);
+          });
         }
       },
       builder: (context, state) {
@@ -119,6 +127,10 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
   }
 
   Widget _buildBody(BuildContext context, FlightSearchScreenState state) {
+    if (_showDownloadSuccess) {
+      return const FlightDownloadCompletion();
+    }
+
     if (state.isDownloading) {
       return _buildDownloadingView(state);
     }
@@ -454,6 +466,22 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
             LinearProgressIndicator(value: state.downloadProgress),
             const SizedBox(height: 8),
             Text('$percent%'),
+            const SizedBox(height: 4),
+            Text(
+              'Downloaded: ${_formatDownloadedMb(state.downloadedBytes)}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: OutlinedButton.icon(
+                onPressed: () =>
+                    context.read<FlightSearchScreenCubit>().cancelDownload(),
+                icon: const Icon(Icons.close_rounded),
+                label: const Text('Cancel download'),
+              ),
+            ),
           ],
         ),
       ),
@@ -484,6 +512,11 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
       case CreateFlightStep.overview:
         return 3;
     }
+  }
+
+  String _formatDownloadedMb(int bytes) {
+    final mb = bytes / (1024 * 1024);
+    return '${mb.toStringAsFixed(1)} MB';
   }
 
   List<Airport> _filterAirportsForCurrentStep(

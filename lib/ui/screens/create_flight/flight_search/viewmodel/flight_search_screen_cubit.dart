@@ -299,6 +299,10 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
       state.copyWith(
         isDownloading: true,
         downloadProgress: 0.0,
+        downloadedBytes: 0,
+        downloadStage: DownloadStage.initializing,
+        clearDownloadTileCount: true,
+        clearDownloadWorkerCount: true,
         downloadDone: false,
         clearDownloadErrorMessage: true,
         clearErrorMessage: true,
@@ -314,6 +318,8 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
                 state.copyWith(
                   isDownloading: true,
                   downloadProgress: event.progress,
+                  downloadedBytes: event.downloadedBytes,
+                  downloadStage: DownloadStage.downloading,
                   downloadDone: false,
                 ),
               );
@@ -323,6 +329,8 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
                 state.copyWith(
                   isDownloading: false,
                   downloadProgress: 1.0,
+                  downloadedBytes: event.fileSize,
+                  downloadStage: DownloadStage.completed,
                   downloadDone: true,
                   clearDownloadErrorMessage: true,
                 ),
@@ -332,6 +340,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
               emit(
                 state.copyWith(
                   isDownloading: false,
+                  downloadStage: DownloadStage.failed,
                   downloadErrorMessage: event.errorMsg,
                 ),
               );
@@ -341,18 +350,65 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
                 state.copyWith(
                   isDownloading: true,
                   downloadProgress: 0.0,
+                  downloadedBytes: 0,
+                  downloadStage: DownloadStage.initializing,
                   downloadDone: false,
+                  clearDownloadTileCount: true,
+                  clearDownloadWorkerCount: true,
                   clearDownloadErrorMessage: true,
                 ),
               );
               break;
             case DownloadMapComputingTiles():
+              emit(
+                state.copyWith(
+                  isDownloading: true,
+                  downloadStage: DownloadStage.computingTiles,
+                  downloadTileCount: event.totalTiles,
+                ),
+              );
+              break;
             case DownloadMapStartingWorkers():
+              emit(
+                state.copyWith(
+                  isDownloading: true,
+                  downloadStage: DownloadStage.startingWorkers,
+                  downloadWorkerCount: event.workerCount,
+                ),
+              );
+              break;
             case DownloadMapFinalizing():
+              emit(
+                state.copyWith(
+                  isDownloading: true,
+                  downloadStage: DownloadStage.finalizing,
+                ),
+              );
+              break;
             case DownloadMapVerifying():
+              emit(
+                state.copyWith(
+                  isDownloading: true,
+                  downloadStage: DownloadStage.verifying,
+                ),
+              );
               break;
           }
         });
+  }
+
+  void cancelDownload() {
+    if (!state.isDownloading) return;
+    _downloadMapUseCase.cancel();
+    _downloadSubscription?.cancel();
+    emit(
+      state.copyWith(
+        isDownloading: false,
+        downloadStage: DownloadStage.idle,
+        clearErrorMessage: true,
+        clearDownloadErrorMessage: true,
+      ),
+    );
   }
 
   Future<bool> handleBackAction() async {

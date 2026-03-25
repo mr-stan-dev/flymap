@@ -19,11 +19,12 @@ sealed class DownloadMapEvent extends Equatable {
 
 class DownloadMapProgress extends DownloadMapEvent {
   final double progress;
+  final int downloadedBytes;
 
-  const DownloadMapProgress(this.progress);
+  const DownloadMapProgress(this.progress, {required this.downloadedBytes});
 
   @override
-  List<Object?> get props => [progress];
+  List<Object?> get props => [progress, downloadedBytes];
 }
 
 class DownloadMapDone extends DownloadMapEvent {

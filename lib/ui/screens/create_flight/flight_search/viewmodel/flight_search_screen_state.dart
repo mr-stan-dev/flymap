@@ -5,6 +5,18 @@ import 'package:flymap/entity/flight_route.dart';
 
 enum CreateFlightStep { departure, arrival, mapPreview, overview }
 
+enum DownloadStage {
+  idle,
+  initializing,
+  computingTiles,
+  startingWorkers,
+  downloading,
+  finalizing,
+  verifying,
+  completed,
+  failed,
+}
+
 class FlightSearchScreenState extends Equatable {
   const FlightSearchScreenState({
     required this.step,
@@ -23,6 +35,10 @@ class FlightSearchScreenState extends Equatable {
     required this.isTooLongFlight,
     required this.isDownloading,
     required this.downloadProgress,
+    required this.downloadedBytes,
+    required this.downloadStage,
+    required this.downloadTileCount,
+    required this.downloadWorkerCount,
     required this.downloadDone,
     required this.errorMessage,
     required this.downloadErrorMessage,
@@ -46,6 +62,10 @@ class FlightSearchScreenState extends Equatable {
       isTooLongFlight: false,
       isDownloading: false,
       downloadProgress: 0.0,
+      downloadedBytes: 0,
+      downloadStage: DownloadStage.idle,
+      downloadTileCount: null,
+      downloadWorkerCount: null,
       downloadDone: false,
       errorMessage: null,
       downloadErrorMessage: null,
@@ -68,6 +88,10 @@ class FlightSearchScreenState extends Equatable {
   final bool isTooLongFlight;
   final bool isDownloading;
   final double downloadProgress;
+  final int downloadedBytes;
+  final DownloadStage downloadStage;
+  final int? downloadTileCount;
+  final int? downloadWorkerCount;
   final bool downloadDone;
   final String? errorMessage;
   final String? downloadErrorMessage;
@@ -98,6 +122,12 @@ class FlightSearchScreenState extends Equatable {
     bool? isTooLongFlight,
     bool? isDownloading,
     double? downloadProgress,
+    int? downloadedBytes,
+    DownloadStage? downloadStage,
+    int? downloadTileCount,
+    bool clearDownloadTileCount = false,
+    int? downloadWorkerCount,
+    bool clearDownloadWorkerCount = false,
     bool? downloadDone,
     String? errorMessage,
     bool clearErrorMessage = false,
@@ -126,6 +156,14 @@ class FlightSearchScreenState extends Equatable {
       isTooLongFlight: isTooLongFlight ?? this.isTooLongFlight,
       isDownloading: isDownloading ?? this.isDownloading,
       downloadProgress: downloadProgress ?? this.downloadProgress,
+      downloadedBytes: downloadedBytes ?? this.downloadedBytes,
+      downloadStage: downloadStage ?? this.downloadStage,
+      downloadTileCount: clearDownloadTileCount
+          ? null
+          : downloadTileCount ?? this.downloadTileCount,
+      downloadWorkerCount: clearDownloadWorkerCount
+          ? null
+          : downloadWorkerCount ?? this.downloadWorkerCount,
       downloadDone: downloadDone ?? this.downloadDone,
       errorMessage: clearErrorMessage
           ? null
@@ -154,6 +192,10 @@ class FlightSearchScreenState extends Equatable {
     isTooLongFlight,
     isDownloading,
     downloadProgress,
+    downloadedBytes,
+    downloadStage,
+    downloadTileCount,
+    downloadWorkerCount,
     downloadDone,
     errorMessage,
     downloadErrorMessage,

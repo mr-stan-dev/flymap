@@ -160,6 +160,7 @@ class VectorTilesDownloader {
       final totalWorkers = chunks.length;
       int completed = 0;
       int tilesDownloaded = 0;
+      int bytesDownloaded = 0;
       final completer = Completer<void>();
       final tileQueue = Queue<TileData>();
       const maxQueueSize = 600;
@@ -189,11 +190,14 @@ class VectorTilesDownloader {
               TileRecord(tile.z, tile.x, tile.y, tile.bytes),
             );
             tilesDownloaded++;
+            bytesDownloaded += tile.bytes.length;
 
             // Log progress updates every 50 tiles
             if (tilesDownloaded % 50 == 0) {
               final progress = tilesDownloaded / filteredTiles.length;
-              controller.add(DownloadMapProgress(progress));
+              controller.add(
+                DownloadMapProgress(progress, downloadedBytes: bytesDownloaded),
+              );
               _logger.log(
                 'Downloaded $tilesDownloaded/${filteredTiles.length} tiles (${(tilesDownloaded / filteredTiles.length * 100).toStringAsFixed(1)}%)',
               );
