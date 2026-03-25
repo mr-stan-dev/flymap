@@ -367,21 +367,14 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (state.isOverviewLoading) ...[
-                    Row(
-                      children: const [
-                        SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        SizedBox(width: 10),
-                        Text('Building route overview...'),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  FlightInfoWidget(route: route, info: state.flightInfo),
+                  FlightInfoWidget(
+                    route: route,
+                    info: state.flightInfo,
+                    isOverviewLoading: state.isOverviewLoading,
+                    overviewErrorMessage: state.isOverviewLoading
+                        ? null
+                        : state.errorMessage,
+                  ),
                 ],
               ),
             ),

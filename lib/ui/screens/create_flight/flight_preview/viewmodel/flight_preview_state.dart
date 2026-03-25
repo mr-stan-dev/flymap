@@ -20,12 +20,16 @@ final class FlightMapPreviewMapState extends FlightPreviewState {
   final FlightInfo flightInfo;
   final double currentZoom;
   final bool isTooLongFlight;
+  final bool isOverviewLoading;
+  final String? overviewErrorMessage;
 
   const FlightMapPreviewMapState({
     required this.flightRoute,
     required this.flightInfo,
     required this.currentZoom,
     required this.isTooLongFlight,
+    required this.isOverviewLoading,
+    required this.overviewErrorMessage,
   });
 
   FlightMapPreviewMapState copyWith({
@@ -33,12 +37,19 @@ final class FlightMapPreviewMapState extends FlightPreviewState {
     FlightInfo? flightInfo,
     double? currentZoom,
     bool? isTooLongFlight,
+    bool? isOverviewLoading,
+    String? overviewErrorMessage,
+    bool clearOverviewErrorMessage = false,
   }) {
     return FlightMapPreviewMapState(
       flightRoute: flightRoute ?? this.flightRoute,
       flightInfo: flightInfo ?? this.flightInfo,
       currentZoom: currentZoom ?? this.currentZoom,
       isTooLongFlight: isTooLongFlight ?? this.isTooLongFlight,
+      isOverviewLoading: isOverviewLoading ?? this.isOverviewLoading,
+      overviewErrorMessage: clearOverviewErrorMessage
+          ? null
+          : overviewErrorMessage ?? this.overviewErrorMessage,
     );
   }
 
@@ -48,6 +59,8 @@ final class FlightMapPreviewMapState extends FlightPreviewState {
     flightInfo,
     currentZoom,
     isTooLongFlight,
+    isOverviewLoading,
+    overviewErrorMessage,
   ];
 }
 

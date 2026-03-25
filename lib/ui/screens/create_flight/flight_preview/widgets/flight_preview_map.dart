@@ -98,6 +98,10 @@ class _FlightPreviewMapWidgetState extends State<FlightPreviewMapWidget> {
                               child: FlightInfoWidget(
                                 route: widget.state.flightRoute,
                                 info: widget.state.flightInfo,
+                                isOverviewLoading:
+                                    widget.state.isOverviewLoading,
+                                overviewErrorMessage:
+                                    widget.state.overviewErrorMessage,
                               ),
                             ),
                           ),

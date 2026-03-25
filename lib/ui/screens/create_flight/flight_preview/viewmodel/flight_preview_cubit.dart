@@ -46,7 +46,8 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     final hasInternet = await _connectivity.hasInternetConnectivity();
 
     if (!hasInternet) {
-      final msg = 'No internet connection. Please check your connection and try again.';
+      final msg =
+          'No internet connection. Please check your connection and try again.';
       emit(FlightMapPreviewError(msg));
       return;
     }
@@ -93,6 +94,8 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
               : FlightInfo.empty,
           currentZoom: zoomLevel,
           isTooLongFlight: isTooLong,
+          isOverviewLoading: !isTooLong,
+          overviewErrorMessage: null,
         ),
       );
     } catch (e) {
@@ -111,10 +114,26 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
       _logger.log('Flight overview: ${flightInfo.overview}');
       final currentState = state;
       if (currentState is FlightMapPreviewMapState && !isClosed) {
-        emit(currentState.copyWith(flightInfo: flightInfo));
+        emit(
+          currentState.copyWith(
+            flightInfo: flightInfo,
+            isOverviewLoading: false,
+            clearOverviewErrorMessage: true,
+          ),
+        );
       }
     } catch (e) {
       _logger.error('_loadPoi error: $e');
+      final currentState = state;
+      if (currentState is FlightMapPreviewMapState && !isClosed) {
+        emit(
+          currentState.copyWith(
+            isOverviewLoading: false,
+            overviewErrorMessage:
+                'Could not load route overview. You can still download the map.',
+          ),
+        );
+      }
     }
   }
 

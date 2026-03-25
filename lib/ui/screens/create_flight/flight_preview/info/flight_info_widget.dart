@@ -3,13 +3,22 @@ import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/ui/map/map_utils.dart';
+import 'package:flymap/ui/screens/shared/flight_overview_content.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
 
 class FlightInfoWidget extends StatelessWidget {
   final FlightRoute route;
   final FlightInfo info;
+  final bool isOverviewLoading;
+  final String? overviewErrorMessage;
 
-  const FlightInfoWidget({super.key, required this.route, required this.info});
+  const FlightInfoWidget({
+    super.key,
+    required this.route,
+    required this.info,
+    this.isOverviewLoading = false,
+    this.overviewErrorMessage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -58,43 +67,32 @@ class FlightInfoWidget extends StatelessWidget {
               ),
             ],
           ),
-          info.isEmpty ? _flightPoiLoading(context) : _flightPoi(context, info),
+          _flightPoi(context, info),
         ],
       ),
     );
   }
 
-  Widget _flightPoiLoading(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Building route overview..',
-              style: context.textTheme.body18Regular,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(width: 8),
-            SizedBox.square(dimension: 12, child: CircularProgressIndicator()),
-          ],
-        ),
-        const SizedBox(height: 12),
-      ],
-    );
-  }
-
   Widget _flightPoi(BuildContext context, FlightInfo info) {
+    final hasOverviewSignal =
+        isOverviewLoading ||
+        (overviewErrorMessage?.trim().isNotEmpty ?? false) ||
+        info.overview.trim().isNotEmpty;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (((info.overview)).trim().isNotEmpty) ...[
+        if (hasOverviewSignal) ...[
           const SizedBox(height: 24),
           Text('Overview', style: context.textTheme.title24Medium),
           const SizedBox(height: 8),
-          Text(info.overview, style: context.textTheme.body18Regular),
+          FlightOverviewContent(
+            overview: info.overview,
+            isLoading: isOverviewLoading,
+            errorMessage: overviewErrorMessage,
+            loadingMessage: 'Building route overview...',
+            emptyMessage: 'Overview is not available yet for this route.',
+          ),
         ],
         if ((info.poi.isNotEmpty)) ...[
           const SizedBox(height: 24),
