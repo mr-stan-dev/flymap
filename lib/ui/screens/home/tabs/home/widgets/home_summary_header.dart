@@ -49,7 +49,7 @@ class HomeSummaryHeader extends StatelessWidget {
             children: [
               _SummaryPill(
                 icon: Icons.flight,
-                label: 'Active flights',
+                label: 'Flights saved',
                 value: '${statistics.totalFlights}',
               ),
               _SummaryPill(
