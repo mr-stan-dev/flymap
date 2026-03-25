@@ -4,19 +4,21 @@ enum MetricTrend { up, down, steady }
 
 class FlightMetricRow extends StatelessWidget {
   const FlightMetricRow({
-    required this.name,
+    this.name,
     required this.value,
     required this.unit,
     required this.color,
     this.trend = MetricTrend.steady,
+    this.showName = true,
     super.key,
   });
 
-  final String name;
+  final String? name;
   final String value;
   final String unit;
   final Color color;
   final MetricTrend trend;
+  final bool showName;
 
   @override
   Widget build(BuildContext context) {
@@ -37,16 +39,19 @@ class FlightMetricRow extends StatelessWidget {
         border: Border.all(color: borderColor),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: showName
+            ? MainAxisAlignment.spaceBetween
+            : MainAxisAlignment.center,
         children: [
-          Text(
-            name,
-            style: textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: color.withValues(alpha: 0.8),
-              letterSpacing: 0.5,
+          if (showName && name != null && name!.isNotEmpty)
+            Text(
+              name!,
+              style: textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: color.withValues(alpha: 0.8),
+                letterSpacing: 0.5,
+              ),
             ),
-          ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
@@ -57,12 +62,6 @@ class FlightMetricRow extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: color,
                 ),
-              ),
-              const SizedBox(width: 4),
-              Icon(
-                _trendIcon(trend),
-                size: 14,
-                color: color.withValues(alpha: 0.8),
               ),
               const SizedBox(width: 4),
               Text(
@@ -77,16 +76,5 @@ class FlightMetricRow extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  IconData _trendIcon(MetricTrend trend) {
-    switch (trend) {
-      case MetricTrend.up:
-        return Icons.north_rounded;
-      case MetricTrend.down:
-        return Icons.south_rounded;
-      case MetricTrend.steady:
-        return Icons.east_rounded;
-    }
   }
 }

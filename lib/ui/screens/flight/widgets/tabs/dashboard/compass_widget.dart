@@ -54,10 +54,31 @@ class _FlightCompassWidgetState extends State<FlightCompassWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Row(
                 children: [
-                  Expanded(child: _buildSpeedIndicator(context)),
+                  Expanded(
+                    child: _buildLabeledMetric(
+                      context,
+                      label: 'Speed',
+                      child: _buildSpeedIndicator(context),
+                    ),
+                  ),
                   const SizedBox(width: 8),
-                  Expanded(child: _buildAltitudeIndicator(context)),
+                  Expanded(
+                    child: _buildLabeledMetric(
+                      context,
+                      label: 'Altitude',
+                      child: _buildAltitudeIndicator(context),
+                    ),
+                  ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Aircraft heading',
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSurfaceVariant,
+                letterSpacing: 0.25,
               ),
             ),
             const SizedBox(height: 16),
@@ -117,7 +138,7 @@ class _FlightCompassWidgetState extends State<FlightCompassWidget> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
-                        '${course.toStringAsFixed(0)}°',
+                        'HDG ${course.toStringAsFixed(0)}°',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onSurfaceVariant,
@@ -172,22 +193,43 @@ class _FlightCompassWidgetState extends State<FlightCompassWidget> {
   Widget _buildSpeedIndicator(BuildContext context) {
     final speed = widget.gpsData?.speed ?? const SpeedValue(0, 'km/h');
     return FlightMetricRow(
-      name: 'SPEED',
       value: speed.value.toStringAsFixed(0),
       unit: speed.unit,
       color: Theme.of(context).colorScheme.primary,
       trend: _speedTrend,
+      showName: false,
     );
   }
 
   Widget _buildAltitudeIndicator(BuildContext context) {
     final altitude = widget.gpsData?.altitude ?? const AltitudeValue(0, 'ft');
     return FlightMetricRow(
-      name: 'ALTITUDE',
       value: altitude.value.toStringAsFixed(0),
       unit: altitude.unit,
       color: Theme.of(context).colorScheme.secondary,
       trend: _altitudeTrend,
+      showName: false,
+    );
+  }
+
+  Widget _buildLabeledMetric(
+    BuildContext context, {
+    required String label,
+    required Widget child,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.3,
+          ),
+        ),
+        const SizedBox(height: 4),
+        child,
+      ],
     );
   }
 
