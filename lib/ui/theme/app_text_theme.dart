@@ -23,7 +23,6 @@ class AppTextTheme extends ThemeExtension<AppTextTheme> {
   final TextStyle body16Regular;
   final TextStyle caption14Regular;
 
-  static const _textThemeArchivo = 'Archivo';
   static const _textFontRaleway = 'Raleway';
 
   //lineheight=fontSize * height so the height values

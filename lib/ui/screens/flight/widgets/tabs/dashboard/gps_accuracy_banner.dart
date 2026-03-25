@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 
 class GpsAccuracyBanner extends StatelessWidget {
   const GpsAccuracyBanner({required this.accuracy, super.key});
@@ -7,7 +8,7 @@ class GpsAccuracyBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final status = _status(accuracy);
+    final status = _status(context, accuracy);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -33,10 +34,14 @@ class GpsAccuracyBanner extends StatelessWidget {
     );
   }
 
-  _GpsAccuracyStatus _status(double value) {
-    if (value < 10) return const _GpsAccuracyStatus('Excellent', Colors.green);
-    if (value < 25) return const _GpsAccuracyStatus('Good', Colors.orange);
-    return const _GpsAccuracyStatus('Poor', Colors.red);
+  _GpsAccuracyStatus _status(BuildContext context, double value) {
+    if (value < 10) {
+      return _GpsAccuracyStatus('Excellent', DsSemanticColors.success(context));
+    }
+    if (value < 25) {
+      return _GpsAccuracyStatus('Good', DsSemanticColors.warning(context));
+    }
+    return _GpsAccuracyStatus('Poor', DsSemanticColors.error(context));
   }
 }
 

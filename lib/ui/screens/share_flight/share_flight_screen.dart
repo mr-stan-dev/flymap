@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/shared/tab_state_placeholder.dart';
 import 'package:flymap/ui/screens/share_flight/viewmodel/share_flight_cubit.dart';
 import 'package:flymap/ui/screens/share_flight/viewmodel/share_flight_state.dart';
@@ -183,23 +184,15 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
                 top: false,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: state.isLoading || state.isSharing
-                          ? null
-                          : () => _shareRoute(context),
-                      icon: state.isSharing
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.share),
-                      label: Text(
-                        state.isSharing ? 'Preparing screenshot...' : 'Share',
-                      ),
-                    ),
+                  child: PrimaryButton(
+                    label: state.isSharing
+                        ? 'Preparing screenshot...'
+                        : 'Share',
+                    onPressed: state.isLoading || state.isSharing
+                        ? null
+                        : () => _shareRoute(context),
+                    leadingIcon: state.isSharing ? null : Icons.share,
+                    isLoading: state.isSharing,
                   ),
                 ),
               ),

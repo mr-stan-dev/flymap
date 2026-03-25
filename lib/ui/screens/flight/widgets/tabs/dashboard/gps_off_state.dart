@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 
 class GpsOffState extends StatelessWidget {
@@ -14,7 +15,7 @@ class GpsOffState extends StatelessWidget {
         Row(
           children: [
             Icon(Icons.gps_off_rounded, color: colorScheme.error, size: 20),
-            const SizedBox(width: 8),
+            const SizedBox(width: DsSpacing.xs),
             Text(
               'Location services are off',
               style: Theme.of(
@@ -23,20 +24,22 @@ class GpsOffState extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: DsSpacing.xs),
         Text(
           'Turn on location services in system settings to resume live flight tracking and map following.',
           style: Theme.of(
             context,
           ).textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
         ),
-        const SizedBox(height: 12),
-        FilledButton.icon(
+        const SizedBox(height: DsSpacing.sm),
+        PrimaryButton(
           onPressed: () {
             context.read<FlightScreenCubit>().openLocationSettings();
           },
-          icon: const Icon(Icons.settings, size: 16),
-          label: const Text('Open location settings'),
+          leadingIcon: Icons.settings,
+          label: 'Open location settings',
+          expand: false,
+          height: 44,
         ),
       ],
     );

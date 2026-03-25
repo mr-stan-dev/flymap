@@ -5,8 +5,7 @@ class AppColourTheme extends ThemeExtension<AppColourTheme> {
   const AppColourTheme({
     required this.accentGreen,
     required this.accentYellow,
-    required this.brandGreen1,
-    required this.brandGreen2,
+    required this.brandBlue,
     required this.brandBlack,
     required this.brandWhite,
     required this.backgroundPrimary,
@@ -25,8 +24,7 @@ class AppColourTheme extends ThemeExtension<AppColourTheme> {
   final Color accentYellow;
 
   // Brand Colors
-  final Color brandGreen1;
-  final Color brandGreen2;
+  final Color brandBlue;
   final Color brandBlack;
   final Color brandWhite;
 
@@ -48,8 +46,7 @@ class AppColourTheme extends ThemeExtension<AppColourTheme> {
   static const dark = AppColourTheme(
     accentGreen: AppColoursCommon.accentBlue,
     accentYellow: AppColoursCommon.accentYellow,
-    brandGreen1: AppColoursCommon.brandBlue,
-    brandGreen2: AppColoursCommon.brandBlueAccent,
+    brandBlue: AppColoursCommon.brandBlue,
     brandBlack: AppColoursCommon.brandBlack,
     brandWhite: AppColoursCommon.brandWhite,
     backgroundPrimary: AppColoursDark.backgroundPrimary,
@@ -66,8 +63,7 @@ class AppColourTheme extends ThemeExtension<AppColourTheme> {
   static const light = AppColourTheme(
     accentGreen: AppColoursCommon.accentBlue,
     accentYellow: AppColoursCommon.accentYellow,
-    brandGreen1: AppColoursCommon.brandBlue,
-    brandGreen2: AppColoursCommon.brandBlueAccent,
+    brandBlue: AppColoursCommon.brandBlue,
     brandBlack: AppColoursCommon.brandBlack,
     brandWhite: AppColoursCommon.brandWhite,
     backgroundPrimary: AppColoursLight.backgroundPrimary,
@@ -88,8 +84,7 @@ class AppColourTheme extends ThemeExtension<AppColourTheme> {
     Color? backgroundTertiary,
     Color? accentGreen,
     Color? accentYellow,
-    Color? brand1,
-    Color? brand2,
+    Color? brandBlue,
     Color? brandBlack,
     Color? brandWhite,
     Color? onButtonColorSecondary,
@@ -119,8 +114,7 @@ class AppColourTheme extends ThemeExtension<AppColourTheme> {
     return AppColourTheme(
       accentGreen: accentGreen ?? this.accentGreen,
       accentYellow: accentYellow ?? this.accentYellow,
-      brandGreen1: brand1 ?? brandGreen1,
-      brandGreen2: brand2 ?? brandGreen2,
+      brandBlue: brandBlue ?? this.brandBlue,
       brandBlack: brandBlack ?? this.brandBlack,
       brandWhite: brandWhite ?? this.brandWhite,
       backgroundPrimary: backgroundPrimary ?? this.backgroundPrimary,
@@ -143,8 +137,7 @@ class AppColourTheme extends ThemeExtension<AppColourTheme> {
     return AppColourTheme(
       accentGreen: Color.lerp(accentGreen, other.accentGreen, t)!,
       accentYellow: Color.lerp(accentYellow, other.accentYellow, t)!,
-      brandGreen1: Color.lerp(brandGreen1, other.brandGreen1, t)!,
-      brandGreen2: Color.lerp(brandGreen2, other.brandGreen2, t)!,
+      brandBlue: Color.lerp(brandBlue, other.brandBlue, t)!,
       brandBlack: Color.lerp(brandBlack, other.brandBlack, t)!,
       brandWhite: Color.lerp(brandWhite, other.brandWhite, t)!,
       backgroundPrimary: Color.lerp(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 
 import 'viewmodel/settings_cubit.dart';
 import 'viewmodel/settings_state.dart';
@@ -25,10 +26,10 @@ class _SettingsView extends StatelessWidget {
       body: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, state) {
           if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const LoadingStateView(title: 'Loading settings...');
           }
           final theme = Theme.of(context);
-          final sectionBg = theme.colorScheme.surfaceVariant;
+          final sectionBg = theme.colorScheme.surfaceContainerHighest;
           return ListView(
             children: [
               // Appearance section
@@ -56,6 +57,7 @@ class _SettingsView extends StatelessWidget {
                         ? 'Dark'
                         : 'Light',
                   );
+                  if (!context.mounted) return;
                   if (selected != null) {
                     context.read<SettingsCubit>().setTheme(
                       selected == 'Dark' ? ThemeMode.dark : ThemeMode.light,
@@ -88,6 +90,7 @@ class _SettingsView extends StatelessWidget {
                     options: const ['ft', 'm'],
                     current: state.altitudeUnit,
                   );
+                  if (!context.mounted) return;
                   if (selected != null) {
                     context.read<SettingsCubit>().setAltitudeUnit(selected);
                   }
@@ -105,6 +108,7 @@ class _SettingsView extends StatelessWidget {
                     options: const ['km/h', 'mph'],
                     current: state.speedUnit,
                   );
+                  if (!context.mounted) return;
                   if (selected != null) {
                     context.read<SettingsCubit>().setSpeedUnit(selected);
                   }
@@ -122,6 +126,7 @@ class _SettingsView extends StatelessWidget {
                     options: const ['24h', '12h'],
                     current: state.timeFormat,
                   );
+                  if (!context.mounted) return;
                   if (selected != null) {
                     context.read<SettingsCubit>().setTimeFormat(selected);
                   }
@@ -186,25 +191,38 @@ class _SettingsView extends StatelessWidget {
     return showDialog<String>(
       context: context,
       builder: (ctx) {
+        final colorScheme = Theme.of(ctx).colorScheme;
         return AlertDialog(
           title: Text(title),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: options
-                .map(
-                  (opt) => RadioListTile<String>(
-                    title: Text(opt),
-                    value: opt,
-                    groupValue: current,
-                    onChanged: (v) => Navigator.of(ctx).pop(v),
-                  ),
-                )
-                .toList(),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 280),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: options
+                    .map(
+                      (opt) => ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(opt),
+                        trailing: opt == current
+                            ? Icon(
+                                Icons.check_circle,
+                                color: colorScheme.primary,
+                              )
+                            : null,
+                        onTap: () => Navigator.of(ctx).pop(opt),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
           ),
           actions: [
-            TextButton(
+            TertiaryButton(
+              label: 'Cancel',
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel'),
+              expand: false,
+              height: 40,
             ),
           ],
         );
@@ -229,13 +247,16 @@ class _SettingItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final onSurface = theme.colorScheme.onSurface.withOpacity(0.7);
+    final onSurface = theme.colorScheme.onSurface.withValues(alpha: 0.7);
 
     return ListTile(
       leading: leading,
       title: Text(title, style: theme.textTheme.titleMedium),
       subtitle: subtitle != null
-          ? Text(subtitle!, style: TextStyle(color: onSurface))
+          ? Text(
+              subtitle!,
+              style: theme.textTheme.bodyMedium?.copyWith(color: onSurface),
+            )
           : null,
       trailing: const Icon(Icons.chevron_right),
       onTap: onTap,

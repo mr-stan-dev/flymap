@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/entity/gps_data.dart';
 
 class GpsLiveStatusCard extends StatefulWidget {
@@ -53,7 +54,7 @@ class _GpsLiveStatusCardState extends State<GpsLiveStatusCard> {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final age = _lastFixAt == null ? null : now.difference(_lastFixAt!);
-    final view = _statusData(age);
+    final view = _statusData(context, age);
 
     return Container(
       width: double.infinity,
@@ -126,32 +127,37 @@ class _GpsLiveStatusCardState extends State<GpsLiveStatusCard> {
     return _SignalQuality.bad;
   }
 
-  _GpsStatusViewData _statusData(Duration? age) {
+  _GpsStatusViewData _statusData(BuildContext context, Duration? age) {
+    final successColor = DsSemanticColors.success(context);
+    final warningColor = DsSemanticColors.warning(context);
+    final infoColor = DsSemanticColors.info(context);
+    final errorColor = DsSemanticColors.error(context);
+
     switch (widget.gpsStatus) {
       case GpsStatus.off:
-        return const _GpsStatusViewData(
-          color: Color(0xFFD94841),
+        return _GpsStatusViewData(
+          color: errorColor,
           icon: Icons.gps_off_rounded,
           title: 'GPS off',
           subtitle: 'Enable location services to start tracking.',
         );
       case GpsStatus.permissionsNotGranted:
-        return const _GpsStatusViewData(
-          color: Color(0xFFDA8A24),
+        return _GpsStatusViewData(
+          color: warningColor,
           icon: Icons.location_disabled_rounded,
           title: 'Location permission required',
           subtitle: 'Grant permission to access live flight telemetry.',
         );
       case GpsStatus.searching:
-        return const _GpsStatusViewData(
-          color: Color(0xFF2472D6),
+        return _GpsStatusViewData(
+          color: infoColor,
           icon: Icons.gps_not_fixed_rounded,
           title: 'Searching for GPS',
           subtitle: 'Looking for a reliable signal',
         );
       case GpsStatus.weakSignal:
         return _GpsStatusViewData(
-          color: const Color(0xFFD48806),
+          color: warningColor,
           icon: Icons.network_check_rounded,
           title: 'Weak GPS signal',
           subtitle: age == null
@@ -160,7 +166,7 @@ class _GpsLiveStatusCardState extends State<GpsLiveStatusCard> {
         );
       case GpsStatus.gpsActive:
         return _GpsStatusViewData(
-          color: const Color(0xFF14824A),
+          color: successColor,
           icon: Icons.gps_fixed_rounded,
           title: 'GPS active',
           subtitle: age == null
@@ -201,7 +207,7 @@ class _SignalStrengthBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _colorForQuality(quality);
+    final color = _colorForQuality(context, quality);
     final filledBars = _filledBars(quality);
 
     return Column(
@@ -267,16 +273,16 @@ class _SignalStrengthBadge extends StatelessWidget {
     }
   }
 
-  Color _colorForQuality(_SignalQuality quality) {
+  Color _colorForQuality(BuildContext context, _SignalQuality quality) {
     switch (quality) {
       case _SignalQuality.good:
-        return const Color(0xFF14824A);
+        return DsSemanticColors.success(context);
       case _SignalQuality.poor:
-        return const Color(0xFFD48806);
+        return DsSemanticColors.warning(context);
       case _SignalQuality.bad:
-        return const Color(0xFFD94841);
+        return DsSemanticColors.error(context);
       case _SignalQuality.searching:
-        return const Color(0xFF2472D6);
+        return DsSemanticColors.info(context);
     }
   }
 }

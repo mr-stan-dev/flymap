@@ -20,6 +20,7 @@ class FlightMetricRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark
         ? color.withValues(alpha: 0.1)
@@ -40,8 +41,7 @@ class FlightMetricRow extends StatelessWidget {
         children: [
           Text(
             name,
-            style: TextStyle(
-              fontSize: 10,
+            style: textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w600,
               color: color.withValues(alpha: 0.8),
               letterSpacing: 0.5,
@@ -53,8 +53,7 @@ class FlightMetricRow extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: TextStyle(
-                  fontSize: 20,
+                style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: color,
                 ),
@@ -68,8 +67,7 @@ class FlightMetricRow extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 unit,
-                style: TextStyle(
-                  fontSize: 12,
+                style: textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                   color: color.withValues(alpha: 0.8),
                 ),

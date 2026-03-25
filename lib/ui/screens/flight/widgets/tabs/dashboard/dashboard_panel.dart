@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/gps_data.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/compass_widget.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/gps_not_granted_state.dart';
@@ -12,10 +13,10 @@ class FlightDashboardPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _DashboardCard(content: _buildContent());
+    return SectionCard(child: _buildContent(context));
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
     switch (state.gpsStatus) {
       case GpsStatus.off:
         return const GpsOffState();
@@ -27,35 +28,16 @@ class FlightDashboardPanel extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Live instruments',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 12),
             FlightCompassWidget(gpsData: state.gpsData),
           ],
         );
     }
-  }
-}
-
-class _DashboardCard extends StatelessWidget {
-  const _DashboardCard({required this.content});
-
-  final Widget content;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
-      ),
-      child: content,
-    );
   }
 }

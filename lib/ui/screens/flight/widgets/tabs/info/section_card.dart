@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 
 class InfoSectionCard extends StatelessWidget {
   const InfoSectionCard({
@@ -14,18 +15,10 @@ class InfoSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          title: Text(title),
-          initiallyExpanded: initiallyExpanded,
-          shape: const Border(),
-          collapsedShape: const Border(),
-          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          children: [child],
-        ),
-      ),
+    return ExpandableSectionCard(
+      title: title,
+      initiallyExpanded: initiallyExpanded,
+      child: child,
     );
   }
 }

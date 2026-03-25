@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/size_utils.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 
 class DeleteFlightConfirmationDialog extends StatelessWidget {
   const DeleteFlightConfirmationDialog({
@@ -31,13 +32,15 @@ class DeleteFlightConfirmationDialog extends StatelessWidget {
         'Space to be regained: $storageLabel.',
       ),
       actions: [
-        TextButton(
+        SecondaryButton(
+          label: 'Cancel',
           onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Cancel'),
+          expand: false,
         ),
-        FilledButton(
+        DestructiveButton(
+          label: 'Yes',
           onPressed: () => Navigator.of(context).pop(true),
-          child: const Text('Yes'),
+          expand: false,
         ),
       ],
     );

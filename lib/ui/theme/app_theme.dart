@@ -14,9 +14,30 @@ class AppTheme {
       brightness: Brightness.dark,
     );
     final scheme = base.copyWith(
-      background: AppColoursDark.backgroundPrimary,
+      primary: AppColoursCommon.brandBlue,
+      onPrimary: AppColoursCommon.brandWhite,
       surface: AppColoursDark.backgroundTertiary,
       secondary: AppColoursCommon.accentYellow,
+      tertiary: AppColoursCommon.info,
+      onSurface: AppColoursDark.textPrimary,
+      onSurfaceVariant: AppColoursDark.textSecondary,
+      error: AppColoursCommon.error,
+    );
+    final colourExtension = AppColourTheme(
+      accentGreen: scheme.primary,
+      accentYellow: scheme.secondary,
+      brandBlue: AppColoursCommon.brandBlue,
+      brandBlack: AppColoursCommon.brandBlack,
+      brandWhite: AppColoursCommon.brandWhite,
+      backgroundPrimary: AppColoursDark.backgroundPrimary,
+      backgroundSecondary: AppColoursDark.backgroundSecondary,
+      backgroundTertiary: scheme.surface,
+      textPrimary: scheme.onSurface,
+      textSecondary: scheme.onSurfaceVariant,
+      successPrimary: AppColoursCommon.success,
+      infoPrimary: scheme.tertiary,
+      errorPrimary: scheme.error,
+      warningPrimary: scheme.secondary,
     );
 
     return ThemeData(
@@ -24,8 +45,8 @@ class AppTheme {
       brightness: Brightness.dark,
       colorScheme: scheme,
       scaffoldBackgroundColor: AppColoursDark.backgroundPrimary,
-      extensions: const <ThemeExtension<dynamic>>[
-        AppColourTheme.dark,
+      extensions: <ThemeExtension<dynamic>>[
+        colourExtension,
         AppTextTheme.textTheme,
       ],
       appBarTheme: const AppBarTheme(
@@ -49,24 +70,79 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade600),
+          borderSide: BorderSide(color: scheme.outline.withValues(alpha: 0.45)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: scheme.primary, width: 2),
         ),
-        hintStyle: TextStyle(color: Colors.grey.shade400),
+        hintStyle: TextStyle(color: scheme.onSurfaceVariant),
         labelStyle: TextStyle(color: scheme.onSurface),
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
           backgroundColor: scheme.primary,
           foregroundColor: scheme.onPrimary,
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 4,
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          side: BorderSide(color: scheme.outline.withValues(alpha: 0.5)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          foregroundColor: scheme.primary,
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 4,
+        ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+        extendedTextStyle: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.2,
         ),
       ),
       chipTheme: ChipThemeData(
@@ -87,7 +163,7 @@ class AppTheme {
       ),
       tabBarTheme: TabBarThemeData(
         labelColor: scheme.onSurface,
-        unselectedLabelColor: scheme.onSurface.withOpacity(0.6),
+        unselectedLabelColor: scheme.onSurface.withValues(alpha: 0.6),
         indicatorColor: scheme.primary,
       ),
       dialogTheme: DialogThemeData(
@@ -101,7 +177,7 @@ class AppTheme {
       ),
       iconTheme: IconThemeData(color: scheme.onSurface),
       dividerTheme: DividerThemeData(
-        color: scheme.onSurface.withOpacity(0.12),
+        color: scheme.onSurface.withValues(alpha: 0.12),
         thickness: 1,
       ),
     );
@@ -115,9 +191,30 @@ class AppTheme {
       brightness: Brightness.light,
     );
     final scheme = base.copyWith(
-      background: AppColoursLight.backgroundPrimary,
+      primary: AppColoursCommon.brandBlue,
+      onPrimary: AppColoursCommon.brandWhite,
       surface: AppColoursLight.backgroundTertiary,
       secondary: AppColoursCommon.accentYellow,
+      tertiary: AppColoursCommon.info,
+      onSurface: AppColoursLight.textPrimary,
+      onSurfaceVariant: AppColoursLight.textSecondary,
+      error: AppColoursCommon.error,
+    );
+    final colourExtension = AppColourTheme(
+      accentGreen: scheme.primary,
+      accentYellow: scheme.secondary,
+      brandBlue: AppColoursCommon.brandBlue,
+      brandBlack: AppColoursCommon.brandBlack,
+      brandWhite: AppColoursCommon.brandWhite,
+      backgroundPrimary: AppColoursLight.backgroundPrimary,
+      backgroundSecondary: AppColoursLight.backgroundSecondary,
+      backgroundTertiary: scheme.surface,
+      textPrimary: scheme.onSurface,
+      textSecondary: scheme.onSurfaceVariant,
+      successPrimary: AppColoursCommon.success,
+      infoPrimary: scheme.tertiary,
+      errorPrimary: scheme.error,
+      warningPrimary: scheme.secondary,
     );
 
     return ThemeData(
@@ -125,8 +222,8 @@ class AppTheme {
       brightness: Brightness.light,
       colorScheme: scheme,
       scaffoldBackgroundColor: AppColoursLight.backgroundPrimary,
-      extensions: const <ThemeExtension<dynamic>>[
-        AppColourTheme.light,
+      extensions: <ThemeExtension<dynamic>>[
+        colourExtension,
         AppTextTheme.textTheme,
       ],
       appBarTheme: const AppBarTheme(
@@ -143,26 +240,31 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFFF0F0F0),
+        fillColor: scheme.surfaceContainerHigh,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade400),
+          borderSide: BorderSide(color: scheme.outline.withValues(alpha: 0.45)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: scheme.primary, width: 2),
         ),
-        hintStyle: TextStyle(color: Colors.grey.shade600),
+        hintStyle: TextStyle(color: scheme.onSurfaceVariant),
         labelStyle: TextStyle(color: scheme.onSurface),
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
           backgroundColor: scheme.primary,
           foregroundColor: scheme.onPrimary,
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -170,8 +272,58 @@ class AppTheme {
           elevation: 2,
         ),
       ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          side: BorderSide(color: scheme.outline.withValues(alpha: 0.5)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          foregroundColor: scheme.primary,
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 2,
+        ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+        extendedTextStyle: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.2,
+        ),
+      ),
       chipTheme: ChipThemeData(
-        backgroundColor: AppColoursLight.backgroundQuaternary,
+        backgroundColor: scheme.surfaceContainerHighest,
         selectedColor: scheme.primary,
         labelStyle: TextStyle(color: scheme.onSurface),
         shape: const StadiumBorder(),
@@ -188,7 +340,7 @@ class AppTheme {
       ),
       tabBarTheme: TabBarThemeData(
         labelColor: scheme.onSurface,
-        unselectedLabelColor: scheme.onSurface.withOpacity(0.6),
+        unselectedLabelColor: scheme.onSurface.withValues(alpha: 0.6),
         indicatorColor: scheme.primary,
       ),
       dialogTheme: DialogThemeData(
@@ -202,7 +354,7 @@ class AppTheme {
       ),
       iconTheme: IconThemeData(color: scheme.onSurface),
       dividerTheme: DividerThemeData(
-        color: scheme.onSurface.withOpacity(0.12),
+        color: scheme.onSurface.withValues(alpha: 0.12),
         thickness: 1,
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/logger.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_state.dart';
 import 'package:flymap/ui/screens/home/tabs/home/widgets/home_tab_loaded.dart';
@@ -47,26 +48,15 @@ class _HomeTabContentState extends State<_HomeTabContent> {
           builder: (context, state) {
             switch (state) {
               case HomeTabLoading():
-                return Center(child: CircularProgressIndicator());
+                return const LoadingStateView(title: 'Loading flights...');
               case HomeTabSuccess():
                 return HomeTabLoaded(state);
               case HomeTabError():
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.error, color: Colors.red, size: 32),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Failed to load flights',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                      TextButton(
-                        onPressed: () => context.read<HomeTabCubit>().retry(),
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
+                return ErrorStateView(
+                  title: 'Failed to load flights',
+                  message: state.message,
+                  onRetry: () => context.read<HomeTabCubit>().retry(),
+                  retryLabel: 'Retry',
                 );
             }
           },

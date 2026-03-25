@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/info/flight_info_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/map/flight_map_preview_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_cubit.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_preview_app_bar.dart';
-import 'package:flymap/ui/theme/app_theme_ext.dart';
 
 class FlightPreviewMapWidget extends StatefulWidget {
   final FlightMapPreviewMapState state;
@@ -21,6 +21,7 @@ class _FlightPreviewMapWidgetState extends State<FlightPreviewMapWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         Expanded(
@@ -66,14 +67,14 @@ class _FlightPreviewMapWidgetState extends State<FlightPreviewMapWidget> {
                   builder: (context, scrollController) {
                     return Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
+                        color: colorScheme.surface,
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(16),
                           topRight: Radius.circular(16),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: colorScheme.shadow.withValues(alpha: 0.2),
                             blurRadius: 8,
                             offset: const Offset(0, -2),
                           ),
@@ -87,7 +88,7 @@ class _FlightPreviewMapWidgetState extends State<FlightPreviewMapWidget> {
                             width: 40,
                             height: 5,
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade400,
+                              color: colorScheme.outline.withValues(alpha: 0.5),
                               borderRadius: BorderRadius.circular(3),
                             ),
                           ),
@@ -111,24 +112,22 @@ class _FlightPreviewMapWidgetState extends State<FlightPreviewMapWidget> {
         ),
         Container(
           width: double.infinity,
-          color: Theme.of(context).colorScheme.surface,
+          color: colorScheme.surface,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
+            child: PrimaryButton(
               onPressed: widget.state.isTooLongFlight
                   ? null
                   : () {
-                context.read<FlightPreviewCubit>().startDownload();
-              },
-              child: Text(
-                widget.state.isTooLongFlight ? 'Too long flight (> 5000km)' : 'Download',
-                style: context.textTheme.button18Bold,
-              ),
+                      context.read<FlightPreviewCubit>().startDownload();
+                    },
+              label: widget.state.isTooLongFlight
+                  ? 'Too long flight (> 5000km)'
+                  : 'Download',
             ),
           ),
         ),
       ],
     );
   }
-
 }

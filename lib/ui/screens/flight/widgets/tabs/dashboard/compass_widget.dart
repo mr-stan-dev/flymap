@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flymap/entity/gps_data.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/compass_rose_painter.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/metric_row.dart';
-import 'package:flymap/ui/theme/app_colours.dart';
 
 class FlightCompassWidget extends StatefulWidget {
   const FlightCompassWidget({required this.gpsData, super.key});
@@ -55,9 +54,9 @@ class _FlightCompassWidgetState extends State<FlightCompassWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Row(
                 children: [
-                  Expanded(child: _buildSpeedIndicator()),
+                  Expanded(child: _buildSpeedIndicator(context)),
                   const SizedBox(width: 8),
-                  Expanded(child: _buildAltitudeIndicator()),
+                  Expanded(child: _buildAltitudeIndicator(context)),
                 ],
               ),
             ),
@@ -70,7 +69,7 @@ class _FlightCompassWidgetState extends State<FlightCompassWidget> {
                 color: colorScheme.surface,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: colorScheme.shadow.withValues(alpha: 0.1),
                     blurRadius: 20,
                     spreadRadius: 5,
                   ),
@@ -170,24 +169,24 @@ class _FlightCompassWidgetState extends State<FlightCompassWidget> {
     return MetricTrend.steady;
   }
 
-  Widget _buildSpeedIndicator() {
+  Widget _buildSpeedIndicator(BuildContext context) {
     final speed = widget.gpsData?.speed ?? const SpeedValue(0, 'km/h');
     return FlightMetricRow(
       name: 'SPEED',
       value: speed.value.toStringAsFixed(0),
       unit: speed.unit,
-      color: AppColoursCommon.accentBlue,
+      color: Theme.of(context).colorScheme.primary,
       trend: _speedTrend,
     );
   }
 
-  Widget _buildAltitudeIndicator() {
+  Widget _buildAltitudeIndicator(BuildContext context) {
     final altitude = widget.gpsData?.altitude ?? const AltitudeValue(0, 'ft');
     return FlightMetricRow(
       name: 'ALTITUDE',
       value: altitude.value.toStringAsFixed(0),
       unit: altitude.unit,
-      color: Colors.deepOrange,
+      color: Theme.of(context).colorScheme.secondary,
       trend: _altitudeTrend,
     );
   }

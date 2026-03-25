@@ -20,6 +20,7 @@ class ShareRouteCitiesChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: shareRouteCitiesChipWidth,
       height: shareRouteCitiesChipHeight,
@@ -27,17 +28,19 @@ class ShareRouteCitiesChip extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF12212D).withValues(alpha: 0.88),
-            const Color(0xFF16384A).withValues(alpha: 0.86),
+            colorScheme.tertiaryContainer.withValues(alpha: 0.9),
+            colorScheme.tertiary.withValues(alpha: 0.84),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
+        border: Border.all(
+          color: colorScheme.onTertiary.withValues(alpha: 0.24),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: colorScheme.shadow.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -49,7 +52,7 @@ class ShareRouteCitiesChip extends StatelessWidget {
           Text(
             'Route',
             style: textTheme.labelSmall?.copyWith(
-              color: Colors.white.withValues(alpha: 0.78),
+              color: colorScheme.onTertiary.withValues(alpha: 0.78),
               fontWeight: FontWeight.w600,
               letterSpacing: 0.2,
             ),
@@ -60,7 +63,7 @@ class ShareRouteCitiesChip extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: textTheme.labelLarge?.copyWith(
-              color: Colors.white,
+              color: colorScheme.onTertiary,
               fontWeight: FontWeight.w700,
             ),
           ),

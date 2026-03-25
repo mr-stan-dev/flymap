@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
 class AppColoursCommon {
-  static const brandBlue = Colors.blue;
-  static const brandBlueAccent = Colors.blueAccent;
+  static const brandBlue = Color(0xFF1565C0);
   static const brandBlack = Color(0xFF2A2A2A);
   static const brandWhite = Color(0xFFFFFFFF);
 
-  static const accentBlue = brandBlue; // Not used by theme as primary anymore
+  static const accentBlue = brandBlue;
   static const accentYellow = warning; // Use warning (amber) as yellow accent
 
   static const success = Color(0xFF41CC4F);

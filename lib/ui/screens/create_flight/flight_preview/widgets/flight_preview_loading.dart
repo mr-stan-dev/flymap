@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
 
 class FlightPreviewLoadingWidget extends StatelessWidget {
@@ -8,23 +9,10 @@ class FlightPreviewLoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(),
-          const SizedBox(height: 16),
-          Text(
-            'Calculating flight route...',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '${airports.departure.displayCode} → ${airports.arrival.displayCode}',
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
+    return LoadingStateView(
+      title: 'Calculating flight route...',
+      subtitle:
+          '${airports.departure.displayCode} -> ${airports.arrival.displayCode}',
     );
   }
 }

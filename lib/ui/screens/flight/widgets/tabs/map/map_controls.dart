@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 
 class FlightMapControls extends StatefulWidget {
   const FlightMapControls({
@@ -65,6 +66,9 @@ class _FlightMapControlsState extends State<FlightMapControls>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final successColor = DsSemanticColors.success(context);
+    final buttonBg = colorScheme.surface.withValues(alpha: 0.75);
     return Positioned(
       top: widget.topOffset,
       right: 8,
@@ -78,8 +82,8 @@ class _FlightMapControlsState extends State<FlightMapControls>
             children: [
               FloatingActionButton(
                 heroTag: 'flight_map_3d_fab',
-                backgroundColor: Colors.black.withValues(alpha: 0.3),
-                foregroundColor: Colors.white,
+                backgroundColor: buttonBg,
+                foregroundColor: colorScheme.onSurface,
                 mini: true,
                 tooltip: widget.is3D ? 'Switch to 2D' : 'Switch to 3D',
                 onPressed: () {
@@ -87,8 +91,7 @@ class _FlightMapControlsState extends State<FlightMapControls>
                 },
                 child: Text(
                   widget.is3D ? '2D' : '3D',
-                  style: const TextStyle(
-                    fontSize: 11,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.2,
                   ),
@@ -100,9 +103,9 @@ class _FlightMapControlsState extends State<FlightMapControls>
                 child: FloatingActionButton(
                   heroTag: 'flight_map_follow_fab',
                   backgroundColor: widget.followUser
-                      ? Colors.green.withValues(alpha: 0.75)
-                      : Colors.black.withValues(alpha: 0.3),
-                  foregroundColor: Colors.white,
+                      ? successColor.withValues(alpha: 0.75)
+                      : buttonBg,
+                  foregroundColor: colorScheme.onSurface,
                   mini: true,
                   tooltip: widget.followUser ? 'Uncenter map' : 'Center on me',
                   onPressed: widget.onToggleFollowUser,

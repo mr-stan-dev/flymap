@@ -21,7 +21,9 @@ class AboutScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Offline maps for flights. Plan a route between airports and download map for seamless offline navigation during your flight.',
-              style: TextStyle(color: onSurface.withOpacity(0.8)),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: onSurface.withValues(alpha: 0.8),
+              ),
             ),
             const SizedBox(height: 24),
             Text(

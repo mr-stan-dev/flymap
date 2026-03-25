@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/section_card.dart';
 
 class AirportsSection extends StatelessWidget {
@@ -20,7 +21,7 @@ class AirportsSection extends StatelessWidget {
             subtitle:
                 '${route.departure.name}, ${route.departure.city}, ${route.departure.countryCode}',
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: DsSpacing.xs),
           _AirportTile(
             icon: Icons.flight_land,
             title: 'Arrival',
@@ -51,16 +52,16 @@ class _AirportTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(DsSpacing.xs + 2),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(DsRadii.sm + 2),
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 18),
-          const SizedBox(width: 8),
+          const SizedBox(width: DsSpacing.xs),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

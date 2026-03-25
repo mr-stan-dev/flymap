@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/size_utils.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/widgets/delete_flight_confirmation_dialog.dart';
 import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_state.dart';
@@ -191,7 +192,12 @@ class _FlightCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                _StatusChip(hasOfflineMap: hasOfflineMap),
+                StatusChip(
+                  label: hasOfflineMap ? 'Saved offline' : 'Needs map',
+                  tone: hasOfflineMap
+                      ? StatusChipTone.success
+                      : StatusChipTone.warning,
+                ),
                 PopupMenuButton<_FlightCardAction>(
                   tooltip: 'Flight actions',
                   onSelected: (value) =>
@@ -226,9 +232,9 @@ class _FlightCard extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
-                _MetaPill(icon: Icons.route, text: '$distanceKm km'),
-                _MetaPill(icon: Icons.map_outlined, text: offlineSize),
-                _MetaPill(
+                MetaPill(icon: Icons.route, text: '$distanceKm km'),
+                MetaPill(icon: Icons.map_outlined, text: offlineSize),
+                MetaPill(
                   icon: Icons.schedule,
                   text: _createdLabel(flight.createdAt),
                 ),
@@ -284,65 +290,6 @@ class _FlightCard extends StatelessWidget {
     if (delta.inHours >= 1) return '${delta.inHours}h ago';
     if (delta.inMinutes >= 1) return '${delta.inMinutes}m ago';
     return 'Just now';
-  }
-}
-
-class _StatusChip extends StatelessWidget {
-  const _StatusChip({required this.hasOfflineMap});
-
-  final bool hasOfflineMap;
-
-  @override
-  Widget build(BuildContext context) {
-    final foreground = hasOfflineMap
-        ? const Color(0xFF177245)
-        : const Color(0xFF9C6A00);
-    final text = hasOfflineMap ? 'Saved offline' : 'Needs map';
-
-    return Container(
-      margin: const EdgeInsets.only(right: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-      decoration: BoxDecoration(
-        color: foreground.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: foreground.withValues(alpha: 0.25)),
-      ),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: foreground,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
-
-class _MetaPill extends StatelessWidget {
-  const _MetaPill({required this.icon, required this.text});
-
-  final IconData icon;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.18)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: colorScheme.onSurfaceVariant),
-          const SizedBox(width: 4),
-          Text(text, style: Theme.of(context).textTheme.labelMedium),
-        ],
-      ),
-    );
   }
 }
 

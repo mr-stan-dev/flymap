@@ -9,11 +9,7 @@ class FlightInfoWidget extends StatelessWidget {
   final FlightRoute route;
   final FlightInfo info;
 
-  const FlightInfoWidget({
-    super.key,
-    required this.route,
-    required this.info,
-  });
+  const FlightInfoWidget({super.key, required this.route, required this.info});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +42,7 @@ class FlightInfoWidget extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Icon(
                   Icons.arrow_forward,
-                  color: Colors.grey[600],
+                  color: theme.colorScheme.onSurfaceVariant,
                   size: 24,
                 ),
               ),
@@ -62,9 +58,7 @@ class FlightInfoWidget extends StatelessWidget {
               ),
             ],
           ),
-          info.isEmpty
-              ? _flightPoiLoading(context)
-              : _flightPoi(context, info),
+          info.isEmpty ? _flightPoiLoading(context) : _flightPoi(context, info),
         ],
       ),
     );
@@ -129,9 +123,9 @@ class FlightInfoWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -11,6 +11,7 @@ class ShareDistanceChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final distanceLabel = '${distanceKm.toStringAsFixed(0)} km';
 
     return Container(
@@ -20,17 +21,19 @@ class ShareDistanceChip extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF0A2540).withValues(alpha: 0.88),
-            const Color(0xFF1168A6).withValues(alpha: 0.88),
+            colorScheme.primaryContainer.withValues(alpha: 0.9),
+            colorScheme.primary.withValues(alpha: 0.88),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
+        border: Border.all(
+          color: colorScheme.onPrimary.withValues(alpha: 0.24),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.22),
+            color: colorScheme.shadow.withValues(alpha: 0.22),
             blurRadius: 12,
             offset: const Offset(0, 5),
           ),
@@ -45,7 +48,7 @@ class ShareDistanceChip extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: textTheme.labelSmall?.copyWith(
-              color: Colors.white.withValues(alpha: 0.82),
+              color: colorScheme.onPrimary.withValues(alpha: 0.82),
               fontWeight: FontWeight.w600,
               letterSpacing: 0.2,
             ),
@@ -56,7 +59,7 @@ class ShareDistanceChip extends StatelessWidget {
               Icon(
                 Icons.flight_takeoff,
                 size: 14,
-                color: Colors.white.withValues(alpha: 0.95),
+                color: colorScheme.onPrimary.withValues(alpha: 0.95),
               ),
               const SizedBox(width: 6),
               Text(
@@ -64,7 +67,7 @@ class ShareDistanceChip extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: textTheme.titleSmall?.copyWith(
-                  color: Colors.white,
+                  color: colorScheme.onPrimary,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.15,
                 ),

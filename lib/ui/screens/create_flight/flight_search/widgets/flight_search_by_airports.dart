@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_download_completion.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/info/flight_info_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/map/flight_map_preview_widget.dart';
@@ -151,7 +152,6 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
     FlightSearchScreenState state,
   ) {
     final cubit = context.read<FlightSearchScreenCubit>();
-    final theme = Theme.of(context);
     final selectedAirport = state.step == CreateFlightStep.departure
         ? state.selectedDeparture
         : state.selectedArrival;
@@ -165,13 +165,7 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
         .toList();
     final results = _filterAirportsForCurrentStep(state.searchResults, state);
     final showPopularAirports = state.searchQuery.trim().isEmpty;
-    const gpsActiveColor = Color(0xFF14824A);
-    final borderColor = selectedAirport != null
-        ? gpsActiveColor
-        : theme.colorScheme.outline.withValues(alpha: 0.45);
-    final focusedBorderColor = selectedAirport != null
-        ? gpsActiveColor
-        : theme.colorScheme.primary;
+    final gpsActiveColor = DsSemanticColors.success(context);
 
     return Column(
       children: [
@@ -183,7 +177,7 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextField(
+                  SearchInputField(
                     controller: _searchController,
                     onChanged: (value) {
                       if (selectedAirport != null) {
@@ -191,74 +185,41 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
                       }
                       cubit.searchAirports(value);
                     },
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: selectedAirport != null ? gpsActiveColor : null,
-                      ),
-                      suffixIcon: selectedAirport != null
-                          ? SizedBox(
-                              width: 96,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(
-                                      state.selectedAirportIsFavorite
-                                          ? Icons.star
-                                          : Icons.star_border,
-                                      color: state.selectedAirportIsFavorite
-                                          ? Colors.amber
-                                          : null,
-                                    ),
-                                    tooltip: state.selectedAirportIsFavorite
-                                        ? 'Remove favorite'
-                                        : 'Add to favorite',
-                                    onPressed:
-                                        cubit.toggleFavoriteForSelectedAirport,
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.close),
-                                    tooltip: 'Remove selected airport',
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      cubit
-                                          .clearSelectedAirportForCurrentStep();
-                                    },
-                                  ),
-                                ],
+                    hintText: state.step == CreateFlightStep.departure
+                        ? 'Search departure airport'
+                        : 'Search arrival airport',
+                    isSelected: selectedAirport != null,
+                    selectedBorderColor: gpsActiveColor,
+                    onClear: () {
+                      _searchController.clear();
+                      cubit.searchAirports('');
+                    },
+                    suffixActions: selectedAirport != null
+                        ? [
+                            IconButton(
+                              icon: Icon(
+                                state.selectedAirportIsFavorite
+                                    ? Icons.star
+                                    : Icons.star_border,
+                                color: state.selectedAirportIsFavorite
+                                    ? DsSemanticColors.warning(context)
+                                    : null,
                               ),
-                            )
-                          : state.searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
+                              tooltip: state.selectedAirportIsFavorite
+                                  ? 'Remove favorite'
+                                  : 'Add to favorite',
+                              onPressed: cubit.toggleFavoriteForSelectedAirport,
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close),
+                              tooltip: 'Remove selected airport',
                               onPressed: () {
                                 _searchController.clear();
-                                cubit.searchAirports('');
+                                cubit.clearSelectedAirportForCurrentStep();
                               },
-                            )
-                          : null,
-                      hintText: state.step == CreateFlightStep.departure
-                          ? 'Search departure airport'
-                          : 'Search arrival airport',
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: borderColor,
-                          width: selectedAirport != null ? 2 : 1,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: focusedBorderColor,
-                          width: selectedAirport != null ? 2.4 : 1.8,
-                        ),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
+                            ),
+                          ]
+                        : const [],
                   ),
                   const SizedBox(height: 12),
                   if (state.isSearchLoading && selectedAirport == null)
@@ -317,11 +278,11 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
                 SizedBox(
                   width: double.infinity,
                   height: 52,
-                  child: FilledButton(
+                  child: PrimaryButton(
                     onPressed: selectedAirport == null
                         ? null
                         : () => cubit.continueFromAirportStep(),
-                    child: const Text('Continue'),
+                    label: 'Continue',
                   ),
                 ),
               ],
@@ -367,13 +328,13 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
             child: SizedBox(
               width: double.infinity,
               height: 52,
-              child: FilledButton(
+              child: PrimaryButton(
                 onPressed: state.canContinueFromMap
                     ? () => context
                           .read<FlightSearchScreenCubit>()
                           .continueFromMap()
                     : null,
-                child: const Text('Continue'),
+                label: 'Continue',
               ),
             ),
           ),
@@ -433,13 +394,13 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
             child: SizedBox(
               width: double.infinity,
               height: 52,
-              child: FilledButton(
+              child: PrimaryButton(
                 onPressed: isDownloadEnabled
                     ? () => context
                           .read<FlightSearchScreenCubit>()
                           .startDownload()
                     : null,
-                child: Text(buttonText),
+                label: buttonText,
               ),
             ),
           ),
@@ -449,41 +410,16 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
   }
 
   Widget _buildDownloadingView(FlightSearchScreenState state) {
-    final percent = (state.downloadProgress * 100).clamp(0, 100).toInt();
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Downloading offline map...',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 12),
-            LinearProgressIndicator(value: state.downloadProgress),
-            const SizedBox(height: 8),
-            Text('$percent%'),
-            const SizedBox(height: 4),
-            Text(
-              'Downloaded: ${_formatDownloadedMb(state.downloadedBytes)}',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: OutlinedButton.icon(
-                onPressed: () =>
-                    context.read<FlightSearchScreenCubit>().cancelDownload(),
-                icon: const Icon(Icons.close_rounded),
-                label: const Text('Cancel download'),
-              ),
-            ),
-          ],
-        ),
+    return ProgressStateView(
+      title: 'Downloading offline map...',
+      progress: state.downloadProgress,
+      secondaryLine:
+          'Downloaded: ${_formatDownloadedMb(state.downloadedBytes)}',
+      trailingAction: SecondaryButton(
+        onPressed: () =>
+            context.read<FlightSearchScreenCubit>().cancelDownload(),
+        leadingIcon: Icons.close_rounded,
+        label: 'Cancel download',
       ),
     );
   }
@@ -558,17 +494,20 @@ class _AirportChipWrap extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       children: airports.map((airport) {
-        return InputChip(
-          label: Text('${airport.displayCode} · ${airport.city}'),
-          selected: false,
+        return SelectionChip(
+          label: '${airport.displayCode} · ${airport.city}',
           onPressed: () => onSelectAirport(airport),
           onDeleted: showFavoriteTrailingIcon && onToggleFavorite != null
               ? () => onToggleFavorite!(airport)
               : null,
           deleteIcon: showFavoriteTrailingIcon
-              ? const Icon(Icons.star, color: Colors.amber, size: 18)
+              ? Icon(
+                  Icons.star,
+                  color: DsSemanticColors.warning(context),
+                  size: 18,
+                )
               : null,
-          deleteButtonTooltipMessage: showFavoriteTrailingIcon
+          deleteTooltip: showFavoriteTrailingIcon
               ? 'Remove from favorites'
               : null,
         );
