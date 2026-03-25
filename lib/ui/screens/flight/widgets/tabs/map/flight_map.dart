@@ -44,6 +44,8 @@ class _FlightMapState extends State<FlightMap> {
   Timer? _controlsHideTimer;
   final _styleMapper = FlightMapStyleMapper();
   bool _isMapInitialized = false;
+  GpsData? _pendingGpsData;
+  bool _isApplyingUserLocation = false;
 
   late final LatLng _center = LatLng(
     MapUtils.center(
@@ -161,6 +163,8 @@ class _FlightMapState extends State<FlightMap> {
   void _onMapCreated(MapLibreMapController controller) {
     _logger.log('Map created successfully');
     _mapController = controller;
+    _isMapInitialized = false;
+    _pendingGpsData = null;
 
     _mapController!.onSymbolTapped.add(_onSymbolTapped);
 
@@ -192,6 +196,8 @@ class _FlightMapState extends State<FlightMap> {
           _isMapInitialized = true;
         });
       }
+
+      await _flushPendingGpsData();
     });
   }
 
@@ -205,7 +211,29 @@ class _FlightMapState extends State<FlightMap> {
   }
 
   Future<void> _updateUserLocation(GpsData data) async {
-    if (!_mapReady || _mapController == null) return;
+    _pendingGpsData = data;
+
+    if (!_mapReady || _mapController == null || !_isMapInitialized) {
+      return;
+    }
+    if (_isApplyingUserLocation) {
+      return;
+    }
+
+    _isApplyingUserLocation = true;
+    try {
+      while (_pendingGpsData != null) {
+        final next = _pendingGpsData!;
+        _pendingGpsData = null;
+        await _applyUserLocation(next);
+      }
+    } finally {
+      _isApplyingUserLocation = false;
+    }
+  }
+
+  Future<void> _applyUserLocation(GpsData data) async {
+    if (!_mapReady || _mapController == null || !_isMapInitialized) return;
     final lat = data.latitude;
     final lon = data.longitude;
     _logger.log('updateUserLocation lat: $lat, lon: $lon');
@@ -213,31 +241,51 @@ class _FlightMapState extends State<FlightMap> {
     final pos = LatLng(lat, lon);
     final heading = data.course ?? 0;
 
-    if (_userCircle == null) {
-      _userCircle = await _mapController!.addCircle(
-        UserLayer.markerCircle(pos),
-      );
-    } else {
-      await _mapController!.updateCircle(
-        _userCircle!,
-        CircleOptions(geometry: pos),
-      );
-    }
+    try {
+      if (_userCircle == null) {
+        _userCircle = await _mapController!.addCircle(
+          UserLayer.markerCircle(pos),
+        );
+      } else {
+        await _mapController!.updateCircle(
+          _userCircle!,
+          CircleOptions(geometry: pos),
+        );
+      }
 
-    if (_userHeadingSymbol == null) {
-      _userHeadingSymbol = await _mapController!.addSymbol(
-        UserLayer.headingArrow(pos, heading),
-      );
-    } else {
-      await _mapController!.updateSymbol(
-        _userHeadingSymbol!,
-        UserLayer.headingArrow(pos, heading),
-      );
+      if (_userHeadingSymbol == null) {
+        _userHeadingSymbol = await _mapController!.addSymbol(
+          UserLayer.headingArrow(pos, heading),
+        );
+      } else {
+        await _mapController!.updateSymbol(
+          _userHeadingSymbol!,
+          UserLayer.headingArrow(pos, heading),
+        );
+      }
+    } catch (e) {
+      _logger.error('Failed to apply user location marker: $e');
+      _pendingGpsData = data;
+      if (_isMapInitialized && mounted) {
+        Future.delayed(const Duration(milliseconds: 250), () {
+          final pending = _pendingGpsData;
+          if (pending != null) {
+            _updateUserLocation(pending);
+          }
+        });
+      }
+      return;
     }
 
     if (_followUser) {
       await _mapController?.animateCamera(CameraUpdate.newLatLng(pos));
     }
+  }
+
+  Future<void> _flushPendingGpsData() async {
+    final pending = _pendingGpsData;
+    if (pending == null) return;
+    await _updateUserLocation(pending);
   }
 
   @override

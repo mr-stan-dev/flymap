@@ -11,14 +11,14 @@ class CorridorLayer extends MapLayer {
     lineOptions = LineOptions(
       lineJoin: 'round',
       geometry: corridor.toGeometry(),
-      lineColor: AppColoursCommon.accentBlue.toHexStringRGB(),
+      lineColor: AppColoursCommon.brandTeal.toHexStringRGB(),
       lineWidth: 3.0,
       lineOpacity: 0.7,
     );
   }
 
   @override
-  void add(MapLibreMapController controller) {
-    controller.addLine(lineOptions);
+  Future<void> add(MapLibreMapController controller) async {
+    await controller.addLine(lineOptions);
   }
 }

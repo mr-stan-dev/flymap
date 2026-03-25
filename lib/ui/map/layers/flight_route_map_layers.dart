@@ -19,10 +19,10 @@ class FlightRouteMapLayers {
     String dashedPathLayerId = 'flight-route-path-layer',
   }) async {
     if (includeDimming) {
-      DimmingLayer(route.corridor).add(controller);
+      await DimmingLayer(route.corridor).add(controller);
     }
     if (includeCorridor) {
-      CorridorLayer(route.corridor).add(controller);
+      await CorridorLayer(route.corridor).add(controller);
     }
 
     await _addDashedRoutePath(
@@ -33,7 +33,7 @@ class FlightRouteMapLayers {
     );
 
     if (includeAirports) {
-      AirportsLayer(
+      await AirportsLayer(
         departure: route.departure,
         arrival: route.arrival,
       ).add(controller);
@@ -70,7 +70,7 @@ class FlightRouteMapLayers {
       sourceId,
       layerId,
       LineLayerProperties(
-        lineColor: AppColoursCommon.accentBlue.toHexStringRGB(),
+        lineColor: AppColoursCommon.brandTeal.toHexStringRGB(),
         lineWidth: 2,
         lineOpacity: 0.75,
         lineJoin: 'round',

@@ -11,14 +11,14 @@ class WaypointsLayer extends MapLayer {
     lineOptions =  LineOptions(
       lineJoin: 'round',
       geometry: waypoints.toGeometry(),
-      lineColor: AppColoursCommon.accentBlue.toHexStringRGB(),
+      lineColor: AppColoursCommon.brandTeal.toHexStringRGB(),
       lineWidth: 2.0,
       lineOpacity: 0.5,
     );
   }
 
   @override
-  void add(MapLibreMapController controller) {
-    controller.addLine(lineOptions);
+  Future<void> add(MapLibreMapController controller) async {
+    await controller.addLine(lineOptions);
   }
 }

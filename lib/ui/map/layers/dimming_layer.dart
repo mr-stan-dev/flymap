@@ -24,7 +24,7 @@ class DimmingLayer extends MapLayer {
   }
 
   @override
-  void add(MapLibreMapController controller) {
-    controller.addFill(fillOptions);
+  Future<void> add(MapLibreMapController controller) async {
+    await controller.addFill(fillOptions);
   }
 }

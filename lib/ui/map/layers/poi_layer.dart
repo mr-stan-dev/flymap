@@ -15,7 +15,7 @@ class PoiLayer extends MapLayer {
   static const String _labelsLayerId = 'poi-labels-layer';
 
   @override
-  void add(MapLibreMapController controller) async {
+  Future<void> add(MapLibreMapController controller) async {
     // Try to add a runtime image for a universal marker; ignore failures and rely on sprite fallback
     try {
       final bytes = await rootBundle.load('assets/icons/poi_generic.png');

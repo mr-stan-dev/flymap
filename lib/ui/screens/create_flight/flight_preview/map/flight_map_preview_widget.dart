@@ -94,7 +94,7 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
     if (_poiSignature == nextSignature) return;
     _poiSignature = nextSignature;
 
-    PoiLayer(poi: widget.flightInfo.poi).add(controller);
+    await PoiLayer(poi: widget.flightInfo.poi).add(controller);
   }
 
   @override

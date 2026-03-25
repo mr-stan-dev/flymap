@@ -4,11 +4,12 @@ class AppColoursCommon {
   static const brandBlue = Color(0xFF1565C0);
   static const brandBlack = Color(0xFF2A2A2A);
   static const brandWhite = Color(0xFFFFFFFF);
+  static const brandTeal = Color(0xFF00838F);
 
   static const accentBlue = brandBlue;
   static const accentYellow = warning; // Use warning (amber) as yellow accent
 
-  static const success = Color(0xFF41CC4F);
+  static const success = Color(0xFF00A512);
   static const warning = Color(0xFFFFA438);
   static const error = Color(0xFFF95959);
   static const info = Color(0xFF3F96FD);
