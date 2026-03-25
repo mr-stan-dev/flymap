@@ -25,7 +25,7 @@ class MapGpsStatusBadge extends StatelessWidget {
           vertical: 7,
         ),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(DsRadii.pill),
           border: Border.all(color: view.color.withValues(alpha: 0.35)),
         ),
