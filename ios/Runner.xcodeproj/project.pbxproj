@@ -196,22 +196,23 @@
 			productReference = 331C8081294A63A400263BE5 /* RunnerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		97C146ED1CF9000F007C117D /* Runner */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
-			buildPhases = (
-				F40F05EA227A0CDA49193D98 /* [CP] Check Pods Manifest.lock */,
-				9740EEB61CF901F6004384FC /* Run Script */,
-				97C146EA1CF9000F007C117D /* Sources */,
-				97C146EB1CF9000F007C117D /* Frameworks */,
-				97C146EC1CF9000F007C117D /* Resources */,
-				9705A1C41CF9048500538489 /* Embed Frameworks */,
-				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
-				56837B5B5786E8240B375E74 /* [CP] Embed Pods Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
+			97C146ED1CF9000F007C117D /* Runner */ = {
+				isa = PBXNativeTarget;
+				buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
+				buildPhases = (
+					F40F05EA227A0CDA49193D98 /* [CP] Check Pods Manifest.lock */,
+					9740EEB61CF901F6004384FC /* Run Script */,
+					97C146EA1CF9000F007C117D /* Sources */,
+					97C146EB1CF9000F007C117D /* Frameworks */,
+					97C146EC1CF9000F007C117D /* Resources */,
+					9705A1C41CF9048500538489 /* Embed Frameworks */,
+					3B06AD1E1E4923F5004D2608 /* Thin Binary */,
+					56837B5B5786E8240B375E74 /* [CP] Embed Pods Frameworks */,
+					A9F0D34C2F4E42AA9B2C18D1 /* Generate MapLibre dSYM */,
+				);
+				buildRules = (
+				);
+				dependencies = (
 			);
 			name = Runner;
 			productName = Runner;
@@ -313,10 +314,10 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		9740EEB61CF901F6004384FC /* Run Script */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
+			9740EEB61CF901F6004384FC /* Run Script */ = {
+				isa = PBXShellScriptBuildPhase;
+				alwaysOutOfDate = 1;
+				buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
@@ -325,12 +326,27 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
-		};
-		DE265C41039F067F11682963 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+				shellPath = /bin/sh;
+				shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
+			};
+			A9F0D34C2F4E42AA9B2C18D1 /* Generate MapLibre dSYM */ = {
+				isa = PBXShellScriptBuildPhase;
+				buildActionMask = 2147483647;
+				files = (
+				);
+				inputPaths = (
+				);
+				name = "Generate MapLibre dSYM";
+				outputPaths = (
+				);
+				runOnlyForDeploymentPostprocessing = 0;
+				shellPath = /bin/sh;
+				shellScript = "set -e\nif [ \"$CONFIGURATION\" != \"Release\" ]; then\n  exit 0\nfi\n\nMAPLIBRE_BIN=\"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MapLibre.framework/MapLibre\"\nMAPLIBRE_DSYM_DIR=\"${DWARF_DSYM_FOLDER_PATH}/MapLibre.framework.dSYM\"\nMAPLIBRE_DSYM_BIN=\"${MAPLIBRE_DSYM_DIR}/Contents/Resources/DWARF/MapLibre\"\n\nif [ ! -f \"$MAPLIBRE_BIN\" ]; then\n  echo \"MapLibre binary not found at ${MAPLIBRE_BIN}; skipping dSYM generation.\"\n  exit 0\nfi\n\nif [ -f \"$MAPLIBRE_DSYM_BIN\" ]; then\n  echo \"MapLibre dSYM already exists.\"\n  exit 0\nfi\n\necho \"Generating MapLibre.framework.dSYM...\"\ndsymutil \"$MAPLIBRE_BIN\" -o \"$MAPLIBRE_DSYM_DIR\" || true\n\nif [ -f \"$MAPLIBRE_DSYM_BIN\" ]; then\n  dwarfdump --uuid \"$MAPLIBRE_DSYM_BIN\" || true\nfi\n";
+				showEnvVarsInLog = 0;
+			};
+			DE265C41039F067F11682963 /* [CP] Check Pods Manifest.lock */ = {
+				isa = PBXShellScriptBuildPhase;
+				buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
