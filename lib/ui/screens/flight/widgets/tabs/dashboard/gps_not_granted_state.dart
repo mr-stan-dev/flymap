@@ -42,7 +42,7 @@ class GpsNotGrantedState extends StatelessWidget {
             context.read<FlightScreenCubit>().requestLocationPermission();
           },
           leadingIcon: Icons.location_on,
-          label: 'Grant permission',
+          label: 'Grant permissions',
           expand: false,
         ),
       ],

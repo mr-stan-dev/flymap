@@ -26,6 +26,13 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   }
 
   Future<void> load() async {
+    await _startGpsListening();
+  }
+
+  Future<void> _startGpsListening() async {
+    await _gpsProvider.stop();
+    _gpsCheckTimer?.cancel();
+
     await _gpsProvider.start(
       onUpdate: (status, {data}) {
         switch (status) {
@@ -96,8 +103,18 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   }
 
   Future<void> requestLocationPermission() async {
-    // Permissions are handled within provider on start
-    await load();
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      await Geolocator.openAppSettings();
+      return;
+    }
+
+    await _startGpsListening();
   }
 
   void openLocationSettings() {

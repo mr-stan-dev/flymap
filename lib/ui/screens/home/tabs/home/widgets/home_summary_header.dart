@@ -37,7 +37,7 @@ class HomeSummaryHeader extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Offline maps for flights.',
+            'Offline maps for flights',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
