@@ -162,7 +162,7 @@ class _SettingsView extends StatelessWidget {
                 onTap: () async {
                   await _openExternalUrl(
                     context,
-                    'https://flymap.app/privacy-policy',
+                    'https://www.apptractor.dev/projects/flymap/privacy',
                   );
                 },
               ),
