@@ -18,6 +18,7 @@ import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_controls.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_gps_status_badge.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_initializing_overlay.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_style_loading_view.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/map/zoom_indicator.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -46,6 +47,7 @@ class _FlightMapState extends State<FlightMap> {
   bool _isMapInitialized = false;
   GpsData? _pendingGpsData;
   bool _isApplyingUserLocation = false;
+  double _currentZoom = 1.0;
 
   late final LatLng _center = LatLng(
     MapUtils.center(
@@ -61,6 +63,7 @@ class _FlightMapState extends State<FlightMap> {
   @override
   void initState() {
     super.initState();
+    _currentZoom = _initialZoom();
     _loadStyle();
     _scheduleControlsAutoHide();
   }
@@ -288,16 +291,40 @@ class _FlightMapState extends State<FlightMap> {
     await _updateUserLocation(pending);
   }
 
+  double _initialZoom() {
+    final zoom = MapUtils.calculateZoomLevel(
+      departure: widget.flight.departure,
+      arrival: widget.flight.arrival,
+    );
+    return zoom.isFinite ? zoom : 1.0;
+  }
+
+  void _onCameraMove(CameraPosition cameraPosition) {
+    final nextZoom = cameraPosition.zoom;
+    if (!nextZoom.isFinite) {
+      return;
+    }
+
+    final currentDisplayZoom = (_currentZoom * 10).round();
+    final nextDisplayZoom = (nextZoom * 10).round();
+
+    if (currentDisplayZoom == nextDisplayZoom) {
+      return;
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _currentZoom = nextZoom;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_styleString == null) {
       return const MapStyleLoadingView();
     }
 
-    final double zoom = MapUtils.calculateZoomLevel(
-      departure: widget.flight.departure,
-      arrival: widget.flight.arrival,
-    );
+    final initialZoom = _initialZoom();
     final double controlsTopOffset =
         MediaQuery.of(context).padding.top + 2 * kToolbarHeight + 8;
 
@@ -321,14 +348,17 @@ class _FlightMapState extends State<FlightMap> {
               onMapCreated: _onMapCreated,
               initialCameraPosition: CameraPosition(
                 target: _center,
-                zoom: zoom.isFinite ? zoom : 1.0,
+                zoom: initialZoom,
               ),
               styleString: _styleString!,
+              trackCameraPosition: true,
+              onCameraMove: _onCameraMove,
               compassViewPosition: CompassViewPosition.bottomRight,
               compassViewMargins: const Point(16, 16),
               onStyleLoadedCallback: _onStyleLoaded,
             ),
           ),
+          ZoomIndicator(topOffset: controlsTopOffset, zoom: _currentZoom),
           FlightMapControls(
             topOffset: controlsTopOffset,
             visible: _showControls || _followUser,
