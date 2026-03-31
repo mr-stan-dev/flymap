@@ -26,10 +26,20 @@ class FlightSearchDownloadingView extends StatelessWidget {
       progress: state.downloadProgress,
       showProgress: showProgressBar,
       secondaryLine: stageLine,
-      trailingAction: SecondaryButton(
-        onPressed: onCancel,
-        leadingIcon: Icons.close_rounded,
-        label: 'Cancel download',
+      trailingAction: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SecondaryButton(
+            onPressed: onCancel,
+            leadingIcon: Icons.close_rounded,
+            label: 'Cancel download',
+          ),
+          const SizedBox(height: DsSpacing.sm),
+          const InlineMessage(
+            message: 'Do not close this screen until download completes',
+            tone: DsMessageTone.info,
+          ),
+        ],
       ),
     );
   }
