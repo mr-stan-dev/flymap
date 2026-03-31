@@ -157,62 +157,8 @@ class _SettingsView extends StatelessWidget {
                     title: 'Flymap Pro',
                     subtitle: _subscriptionStatusText(subscriptionState),
                     leading: const Icon(Icons.workspace_premium_outlined),
-                    onTap: () {},
+                    onTap: () => _openSubscription(context, subscriptionState),
                   ),
-                  const Divider(height: 1),
-                  _SettingItem(
-                    title: 'Open Paywall',
-                    subtitle: 'Weekly / monthly / yearly plans',
-                    leading: const Icon(Icons.local_offer_outlined),
-                    onTap: () => _openPaywall(context),
-                  ),
-                  const Divider(height: 1),
-                  _SettingItem(
-                    title: 'Restore Purchases',
-                    subtitle: 'Recover previous subscriptions',
-                    leading: const Icon(Icons.restore),
-                    onTap: () => _restorePurchases(context),
-                  ),
-                  const Divider(height: 1),
-                  _SettingItem(
-                    title: 'Manage Subscription',
-                    subtitle: 'Open RevenueCat Customer Center',
-                    leading: const Icon(Icons.manage_accounts_outlined),
-                    onTap: () => _openCustomerCenter(context),
-                  ),
-                  if (subscriptionState.isProductsLoading) ...[
-                    const Divider(height: 1),
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-                  ] else if (subscriptionState.products.isNotEmpty) ...[
-                    const Divider(height: 1),
-                    ...subscriptionState.products.map((product) {
-                      return Column(
-                        children: [
-                          ListTile(
-                            leading: const Icon(Icons.sell_outlined),
-                            title: Text(product.title),
-                            subtitle: Text(
-                              product.description.trim().isEmpty
-                                  ? product.productId
-                                  : product.description,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            trailing: Text(product.priceText),
-                            onTap: () => _purchasePackage(
-                              context,
-                              packageId: product.packageId,
-                              label: product.title,
-                            ),
-                          ),
-                          const Divider(height: 1),
-                        ],
-                      );
-                    }),
-                  ],
 
                   // About section
                   Container(
@@ -270,53 +216,34 @@ class _SettingsView extends StatelessWidget {
         : 'Not active';
   }
 
-  Future<void> _openPaywall(BuildContext context) async {
+  Future<void> _openSubscription(
+    BuildContext context,
+    SubscriptionState state,
+  ) async {
+    if (state.isPro) {
+      AppRouter.goToSubscriptionManagement(context);
+      return;
+    }
+
     final result = await context
         .read<SubscriptionCubit>()
         .presentPaywallIfNeeded();
     if (!context.mounted) return;
 
-    final message = switch (result) {
-      SubscriptionPaywallResult.purchased => 'Purchase completed successfully.',
-      SubscriptionPaywallResult.restored => 'Purchases restored successfully.',
-      SubscriptionPaywallResult.cancelled => 'Purchase cancelled.',
-      SubscriptionPaywallResult.notPresented => 'You already have access.',
-      SubscriptionPaywallResult.error => 'Failed to open paywall.',
-    };
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    switch (result) {
+      case SubscriptionPaywallResult.purchased:
+      case SubscriptionPaywallResult.restored:
+        AppRouter.goToSubscriptionManagement(context);
+      case SubscriptionPaywallResult.cancelled:
+        _showSnackBar(context, 'Purchase cancelled.');
+      case SubscriptionPaywallResult.notPresented:
+        _showSnackBar(context, 'No paywall available right now.');
+      case SubscriptionPaywallResult.error:
+        _showSnackBar(context, 'Failed to open paywall.');
+    }
   }
 
-  Future<void> _restorePurchases(BuildContext context) async {
-    await context.read<SubscriptionCubit>().restorePurchases();
-    if (!context.mounted) return;
-    final state = context.read<SubscriptionCubit>().state;
-    final message = state.errorMessage?.trim().isNotEmpty == true
-        ? state.errorMessage!
-        : 'Restore completed.';
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  Future<void> _openCustomerCenter(BuildContext context) async {
-    await context.read<SubscriptionCubit>().presentCustomerCenter();
-  }
-
-  Future<void> _purchasePackage(
-    BuildContext context, {
-    required String packageId,
-    required String label,
-  }) async {
-    await context.read<SubscriptionCubit>().purchasePackage(packageId);
-    if (!context.mounted) return;
-    final state = context.read<SubscriptionCubit>().state;
-    final message = state.isPro
-        ? '$label purchased successfully.'
-        : (state.errorMessage?.trim().isNotEmpty == true
-              ? state.errorMessage!
-              : 'Purchase did not complete.');
+  void _showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));

@@ -7,14 +7,14 @@ import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
 import android.view.PixelCopy
-import io.flutter.embedding.android.FlutterActivity
+import androidx.fragment.app.FragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.io.ByteArrayOutputStream
 import kotlin.math.roundToInt
 
-class NativeCaptureDelegate(private val activity: FlutterActivity) {
+class NativeCaptureDelegate(private val activity: FragmentActivity) {
   companion object {
     private const val channelName = "app.flymap/native_capture"
     private const val methodCaptureRectPng = "captureRectPng"
@@ -171,4 +171,3 @@ class NativeCaptureDelegate(private val activity: FlutterActivity) {
     return output.toByteArray()
   }
 }
-

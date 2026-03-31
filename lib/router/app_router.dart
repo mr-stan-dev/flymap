@@ -10,6 +10,7 @@ import 'package:flymap/ui/screens/home/home_screen.dart';
 import 'package:flymap/ui/screens/onboarding/onboarding_screen.dart';
 import 'package:flymap/ui/screens/share_flight/share_flight_screen.dart';
 import 'package:flymap/ui/screens/settings/settings_screen.dart';
+import 'package:flymap/ui/screens/subscription/subscription_management_screen.dart';
 import 'package:go_router/go_router.dart';
 
 /// App router configuration using go_router
@@ -20,6 +21,7 @@ class AppRouter {
   static const String flightRoute = '/flight';
   static const String shareFlightRoute = '/share-flight';
   static const String settingsRoute = '/settings';
+  static const String subscriptionRoute = '/subscription';
   static const String aboutRoute = '/about';
   static const String onboardingRoute = '/onboarding';
 
@@ -101,6 +103,13 @@ class AppRouter {
           builder: (context, state) => const SettingsScreen(),
         ),
 
+        // Subscription management route
+        GoRoute(
+          path: subscriptionRoute,
+          name: 'subscription',
+          builder: (context, state) => const SubscriptionManagementScreen(),
+        ),
+
         // About
         GoRoute(
           path: aboutRoute,
@@ -137,6 +146,11 @@ class AppRouter {
   /// Navigate to settings
   static void goToSettings(BuildContext context) {
     context.push(settingsRoute);
+  }
+
+  /// Navigate to subscription management
+  static void goToSubscriptionManagement(BuildContext context) {
+    context.push(subscriptionRoute);
   }
 
   /// Navigate to about

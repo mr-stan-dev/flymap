@@ -22,22 +22,6 @@ class RevenueCatEnvConfig {
         'RC_API_KEY_ANDROID',
         defaultValue: _defaultApiKey,
       ),
-      entitlementPro: String.fromEnvironment(
-        'RC_ENTITLEMENT_PRO',
-        defaultValue: 'Flymap Pro',
-      ),
-      weeklyPackageId: String.fromEnvironment(
-        'RC_PACKAGE_WEEKLY',
-        defaultValue: 'weekly',
-      ),
-      monthlyPackageId: String.fromEnvironment(
-        'RC_PACKAGE_MONTHLY',
-        defaultValue: 'monthly',
-      ),
-      yearlyPackageId: String.fromEnvironment(
-        'RC_PACKAGE_YEARLY',
-        defaultValue: 'yearly',
-      ),
     );
   }
 

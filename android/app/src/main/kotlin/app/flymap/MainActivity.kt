@@ -1,9 +1,9 @@
 package app.flymap
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 
-class MainActivity : FlutterActivity() {
+class MainActivity : FlutterFragmentActivity() {
   private val nativeCaptureDelegate by lazy { NativeCaptureDelegate(this) }
 
   override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -11,4 +11,3 @@ class MainActivity : FlutterActivity() {
     nativeCaptureDelegate.register(flutterEngine)
   }
 }
-
