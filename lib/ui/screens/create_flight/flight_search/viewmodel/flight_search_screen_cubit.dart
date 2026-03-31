@@ -10,6 +10,7 @@ import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/entity/wiki_article_candidate.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
+import 'package:flymap/subscription/pro_limits.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/widgets/popular_flights.dart';
 import 'package:flymap/usecase/build_wikipedia_candidates_use_case.dart';
@@ -26,6 +27,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     required BuildWikipediaCandidatesUseCase buildWikipediaCandidatesUseCase,
     required DownloadWikipediaArticlesUseCase downloadWikipediaArticlesUseCase,
     required GetFlightInfoUseCase getFlightInfoUseCase,
+    bool autoInitialize = true,
   }) : _airportsDb = airportsDb,
        _favoritesRepository = favoritesRepository,
        _routeProvider = routeProvider,
@@ -34,7 +36,9 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
        _downloadWikipediaArticlesUseCase = downloadWikipediaArticlesUseCase,
        _getFlightInfoUseCase = getFlightInfoUseCase,
        super(FlightSearchScreenState.initial()) {
-    _initialize();
+    if (autoInitialize) {
+      _initialize();
+    }
   }
 
   final _logger = Logger('FlightSearchScreenCubit');
@@ -51,6 +55,9 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
 
   static const _tooLongRouteMessage =
       'Downloading routes over 5,000 km is not supported yet.';
+
+  int get _freeWikiArticlesSelectionLimit =>
+      ProLimits.freeWikiArticlesSelectionLimit;
 
   Future<void> _initialize() async {
     try {
@@ -366,7 +373,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     );
   }
 
-  Future<void> startDownload() async {
+  Future<void> startDownload({required bool isPro}) async {
     if (state.isDownloading) return;
     final route = state.flightRoute;
     if (route == null || state.isTooLongFlight) return;
@@ -374,7 +381,20 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     _downloadCancelled = false;
     await _downloadSubscription?.cancel();
 
-    final selectedUrls = state.selectedArticleUrls.toList();
+    final selectedUrls =
+        (isPro
+                ? state.selectedArticleUrls
+                : state.selectedArticleUrls.take(
+                    _freeWikiArticlesSelectionLimit,
+                  ))
+            .toList();
+    if (!isPro && selectedUrls.length != state.selectedArticleUrls.length) {
+      emit(
+        state.copyWith(
+          selectedArticleUrls: selectedUrls,
+        ),
+      );
+    }
     final hasArticlePhase = selectedUrls.isNotEmpty;
     final baseInfo = state.flightInfo;
 

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/subscription/pro_limits.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
+import 'package:flymap/ui/widgets/wikipedia_logo_avatar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FlightSearchWikipediaArticlesStep extends StatelessWidget {
   const FlightSearchWikipediaArticlesStep({
     required this.state,
+    required this.isProUser,
     required this.onToggleArticle,
     required this.onToggleAll,
     required this.onStartDownload,
@@ -14,12 +17,10 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
   });
 
   final FlightSearchScreenState state;
+  final bool isProUser;
   final ValueChanged<String> onToggleArticle;
   final VoidCallback onToggleAll;
   final VoidCallback onStartDownload;
-
-  static const _wikipediaLogoIconAsset =
-      'assets/images/wikipedia_logo_icon.webp';
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +33,8 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
     final isLoading = state.isWikiSuggestionsLoading;
     final hasCandidates = candidates.isNotEmpty;
     final selectedSet = state.selectedArticleUrls.toSet();
+    final isFreeOverLimit =
+        !isProUser && selectedCount > ProLimits.freeWikiArticlesSelectionLimit;
     final allSelected =
         hasCandidates &&
         candidates.every((candidate) => selectedSet.contains(candidate.url));
@@ -91,7 +94,7 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
                     children: [
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        leading: _wikiLogoBadge(context),
+                        leading: const WikipediaLogoAvatar(size: 36),
                         title: Text(
                           candidate.title,
                           maxLines: 2,
@@ -100,15 +103,23 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
                         subtitle: GestureDetector(
                           behavior: HitTestBehavior.opaque,
                           onTap: () => _openUrl(context, candidate.url),
-                          child: Text(
-                            candidate.url,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  decoration: TextDecoration.underline,
-                                ),
+                          child: Builder(
+                            builder: (context) {
+                              final linkColor = Theme.of(
+                                context,
+                              ).colorScheme.primary;
+                              return Text(
+                                candidate.url,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color: linkColor,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: linkColor,
+                                    ),
+                              );
+                            },
                           ),
                         ),
                         trailing: Checkbox(
@@ -134,56 +145,43 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Estimated download size: $estimatedSizeRange',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
+                isFreeOverLimit
+                    ? Text(
+                        'Free plan includes up to 3 offline articles. Upgrade to Pro for unlimited articles.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: DsBrandColors.proAmber,
+                        ),
+                      )
+                    : Text(
+                        'Estimated download size: $estimatedSizeRange',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
                 const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
                   height: 52,
-                  child: PrimaryButton(
-                    onPressed: isLoading ? null : onStartDownload,
-                    label: isLoading
-                        ? 'Loading article suggestions...'
-                        : selectedCount > 0
-                        ? 'Download map + $selectedCount article${selectedCount == 1 ? '' : 's'}'
-                        : 'Download map',
-                  ),
+                  child: isFreeOverLimit
+                      ? PremiumButton(
+                          label: 'Upgrade',
+                          icon: Icons.workspace_premium_rounded,
+                          onPressed: isLoading ? null : onStartDownload,
+                        )
+                      : PrimaryButton(
+                          onPressed: isLoading ? null : onStartDownload,
+                          label: isLoading
+                              ? 'Loading article suggestions...'
+                              : selectedCount > 0
+                              ? 'Download map + $selectedCount article${selectedCount == 1 ? '' : 's'}'
+                              : 'Download map',
+                        ),
                 ),
               ],
             ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _wikiLogoBadge(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(DsRadii.sm),
-      child: SizedBox(
-        width: 36,
-        height: 36,
-        child: Image.asset(
-          _wikipediaLogoIconAsset,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) {
-            return Container(
-              alignment: Alignment.center,
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              child: Text(
-                'W',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-              ),
-            );
-          },
-        ),
-      ),
     );
   }
 

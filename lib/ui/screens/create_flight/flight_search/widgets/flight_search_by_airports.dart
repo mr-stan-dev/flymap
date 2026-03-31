@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/subscription/pro_limits.dart';
+import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_cubit.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/widgets/flight_search_by_airports_step_content.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/widgets/flight_search_by_airports_step_meta.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
+import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 
 class FlightSearchByAirports extends StatefulWidget {
   const FlightSearchByAirports({super.key});
@@ -79,6 +84,9 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
         }
       },
       builder: (context, state) {
+        final isProUser = context.select(
+          (SubscriptionCubit cubit) => cubit.state.isPro,
+        );
         final cubit = context.read<FlightSearchScreenCubit>();
         return PopScope(
           canPop: false,
@@ -130,7 +138,10 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
                 onContinueFromOverview: cubit.continueFromOverview,
                 onToggleWikiArticle: cubit.toggleWikiArticleSelection,
                 onToggleAllWikiArticles: cubit.toggleAllWikiArticleSelections,
-                onStartDownload: cubit.startDownload,
+                isProUser: isProUser,
+                onStartDownload: () => unawaited(
+                  _handleStartDownload(state: state, isProUser: isProUser),
+                ),
                 onCancelDownload: cubit.cancelDownload,
               ),
             ),
@@ -138,6 +149,49 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
         );
       },
     );
+  }
+
+  Future<void> _handleStartDownload({
+    required FlightSearchScreenState state,
+    required bool isProUser,
+  }) async {
+    final selectedCount = state.selectedArticleUrls.length;
+    final shouldUpgradeFirst =
+        !isProUser && selectedCount > ProLimits.freeWikiArticlesSelectionLimit;
+    if (!shouldUpgradeFirst) {
+      await context.read<FlightSearchScreenCubit>().startDownload(
+        isPro: isProUser,
+      );
+      return;
+    }
+
+    final subscriptionCubit = context.read<SubscriptionCubit>();
+    final result = await subscriptionCubit.presentPaywallIfNeeded();
+    if (!mounted) return;
+
+    switch (result) {
+      case SubscriptionPaywallResult.purchased:
+      case SubscriptionPaywallResult.restored:
+        await context.read<FlightSearchScreenCubit>().startDownload(
+          isPro: true,
+        );
+        return;
+      case SubscriptionPaywallResult.cancelled:
+        _showSnackBar('Upgrade cancelled.');
+        return;
+      case SubscriptionPaywallResult.notPresented:
+        _showSnackBar('No paywall available right now.');
+        return;
+      case SubscriptionPaywallResult.error:
+        _showSnackBar('Failed to open paywall.');
+        return;
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _onBackPressed(BuildContext context) async {

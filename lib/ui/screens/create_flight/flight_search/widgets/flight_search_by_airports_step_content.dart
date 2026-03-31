@@ -25,6 +25,7 @@ class FlightSearchByAirportsStepContent extends StatelessWidget {
     required this.onContinueFromOverview,
     required this.onToggleWikiArticle,
     required this.onToggleAllWikiArticles,
+    required this.isProUser,
     required this.onStartDownload,
     required this.onCancelDownload,
     super.key,
@@ -44,6 +45,7 @@ class FlightSearchByAirportsStepContent extends StatelessWidget {
   final VoidCallback onContinueFromOverview;
   final ValueChanged<String> onToggleWikiArticle;
   final VoidCallback onToggleAllWikiArticles;
+  final bool isProUser;
   final VoidCallback onStartDownload;
   final VoidCallback onCancelDownload;
 
@@ -113,6 +115,7 @@ class FlightSearchByAirportsStepContent extends StatelessWidget {
       case CreateFlightStep.wikipediaArticles:
         return FlightSearchWikipediaArticlesStep(
           state: state,
+          isProUser: isProUser,
           onToggleArticle: onToggleWikiArticle,
           onToggleAll: onToggleAllWikiArticles,
           onStartDownload: onStartDownload,
