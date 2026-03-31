@@ -11,6 +11,9 @@ import 'package:flymap/data/wiki/wikipedia_article_client.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
+import 'package:flymap/repository/subscription_repository.dart';
+import 'package:flymap/subscription/revenuecat_client.dart';
+import 'package:flymap/subscription/revenuecat_env_config.dart';
 import 'package:flymap/usecase/build_wikipedia_candidates_use_case.dart';
 import 'package:flymap/usecase/download_map_use_case.dart';
 import 'package:flymap/usecase/download_wikipedia_articles_use_case.dart';
@@ -71,5 +74,15 @@ class DiModule {
     );
 
     i.registerLazySingleton<OnboardingRepository>(() => OnboardingRepository());
+
+    i.registerLazySingleton<RevenueCatEnvConfig>(
+      RevenueCatEnvConfig.fromEnvironment,
+    );
+    i.registerLazySingleton<RevenueCatClient>(
+      () => PurchasesRevenueCatClient(),
+    );
+    i.registerLazySingleton<SubscriptionRepository>(
+      () => RevenueCatSubscriptionRepository(client: i.get(), config: i.get()),
+    );
   }
 }

@@ -14,6 +14,7 @@ import 'firebase_options.dart';
 import 'router/app_router.dart';
 import 'ui/screens/settings/viewmodel/settings_cubit.dart';
 import 'ui/screens/settings/viewmodel/settings_state.dart';
+import 'ui/screens/subscription/viewmodel/subscription_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,12 +49,18 @@ class _MyAppState extends State<MyApp> {
   );
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => SettingsCubit()..load(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => SettingsCubit()..load()),
+        BlocProvider(
+          create: (_) =>
+              SubscriptionCubit(repository: GetIt.I.get())..initialize(),
+        ),
+      ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settings) {
           return MaterialApp.router(
-            title: 'flymap',
+            title: 'Flymap',
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: settings.themeMode,

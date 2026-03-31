@@ -37,6 +37,8 @@ dependencies:
   flutter_markdown: ^0.7.4+3
   html: ^0.15.6
   webview_flutter: ^4.13.0
+  purchases_flutter: ^9.15.1
+  purchases_ui_flutter: ^9.15.1
 
 dev_dependencies:
   flutter_test:
