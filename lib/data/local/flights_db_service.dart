@@ -8,7 +8,9 @@ import 'package:flymap/logger.dart';
 import 'package:sembast/sembast_io.dart';
 
 import 'app_database.dart';
+import 'mappers/flight_article_db_mapper.dart';
 import 'mappers/flight_db_mapper.dart';
+import 'mappers/flight_info_db_mapper.dart';
 import 'mappers/flight_map_mapper.dart';
 
 class FlightsDBService {
@@ -91,6 +93,50 @@ class FlightsDBService {
           }
         }
       }
+
+      final dynamic infoRaw = map[FlightDBKeys.flightInfo];
+      if (infoRaw is Map) {
+        final dynamic articlesRaw = infoRaw[FlightInfoDBKeys.articles];
+        if (articlesRaw is List) {
+          final appDocDir = await getApplicationDocumentsDirectory();
+          final articleRootPath = p.join(appDocDir.path, 'article_media');
+          for (final article in articlesRaw.whereType<Map>()) {
+            final pathsToDelete = <String>{};
+
+            final leadPath = article[FlightArticleDBKeys.leadImageRelativePath]
+                ?.toString();
+            if (leadPath != null && leadPath.isNotEmpty) {
+              pathsToDelete.add(leadPath);
+            }
+
+            final inlinePathsRaw =
+                article[FlightArticleDBKeys.inlineImageRelativePaths];
+            if (inlinePathsRaw is List) {
+              for (final path in inlinePathsRaw.whereType<String>()) {
+                if (path.trim().isNotEmpty) {
+                  pathsToDelete.add(path);
+                }
+              }
+            }
+
+            for (final relativePath in pathsToDelete) {
+              final imagePath = p.join(appDocDir.path, relativePath);
+              final imageFile = File(imagePath);
+              if (!imageFile.existsSync()) continue;
+              try {
+                imageFile.deleteSync();
+                _logger.log('Deleted article image: $imagePath');
+                _deleteEmptyArticleDirs(
+                  startDir: imageFile.parent,
+                  articleRootPath: articleRootPath,
+                );
+              } catch (e) {
+                _logger.error('Failed to delete article image $imagePath: $e');
+              }
+            }
+          }
+        }
+      }
     } catch (e) {
       _logger.error('Error deleting map files for flight $flight: $e');
     }
@@ -107,6 +153,31 @@ class FlightsDBService {
           _logger.error('Failed to delete sidecar ${sidecar.path}: $e');
         }
       }
+    }
+  }
+
+  void _deleteEmptyArticleDirs({
+    required Directory startDir,
+    required String articleRootPath,
+  }) {
+    var current = startDir;
+    while (true) {
+      final currentPath = current.path;
+      if (currentPath == articleRootPath ||
+          !p.isWithin(articleRootPath, currentPath)) {
+        break;
+      }
+
+      final children = current.listSync();
+      if (children.isNotEmpty) break;
+
+      try {
+        current.deleteSync();
+      } catch (_) {
+        break;
+      }
+
+      current = current.parent;
     }
   }
 }

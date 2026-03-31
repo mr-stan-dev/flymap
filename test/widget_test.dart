@@ -20,7 +20,7 @@ void main() {
     DiModule().register();
     await GetIt.I<AppDatabase>().initialize();
 
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const MyApp(showOnboarding: false));
 
     expect(find.byType(MaterialApp), findsOneWidget);
   });

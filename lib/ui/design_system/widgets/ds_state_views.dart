@@ -199,6 +199,7 @@ class ProgressStateView extends StatelessWidget {
   const ProgressStateView({
     required this.title,
     required this.progress,
+    this.showProgress = true,
     this.subtitle,
     this.progressText,
     this.secondaryLine,
@@ -209,6 +210,7 @@ class ProgressStateView extends StatelessWidget {
 
   final String title;
   final double progress;
+  final bool showProgress;
   final String? subtitle;
   final String? progressText;
   final String? secondaryLine;
@@ -251,10 +253,14 @@ class ProgressStateView extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ],
-            const SizedBox(height: DsSpacing.md),
-            LinearProgressIndicator(value: progress),
-            const SizedBox(height: DsSpacing.xs),
-            Text(label, style: Theme.of(context).textTheme.titleSmall),
+            if (showProgress) ...[
+              const SizedBox(height: DsSpacing.md),
+              LinearProgressIndicator(value: progress),
+              const SizedBox(height: DsSpacing.xs),
+              Text(label, style: Theme.of(context).textTheme.titleSmall),
+            ] else ...[
+              const SizedBox(height: DsSpacing.md),
+            ],
             if (secondaryLine != null) ...[
               const SizedBox(height: DsSpacing.xxs),
               Text(

@@ -1,5 +1,6 @@
 import 'package:flymap/data/api/flight_info_api.dart';
 import 'package:flymap/entity/flight_info.dart';
+import 'package:flymap/entity/wiki_article_candidate.dart';
 import 'package:latlong2/latlong.dart';
 
 /// Use case to fetch flight-related info (e.g., POIs) via backend Cloud Function
@@ -15,6 +16,18 @@ class GetFlightInfoUseCase {
     required List<LatLng> waypoints,
   }) async {
     return await _flightInfoApi.getFlightOverview(
+      airportDeparture,
+      airportArrival,
+      waypoints,
+    );
+  }
+
+  Future<List<WikiArticleCandidate>> getWikiArticleCandidates({
+    required String airportDeparture,
+    required String airportArrival,
+    required List<LatLng> waypoints,
+  }) async {
+    return await _flightInfoApi.getFlightWikiArticles(
       airportDeparture,
       airportArrival,
       waypoints,

@@ -5,6 +5,67 @@ import 'package:flymap/entity/flight_route.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapUtils {
+  static const _fallbackDistanceKm = 1000.0;
+  static const _baseMinMbPer1000Km = 30.0;
+  static const _baseMaxMbPer1000Km = 50.0;
+  static const _articleMb = 0.5;
+
+  static String estimatedDownloadSizeRangeLabel({
+    required FlightRoute? route,
+    required int selectedArticlesCount,
+  }) {
+    final distanceKm = (route?.distanceInKm ?? _fallbackDistanceKm).clamp(
+      1.0,
+      double.infinity,
+    );
+    final center = route == null ? null : routeCenter(route);
+    final regionMultiplier = _regionMultiplier(center);
+
+    final mapMinMb =
+        (distanceKm / 1000.0) * _baseMinMbPer1000Km * regionMultiplier;
+    final mapMaxMb =
+        (distanceKm / 1000.0) * _baseMaxMbPer1000Km * regionMultiplier;
+    final articlesMb = selectedArticlesCount * _articleMb;
+
+    final minMb = _roundUpToNext10Mb(mapMinMb + articlesMb);
+    final maxMb = _roundUpToNext10Mb(mapMaxMb + articlesMb);
+    return '${minMb.toStringAsFixed(0)}-${maxMb.toStringAsFixed(0)} MB';
+  }
+
+  static double _roundUpToNext10Mb(double valueMb) {
+    return (valueMb / 10.0).ceil() * 10.0;
+  }
+
+  static double _regionMultiplier(LatLng? center) {
+    if (center == null) return 1.0;
+
+    final lat = center.latitude;
+    final lon = center.longitude;
+
+    // Europe: typically denser vector tiles
+    if (lat >= 35 && lat <= 72 && lon >= -12 && lon <= 45) return 2.2;
+
+    // East Asia (Japan/Korea/coastal China)
+    if (lat >= 20 && lat <= 50 && lon >= 100 && lon <= 145) return 1.6;
+
+    // South Asia
+    if (lat >= 5 && lat <= 35 && lon >= 65 && lon <= 95) return 1.3;
+
+    // North America: usually lighter than Europe for this tileset
+    if (lat >= 15 && lat <= 75 && lon >= -170 && lon <= -50) return 0.6;
+
+    // South America
+    if (lat >= -55 && lat <= 15 && lon >= -85 && lon <= -35) return 0.9;
+
+    // Africa
+    if (lat >= -35 && lat <= 37 && lon >= -20 && lon <= 52) return 0.9;
+
+    // Australia / NZ region
+    if (lat >= -50 && lat <= -10 && lon >= 110 && lon <= 180) return 0.8;
+
+    return 1.0;
+  }
+
   /// Calculate appropriate zoom level based on distance in degrees
   static double calculateZoomLevel({
     required Airport departure,
@@ -62,7 +123,8 @@ class MapUtils {
   }
 
   static LatLng routeCenter(FlightRoute route) {
-    final lat = (route.departure.latLon.latitude + route.arrival.latLon.latitude) / 2;
+    final lat =
+        (route.departure.latLon.latitude + route.arrival.latLon.latitude) / 2;
 
     // Handle longitude wrapping for antimeridian crossing
     final lon = _calculateCenterLongitude(
@@ -74,10 +136,7 @@ class MapUtils {
   }
 
   /// Calculate center point between two airports, handling antimeridian crossing
-  static LatLng center({
-    required Airport departure,
-    required Airport arrival,
-  }) {
+  static LatLng center({required Airport departure, required Airport arrival}) {
     final lat = (departure.latLon.latitude + arrival.latLon.latitude) / 2;
 
     // Handle longitude wrapping for antimeridian crossing
@@ -160,7 +219,7 @@ class MapUtils {
     // Haversine formula
     final a =
         sin(deltaLat / 2) * sin(deltaLat / 2) +
-            cos(lat1Rad) * cos(lat2Rad) * sin(deltaLon / 2) * sin(deltaLon / 2);
+        cos(lat1Rad) * cos(lat2Rad) * sin(deltaLon / 2) * sin(deltaLon / 2);
 
     final c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
@@ -185,11 +244,11 @@ class MapUtils {
 
     for (int i = 0; i < polygon.length; i++) {
       if (((polygon[i].latitude > point.latitude) !=
-          (polygon[j].latitude > point.latitude)) &&
+              (polygon[j].latitude > point.latitude)) &&
           (point.longitude <
               (polygon[j].longitude - polygon[i].longitude) *
-                  (point.latitude - polygon[i].latitude) /
-                  (polygon[j].latitude - polygon[i].latitude) +
+                      (point.latitude - polygon[i].latitude) /
+                      (polygon[j].latitude - polygon[i].latitude) +
                   polygon[i].longitude)) {
         inside = !inside;
       }

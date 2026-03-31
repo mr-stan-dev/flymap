@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flymap/entity/airport.dart';
 import 'package:flymap/router/app_router.dart';
-import 'package:flymap/ui/design_system/design_system.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_download_completion.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/info/flight_info_widget.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/map/flight_map_preview_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_cubit.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
+import 'package:flymap/ui/screens/create_flight/flight_search/widgets/flight_search_by_airports_step_content.dart';
+import 'package:flymap/ui/screens/create_flight/flight_search/widgets/flight_search_by_airports_step_meta.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 
 class FlightSearchByAirports extends StatefulWidget {
@@ -40,7 +37,7 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
             previous.step != current.step;
       },
       listener: (listenerContext, state) {
-        final nextStepIndex = _stepIndex(state.step);
+        final nextStepIndex = FlightSearchStepMeta.indexForStep(state.step);
         if (nextStepIndex != _previousStepIndex) {
           setState(() {
             _stepEnterFrom = nextStepIndex > _previousStepIndex ? 1.0 : -1.0;
@@ -82,13 +79,12 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
         }
       },
       builder: (context, state) {
+        final cubit = context.read<FlightSearchScreenCubit>();
         return PopScope(
           canPop: false,
           onPopInvokedWithResult: (didPop, _) async {
             if (didPop) return;
-            final shouldPop = await context
-                .read<FlightSearchScreenCubit>()
-                .handleBackAction();
+            final shouldPop = await cubit.handleBackAction();
             if (shouldPop && context.mounted) {
               Navigator.of(context).pop();
             }
@@ -97,16 +93,9 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
             appBar: AppBar(
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: () async {
-                  final shouldPop = await context
-                      .read<FlightSearchScreenCubit>()
-                      .handleBackAction();
-                  if (shouldPop && context.mounted) {
-                    Navigator.of(context).pop();
-                  }
-                },
+                onPressed: () => _onBackPressed(context),
               ),
-              title: Text(_titleForStep(state.step)),
+              title: Text(FlightSearchStepMeta.titleForStep(state.step)),
             ),
             body: TweenAnimationBuilder<double>(
               key: ValueKey(state.step.name),
@@ -119,7 +108,31 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
                   child: child,
                 );
               },
-              child: _buildBody(context, state),
+              child: FlightSearchByAirportsStepContent(
+                state: state,
+                searchController: _searchController,
+                showDownloadSuccess: _showDownloadSuccess,
+                onSearchChanged: cubit.searchAirports,
+                onClearSearch: () {
+                  _searchController.clear();
+                  cubit.searchAirports('');
+                },
+                onToggleFavoriteForSelected:
+                    cubit.toggleFavoriteForSelectedAirport,
+                onClearSelectedAirport: () {
+                  _searchController.clear();
+                  cubit.clearSelectedAirportForCurrentStep();
+                },
+                onSelectAirport: cubit.selectAirport,
+                onToggleFavoriteForAirport: cubit.toggleFavoriteForAirport,
+                onContinueFromAirportStep: cubit.continueFromAirportStep,
+                onContinueFromMap: cubit.continueFromMap,
+                onContinueFromOverview: cubit.continueFromOverview,
+                onToggleWikiArticle: cubit.toggleWikiArticleSelection,
+                onToggleAllWikiArticles: cubit.toggleAllWikiArticleSelections,
+                onStartDownload: cubit.startDownload,
+                onCancelDownload: cubit.cancelDownload,
+              ),
             ),
           ),
         );
@@ -127,440 +140,12 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
     );
   }
 
-  Widget _buildBody(BuildContext context, FlightSearchScreenState state) {
-    if (_showDownloadSuccess) {
-      return const FlightDownloadCompletion();
+  Future<void> _onBackPressed(BuildContext context) async {
+    final shouldPop = await context
+        .read<FlightSearchScreenCubit>()
+        .handleBackAction();
+    if (shouldPop && context.mounted) {
+      Navigator.of(context).pop();
     }
-
-    if (state.isDownloading) {
-      return _buildDownloadingView(state);
-    }
-
-    switch (state.step) {
-      case CreateFlightStep.departure:
-      case CreateFlightStep.arrival:
-        return _buildAirportSelectionStep(context, state);
-      case CreateFlightStep.mapPreview:
-        return _buildMapPreviewStep(context, state);
-      case CreateFlightStep.overview:
-        return _buildOverviewStep(context, state);
-    }
-  }
-
-  Widget _buildAirportSelectionStep(
-    BuildContext context,
-    FlightSearchScreenState state,
-  ) {
-    final cubit = context.read<FlightSearchScreenCubit>();
-    final selectedAirport = state.step == CreateFlightStep.departure
-        ? state.selectedDeparture
-        : state.selectedArrival;
-    final favorites = _filterAirportsForCurrentStep(
-      state.favoriteAirports,
-      state,
-    );
-    final favoriteCodes = favorites.map(_airportCode).toSet();
-    final popular = _filterAirportsForCurrentStep(state.popularAirports, state)
-        .where((airport) => !favoriteCodes.contains(_airportCode(airport)))
-        .toList();
-    final results = _filterAirportsForCurrentStep(state.searchResults, state);
-    final showPopularAirports = state.searchQuery.trim().isEmpty;
-    final gpsActiveColor = DsSemanticColors.success(context);
-
-    return Column(
-      children: [
-        Expanded(
-          child: SafeArea(
-            bottom: false,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SearchInputField(
-                    controller: _searchController,
-                    onChanged: (value) {
-                      if (selectedAirport != null) {
-                        cubit.clearSelectedAirportForCurrentStep();
-                      }
-                      cubit.searchAirports(value);
-                    },
-                    hintText: state.step == CreateFlightStep.departure
-                        ? 'Search departure airport'
-                        : 'Search arrival airport',
-                    isSelected: selectedAirport != null,
-                    selectedBorderColor: gpsActiveColor,
-                    onClear: () {
-                      _searchController.clear();
-                      cubit.searchAirports('');
-                    },
-                    suffixActions: selectedAirport != null
-                        ? [
-                            IconButton(
-                              icon: Icon(
-                                state.selectedAirportIsFavorite
-                                    ? Icons.star
-                                    : Icons.star_border,
-                                color: state.selectedAirportIsFavorite
-                                    ? DsSemanticColors.warning(context)
-                                    : null,
-                              ),
-                              tooltip: state.selectedAirportIsFavorite
-                                  ? 'Remove favorite'
-                                  : 'Add to favorite',
-                              onPressed: cubit.toggleFavoriteForSelectedAirport,
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.close),
-                              tooltip: 'Remove selected airport',
-                              onPressed: () {
-                                _searchController.clear();
-                                cubit.clearSelectedAirportForCurrentStep();
-                              },
-                            ),
-                          ]
-                        : const [],
-                  ),
-                  const SizedBox(height: 12),
-                  if (state.isSearchLoading && selectedAirport == null)
-                    const Center(child: CircularProgressIndicator())
-                  else if (state.searchQuery.isNotEmpty &&
-                      results.isEmpty &&
-                      selectedAirport == null)
-                    _EmptySearchResults(step: state.step)
-                  else if (results.isNotEmpty && selectedAirport == null)
-                    _SearchResultList(
-                      airports: results,
-                      onSelectAirport: cubit.selectAirport,
-                    ),
-                  if (favorites.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Text(
-                      'Favorites',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _AirportChipWrap(
-                      airports: favorites,
-                      onSelectAirport: cubit.selectAirport,
-                      showFavoriteTrailingIcon: true,
-                      onToggleFavorite: cubit.toggleFavoriteForAirport,
-                    ),
-                  ],
-                  if (showPopularAirports) ...[
-                    const SizedBox(height: 16),
-                    Text(
-                      'Popular airports',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _AirportChipWrap(
-                      airports: popular,
-                      onSelectAirport: cubit.selectAirport,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ),
-        SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: PrimaryButton(
-                    onPressed: selectedAirport == null
-                        ? null
-                        : () => cubit.continueFromAirportStep(),
-                    label: 'Continue',
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMapPreviewStep(
-    BuildContext context,
-    FlightSearchScreenState state,
-  ) {
-    final route = state.flightRoute;
-    if (state.isPreviewLoading || route == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    return Column(
-      children: [
-        Expanded(
-          child: FlightMapPreviewWidget(
-            flightRoute: route,
-            flightInfo: state.flightInfo,
-          ),
-        ),
-        if (state.isTooLongFlight)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-            child: Text(
-              'Downloading routes over 5,000 km is not supported yet.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.error,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: PrimaryButton(
-                onPressed: state.canContinueFromMap
-                    ? () => context
-                          .read<FlightSearchScreenCubit>()
-                          .continueFromMap()
-                    : null,
-                label: 'Continue',
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOverviewStep(
-    BuildContext context,
-    FlightSearchScreenState state,
-  ) {
-    final route = state.flightRoute;
-    if (route == null) {
-      return const Center(child: Text('Route is not ready yet.'));
-    }
-
-    final isDownloadEnabled = !state.isTooLongFlight;
-    final buttonText = state.isTooLongFlight
-        ? 'Too long flight (> 5000km)'
-        : 'Download map';
-
-    return Column(
-      children: [
-        Expanded(
-          child: SafeArea(
-            top: false,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  FlightInfoWidget(
-                    route: route,
-                    info: state.flightInfo,
-                    isOverviewLoading: state.isOverviewLoading,
-                    overviewErrorMessage: state.isOverviewLoading
-                        ? null
-                        : state.errorMessage,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: PrimaryButton(
-                onPressed: isDownloadEnabled
-                    ? () => context
-                          .read<FlightSearchScreenCubit>()
-                          .startDownload()
-                    : null,
-                label: buttonText,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDownloadingView(FlightSearchScreenState state) {
-    return ProgressStateView(
-      title: 'Downloading offline map...',
-      progress: state.downloadProgress,
-      secondaryLine:
-          'Downloaded: ${_formatDownloadedMb(state.downloadedBytes)}',
-      trailingAction: SecondaryButton(
-        onPressed: () =>
-            context.read<FlightSearchScreenCubit>().cancelDownload(),
-        leadingIcon: Icons.close_rounded,
-        label: 'Cancel download',
-      ),
-    );
-  }
-
-  String _titleForStep(CreateFlightStep step) {
-    switch (step) {
-      case CreateFlightStep.departure:
-        return 'Choose departure airport';
-      case CreateFlightStep.arrival:
-        return 'Choose arrival airport';
-      case CreateFlightStep.mapPreview:
-        return 'Map preview';
-      case CreateFlightStep.overview:
-        return 'Route overview';
-    }
-  }
-
-  int _stepIndex(CreateFlightStep step) {
-    switch (step) {
-      case CreateFlightStep.departure:
-        return 0;
-      case CreateFlightStep.arrival:
-        return 1;
-      case CreateFlightStep.mapPreview:
-        return 2;
-      case CreateFlightStep.overview:
-        return 3;
-    }
-  }
-
-  String _formatDownloadedMb(int bytes) {
-    final mb = bytes / (1024 * 1024);
-    return '${mb.toStringAsFixed(1)} MB';
-  }
-
-  List<Airport> _filterAirportsForCurrentStep(
-    List<Airport> airports,
-    FlightSearchScreenState state,
-  ) {
-    if (state.step != CreateFlightStep.arrival) return airports;
-    final departureCode = _airportCode(state.selectedDeparture);
-    if (departureCode.isEmpty) return airports;
-    return airports
-        .where((airport) => _airportCode(airport) != departureCode)
-        .toList();
-  }
-
-  String _airportCode(Airport? airport) {
-    if (airport == null) return '';
-    final primary = airport.primaryCode.trim().toUpperCase();
-    if (primary.isNotEmpty) return primary;
-    return airport.displayCode.trim().toUpperCase();
-  }
-}
-
-class _AirportChipWrap extends StatelessWidget {
-  const _AirportChipWrap({
-    required this.airports,
-    required this.onSelectAirport,
-    this.showFavoriteTrailingIcon = false,
-    this.onToggleFavorite,
-  });
-
-  final List<Airport> airports;
-  final Future<void> Function(Airport airport) onSelectAirport;
-  final bool showFavoriteTrailingIcon;
-  final Future<void> Function(Airport airport)? onToggleFavorite;
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: airports.map((airport) {
-        return SelectionChip(
-          label: '${airport.displayCode} · ${airport.city}',
-          onPressed: () => onSelectAirport(airport),
-          onDeleted: showFavoriteTrailingIcon && onToggleFavorite != null
-              ? () => onToggleFavorite!(airport)
-              : null,
-          deleteIcon: showFavoriteTrailingIcon
-              ? Icon(
-                  Icons.star,
-                  color: DsSemanticColors.warning(context),
-                  size: 18,
-                )
-              : null,
-          deleteTooltip: showFavoriteTrailingIcon
-              ? 'Remove from favorites'
-              : null,
-        );
-      }).toList(),
-    );
-  }
-}
-
-class _SearchResultList extends StatelessWidget {
-  const _SearchResultList({
-    required this.airports,
-    required this.onSelectAirport,
-  });
-
-  final List<Airport> airports;
-  final Future<void> Function(Airport airport) onSelectAirport;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: airports.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
-      itemBuilder: (context, index) {
-        final airport = airports[index];
-        return ListTile(
-          onTap: () => onSelectAirport(airport),
-          dense: true,
-          visualDensity: const VisualDensity(vertical: -2),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-          title: Text(
-            '${airport.name} (${airport.displayCode})',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _EmptySearchResults extends StatelessWidget {
-  const _EmptySearchResults({required this.step});
-
-  final CreateFlightStep step;
-
-  @override
-  Widget build(BuildContext context) {
-    final text = step == CreateFlightStep.departure
-        ? 'No departure airports found.'
-        : 'No arrival airports found.';
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-      ),
-    );
   }
 }

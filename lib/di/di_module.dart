@@ -7,10 +7,13 @@ import 'package:flymap/data/local/mappers/flight_db_mapper.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/data/route/great_circle_route_provider.dart';
+import 'package:flymap/data/wiki/wikipedia_article_client.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
+import 'package:flymap/usecase/build_wikipedia_candidates_use_case.dart';
 import 'package:flymap/usecase/download_map_use_case.dart';
+import 'package:flymap/usecase/download_wikipedia_articles_use_case.dart';
 import 'package:flymap/usecase/get_flight_info_use_case.dart';
 import 'package:get_it/get_it.dart';
 
@@ -45,6 +48,15 @@ class DiModule {
         service: GetIt.I.get(),
         connectivity: GetIt.I.get(),
       ),
+    );
+    i.registerLazySingleton<WikipediaArticleClient>(
+      () => WikipediaArticleClient(),
+    );
+    i.registerLazySingleton<BuildWikipediaCandidatesUseCase>(
+      () => const BuildWikipediaCandidatesUseCase(),
+    );
+    i.registerLazySingleton<DownloadWikipediaArticlesUseCase>(
+      () => DownloadWikipediaArticlesUseCase(articleClient: GetIt.I.get()),
     );
     i.registerLazySingleton<GetFlightInfoUseCase>(
       () => GetFlightInfoUseCase(flightInfoApi: GetIt.I.get()),

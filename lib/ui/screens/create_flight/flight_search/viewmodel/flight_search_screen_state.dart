@@ -2,11 +2,19 @@ import 'package:equatable/equatable.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/entity/wiki_article_candidate.dart';
 
-enum CreateFlightStep { departure, arrival, mapPreview, overview }
+enum CreateFlightStep {
+  departure,
+  arrival,
+  mapPreview,
+  overview,
+  wikipediaArticles,
+}
 
 enum DownloadStage {
   idle,
+  downloadingArticles,
   initializing,
   computingTiles,
   startingWorkers,
@@ -30,6 +38,9 @@ class FlightSearchScreenState extends Equatable {
     required this.selectedAirportIsFavorite,
     required this.flightRoute,
     required this.flightInfo,
+    required this.articleCandidates,
+    required this.selectedArticleUrls,
+    required this.isWikiSuggestionsLoading,
     required this.isPreviewLoading,
     required this.isOverviewLoading,
     required this.isTooLongFlight,
@@ -37,6 +48,9 @@ class FlightSearchScreenState extends Equatable {
     required this.downloadProgress,
     required this.downloadedBytes,
     required this.downloadStage,
+    required this.articleDownloadCompleted,
+    required this.articleDownloadTotal,
+    required this.articleDownloadFailed,
     required this.downloadTileCount,
     required this.downloadWorkerCount,
     required this.downloadDone,
@@ -57,6 +71,9 @@ class FlightSearchScreenState extends Equatable {
       selectedAirportIsFavorite: false,
       flightRoute: null,
       flightInfo: FlightInfo.empty,
+      articleCandidates: [],
+      selectedArticleUrls: [],
+      isWikiSuggestionsLoading: false,
       isPreviewLoading: false,
       isOverviewLoading: false,
       isTooLongFlight: false,
@@ -64,6 +81,9 @@ class FlightSearchScreenState extends Equatable {
       downloadProgress: 0.0,
       downloadedBytes: 0,
       downloadStage: DownloadStage.idle,
+      articleDownloadCompleted: 0,
+      articleDownloadTotal: 0,
+      articleDownloadFailed: 0,
       downloadTileCount: null,
       downloadWorkerCount: null,
       downloadDone: false,
@@ -83,6 +103,9 @@ class FlightSearchScreenState extends Equatable {
   final bool selectedAirportIsFavorite;
   final FlightRoute? flightRoute;
   final FlightInfo flightInfo;
+  final List<WikiArticleCandidate> articleCandidates;
+  final List<String> selectedArticleUrls;
+  final bool isWikiSuggestionsLoading;
   final bool isPreviewLoading;
   final bool isOverviewLoading;
   final bool isTooLongFlight;
@@ -90,6 +113,9 @@ class FlightSearchScreenState extends Equatable {
   final double downloadProgress;
   final int downloadedBytes;
   final DownloadStage downloadStage;
+  final int articleDownloadCompleted;
+  final int articleDownloadTotal;
+  final int articleDownloadFailed;
   final int? downloadTileCount;
   final int? downloadWorkerCount;
   final bool downloadDone;
@@ -117,6 +143,10 @@ class FlightSearchScreenState extends Equatable {
     FlightRoute? flightRoute,
     bool clearFlightRoute = false,
     FlightInfo? flightInfo,
+    List<WikiArticleCandidate>? articleCandidates,
+    List<String>? selectedArticleUrls,
+    bool clearSelectedArticleUrls = false,
+    bool? isWikiSuggestionsLoading,
     bool? isPreviewLoading,
     bool? isOverviewLoading,
     bool? isTooLongFlight,
@@ -124,6 +154,9 @@ class FlightSearchScreenState extends Equatable {
     double? downloadProgress,
     int? downloadedBytes,
     DownloadStage? downloadStage,
+    int? articleDownloadCompleted,
+    int? articleDownloadTotal,
+    int? articleDownloadFailed,
     int? downloadTileCount,
     bool clearDownloadTileCount = false,
     int? downloadWorkerCount,
@@ -151,6 +184,12 @@ class FlightSearchScreenState extends Equatable {
           selectedAirportIsFavorite ?? this.selectedAirportIsFavorite,
       flightRoute: clearFlightRoute ? null : flightRoute ?? this.flightRoute,
       flightInfo: flightInfo ?? this.flightInfo,
+      articleCandidates: articleCandidates ?? this.articleCandidates,
+      selectedArticleUrls: clearSelectedArticleUrls
+          ? const []
+          : selectedArticleUrls ?? this.selectedArticleUrls,
+      isWikiSuggestionsLoading:
+          isWikiSuggestionsLoading ?? this.isWikiSuggestionsLoading,
       isPreviewLoading: isPreviewLoading ?? this.isPreviewLoading,
       isOverviewLoading: isOverviewLoading ?? this.isOverviewLoading,
       isTooLongFlight: isTooLongFlight ?? this.isTooLongFlight,
@@ -158,6 +197,11 @@ class FlightSearchScreenState extends Equatable {
       downloadProgress: downloadProgress ?? this.downloadProgress,
       downloadedBytes: downloadedBytes ?? this.downloadedBytes,
       downloadStage: downloadStage ?? this.downloadStage,
+      articleDownloadCompleted:
+          articleDownloadCompleted ?? this.articleDownloadCompleted,
+      articleDownloadTotal: articleDownloadTotal ?? this.articleDownloadTotal,
+      articleDownloadFailed:
+          articleDownloadFailed ?? this.articleDownloadFailed,
       downloadTileCount: clearDownloadTileCount
           ? null
           : downloadTileCount ?? this.downloadTileCount,
@@ -187,6 +231,9 @@ class FlightSearchScreenState extends Equatable {
     selectedAirportIsFavorite,
     flightRoute,
     flightInfo,
+    articleCandidates,
+    selectedArticleUrls,
+    isWikiSuggestionsLoading,
     isPreviewLoading,
     isOverviewLoading,
     isTooLongFlight,
@@ -194,6 +241,9 @@ class FlightSearchScreenState extends Equatable {
     downloadProgress,
     downloadedBytes,
     downloadStage,
+    articleDownloadCompleted,
+    articleDownloadTotal,
+    articleDownloadFailed,
     downloadTileCount,
     downloadWorkerCount,
     downloadDone,

@@ -4,13 +4,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/entity/airport.dart';
+import 'package:flymap/entity/flight_article.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/entity/wiki_article_candidate.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/widgets/popular_flights.dart';
+import 'package:flymap/usecase/build_wikipedia_candidates_use_case.dart';
 import 'package:flymap/usecase/download_map_use_case.dart';
+import 'package:flymap/usecase/download_wikipedia_articles_use_case.dart';
 import 'package:flymap/usecase/get_flight_info_use_case.dart';
 
 class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
@@ -19,11 +23,15 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     required FavoriteAirportsRepository favoritesRepository,
     required FlightRouteProvider routeProvider,
     required DownloadMapUseCase downloadMapUseCase,
+    required BuildWikipediaCandidatesUseCase buildWikipediaCandidatesUseCase,
+    required DownloadWikipediaArticlesUseCase downloadWikipediaArticlesUseCase,
     required GetFlightInfoUseCase getFlightInfoUseCase,
   }) : _airportsDb = airportsDb,
        _favoritesRepository = favoritesRepository,
        _routeProvider = routeProvider,
        _downloadMapUseCase = downloadMapUseCase,
+       _buildWikipediaCandidatesUseCase = buildWikipediaCandidatesUseCase,
+       _downloadWikipediaArticlesUseCase = downloadWikipediaArticlesUseCase,
        _getFlightInfoUseCase = getFlightInfoUseCase,
        super(FlightSearchScreenState.initial()) {
     _initialize();
@@ -34,9 +42,12 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
   final FavoriteAirportsRepository _favoritesRepository;
   final FlightRouteProvider _routeProvider;
   final DownloadMapUseCase _downloadMapUseCase;
+  final BuildWikipediaCandidatesUseCase _buildWikipediaCandidatesUseCase;
+  final DownloadWikipediaArticlesUseCase _downloadWikipediaArticlesUseCase;
   final GetFlightInfoUseCase _getFlightInfoUseCase;
 
   StreamSubscription? _downloadSubscription;
+  bool _downloadCancelled = false;
 
   static const _tooLongRouteMessage =
       'Downloading routes over 5,000 km is not supported yet.';
@@ -126,6 +137,9 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             selectedAirportIsFavorite: isFavorite,
             clearFlightRoute: true,
             flightInfo: FlightInfo.empty,
+            articleCandidates: const [],
+            clearSelectedArticleUrls: true,
+            isWikiSuggestionsLoading: false,
             isPreviewLoading: false,
             isOverviewLoading: false,
             isTooLongFlight: false,
@@ -144,6 +158,9 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             selectedAirportIsFavorite: isFavorite,
             clearFlightRoute: true,
             flightInfo: FlightInfo.empty,
+            articleCandidates: const [],
+            clearSelectedArticleUrls: true,
+            isWikiSuggestionsLoading: false,
             isPreviewLoading: false,
             isOverviewLoading: false,
             isTooLongFlight: false,
@@ -154,6 +171,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         break;
       case CreateFlightStep.mapPreview:
       case CreateFlightStep.overview:
+      case CreateFlightStep.wikipediaArticles:
         break;
     }
   }
@@ -162,7 +180,9 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     final airport = switch (state.step) {
       CreateFlightStep.departure => state.selectedDeparture,
       CreateFlightStep.arrival => state.selectedArrival,
-      CreateFlightStep.mapPreview || CreateFlightStep.overview => null,
+      CreateFlightStep.mapPreview ||
+      CreateFlightStep.overview ||
+      CreateFlightStep.wikipediaArticles => null,
     };
     if (airport == null) return;
 
@@ -186,7 +206,9 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     final selected = switch (state.step) {
       CreateFlightStep.departure => state.selectedDeparture,
       CreateFlightStep.arrival => state.selectedArrival,
-      CreateFlightStep.mapPreview || CreateFlightStep.overview => null,
+      CreateFlightStep.mapPreview ||
+      CreateFlightStep.overview ||
+      CreateFlightStep.wikipediaArticles => null,
     };
 
     if (_airportCode(selected) == code) {
@@ -222,6 +244,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         break;
       case CreateFlightStep.mapPreview:
       case CreateFlightStep.overview:
+      case CreateFlightStep.wikipediaArticles:
         break;
     }
   }
@@ -242,6 +265,9 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             clearSelectedArrival: true,
             clearFlightRoute: true,
             flightInfo: FlightInfo.empty,
+            articleCandidates: const [],
+            clearSelectedArticleUrls: true,
+            isWikiSuggestionsLoading: false,
             isPreviewLoading: false,
             isOverviewLoading: false,
             isTooLongFlight: false,
@@ -263,6 +289,9 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             selectedAirportIsFavorite: false,
             clearFlightRoute: true,
             flightInfo: FlightInfo.empty,
+            articleCandidates: const [],
+            clearSelectedArticleUrls: true,
+            isWikiSuggestionsLoading: false,
             isPreviewLoading: true,
             isOverviewLoading: false,
             isTooLongFlight: false,
@@ -274,6 +303,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         break;
       case CreateFlightStep.mapPreview:
       case CreateFlightStep.overview:
+      case CreateFlightStep.wikipediaArticles:
         break;
     }
   }
@@ -289,18 +319,76 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     );
   }
 
+  void continueFromOverview() {
+    if (state.flightRoute == null || state.isTooLongFlight) return;
+    emit(
+      state.copyWith(
+        step: CreateFlightStep.wikipediaArticles,
+        clearErrorMessage: true,
+        clearDownloadErrorMessage: true,
+      ),
+    );
+  }
+
+  void toggleWikiArticleSelection(String url) {
+    if (state.step != CreateFlightStep.wikipediaArticles) return;
+    if (!state.articleCandidates.any((candidate) => candidate.url == url)) {
+      return;
+    }
+
+    final current = state.selectedArticleUrls.toList();
+    final currentSet = current.toSet();
+    if (currentSet.contains(url)) {
+      current.removeWhere((item) => item == url);
+      emit(
+        state.copyWith(selectedArticleUrls: current, clearErrorMessage: true),
+      );
+      return;
+    }
+
+    current.add(url);
+    emit(state.copyWith(selectedArticleUrls: current, clearErrorMessage: true));
+  }
+
+  void toggleAllWikiArticleSelections() {
+    if (state.step != CreateFlightStep.wikipediaArticles) return;
+    final candidateUrls = state.articleCandidates.map((e) => e.url).toList();
+    if (candidateUrls.isEmpty) return;
+
+    final selectedSet = state.selectedArticleUrls.toSet();
+    final allSelected = candidateUrls.every(selectedSet.contains);
+
+    emit(
+      state.copyWith(
+        selectedArticleUrls: allSelected ? const [] : candidateUrls,
+        clearErrorMessage: true,
+      ),
+    );
+  }
+
   Future<void> startDownload() async {
     if (state.isDownloading) return;
     final route = state.flightRoute;
     if (route == null || state.isTooLongFlight) return;
 
-    _downloadSubscription?.cancel();
+    _downloadCancelled = false;
+    await _downloadSubscription?.cancel();
+
+    final selectedUrls = state.selectedArticleUrls.toList();
+    final hasArticlePhase = selectedUrls.isNotEmpty;
+    final baseInfo = state.flightInfo;
+
     emit(
       state.copyWith(
         isDownloading: true,
         downloadProgress: 0.0,
         downloadedBytes: 0,
-        downloadStage: DownloadStage.initializing,
+        downloadStage: hasArticlePhase
+            ? DownloadStage.downloadingArticles
+            : DownloadStage.initializing,
+        articleDownloadCompleted: 0,
+        articleDownloadTotal: selectedUrls.length,
+        articleDownloadFailed: 0,
         clearDownloadTileCount: true,
         clearDownloadWorkerCount: true,
         downloadDone: false,
@@ -309,15 +397,73 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
       ),
     );
 
+    List<FlightArticle> downloadedArticles = const [];
+    if (hasArticlePhase) {
+      try {
+        final result = await _downloadWikipediaArticlesUseCase.call(
+          bundleId: _articleBundleId(route),
+          articleUrls: selectedUrls,
+          onProgress: (progress) {
+            if (_downloadCancelled || isClosed) return;
+            emit(
+              state.copyWith(
+                isDownloading: true,
+                downloadStage: DownloadStage.downloadingArticles,
+                articleDownloadCompleted: progress.completed,
+                articleDownloadTotal: progress.total,
+                articleDownloadFailed: progress.failed,
+                downloadProgress: 0.0,
+                downloadDone: false,
+              ),
+            );
+          },
+        );
+
+        if (_downloadCancelled || isClosed || result.cancelled) return;
+
+        downloadedArticles = result.articles;
+        emit(
+          state.copyWith(
+            isDownloading: true,
+            downloadStage: DownloadStage.initializing,
+            articleDownloadCompleted: selectedUrls.length,
+            articleDownloadTotal: selectedUrls.length,
+            articleDownloadFailed: result.failedCount,
+            downloadProgress: 0.0,
+          ),
+        );
+      } catch (e) {
+        _logger.error(
+          'Article download failed; continuing with map-only download: $e',
+        );
+        if (_downloadCancelled || isClosed) return;
+        emit(
+          state.copyWith(
+            isDownloading: true,
+            downloadStage: DownloadStage.initializing,
+            articleDownloadCompleted: selectedUrls.length,
+            articleDownloadTotal: selectedUrls.length,
+            articleDownloadFailed: selectedUrls.length,
+            downloadProgress: 0.0,
+            errorMessage: 'Some articles failed. Continuing with map download.',
+          ),
+        );
+      }
+    }
+
+    if (_downloadCancelled || isClosed) return;
+
+    final infoForSave = baseInfo.copyWith(articles: downloadedArticles);
     _downloadSubscription = _downloadMapUseCase
-        .call(flightRoute: route, flightInfo: state.flightInfo)
+        .call(flightRoute: route, flightInfo: infoForSave)
         .listen((event) {
+          if (_downloadCancelled || isClosed) return;
           switch (event) {
             case DownloadMapProgress():
               emit(
                 state.copyWith(
                   isDownloading: true,
-                  downloadProgress: event.progress,
+                  downloadProgress: event.progress.clamp(0.0, 1.0),
                   downloadedBytes: event.downloadedBytes,
                   downloadStage: DownloadStage.downloading,
                   downloadDone: false,
@@ -349,9 +495,9 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
               emit(
                 state.copyWith(
                   isDownloading: true,
-                  downloadProgress: 0.0,
                   downloadedBytes: 0,
                   downloadStage: DownloadStage.initializing,
+                  downloadProgress: 0.0,
                   downloadDone: false,
                   clearDownloadTileCount: true,
                   clearDownloadWorkerCount: true,
@@ -399,12 +545,17 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
 
   void cancelDownload() {
     if (!state.isDownloading) return;
+    _downloadCancelled = true;
+    _downloadWikipediaArticlesUseCase.cancel();
     _downloadMapUseCase.cancel();
     _downloadSubscription?.cancel();
     emit(
       state.copyWith(
         isDownloading: false,
+        downloadProgress: 0.0,
         downloadStage: DownloadStage.idle,
+        clearDownloadTileCount: true,
+        clearDownloadWorkerCount: true,
         clearErrorMessage: true,
         clearDownloadErrorMessage: true,
       ),
@@ -459,6 +610,15 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
           ),
         );
         return false;
+      case CreateFlightStep.wikipediaArticles:
+        emit(
+          state.copyWith(
+            step: CreateFlightStep.overview,
+            clearErrorMessage: true,
+            clearDownloadErrorMessage: true,
+          ),
+        );
+        return false;
     }
   }
 
@@ -473,15 +633,19 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         arrival: arrival,
       );
       final isTooLong = route.distanceInKm > 5000.0;
+      final info = isTooLong
+          ? const FlightInfo(_tooLongRouteMessage, [])
+          : FlightInfo.empty;
 
       emit(
         state.copyWith(
           flightRoute: route,
           isPreviewLoading: false,
           isTooLongFlight: isTooLong,
-          flightInfo: isTooLong
-              ? const FlightInfo(_tooLongRouteMessage, [])
-              : FlightInfo.empty,
+          flightInfo: info,
+          articleCandidates: const [],
+          clearSelectedArticleUrls: true,
+          isWikiSuggestionsLoading: !isTooLong,
           isOverviewLoading: !isTooLong,
         ),
       );
@@ -494,6 +658,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
       emit(
         state.copyWith(
           isPreviewLoading: false,
+          isWikiSuggestionsLoading: false,
           isOverviewLoading: false,
           errorMessage: 'Failed to build route preview. Please try again.',
         ),
@@ -514,17 +679,96 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         return;
       }
 
-      emit(state.copyWith(flightInfo: info, isOverviewLoading: false));
+      final updatedCandidates = _safeBuildArticleCandidates(info: info);
+      _logger.log(
+        'Local wiki candidates from overview=${updatedCandidates.length}',
+      );
+      emit(
+        state.copyWith(
+          flightInfo: info,
+          isOverviewLoading: false,
+          isWikiSuggestionsLoading: true,
+        ),
+      );
     } catch (e) {
       _logger.error('Failed to prefetch route overview: $e');
       emit(
         state.copyWith(
           isOverviewLoading: false,
+          isWikiSuggestionsLoading: false,
           errorMessage:
               'Could not load route overview. You can still continue.',
         ),
       );
+      return;
     }
+
+    try {
+      final suggestedCandidates = await _getFlightInfoUseCase
+          .getWikiArticleCandidates(
+            airportArrival: route.arrival.name,
+            airportDeparture: route.departure.name,
+            waypoints: route.waypoints,
+          );
+      _logger.log(
+        'Backend wiki candidates received=${suggestedCandidates.length}',
+      );
+      if (suggestedCandidates.isNotEmpty) {
+        final sample = suggestedCandidates.take(3).map((e) => e.url).join(', ');
+        _logger.log('Backend wiki sample=[$sample]');
+      }
+
+      final routeAfterWikiCall = state.flightRoute;
+      if (routeAfterWikiCall == null ||
+          routeAfterWikiCall.routeCode != route.routeCode) {
+        _logger.log(
+          'Skip applying backend wiki candidates due to route mismatch',
+        );
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          articleCandidates: suggestedCandidates,
+          selectedArticleUrls: _retainSelectedArticleUrls(
+            selectedUrls: state.selectedArticleUrls,
+            candidates: suggestedCandidates,
+          ),
+          isWikiSuggestionsLoading: false,
+        ),
+      );
+      _logger.log(
+        'Applied backend wiki candidates to state: ${suggestedCandidates.length}',
+      );
+    } catch (e) {
+      _logger.error('Failed to fetch wiki article suggestions: $e');
+      emit(state.copyWith(isWikiSuggestionsLoading: false));
+    }
+  }
+
+  List<WikiArticleCandidate> _buildArticleCandidates({
+    required FlightInfo info,
+  }) {
+    return _buildWikipediaCandidatesUseCase.call(flightInfo: info);
+  }
+
+  List<WikiArticleCandidate> _safeBuildArticleCandidates({
+    required FlightInfo info,
+  }) {
+    try {
+      return _buildArticleCandidates(info: info);
+    } catch (e) {
+      _logger.error('Failed to build article candidates: $e');
+      return const [];
+    }
+  }
+
+  List<String> _retainSelectedArticleUrls({
+    required List<String> selectedUrls,
+    required List<WikiArticleCandidate> candidates,
+  }) {
+    final candidateUrls = candidates.map((candidate) => candidate.url).toSet();
+    return selectedUrls.where(candidateUrls.contains).toList();
   }
 
   List<Airport> _applyStepAirportFilter(List<Airport> airports) {
@@ -587,8 +831,13 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
   String _airportSearchLabel(Airport airport) =>
       '${airport.name} (${airport.displayCode})';
 
+  String _articleBundleId(FlightRoute route) =>
+      '${route.routeCode}_${route.departure.displayCode}_${route.arrival.displayCode}';
+
   @override
   Future<void> close() {
+    _downloadCancelled = true;
+    _downloadWikipediaArticlesUseCase.cancel();
     _downloadMapUseCase.cancel();
     _downloadSubscription?.cancel();
     return super.close();
