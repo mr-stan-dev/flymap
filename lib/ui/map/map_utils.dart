@@ -2,30 +2,32 @@ import 'dart:math';
 
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/map_download_config.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapUtils {
-  static const _fallbackDistanceKm = 1000.0;
-  static const _baseMinMbPer1000Km = 30.0;
-  static const _baseMaxMbPer1000Km = 50.0;
-  static const _articleMb = 0.5;
-
   static String estimatedDownloadSizeRangeLabel({
     required FlightRoute? route,
     required int selectedArticlesCount,
   }) {
-    final distanceKm = (route?.distanceInKm ?? _fallbackDistanceKm).clamp(
-      1.0,
-      double.infinity,
-    );
+    final distanceKm =
+        (route?.distanceInKm ?? MapDownloadConfig.fallbackDistanceKm).clamp(
+          1.0,
+          double.infinity,
+        );
     final center = route == null ? null : routeCenter(route);
     final regionMultiplier = _regionMultiplier(center);
 
     final mapMinMb =
-        (distanceKm / 1000.0) * _baseMinMbPer1000Km * regionMultiplier;
+        (distanceKm / 1000.0) *
+        MapDownloadConfig.estimatedMinMbPer1000Km *
+        regionMultiplier;
     final mapMaxMb =
-        (distanceKm / 1000.0) * _baseMaxMbPer1000Km * regionMultiplier;
-    final articlesMb = selectedArticlesCount * _articleMb;
+        (distanceKm / 1000.0) *
+        MapDownloadConfig.estimatedMaxMbPer1000Km *
+        regionMultiplier;
+    final articlesMb =
+        selectedArticlesCount * MapDownloadConfig.estimatedArticleMb;
 
     final minMb = _roundUpToNext10Mb(mapMinMb + articlesMb);
     final maxMb = _roundUpToNext10Mb(mapMaxMb + articlesMb);

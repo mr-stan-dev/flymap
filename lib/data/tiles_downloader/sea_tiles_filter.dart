@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flymap/data/land_mask_provider.dart';
+import 'package:flymap/map_download_config.dart';
 
 import 'tile_utils.dart';
 
@@ -9,8 +10,10 @@ class SeaTilesFilter {
   final LandMaskProvider landMaskProvider;
   final int minZoomToFilter;
 
-  SeaTilesFilter({LandMaskProvider? landMaskProvider, this.minZoomToFilter = 6})
-    : landMaskProvider = landMaskProvider ?? LandMaskProvider();
+  SeaTilesFilter({
+    LandMaskProvider? landMaskProvider,
+    this.minZoomToFilter = MapDownloadConfig.seaFilterMinZoom,
+  }) : landMaskProvider = landMaskProvider ?? LandMaskProvider();
 
   /// Returns true if the tile is sea-only (no land present)
   bool isSeaTile(MapTile tile) {

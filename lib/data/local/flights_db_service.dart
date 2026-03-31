@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/logger.dart';
+import 'package:flymap/map_download_config.dart';
 import 'package:sembast/sembast_io.dart';
 
 import 'app_database.dart';
@@ -78,7 +79,11 @@ class FlightsDBService {
           if (storedPath != null && storedPath.isNotEmpty) {
             // DB stores only the filename; construct full path
             final fileName = p.basename(storedPath);
-            final filePath = p.join(appDir.path, 'mbtiles', fileName);
+            final filePath = p.join(
+              appDir.path,
+              MapDownloadConfig.mbtilesDirectoryName,
+              fileName,
+            );
             _logger.log('Deleting map file: $filePath');
             final f = File(filePath);
             if (f.existsSync()) {

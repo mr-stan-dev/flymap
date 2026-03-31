@@ -9,6 +9,7 @@ import 'package:flymap/data/local/mappers/flight_map_mapper.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/gps_data.dart';
 import 'package:flymap/logger.dart';
+import 'package:flymap/map_download_config.dart';
 import 'package:flymap/ui/map/layers/flight_route_map_layers.dart';
 import 'package:flymap/ui/map/layers/user_layer.dart';
 import 'package:flymap/ui/map/map_utils.dart';
@@ -80,7 +81,11 @@ class _FlightMapState extends State<FlightMap> {
     // iOS container UUID staleness)
     final fileName = p.basename(storedPath);
     final appDir = await getApplicationCacheDirectory();
-    final resolvedPath = p.join(appDir.path, 'mbtiles', fileName);
+    final resolvedPath = p.join(
+      appDir.path,
+      MapDownloadConfig.mbtilesDirectoryName,
+      fileName,
+    );
     final file = File(resolvedPath);
 
     if (!await file.exists()) {

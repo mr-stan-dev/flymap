@@ -10,6 +10,7 @@ import 'package:flymap/data/tiles_downloader/tile_utils.dart';
 import 'package:flymap/data/tiles_downloader/vector_tiles_db.dart';
 import 'package:flymap/data/tiles_downloader/vector_tiles_worker.dart';
 import 'package:flymap/logger.dart';
+import 'package:flymap/map_download_config.dart';
 import 'package:flymap/usecase/download_map_use_case.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
 import 'package:path/path.dart' as p;
@@ -27,12 +28,8 @@ class VectorTilesDownloader {
     required this.polygon,
     required this.minZoom,
     required this.maxZoom,
-    this.isolatesCount = 6,
+    this.isolatesCount = MapDownloadConfig.defaultWorkerCount,
   });
-
-  // TODO: Make 20260304_001001_pt part configurable
-  static const _urlTemplate =
-      'https://tiles.openfreemap.org/planet/20260304_001001_pt/{z}/{x}/{y}.pbf';
 
   final List<Isolate> _isolates = [];
   ReceivePort? _receivePort;
@@ -91,7 +88,10 @@ class VectorTilesDownloader {
 
       // Get proper directory path
       final appDir = await getApplicationCacheDirectory();
-      final targetDirPath = p.join(appDir.path, 'mbtiles');
+      final targetDirPath = p.join(
+        appDir.path,
+        MapDownloadConfig.mbtilesDirectoryName,
+      );
 
       final mbtilesPath = p.join(targetDirPath, '$fileName.mbtiles');
       _logger.log('MBTiles file: $mbtilesPath');
@@ -125,7 +125,9 @@ class VectorTilesDownloader {
       }
 
       // Filter out sea tiles for zoom >= 6
-      final seaFilter = SeaTilesFilter(minZoomToFilter: 6);
+      final seaFilter = SeaTilesFilter(
+        minZoomToFilter: MapDownloadConfig.seaFilterMinZoom,
+      );
       final filteredTiles = seaFilter.filterTiles(allTiles);
       final skipped = allTiles.length - filteredTiles.length;
       _logger.log(
@@ -276,7 +278,11 @@ class VectorTilesDownloader {
         for (final chunk in chunks) {
           final iso = await Isolate.spawn<WorkerInit>(
             downloadWorker,
-            WorkerInit(chunk, _urlTemplate, receivePort.sendPort),
+            WorkerInit(
+              chunk,
+              MapDownloadConfig.tileUrlTemplate,
+              receivePort.sendPort,
+            ),
           );
           _isolates.add(iso);
         }

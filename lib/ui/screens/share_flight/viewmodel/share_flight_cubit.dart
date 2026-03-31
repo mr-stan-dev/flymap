@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/mappers/flight_map_mapper.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/logger.dart';
+import 'package:flymap/map_download_config.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -42,7 +43,11 @@ class ShareFlightCubit extends Cubit<ShareFlightState> {
       // DB path stores filename only to avoid stale iOS container paths.
       final fileName = p.basename(storedPath);
       final appDir = await getApplicationCacheDirectory();
-      final resolvedPath = p.join(appDir.path, 'mbtiles', fileName);
+      final resolvedPath = p.join(
+        appDir.path,
+        MapDownloadConfig.mbtilesDirectoryName,
+        fileName,
+      );
       final file = File(resolvedPath);
       if (!await file.exists()) {
         _logger.error('MBTiles file not found for share map: $resolvedPath');

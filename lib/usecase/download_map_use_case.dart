@@ -10,6 +10,7 @@ import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_map.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/map_download_config.dart';
 
 import '../logger.dart';
 
@@ -117,12 +118,12 @@ class DownloadMapUseCase {
       // Create and start the vector tiles downloader
       final downloader = VectorTilesDownloader(
         polygon: flightRoute.corridor,
-        minZoom: 0,
-        maxZoom: 10,
+        minZoom: MapDownloadConfig.minDownloadZoom,
+        maxZoom: MapDownloadConfig.maxDownloadZoom,
       );
       _currentDownloader = downloader;
 
-      final mapLayer = 'ofm_vector'; // openfreemap_vector
+      final mapLayer = MapDownloadConfig.mapLayerId;
       final fileName = '${flightRoute.routeCode}_$mapLayer';
       final id = fileName; // Same key for DB record and MBTiles file
 

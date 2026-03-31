@@ -4,21 +4,20 @@ import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/data/route/route_corridor_provider.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/map_download_config.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:latlong2/latlong.dart';
 
 /// Provider for calculating great circle routes between two points
 class GreatCircleRouteProvider implements FlightRouteProvider {
   final corridorProvider = RouteCorridorProvider();
-  static const _wayPointDensityKm = 100;
-  static const _corridorWidthKm = 160.0;
 
   @override
   FlightRoute getRoute({required Airport departure, required Airport arrival}) {
     final waypoints = calculateRoute(departure.latLon, arrival.latLon);
     final corridor = corridorProvider.calculateCorridor(
       waypoints,
-      widthKm: _corridorWidthKm,
+      widthKm: MapDownloadConfig.corridorWidthKm,
     );
     return FlightRoute(
       departure: departure,
@@ -33,7 +32,7 @@ class GreatCircleRouteProvider implements FlightRouteProvider {
 
     final distanceKm = MapUtils.distanceKm(departure: start, arrival: end);
 
-    final segments = (distanceKm / _wayPointDensityKm).round();
+    final segments = (distanceKm / MapDownloadConfig.wayPointDensityKm).round();
 
     for (int i = 0; i <= segments; i++) {
       final fraction = i / segments;
