@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/mappers/flight_map_mapper.dart';
+import 'package:flymap/data/tiles_downloader/mbtiles_validator.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/gps_data.dart';
 import 'package:flymap/logger.dart';
@@ -49,6 +50,7 @@ class _FlightMapState extends State<FlightMap> {
   GpsData? _pendingGpsData;
   bool _isApplyingUserLocation = false;
   double _currentZoom = 1.0;
+  String? _mapLoadError;
 
   late final LatLng _center = LatLng(
     MapUtils.center(
@@ -74,6 +76,7 @@ class _FlightMapState extends State<FlightMap> {
     final storedPath = widget.flight.flightMap?.filePath ?? '';
     if (storedPath.isEmpty) {
       _logger.log('No MBTiles file path found');
+      _setMapLoadError('Offline map is not available for this flight.');
       return;
     }
 
@@ -90,9 +93,29 @@ class _FlightMapState extends State<FlightMap> {
 
     if (!await file.exists()) {
       _logger.error('MBTiles file not found: $resolvedPath');
+      _setMapLoadError(
+        'Offline map file is missing. Please re-download this route.',
+      );
       return;
     }
     _logger.log('Loading mbtiles: $fileName');
+    _logger.log('Resolved MBTiles path: ${file.absolute.path}');
+
+    final validationResult = await MbtilesValidator.validate(
+      file.absolute.path,
+      logger: _logger,
+    );
+    if (!validationResult.isValid) {
+      _logger.error(
+        'MBTiles validation failed for ${file.absolute.path}: '
+        '${validationResult.errorMessage}',
+      );
+      _setMapLoadError(
+        validationResult.errorMessage ??
+            'Offline map validation failed. Please re-download this route.',
+      );
+      return;
+    }
 
     try {
       // Load the style from assets
@@ -109,10 +132,33 @@ class _FlightMapState extends State<FlightMap> {
 
       setState(() {
         _styleString = updated;
+        _mapLoadError = null;
       });
     } catch (e) {
       _logger.error('Error loading style from assets: $e');
+      _setMapLoadError('Could not load offline map style.');
     }
+  }
+
+  void _setMapLoadError(String message) {
+    if (!mounted) return;
+    setState(() {
+      _styleString = null;
+      _mapLoadError = message;
+    });
+    _showMapErrorToast(message);
+  }
+
+  void _showMapErrorToast(String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final messenger = ScaffoldMessenger.maybeOf(context);
+      if (messenger == null) return;
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      );
+    });
   }
 
   Future<void> _toggleUserFollow() async {
@@ -326,7 +372,10 @@ class _FlightMapState extends State<FlightMap> {
   @override
   Widget build(BuildContext context) {
     if (_styleString == null) {
-      return const MapStyleLoadingView();
+      return MapStyleLoadingView(
+        message: _mapLoadError ?? 'Loading map style...',
+        isError: _mapLoadError != null,
+      );
     }
 
     final initialZoom = _initialZoom();

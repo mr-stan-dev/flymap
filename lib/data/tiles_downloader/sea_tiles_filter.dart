@@ -24,8 +24,13 @@ class SeaTilesFilter {
     return !hasLand;
   }
 
+  Future<void> initialize() async {
+    await landMaskProvider.ensureInitialized();
+  }
+
   /// Filters out sea-only tiles (only for zoom >= minZoomToFilter)
-  List<MapTile> filterTiles(Iterable<MapTile> tiles) {
+  Future<List<MapTile>> filterTiles(Iterable<MapTile> tiles) async {
+    await initialize();
     final result = <MapTile>[];
     for (final tile in tiles) {
       if (tile.z >= minZoomToFilter && isSeaTile(tile)) {

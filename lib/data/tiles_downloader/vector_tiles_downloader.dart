@@ -128,11 +128,25 @@ class VectorTilesDownloader {
       final seaFilter = SeaTilesFilter(
         minZoomToFilter: MapDownloadConfig.seaFilterMinZoom,
       );
-      final filteredTiles = seaFilter.filterTiles(allTiles);
+      final filteredTiles = await seaFilter.filterTiles(allTiles);
       final skipped = allTiles.length - filteredTiles.length;
+      final skippedByZoom = _buildSkippedByZoom(
+        allTiles: allTiles,
+        filteredTiles: filteredTiles,
+      );
       _logger.log(
         'Computed ${allTiles.length} tiles; skipped $skipped sea tiles; downloading ${filteredTiles.length} tiles',
       );
+      if (skippedByZoom.isNotEmpty) {
+        final details = skippedByZoom.entries
+            .map((entry) => 'z${entry.key}:${entry.value}')
+            .join(', ');
+        _logger.log('Sea filter skipped by zoom: $details');
+      } else {
+        _logger.log(
+          'Sea filter skipped by zoom: none (every selected tile intersects land).',
+        );
+      }
 
       // Computing tiles event
       controller.add(DownloadMapComputingTiles(filteredTiles.length));
@@ -409,5 +423,29 @@ class VectorTilesDownloader {
     try {
       await controller.close();
     } catch (_) {}
+  }
+
+  Map<int, int> _buildSkippedByZoom({
+    required List<MapTile> allTiles,
+    required List<MapTile> filteredTiles,
+  }) {
+    final allByZoom = <int, int>{};
+    final filteredByZoom = <int, int>{};
+
+    for (final tile in allTiles) {
+      allByZoom[tile.z] = (allByZoom[tile.z] ?? 0) + 1;
+    }
+    for (final tile in filteredTiles) {
+      filteredByZoom[tile.z] = (filteredByZoom[tile.z] ?? 0) + 1;
+    }
+
+    final skippedByZoom = <int, int>{};
+    for (final entry in allByZoom.entries) {
+      final skipped = entry.value - (filteredByZoom[entry.key] ?? 0);
+      if (skipped > 0) {
+        skippedByZoom[entry.key] = skipped;
+      }
+    }
+    return skippedByZoom;
   }
 }
