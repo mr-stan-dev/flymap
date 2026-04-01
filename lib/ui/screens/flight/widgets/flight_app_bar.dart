@@ -6,7 +6,9 @@ import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/widgets/delete_flight_confirmation_dialog.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/route_copy_builder.dart';
+import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
+import 'package:flymap/ui/widgets/pro_widgets.dart';
 
 class FlightAppBar extends StatelessWidget {
   const FlightAppBar({required this.flight, this.hideProgress = 0, super.key});
@@ -29,6 +31,9 @@ class FlightAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isProUser = context.select(
+      (SubscriptionCubit cubit) => cubit.state.isPro,
+    );
     return SafeArea(
       bottom: false,
       child: AnimatedSlide(
@@ -45,51 +50,76 @@ class FlightAppBar extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(_innerPadding),
-              child: Row(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Stack(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: context.colorTheme.backgroundPrimary,
-                      borderRadius: BorderRadius.circular(8),
+                  if (isProUser)
+                    const Positioned(
+                      left: 0,
+                      top: 0,
+                      right: 0,
+                      child: ProGradientStrip(height: 3),
                     ),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      '${flight.route.departure.displayCode}-${flight.route.arrival.displayCode}',
-                      style: context.textTheme.button18Bold,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: context.colorTheme.backgroundPrimary,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert),
-                      onSelected: (value) async {
-                        await _handleMenuAction(context, value);
-                      },
-                      itemBuilder: (context) => const [
-                        PopupMenuItem(
-                          value: 'share_route',
-                          child: Text('Share route'),
+                  Padding(
+                    padding: const EdgeInsets.all(_innerPadding),
+                    child: Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: context.colorTheme.backgroundPrimary,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.arrow_back),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
                         ),
-                        PopupMenuItem(
-                          value: 'copy_route',
-                          child: Text('Copy route'),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  '${flight.route.departure.displayCode}-${flight.route.arrival.displayCode}',
+                                  style: context.textTheme.button18Bold,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (isProUser) ...[
+                                const SizedBox(width: 8),
+                                const ProBadge(compact: true),
+                              ],
+                            ],
+                          ),
                         ),
-                        PopupMenuDivider(),
-                        PopupMenuItem(
-                          value: 'delete_flight',
-                          child: Text('Delete flight'),
+                        const SizedBox(width: 12),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: context.colorTheme.backgroundPrimary,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_vert),
+                            onSelected: (value) async {
+                              await _handleMenuAction(context, value);
+                            },
+                            itemBuilder: (context) => const [
+                              PopupMenuItem(
+                                value: 'share_route',
+                                child: Text('Share route'),
+                              ),
+                              PopupMenuItem(
+                                value: 'copy_route',
+                                child: Text('Copy route'),
+                              ),
+                              PopupMenuDivider(),
+                              PopupMenuItem(
+                                value: 'delete_flight',
+                                child: Text('Delete flight'),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

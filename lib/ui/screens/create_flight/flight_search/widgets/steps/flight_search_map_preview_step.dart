@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/map_detail_level.dart';
-import 'package:flymap/map_download_config.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/map/flight_map_preview_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/map/map_utils.dart';
+import 'package:flymap/ui/widgets/pro_widgets.dart';
 
 class FlightSearchMapPreviewStep extends StatelessWidget {
   const FlightSearchMapPreviewStep({
@@ -76,7 +76,7 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: _MapDetailLevelButton(
-                        label: 'Detailed',
+                        label: 'Pro',
                         icon: Icons.workspace_premium_rounded,
                         selected: selectedDetailLevel == MapDetailLevel.pro,
                         selectedBorderColor: DsBrandColors.proAmber,
@@ -86,10 +86,7 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     IconButton(
-                      onPressed: () => _showMapDetailLevelInfoDialog(
-                        context,
-                        distanceKm: route.distanceInKm,
-                      ),
+                      onPressed: () => _showMapDetailLevelInfoDialog(context),
                       tooltip: 'Map detail info',
                       icon: const Icon(Icons.info_outline_rounded, size: 18),
                       visualDensity: VisualDensity.compact,
@@ -136,11 +133,7 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
     );
   }
 
-  Future<void> _showMapDetailLevelInfoDialog(
-    BuildContext context, {
-    required double distanceKm,
-  }) async {
-
+  Future<void> _showMapDetailLevelInfoDialog(BuildContext context) async {
     await showDialog<void>(
       context: context,
       builder: (dialogContext) {
@@ -151,7 +144,7 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Basic map has lower zoom but download is faster and uses less storage. \n \nDetailed gives you a higher zoom but download size is bigger.',
+                'Basic map has lower zoom but download is faster and uses less storage. \n \nPro gives you a higher zoom, more details but download size is bigger.',
               ),
             ],
           ),

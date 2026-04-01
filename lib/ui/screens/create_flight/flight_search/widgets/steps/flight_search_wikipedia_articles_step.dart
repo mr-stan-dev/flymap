@@ -3,6 +3,7 @@ import 'package:flymap/subscription/pro_limits.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
+import 'package:flymap/ui/widgets/pro_widgets.dart';
 import 'package:flymap/ui/widgets/wikipedia_logo_avatar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -34,8 +35,7 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
     final isLoading = state.isWikiSuggestionsLoading;
     final hasCandidates = candidates.isNotEmpty;
     final selectedSet = state.selectedArticleUrls.toSet();
-    final isFreeOverLimit =
-        !isProUser && selectedCount > ProLimits.freeWikiArticlesSelectionLimit;
+    final isFreeOverLimit = selectedCount > ProLimits.freeWikiArticlesSelectionLimit;
     final allSelected =
         hasCandidates &&
         candidates.every((candidate) => selectedSet.contains(candidate.url));
@@ -146,7 +146,15 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                isFreeOverLimit
+                if (isProUser && isFreeOverLimit) ...[
+                  const ProActiveBlock(
+                    title: 'Pro active',
+                    message:
+                        'Full articles pack unlocked.',
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                !isProUser && isFreeOverLimit
                     ? Text(
                         'Free plan includes up to 3 offline articles. Upgrade to Pro for unlimited articles.',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -163,7 +171,7 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   height: 52,
-                  child: isFreeOverLimit
+                  child: !isProUser && isFreeOverLimit
                       ? PremiumButton(
                           label: 'Upgrade',
                           icon: Icons.workspace_premium_rounded,

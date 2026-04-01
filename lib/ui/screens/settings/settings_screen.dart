@@ -4,9 +4,11 @@ import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart';
+import 'package:flymap/ui/widgets/pro_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flymap/router/app_router.dart';
 
+import 'widgets/subscription_top_banner.dart';
 import 'viewmodel/settings_cubit.dart';
 import 'viewmodel/settings_state.dart';
 
@@ -25,8 +27,22 @@ class _SettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isProUser = context.select(
+      (SubscriptionCubit cubit) => cubit.state.isPro,
+    );
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Settings'),
+            if (isProUser) ...[
+              const SizedBox(width: 8),
+              const ProBadge(compact: true),
+            ],
+          ],
+        ),
+      ),
       body: BlocBuilder<SubscriptionCubit, SubscriptionState>(
         builder: (context, subscriptionState) {
           return BlocBuilder<SettingsCubit, SettingsState>(
@@ -38,6 +54,13 @@ class _SettingsView extends StatelessWidget {
               final sectionBg = theme.colorScheme.surfaceContainerHighest;
               return ListView(
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+                    child: SubscriptionTopBanner(
+                      state: subscriptionState,
+                      onManage: () => _openSubscription(context),
+                    ),
+                  ),
                   // Appearance section
                   Container(
                     width: double.infinity,
@@ -141,25 +164,6 @@ class _SettingsView extends StatelessWidget {
                     },
                   ),
 
-                  // Subscription section
-                  Container(
-                    width: double.infinity,
-                    color: sectionBg,
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                    child: Text(
-                      'Subscription',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  _SettingItem(
-                    title: 'Flymap Pro',
-                    subtitle: _subscriptionStatusText(subscriptionState),
-                    leading: const Icon(Icons.workspace_premium_outlined),
-                    onTap: () => _openSubscription(context, subscriptionState),
-                  ),
-
                   // About section
                   Container(
                     width: double.infinity,
@@ -201,52 +205,41 @@ class _SettingsView extends StatelessWidget {
     );
   }
 
-  String _subscriptionStatusText(SubscriptionState state) {
-    if (state.phase == SubscriptionPhase.loading ||
-        state.phase == SubscriptionPhase.unknown) {
-      return 'Checking subscription status...';
-    }
-
-    if (state.isPro) {
-      return 'Active';
-    }
-
-    return state.errorMessage?.trim().isNotEmpty == true
-        ? 'Not active (${state.errorMessage})'
-        : 'Not active';
-  }
-
-  Future<void> _openSubscription(
-    BuildContext context,
-    SubscriptionState state,
-  ) async {
-    if (state.isPro) {
+  Future<void> _openSubscription(BuildContext context) async {
+    final subscriptionCubit = context.read<SubscriptionCubit>();
+    final messenger = ScaffoldMessenger.of(context);
+    if (subscriptionCubit.state.isPro) {
       AppRouter.goToSubscriptionManagement(context);
       return;
     }
 
-    final result = await context
-        .read<SubscriptionCubit>()
-        .presentPaywallIfNeeded();
+    final result = await subscriptionCubit.presentPaywallIfNeeded();
     if (!context.mounted) return;
 
     switch (result) {
       case SubscriptionPaywallResult.purchased:
       case SubscriptionPaywallResult.restored:
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Flymap Pro activated.')),
+        );
         AppRouter.goToSubscriptionManagement(context);
+        return;
       case SubscriptionPaywallResult.cancelled:
-        _showSnackBar(context, 'Purchase cancelled.');
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Upgrade cancelled.')),
+        );
+        return;
       case SubscriptionPaywallResult.notPresented:
-        _showSnackBar(context, 'No paywall available right now.');
+        messenger.showSnackBar(
+          const SnackBar(content: Text('No paywall available right now.')),
+        );
+        return;
       case SubscriptionPaywallResult.error:
-        _showSnackBar(context, 'Failed to open paywall.');
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Failed to open paywall.')),
+        );
+        return;
     }
-  }
-
-  void _showSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _openExternalUrl(BuildContext context, String url) async {

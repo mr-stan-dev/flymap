@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
-import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SubscriptionManagementScreen extends StatefulWidget {
   const SubscriptionManagementScreen({super.key});
@@ -18,6 +18,15 @@ class SubscriptionManagementScreen extends StatefulWidget {
 
 class _SubscriptionManagementScreenState
     extends State<SubscriptionManagementScreen> {
+  static const String _supportEmail = 'support@apptractor.dev';
+  static final Uri _iosSubscriptionsUri = Uri.parse(
+    'https://apps.apple.com/account/subscriptions',
+  );
+  static final Uri _androidSubscriptionsUri = Uri.parse(
+    'https://play.google.com/store/account/subscriptions',
+  );
+  bool _isPaywallLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -25,9 +34,6 @@ class _SubscriptionManagementScreenState
       if (!mounted) return;
       final cubit = context.read<SubscriptionCubit>();
       unawaited(cubit.refresh());
-      if (cubit.state.products.isEmpty && !cubit.state.isProductsLoading) {
-        unawaited(cubit.loadProducts());
-      }
     });
   }
 
@@ -43,63 +49,37 @@ class _SubscriptionManagementScreenState
               return const Center(child: CircularProgressIndicator());
             }
 
-            if (!state.isPro) {
-              return _buildFreePaywallOnly(context, state);
-            }
-
             return RefreshIndicator(
               onRefresh: () async {
                 final cubit = context.read<SubscriptionCubit>();
                 await cubit.refresh();
-                await cubit.loadProducts();
               },
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
                   _buildStatusCard(context, state),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Pull down to refresh your subscription status.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                   const SizedBox(height: 12),
-                  _buildActionsCard(context, state),
-                  const SizedBox(height: 12),
-                  _buildPlansCard(context, state),
+                  SectionCard(
+                    title: 'Need help?',
+                    child: SecondaryButton(
+                      label: 'Contact support',
+                      leadingIcon: Icons.support_agent_rounded,
+                      onPressed: () => _contactSupport(context),
+                    ),
+                  ),
                 ],
               ),
             );
           },
         ),
       ),
-    );
-  }
-
-  Widget _buildFreePaywallOnly(BuildContext context, SubscriptionState state) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        SectionCard(
-          title: 'Flymap Pro',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const InfoBanner(
-                message: 'Unlock Flymap Pro to get premium features.',
-                tone: DsMessageTone.info,
-              ),
-              const SizedBox(height: 16),
-              PrimaryButton(
-                label: 'See Pro Plans',
-                leadingIcon: Icons.workspace_premium_outlined,
-                onPressed: () => _openPaywall(context),
-              ),
-              if (state.errorMessage?.trim().isNotEmpty == true) ...[
-                const SizedBox(height: 12),
-                InlineMessage(
-                  message: state.errorMessage!,
-                  tone: DsMessageTone.warning,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
     );
   }
 
@@ -111,19 +91,19 @@ class _SubscriptionManagementScreenState
       SubscriptionPhase.free => 'You are on Free plan.',
     };
 
-    final tone = switch (state.phase) {
-      SubscriptionPhase.pro => DsMessageTone.success,
-      SubscriptionPhase.free => DsMessageTone.neutral,
-      SubscriptionPhase.unknown ||
-      SubscriptionPhase.loading => DsMessageTone.info,
-    };
-
     return SectionCard(
       title: 'Flymap Pro',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InfoBanner(message: statusText, tone: tone),
+          state.isPro
+              ? _buildProStatusBanner(context, statusText)
+              : InfoBanner(
+                  message: statusText,
+                  tone: state.phase == SubscriptionPhase.free
+                      ? DsMessageTone.neutral
+                      : DsMessageTone.info,
+                ),
           const SizedBox(height: 12),
           _MetaRow(
             label: 'Status',
@@ -141,6 +121,32 @@ class _SubscriptionManagementScreenState
             label: 'Last update',
             value: _formatDateTime(state.lastUpdatedAt) ?? 'Unknown',
           ),
+          const SizedBox(height: 8),
+          if (state.isPro)
+            TertiaryButton(
+              label: 'Manage subscription',
+              leadingIcon: Icons.storefront_rounded,
+              trailingIcon: Icons.open_in_new_rounded,
+              onPressed: () => _openStoreSubscriptions(
+                messenger: ScaffoldMessenger.of(context),
+                platform: Theme.of(context).platform,
+              ),
+            )
+          else
+            PremiumButton(
+              label: 'Upgrade to Pro',
+              onPressed: _isPaywallLoading ? null : () => _openPaywall(context),
+              isLoading: _isPaywallLoading,
+            ),
+          const SizedBox(height: 8),
+          Text(
+            state.isPro
+                ? 'You can cancel or change billing in your App Store or Google Play subscription settings.'
+                : 'Free users can upgrade to Pro to unlock premium features.',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
           if (state.errorMessage?.trim().isNotEmpty == true) ...[
             const SizedBox(height: 8),
             InlineMessage(
@@ -153,145 +159,38 @@ class _SubscriptionManagementScreenState
     );
   }
 
-  Widget _buildActionsCard(BuildContext context, SubscriptionState state) {
-    final isBusy = state.isLoading;
-    return SectionCard(
-      title: 'Manage',
-      child: Column(
+  Widget _buildProStatusBanner(BuildContext context, String text) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: DsBrandColors.proAmber.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: DsBrandColors.proAmber.withValues(alpha: 0.7),
+        ),
+      ),
+      child: Row(
         children: [
-          PrimaryButton(
-            label: 'Open Paywall',
-            leadingIcon: Icons.local_offer_outlined,
-            isLoading: isBusy,
-            onPressed: isBusy ? null : () => _openPaywall(context),
+          const Icon(
+            Icons.workspace_premium_rounded,
+            size: 18,
+            color: DsBrandColors.proAmber,
           ),
-          const SizedBox(height: 8),
-          SecondaryButton(
-            label: 'Restore Purchases',
-            leadingIcon: Icons.restore,
-            onPressed: isBusy ? null : () => _restorePurchases(context),
-          ),
-          const SizedBox(height: 8),
-          TertiaryButton(
-            label: 'Customer Center',
-            leadingIcon: Icons.manage_accounts_outlined,
-            onPressed: isBusy ? null : () => _openCustomerCenter(context),
-          ),
-          const SizedBox(height: 8),
-          TertiaryButton(
-            label: 'Refresh Status',
-            leadingIcon: Icons.refresh,
-            onPressed: isBusy
-                ? null
-                : () => context.read<SubscriptionCubit>().refresh(),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: DsBrandColors.proAmber,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ],
       ),
     );
-  }
-
-  Widget _buildPlansCard(BuildContext context, SubscriptionState state) {
-    if (state.isProductsLoading) {
-      return const SectionCard(
-        title: 'Available Plans',
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 24),
-          child: Center(child: CircularProgressIndicator()),
-        ),
-      );
-    }
-
-    if (state.products.isEmpty) {
-      return SectionCard(
-        title: 'Available Plans',
-        trailing: IconButton(
-          icon: const Icon(Icons.refresh),
-          onPressed: () => context.read<SubscriptionCubit>().loadProducts(),
-        ),
-        child: const Text(
-          'No plans available right now. Pull down to refresh.',
-        ),
-      );
-    }
-
-    return SectionCard(
-      title: 'Available Plans',
-      trailing: IconButton(
-        icon: const Icon(Icons.refresh),
-        onPressed: () => context.read<SubscriptionCubit>().loadProducts(),
-      ),
-      child: Column(
-        children: state.products
-            .map(
-              (product) => _PlanTile(
-                product: product,
-                onTap: () => _purchasePackage(
-                  context,
-                  packageId: product.packageId,
-                  label: product.title,
-                ),
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
-
-  Future<void> _openPaywall(BuildContext context) async {
-    final result = await context
-        .read<SubscriptionCubit>()
-        .presentPaywallIfNeeded();
-    if (!context.mounted) return;
-
-    final message = switch (result) {
-      SubscriptionPaywallResult.purchased => 'Purchase completed successfully.',
-      SubscriptionPaywallResult.restored => 'Purchases restored successfully.',
-      SubscriptionPaywallResult.cancelled => 'Purchase cancelled.',
-      SubscriptionPaywallResult.notPresented => 'You already have access.',
-      SubscriptionPaywallResult.error => 'Failed to open paywall.',
-    };
-    _showMessage(context, message);
-  }
-
-  Future<void> _restorePurchases(BuildContext context) async {
-    await context.read<SubscriptionCubit>().restorePurchases();
-    if (!context.mounted) return;
-    final state = context.read<SubscriptionCubit>().state;
-    final message = state.errorMessage?.trim().isNotEmpty == true
-        ? state.errorMessage!
-        : 'Restore completed.';
-    _showMessage(context, message);
-  }
-
-  Future<void> _openCustomerCenter(BuildContext context) async {
-    await context.read<SubscriptionCubit>().presentCustomerCenter();
-    if (!context.mounted) return;
-    final state = context.read<SubscriptionCubit>().state;
-    if (state.errorMessage?.trim().isNotEmpty == true) {
-      _showMessage(context, state.errorMessage!);
-    }
-  }
-
-  Future<void> _purchasePackage(
-    BuildContext context, {
-    required String packageId,
-    required String label,
-  }) async {
-    await context.read<SubscriptionCubit>().purchasePackage(packageId);
-    if (!context.mounted) return;
-    final state = context.read<SubscriptionCubit>().state;
-    final message = state.isPro
-        ? '$label purchased successfully.'
-        : (state.errorMessage?.trim().isNotEmpty == true
-              ? state.errorMessage!
-              : 'Purchase did not complete.');
-    _showMessage(context, message);
-  }
-
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   String? _formatDateTime(DateTime? value) {
@@ -303,6 +202,60 @@ class _SubscriptionManagementScreenState
     final hh = local.hour.toString().padLeft(2, '0');
     final min = local.minute.toString().padLeft(2, '0');
     return '$yyyy-$mm-$dd $hh:$min';
+  }
+
+  Future<void> _contactSupport(BuildContext context) async {
+    final uri = Uri(
+      scheme: 'mailto',
+      path: _supportEmail,
+      queryParameters: const {'subject': 'Flymap subscription support'},
+    );
+    final launched = await launchUrl(uri);
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Could not open email app')));
+    }
+  }
+
+  Future<void> _openStoreSubscriptions({
+    required ScaffoldMessengerState messenger,
+    required TargetPlatform platform,
+  }) async {
+    final uri = switch (platform) {
+      TargetPlatform.iOS || TargetPlatform.macOS => _iosSubscriptionsUri,
+      TargetPlatform.android => _androidSubscriptionsUri,
+      _ => _androidSubscriptionsUri,
+    };
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Could not open subscription settings')),
+      );
+    }
+  }
+
+  Future<void> _openPaywall(BuildContext context) async {
+    if (_isPaywallLoading) return;
+    setState(() => _isPaywallLoading = true);
+    final cubit = context.read<SubscriptionCubit>();
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final result = await cubit.presentPaywallIfNeeded();
+      final message = switch (result) {
+        SubscriptionPaywallResult.purchased => 'Flymap Pro activated.',
+        SubscriptionPaywallResult.restored => 'Flymap Pro restored.',
+        SubscriptionPaywallResult.cancelled => 'Upgrade cancelled.',
+        SubscriptionPaywallResult.notPresented =>
+          'No paywall available right now.',
+        SubscriptionPaywallResult.error => 'Failed to open paywall.',
+      };
+      messenger.showSnackBar(SnackBar(content: Text(message)));
+    } finally {
+      if (mounted) {
+        setState(() => _isPaywallLoading = false);
+      }
+    }
   }
 }
 
@@ -331,31 +284,6 @@ class _MetaRow extends StatelessWidget {
           Expanded(child: Text(value, style: theme.textTheme.bodyMedium)),
         ],
       ),
-    );
-  }
-}
-
-class _PlanTile extends StatelessWidget {
-  const _PlanTile({required this.product, required this.onTap});
-
-  final SubscriptionProduct product;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: const Icon(Icons.sell_outlined),
-      title: Text(product.title),
-      subtitle: Text(
-        product.description.trim().isEmpty
-            ? product.productId
-            : product.description,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      trailing: Text(product.priceText),
-      onTap: onTap,
     );
   }
 }
