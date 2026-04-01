@@ -63,41 +63,40 @@ void main() {
       );
     });
 
-    testWidgets(
-      'shows "Upgrade & Download" for free users above 3 selections',
-      (tester) async {
-        final state = FlightSearchScreenState.initial().copyWith(
-          step: CreateFlightStep.wikipediaArticles,
-          articleCandidates: _candidates(4),
-          selectedArticleUrls: const [
-            'https://en.wikipedia.org/wiki/Article_1',
-            'https://en.wikipedia.org/wiki/Article_2',
-            'https://en.wikipedia.org/wiki/Article_3',
-            'https://en.wikipedia.org/wiki/Article_4',
-          ],
-        );
+    testWidgets('shows "Upgrade" for free users above 3 selections', (
+      tester,
+    ) async {
+      final state = FlightSearchScreenState.initial().copyWith(
+        step: CreateFlightStep.wikipediaArticles,
+        articleCandidates: _candidates(4),
+        selectedArticleUrls: const [
+          'https://en.wikipedia.org/wiki/Article_1',
+          'https://en.wikipedia.org/wiki/Article_2',
+          'https://en.wikipedia.org/wiki/Article_3',
+          'https://en.wikipedia.org/wiki/Article_4',
+        ],
+      );
 
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: FlightSearchWikipediaArticlesStep(
-                state: state,
-                isProUser: false,
-                onToggleArticle: (_) {},
-                onToggleAll: () {},
-                onStartDownload: () {},
-              ),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: FlightSearchWikipediaArticlesStep(
+              state: state,
+              isProUser: false,
+              onToggleArticle: (_) {},
+              onToggleAll: () {},
+              onStartDownload: () {},
             ),
           ),
-        );
+        ),
+      );
 
-        expect(find.text('Upgrade & Download'), findsOneWidget);
-        expect(
-          find.textContaining('Free plan includes up to 3 offline articles'),
-          findsOneWidget,
-        );
-      },
-    );
+      expect(find.text('Upgrade'), findsOneWidget);
+      expect(
+        find.textContaining('Free plan includes up to 3 offline articles'),
+        findsOneWidget,
+      );
+    });
   });
 }
 

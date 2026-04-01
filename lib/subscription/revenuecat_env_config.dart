@@ -2,25 +2,20 @@ import 'package:flutter/foundation.dart';
 
 class RevenueCatEnvConfig {
   const RevenueCatEnvConfig({
-    this.iosApiKey = _defaultApiKey,
-    this.androidApiKey = _defaultApiKey,
+    this.iosApiKey = '',
+    this.androidApiKey = '',
     this.entitlementPro = 'Flymap Pro',
     this.weeklyPackageId = 'weekly',
     this.monthlyPackageId = 'monthly',
     this.yearlyPackageId = 'yearly',
   });
 
-  static const _defaultApiKey = 'test_xoDWuBlcmaxIARJzQkcHLnwgTDL';
-
   factory RevenueCatEnvConfig.fromEnvironment() {
     return const RevenueCatEnvConfig(
-      iosApiKey: String.fromEnvironment(
-        'RC_API_KEY_IOS',
-        defaultValue: _defaultApiKey,
-      ),
+      iosApiKey: String.fromEnvironment('RC_API_KEY_IOS', defaultValue: ''),
       androidApiKey: String.fromEnvironment(
         'RC_API_KEY_ANDROID',
-        defaultValue: _defaultApiKey,
+        defaultValue: '',
       ),
     );
   }

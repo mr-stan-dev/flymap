@@ -46,5 +46,12 @@ void main() {
 
       expect(config.packageIdsInDisplayOrder, ['weekly', 'monthly', 'yearly']);
     });
+
+    test('defaults to empty API keys when not provided', () {
+      const config = RevenueCatEnvConfig();
+
+      expect(config.apiKeyForPlatform(TargetPlatform.iOS), isEmpty);
+      expect(config.apiKeyForPlatform(TargetPlatform.android), isEmpty);
+    });
   });
 }

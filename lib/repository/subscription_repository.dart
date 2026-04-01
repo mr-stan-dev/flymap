@@ -6,6 +6,7 @@ import 'package:flymap/subscription/revenuecat_client.dart';
 import 'package:flymap/subscription/revenuecat_env_config.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/subscription/subscription_product.dart';
+import 'package:flymap/subscription/subscription_status_cache.dart';
 import 'package:flymap/subscription/subscription_status.dart';
 
 abstract class SubscriptionRepository {
@@ -34,9 +35,11 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
   RevenueCatSubscriptionRepository({
     required RevenueCatClient client,
     required RevenueCatEnvConfig config,
+    SubscriptionStatusCache? statusCache,
     TargetPlatform? platformOverride,
   }) : _client = client,
        _config = config,
+       _statusCache = statusCache ?? _NoopSubscriptionStatusCache(),
        _platformOverride = platformOverride,
        _currentStatus = SubscriptionStatus(
          isPro: false,
@@ -46,6 +49,7 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
 
   final RevenueCatClient _client;
   final RevenueCatEnvConfig _config;
+  final SubscriptionStatusCache _statusCache;
   final TargetPlatform? _platformOverride;
   final _logger = const Logger('SubscriptionRepository');
 
@@ -76,10 +80,19 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
   }
 
   Future<SubscriptionStatus> _initializeInternal() async {
+    final cached = await _statusCache.load();
+    if (cached != null) {
+      _publish(cached, persist: false);
+    }
+
     final apiKey = _config.apiKeyForCurrentPlatform(
       platform: _platformOverride,
     );
     if (apiKey.isEmpty) {
+      _logger.error(
+        'RevenueCat API key is missing for this platform. '
+        'Set RC_API_KEY_IOS / RC_API_KEY_ANDROID.',
+      );
       return _publishError(
         'RevenueCat API key is missing for this platform. '
         'Set RC_API_KEY_IOS / RC_API_KEY_ANDROID.',
@@ -280,8 +293,14 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
     return snapshot.entitlements['pro'] ?? snapshot.entitlements['Flymap Pro'];
   }
 
-  SubscriptionStatus _publish(SubscriptionStatus status) {
+  SubscriptionStatus _publish(
+    SubscriptionStatus status, {
+    bool persist = true,
+  }) {
     _currentStatus = status;
+    if (persist) {
+      unawaited(_statusCache.save(status));
+    }
     if (!_statusController.isClosed) {
       _statusController.add(status);
     }
@@ -289,13 +308,22 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
   }
 
   SubscriptionStatus _publishError(String message) {
-    final status = SubscriptionStatus(
-      isPro: false,
-      entitlementId: _config.entitlementId,
-      expiresAt: null,
+    final status = _currentStatus.copyWith(
       lastUpdatedAt: DateTime.now(),
       error: message,
     );
-    return _publish(status);
+    return _publish(status, persist: false);
   }
+}
+
+class _NoopSubscriptionStatusCache implements SubscriptionStatusCache {
+  const _NoopSubscriptionStatusCache();
+
+  @override
+  Future<SubscriptionStatus?> load() async {
+    return null;
+  }
+
+  @override
+  Future<void> save(SubscriptionStatus status) async {}
 }

@@ -53,6 +53,18 @@ void main() {
       expect(cubit.state.errorMessage, isNotEmpty);
     });
 
+    test('startup keeps pro phase when status has error', () async {
+      repository.initializeResult = _status(
+        isPro: true,
+        error: 'Failed to refresh subscription status.',
+      );
+
+      await cubit.initialize();
+
+      expect(cubit.state.phase, SubscriptionPhase.pro);
+      expect(cubit.state.errorMessage, isNotEmpty);
+    });
+
     test('refresh and restore update state', () async {
       repository.refreshResult = _status(isPro: false);
       await cubit.refresh();

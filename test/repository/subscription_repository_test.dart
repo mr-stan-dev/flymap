@@ -6,20 +6,25 @@ import 'package:flymap/repository/subscription_repository.dart';
 import 'package:flymap/subscription/revenuecat_client.dart';
 import 'package:flymap/subscription/revenuecat_env_config.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
+import 'package:flymap/subscription/subscription_status.dart';
+import 'package:flymap/subscription/subscription_status_cache.dart';
 
 void main() {
   group('RevenueCatSubscriptionRepository', () {
     late _FakeRevenueCatClient client;
+    late _FakeSubscriptionStatusCache cache;
     late RevenueCatSubscriptionRepository repository;
 
     setUp(() {
       client = _FakeRevenueCatClient();
+      cache = _FakeSubscriptionStatusCache();
       repository = RevenueCatSubscriptionRepository(
         client: client,
         config: const RevenueCatEnvConfig(
           androidApiKey: 'android_key',
           entitlementPro: 'pro',
         ),
+        statusCache: cache,
         platformOverride: TargetPlatform.android,
       );
     });
@@ -57,7 +62,12 @@ void main() {
       expect(status.error, isNull);
     });
 
-    test('returns fail-open error when API key is missing', () async {
+    test('returns cached status with error when API key is missing', () async {
+      cache.loaded = SubscriptionStatus(
+        isPro: true,
+        entitlementId: 'pro',
+        lastUpdatedAt: DateTime.parse('2026-01-01T00:00:00Z'),
+      );
       final noKeyRepository = RevenueCatSubscriptionRepository(
         client: client,
         config: const RevenueCatEnvConfig(
@@ -65,6 +75,7 @@ void main() {
           androidApiKey: '',
           entitlementPro: 'pro',
         ),
+        statusCache: cache,
         platformOverride: TargetPlatform.android,
       );
       addTearDown(noKeyRepository.close);
@@ -72,7 +83,43 @@ void main() {
       final status = await noKeyRepository.initialize();
 
       expect(client.configureCalls, 0);
-      expect(status.isPro, isFalse);
+      expect(status.isPro, isTrue);
+      expect(status.error, isNotEmpty);
+    });
+
+    test(
+      'returns free with error when API key is missing and cache is empty',
+      () async {
+        final emptyCache = _FakeSubscriptionStatusCache();
+        final noKeyRepository = RevenueCatSubscriptionRepository(
+          client: client,
+          config: const RevenueCatEnvConfig(
+            iosApiKey: '',
+            androidApiKey: '',
+            entitlementPro: 'pro',
+          ),
+          statusCache: emptyCache,
+          platformOverride: TargetPlatform.android,
+        );
+        addTearDown(noKeyRepository.close);
+
+        final status = await noKeyRepository.initialize();
+
+        expect(status.isPro, isFalse);
+        expect(status.error, isNotEmpty);
+      },
+    );
+
+    test('refresh failure keeps previous pro status', () async {
+      client.getCustomerInfoResult = _snapshot({
+        'pro': const RevenueCatEntitlementSnapshot(isActive: true),
+      });
+      await repository.initialize();
+
+      client.throwOnGetCustomerInfo = true;
+      final status = await repository.refresh();
+
+      expect(status.isPro, isTrue);
       expect(status.error, isNotEmpty);
     });
 
@@ -88,6 +135,23 @@ void main() {
       expect(status.isPro, isFalse);
       expect(status.error, isNotEmpty);
     });
+
+    test(
+      'loads cached status before configure and keeps it on init failure',
+      () async {
+        cache.loaded = SubscriptionStatus(
+          isPro: true,
+          entitlementId: 'pro',
+          lastUpdatedAt: DateTime.parse('2026-02-01T00:00:00Z'),
+        );
+        client.throwOnConfigure = true;
+
+        final status = await repository.initialize();
+
+        expect(status.isPro, isTrue);
+        expect(status.error, isNotEmpty);
+      },
+    );
 
     test('forwards customer info stream updates', () async {
       client.getCustomerInfoResult = _snapshot({
@@ -157,6 +221,19 @@ void main() {
 
       expect(products.map((e) => e.packageId), ['weekly', 'monthly', 'yearly']);
     });
+
+    test('persists last successful status to cache', () async {
+      client.getCustomerInfoResult = _snapshot({
+        'pro': const RevenueCatEntitlementSnapshot(isActive: true),
+      });
+
+      final status = await repository.initialize();
+
+      expect(status.isPro, isTrue);
+      expect(cache.saved, isNotNull);
+      expect(cache.saved?.isPro, isTrue);
+      expect(cache.saved?.entitlementId, 'pro');
+    });
   });
 }
 
@@ -170,6 +247,7 @@ class _FakeRevenueCatClient implements RevenueCatClient {
   final _controller = StreamController<RevenueCatCustomerSnapshot>.broadcast();
 
   int configureCalls = 0;
+  bool throwOnConfigure = false;
   bool throwOnGetCustomerInfo = false;
   RevenueCatCustomerSnapshot getCustomerInfoResult =
       const RevenueCatCustomerSnapshot(entitlements: {});
@@ -191,6 +269,9 @@ class _FakeRevenueCatClient implements RevenueCatClient {
 
   @override
   Future<void> configure({required String apiKey}) async {
+    if (throwOnConfigure) {
+      throw StateError('configure failed');
+    }
     configureCalls++;
   }
 
@@ -231,5 +312,20 @@ class _FakeRevenueCatClient implements RevenueCatClient {
 
   void emitSnapshot(RevenueCatCustomerSnapshot snapshot) {
     _controller.add(snapshot);
+  }
+}
+
+class _FakeSubscriptionStatusCache implements SubscriptionStatusCache {
+  SubscriptionStatus? loaded;
+  SubscriptionStatus? saved;
+
+  @override
+  Future<SubscriptionStatus?> load() async {
+    return loaded;
+  }
+
+  @override
+  Future<void> save(SubscriptionStatus status) async {
+    saved = status;
   }
 }

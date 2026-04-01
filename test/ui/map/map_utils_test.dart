@@ -61,7 +61,7 @@ void main() {
       );
 
       expect(basicLabel, '30-50 MB');
-      expect(proLabel, '60-100 MB');
+      expect(proLabel, '50-90 MB');
     });
   });
 }
