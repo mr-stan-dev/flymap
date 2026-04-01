@@ -1,0 +1,1 @@
+enum MapDetailLevel { basic, pro }

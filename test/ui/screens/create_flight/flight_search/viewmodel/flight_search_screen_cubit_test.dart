@@ -4,6 +4,7 @@ import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/entity/map_detail_level.dart';
 import 'package:flymap/entity/wiki_article_candidate.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_cubit.dart';
@@ -114,6 +115,95 @@ void main() {
         ]);
       },
     );
+
+    test('default selected map detail level is basic', () {
+      expect(cubit.state.selectedMapDetailLevel, MapDetailLevel.basic);
+    });
+
+    test('selectMapDetailLevel updates state in map preview step', () {
+      cubit.setStateForTest(
+        cubit.state.copyWith(step: CreateFlightStep.mapPreview),
+      );
+
+      cubit.selectMapDetailLevel(MapDetailLevel.pro);
+
+      expect(cubit.state.selectedMapDetailLevel, MapDetailLevel.pro);
+    });
+
+    test('route selection reset sets map detail level back to basic', () async {
+      final route = _route();
+      cubit.setStateForTest(
+        cubit.state.copyWith(
+          step: CreateFlightStep.arrival,
+          selectedDeparture: route.departure,
+          selectedMapDetailLevel: MapDetailLevel.pro,
+        ),
+      );
+
+      await cubit.selectAirport(route.arrival);
+
+      expect(cubit.state.selectedMapDetailLevel, MapDetailLevel.basic);
+    });
+
+    test('startDownload passes z10 for basic short route', () async {
+      cubit.setStateForTest(
+        cubit.state.copyWith(
+          selectedArticleUrls: const [],
+          selectedMapDetailLevel: MapDetailLevel.basic,
+          flightRoute: _route(),
+          isTooLongFlight: false,
+        ),
+      );
+
+      await cubit.startDownload(isPro: true);
+
+      expect(mapUseCase.lastMaxZoom, 10);
+    });
+
+    test('startDownload passes z9 for basic long route', () async {
+      cubit.setStateForTest(
+        cubit.state.copyWith(
+          selectedArticleUrls: const [],
+          selectedMapDetailLevel: MapDetailLevel.basic,
+          flightRoute: _longRoute(),
+          isTooLongFlight: false,
+        ),
+      );
+
+      await cubit.startDownload(isPro: true);
+
+      expect(mapUseCase.lastMaxZoom, 9);
+    });
+
+    test('startDownload passes z11 for pro short route', () async {
+      cubit.setStateForTest(
+        cubit.state.copyWith(
+          selectedArticleUrls: const [],
+          selectedMapDetailLevel: MapDetailLevel.pro,
+          flightRoute: _route(),
+          isTooLongFlight: false,
+        ),
+      );
+
+      await cubit.startDownload(isPro: true);
+
+      expect(mapUseCase.lastMaxZoom, 11);
+    });
+
+    test('startDownload passes z10 for pro long route', () async {
+      cubit.setStateForTest(
+        cubit.state.copyWith(
+          selectedArticleUrls: const [],
+          selectedMapDetailLevel: MapDetailLevel.pro,
+          flightRoute: _longRoute(),
+          isTooLongFlight: false,
+        ),
+      );
+
+      await cubit.startDownload(isPro: true);
+
+      expect(mapUseCase.lastMaxZoom, 10);
+    });
   });
 }
 
@@ -154,6 +244,33 @@ FlightRoute _route() {
     arrival: arrival,
     waypoints: [LatLng(10, 10), LatLng(20, 20)],
     corridor: [LatLng(10, 10), LatLng(20, 20)],
+  );
+}
+
+FlightRoute _longRoute() {
+  const departure = Airport(
+    name: 'C',
+    city: 'C',
+    countryCode: 'US',
+    latLon: LatLng(10, 10),
+    iataCode: 'CCC',
+    icaoCode: 'CCCC',
+    wikipediaUrl: '',
+  );
+  const arrival = Airport(
+    name: 'D',
+    city: 'D',
+    countryCode: 'US',
+    latLon: LatLng(35, 35),
+    iataCode: 'DDD',
+    icaoCode: 'DDDD',
+    wikipediaUrl: '',
+  );
+  return const FlightRoute(
+    departure: departure,
+    arrival: arrival,
+    waypoints: [LatLng(10, 10), LatLng(35, 35)],
+    corridor: [LatLng(10, 10), LatLng(35, 35)],
   );
 }
 
@@ -217,6 +334,8 @@ class _FakeBuildWikipediaCandidatesUseCase
 }
 
 class _FakeDownloadMapUseCase implements DownloadMapUseCase {
+  int? lastMaxZoom;
+
   @override
   void cancel() {}
 
@@ -224,7 +343,9 @@ class _FakeDownloadMapUseCase implements DownloadMapUseCase {
   Stream<DownloadMapEvent> call({
     required FlightRoute flightRoute,
     required FlightInfo flightInfo,
+    required int maxZoom,
   }) {
+    lastMaxZoom = maxZoom;
     return const Stream<DownloadMapEvent>.empty();
   }
 }

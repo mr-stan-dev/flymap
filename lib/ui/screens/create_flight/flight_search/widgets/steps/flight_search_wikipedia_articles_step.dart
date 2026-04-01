@@ -27,6 +27,7 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
     final selectedCount = state.selectedArticleUrls.length;
     final estimatedSizeRange = MapUtils.estimatedDownloadSizeRangeLabel(
       route: state.flightRoute,
+      mapDetailLevel: state.selectedMapDetailLevel,
       selectedArticlesCount: selectedCount,
     );
     final candidates = state.articleCandidates;

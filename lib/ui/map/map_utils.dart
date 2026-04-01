@@ -2,12 +2,14 @@ import 'dart:math';
 
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/entity/map_detail_level.dart';
 import 'package:flymap/map_download_config.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapUtils {
   static String estimatedDownloadSizeRangeLabel({
     required FlightRoute? route,
+    required MapDetailLevel mapDetailLevel,
     required int selectedArticlesCount,
   }) {
     final distanceKm =
@@ -17,15 +19,22 @@ class MapUtils {
         );
     final center = route == null ? null : routeCenter(route);
     final regionMultiplier = _regionMultiplier(center);
+    final maxZoom = MapDownloadConfig.resolveMaxZoom(
+      distanceKm: distanceKm,
+      detailLevel: mapDetailLevel,
+    );
+    final zoomScale = MapDownloadConfig.zoomScaleForEstimate(maxZoom);
 
     final mapMinMb =
         (distanceKm / 1000.0) *
         MapDownloadConfig.estimatedMinMbPer1000Km *
-        regionMultiplier;
+        regionMultiplier *
+        zoomScale;
     final mapMaxMb =
         (distanceKm / 1000.0) *
         MapDownloadConfig.estimatedMaxMbPer1000Km *
-        regionMultiplier;
+        regionMultiplier *
+        zoomScale;
     final articlesMb =
         selectedArticlesCount * MapDownloadConfig.estimatedArticleMb;
 
@@ -45,7 +54,7 @@ class MapUtils {
     final lon = center.longitude;
 
     // Europe: typically denser vector tiles
-    if (lat >= 35 && lat <= 72 && lon >= -12 && lon <= 45) return 2.2;
+    if (lat >= 35 && lat <= 72 && lon >= -12 && lon <= 45) return 2;
 
     // East Asia (Japan/Korea/coastal China)
     if (lat >= 20 && lat <= 50 && lon >= 100 && lon <= 145) return 1.6;
@@ -54,7 +63,7 @@ class MapUtils {
     if (lat >= 5 && lat <= 35 && lon >= 65 && lon <= 95) return 1.3;
 
     // North America: usually lighter than Europe for this tileset
-    if (lat >= 15 && lat <= 75 && lon >= -170 && lon <= -50) return 0.6;
+    if (lat >= 15 && lat <= 75 && lon >= -170 && lon <= -50) return 0.9;
 
     // South America
     if (lat >= -55 && lat <= 15 && lon >= -85 && lon <= -35) return 0.9;
@@ -63,7 +72,7 @@ class MapUtils {
     if (lat >= -35 && lat <= 37 && lon >= -20 && lon <= 52) return 0.9;
 
     // Australia / NZ region
-    if (lat >= -50 && lat <= -10 && lon >= 110 && lon <= 180) return 0.8;
+    if (lat >= -50 && lat <= -10 && lon >= 110 && lon <= 180) return 0.9;
 
     return 1.0;
   }

@@ -1,3 +1,7 @@
+import 'dart:math' as math;
+
+import 'package:flymap/entity/map_detail_level.dart';
+
 class MapDownloadConfig {
   MapDownloadConfig._();
 
@@ -18,4 +22,21 @@ class MapDownloadConfig {
   static const double estimatedMinMbPer1000Km = 30.0;
   static const double estimatedMaxMbPer1000Km = 50.0;
   static const double estimatedArticleMb = 0.5;
+
+  static bool isLongRoute(double distanceKm) => distanceKm > 2500.0;
+
+  static int resolveMaxZoom({
+    required double distanceKm,
+    required MapDetailLevel detailLevel,
+  }) {
+    final longRoute = isLongRoute(distanceKm);
+    return switch (detailLevel) {
+      MapDetailLevel.basic => longRoute ? 9 : 10,
+      MapDetailLevel.pro => longRoute ? 10 : 11,
+    };
+  }
+
+  static double zoomScaleForEstimate(int maxZoom) {
+    return math.pow(2, maxZoom - 10).toDouble();
+  }
 }

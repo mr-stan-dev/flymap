@@ -105,6 +105,7 @@ class DownloadMapUseCase {
   Stream<DownloadMapEvent> call({
     required FlightRoute flightRoute,
     required FlightInfo flightInfo,
+    required int maxZoom,
   }) async* {
     try {
       // Check internet connectivity before starting
@@ -119,7 +120,7 @@ class DownloadMapUseCase {
       final downloader = VectorTilesDownloader(
         polygon: flightRoute.corridor,
         minZoom: MapDownloadConfig.minDownloadZoom,
-        maxZoom: MapDownloadConfig.maxDownloadZoom,
+        maxZoom: maxZoom,
       );
       _currentDownloader = downloader;
 

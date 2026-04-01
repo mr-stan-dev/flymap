@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/entity/map_detail_level.dart';
 import 'package:flymap/subscription/pro_limits.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_cubit.dart';
@@ -134,7 +135,10 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
                 onSelectAirport: cubit.selectAirport,
                 onToggleFavoriteForAirport: cubit.toggleFavoriteForAirport,
                 onContinueFromAirportStep: cubit.continueFromAirportStep,
-                onContinueFromMap: cubit.continueFromMap,
+                onContinueFromMap: () => unawaited(
+                  _handleContinueFromMap(state: state, isProUser: isProUser),
+                ),
+                onSelectMapDetailLevel: cubit.selectMapDetailLevel,
                 onContinueFromOverview: cubit.continueFromOverview,
                 onToggleWikiArticle: cubit.toggleWikiArticleSelection,
                 onToggleAllWikiArticles: cubit.toggleAllWikiArticleSelections,
@@ -156,8 +160,12 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
     required bool isProUser,
   }) async {
     final selectedCount = state.selectedArticleUrls.length;
-    final shouldUpgradeFirst =
+    final shouldUpgradeForArticles =
         !isProUser && selectedCount > ProLimits.freeWikiArticlesSelectionLimit;
+    final shouldUpgradeForMapConfig =
+        !isProUser && state.selectedMapDetailLevel == MapDetailLevel.pro;
+    final shouldUpgradeFirst =
+        shouldUpgradeForArticles || shouldUpgradeForMapConfig;
     if (!shouldUpgradeFirst) {
       await context.read<FlightSearchScreenCubit>().startDownload(
         isPro: isProUser,
@@ -175,6 +183,38 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
         await context.read<FlightSearchScreenCubit>().startDownload(
           isPro: true,
         );
+        return;
+      case SubscriptionPaywallResult.cancelled:
+        _showSnackBar('Upgrade cancelled.');
+        return;
+      case SubscriptionPaywallResult.notPresented:
+        _showSnackBar('No paywall available right now.');
+        return;
+      case SubscriptionPaywallResult.error:
+        _showSnackBar('Failed to open paywall.');
+        return;
+    }
+  }
+
+  Future<void> _handleContinueFromMap({
+    required FlightSearchScreenState state,
+    required bool isProUser,
+  }) async {
+    final shouldUpgradeFirst =
+        !isProUser && state.selectedMapDetailLevel == MapDetailLevel.pro;
+    if (!shouldUpgradeFirst) {
+      await context.read<FlightSearchScreenCubit>().continueFromMap();
+      return;
+    }
+
+    final subscriptionCubit = context.read<SubscriptionCubit>();
+    final result = await subscriptionCubit.presentPaywallIfNeeded();
+    if (!mounted) return;
+
+    switch (result) {
+      case SubscriptionPaywallResult.purchased:
+      case SubscriptionPaywallResult.restored:
+        await context.read<FlightSearchScreenCubit>().continueFromMap();
         return;
       case SubscriptionPaywallResult.cancelled:
         _showSnackBar('Upgrade cancelled.');

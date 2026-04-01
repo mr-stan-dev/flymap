@@ -6,6 +6,7 @@ import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/logger.dart';
+import 'package:flymap/map_download_config.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
@@ -159,6 +160,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
           .call(
             flightRoute: currentState.flightRoute,
             flightInfo: currentState.flightInfo,
+            maxZoom: MapDownloadConfig.maxDownloadZoom,
           )
           .listen((event) {
             // Handle different download events

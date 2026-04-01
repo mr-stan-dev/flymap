@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/entity/map_detail_level.dart';
 import 'package:flymap/entity/wiki_article_candidate.dart';
 
 enum CreateFlightStep {
@@ -38,6 +39,7 @@ class FlightSearchScreenState extends Equatable {
     required this.selectedAirportIsFavorite,
     required this.flightRoute,
     required this.flightInfo,
+    required this.selectedMapDetailLevel,
     required this.articleCandidates,
     required this.selectedArticleUrls,
     required this.isWikiSuggestionsLoading,
@@ -71,6 +73,7 @@ class FlightSearchScreenState extends Equatable {
       selectedAirportIsFavorite: false,
       flightRoute: null,
       flightInfo: FlightInfo.empty,
+      selectedMapDetailLevel: MapDetailLevel.basic,
       articleCandidates: [],
       selectedArticleUrls: [],
       isWikiSuggestionsLoading: false,
@@ -103,6 +106,7 @@ class FlightSearchScreenState extends Equatable {
   final bool selectedAirportIsFavorite;
   final FlightRoute? flightRoute;
   final FlightInfo flightInfo;
+  final MapDetailLevel selectedMapDetailLevel;
   final List<WikiArticleCandidate> articleCandidates;
   final List<String> selectedArticleUrls;
   final bool isWikiSuggestionsLoading;
@@ -143,6 +147,7 @@ class FlightSearchScreenState extends Equatable {
     FlightRoute? flightRoute,
     bool clearFlightRoute = false,
     FlightInfo? flightInfo,
+    MapDetailLevel? selectedMapDetailLevel,
     List<WikiArticleCandidate>? articleCandidates,
     List<String>? selectedArticleUrls,
     bool clearSelectedArticleUrls = false,
@@ -184,6 +189,8 @@ class FlightSearchScreenState extends Equatable {
           selectedAirportIsFavorite ?? this.selectedAirportIsFavorite,
       flightRoute: clearFlightRoute ? null : flightRoute ?? this.flightRoute,
       flightInfo: flightInfo ?? this.flightInfo,
+      selectedMapDetailLevel:
+          selectedMapDetailLevel ?? this.selectedMapDetailLevel,
       articleCandidates: articleCandidates ?? this.articleCandidates,
       selectedArticleUrls: clearSelectedArticleUrls
           ? const []
@@ -231,6 +238,7 @@ class FlightSearchScreenState extends Equatable {
     selectedAirportIsFavorite,
     flightRoute,
     flightInfo,
+    selectedMapDetailLevel,
     articleCandidates,
     selectedArticleUrls,
     isWikiSuggestionsLoading,

@@ -20,7 +20,6 @@ import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_controls.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_gps_status_badge.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_initializing_overlay.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_style_loading_view.dart';
-import 'package:flymap/ui/screens/flight/widgets/tabs/map/zoom_indicator.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -49,7 +48,7 @@ class _FlightMapState extends State<FlightMap> {
   bool _isMapInitialized = false;
   GpsData? _pendingGpsData;
   bool _isApplyingUserLocation = false;
-  double _currentZoom = 1.0;
+  int? _lastLoggedZoomTenths;
   String? _mapLoadError;
 
   late final LatLng _center = LatLng(
@@ -66,7 +65,6 @@ class _FlightMapState extends State<FlightMap> {
   @override
   void initState() {
     super.initState();
-    _currentZoom = _initialZoom();
     _loadStyle();
     _scheduleControlsAutoHide();
   }
@@ -356,17 +354,13 @@ class _FlightMapState extends State<FlightMap> {
       return;
     }
 
-    final currentDisplayZoom = (_currentZoom * 10).round();
-    final nextDisplayZoom = (nextZoom * 10).round();
-
-    if (currentDisplayZoom == nextDisplayZoom) {
+    final nextZoomTenths = (nextZoom * 10).round();
+    if (_lastLoggedZoomTenths == nextZoomTenths) {
       return;
     }
 
-    if (!mounted) return;
-    setState(() {
-      _currentZoom = nextZoom;
-    });
+    _lastLoggedZoomTenths = nextZoomTenths;
+    _logger.log('Camera zoom: ${nextZoom.toStringAsFixed(1)}');
   }
 
   @override
@@ -412,7 +406,6 @@ class _FlightMapState extends State<FlightMap> {
               onStyleLoadedCallback: _onStyleLoaded,
             ),
           ),
-          ZoomIndicator(topOffset: controlsTopOffset, zoom: _currentZoom),
           FlightMapControls(
             topOffset: controlsTopOffset,
             visible: _showControls || _followUser,

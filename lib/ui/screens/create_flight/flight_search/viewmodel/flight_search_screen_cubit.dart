@@ -7,8 +7,10 @@ import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_article.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/entity/map_detail_level.dart';
 import 'package:flymap/entity/wiki_article_candidate.dart';
 import 'package:flymap/logger.dart';
+import 'package:flymap/map_download_config.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/subscription/pro_limits.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
@@ -143,6 +145,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             isSearchLoading: false,
             selectedAirportIsFavorite: isFavorite,
             clearFlightRoute: true,
+            selectedMapDetailLevel: MapDetailLevel.basic,
             flightInfo: FlightInfo.empty,
             articleCandidates: const [],
             clearSelectedArticleUrls: true,
@@ -164,6 +167,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             isSearchLoading: false,
             selectedAirportIsFavorite: isFavorite,
             clearFlightRoute: true,
+            selectedMapDetailLevel: MapDetailLevel.basic,
             flightInfo: FlightInfo.empty,
             articleCandidates: const [],
             clearSelectedArticleUrls: true,
@@ -271,6 +275,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             selectedAirportIsFavorite: false,
             clearSelectedArrival: true,
             clearFlightRoute: true,
+            selectedMapDetailLevel: MapDetailLevel.basic,
             flightInfo: FlightInfo.empty,
             articleCandidates: const [],
             clearSelectedArticleUrls: true,
@@ -295,6 +300,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             isSearchLoading: false,
             selectedAirportIsFavorite: false,
             clearFlightRoute: true,
+            selectedMapDetailLevel: MapDetailLevel.basic,
             flightInfo: FlightInfo.empty,
             articleCandidates: const [],
             clearSelectedArticleUrls: true,
@@ -322,6 +328,17 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         step: CreateFlightStep.overview,
         clearErrorMessage: true,
         clearDownloadErrorMessage: true,
+      ),
+    );
+  }
+
+  void selectMapDetailLevel(MapDetailLevel detailLevel) {
+    if (state.step != CreateFlightStep.mapPreview) return;
+    if (state.selectedMapDetailLevel == detailLevel) return;
+    emit(
+      state.copyWith(
+        selectedMapDetailLevel: detailLevel,
+        clearErrorMessage: true,
       ),
     );
   }
@@ -389,14 +406,14 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
                   ))
             .toList();
     if (!isPro && selectedUrls.length != state.selectedArticleUrls.length) {
-      emit(
-        state.copyWith(
-          selectedArticleUrls: selectedUrls,
-        ),
-      );
+      emit(state.copyWith(selectedArticleUrls: selectedUrls));
     }
     final hasArticlePhase = selectedUrls.isNotEmpty;
     final baseInfo = state.flightInfo;
+    final effectiveMaxZoom = MapDownloadConfig.resolveMaxZoom(
+      distanceKm: route.distanceInKm,
+      detailLevel: state.selectedMapDetailLevel,
+    );
 
     emit(
       state.copyWith(
@@ -475,7 +492,11 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
 
     final infoForSave = baseInfo.copyWith(articles: downloadedArticles);
     _downloadSubscription = _downloadMapUseCase
-        .call(flightRoute: route, flightInfo: infoForSave)
+        .call(
+          flightRoute: route,
+          flightInfo: infoForSave,
+          maxZoom: effectiveMaxZoom,
+        )
         .listen((event) {
           if (_downloadCancelled || isClosed) return;
           switch (event) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/airport.dart';
+import 'package:flymap/entity/map_detail_level.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_download_completion.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/widgets/flight_search_by_airports_step_meta.dart';
@@ -22,6 +23,7 @@ class FlightSearchByAirportsStepContent extends StatelessWidget {
     required this.onToggleFavoriteForAirport,
     required this.onContinueFromAirportStep,
     required this.onContinueFromMap,
+    required this.onSelectMapDetailLevel,
     required this.onContinueFromOverview,
     required this.onToggleWikiArticle,
     required this.onToggleAllWikiArticles,
@@ -42,6 +44,7 @@ class FlightSearchByAirportsStepContent extends StatelessWidget {
   final Future<void> Function(Airport airport) onToggleFavoriteForAirport;
   final VoidCallback onContinueFromAirportStep;
   final VoidCallback onContinueFromMap;
+  final ValueChanged<MapDetailLevel> onSelectMapDetailLevel;
   final VoidCallback onContinueFromOverview;
   final ValueChanged<String> onToggleWikiArticle;
   final VoidCallback onToggleAllWikiArticles;
@@ -105,7 +108,9 @@ class FlightSearchByAirportsStepContent extends StatelessWidget {
       case CreateFlightStep.mapPreview:
         return FlightSearchMapPreviewStep(
           state: state,
+          isProUser: isProUser,
           onContinue: onContinueFromMap,
+          onSelectMapDetailLevel: onSelectMapDetailLevel,
         );
       case CreateFlightStep.overview:
         return FlightSearchOverviewStep(
