@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -12,11 +13,15 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 class FlightMapPreviewWidget extends StatefulWidget {
   final FlightRoute flightRoute;
   final FlightInfo flightInfo;
+  final double minZoom;
+  final double maxZoom;
 
   const FlightMapPreviewWidget({
     super.key,
     required this.flightRoute,
     required this.flightInfo,
+    required this.minZoom,
+    required this.maxZoom,
   });
 
   @override
@@ -39,6 +44,7 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
     setState(() {
       _mapReady = true;
     });
+    unawaited(_clampCameraZoomToBounds());
   }
 
   void _onStyleLoaded() {
@@ -65,6 +71,27 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
     if (oldWidget.flightInfo != widget.flightInfo) {
       _syncPoiLayer();
     }
+    final zoomBoundsChanged =
+        oldWidget.minZoom != widget.minZoom ||
+        oldWidget.maxZoom != widget.maxZoom;
+    if (zoomBoundsChanged) {
+      unawaited(_clampCameraZoomToBounds());
+    }
+  }
+
+  Future<void> _clampCameraZoomToBounds() async {
+    final controller = _mapController;
+    if (controller == null) return;
+
+    final currentZoom = controller.cameraPosition?.zoom;
+    if (currentZoom == null || !currentZoom.isFinite) return;
+
+    final minZoom = widget.minZoom;
+    final maxZoom = widget.maxZoom;
+    final clampedZoom = currentZoom.clamp(minZoom, maxZoom).toDouble();
+    if ((clampedZoom - currentZoom).abs() < 0.001) return;
+
+    await controller.animateCamera(CameraUpdate.zoomTo(clampedZoom));
   }
 
   Future<void> _syncPoiLayer() async {
@@ -86,12 +113,17 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
       departure: route.departure,
       arrival: route.arrival,
     );
+    final initialZoom = (zoom.isFinite ? zoom : 1.0)
+        .clamp(widget.minZoom, widget.maxZoom)
+        .toDouble();
     return MapLibreMap(
       onMapCreated: _onMapCreated,
-      initialCameraPosition: CameraPosition(
-        target: _center,
-        zoom: zoom.isFinite ? zoom : 1.0,
+      initialCameraPosition: CameraPosition(target: _center, zoom: initialZoom),
+      minMaxZoomPreference: MinMaxZoomPreference(
+        widget.minZoom,
+        widget.maxZoom,
       ),
+      trackCameraPosition: true,
       styleString: "https://tiles.openfreemap.org/styles/liberty",
       compassViewPosition: CompassViewPosition.bottomRight,
       compassViewMargins: const Point(16, 16),

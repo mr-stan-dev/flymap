@@ -9,7 +9,6 @@ class MapDownloadConfig {
   static const double corridorWidthKm = 160.0;
 
   static const int minDownloadZoom = 0;
-  static const int maxDownloadZoom = 10;
   static const int defaultWorkerCount = 6;
   static const int seaFilterMinZoom = 6;
 

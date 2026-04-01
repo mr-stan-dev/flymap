@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/entity/map_detail_level.dart';
+import 'package:flymap/map_download_config.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/info/flight_info_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/map/flight_map_preview_widget.dart';
@@ -22,6 +24,10 @@ class _FlightPreviewMapWidgetState extends State<FlightPreviewMapWidget> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final resolvedMaxZoom = MapDownloadConfig.resolveMaxZoom(
+      distanceKm: widget.state.flightRoute.distanceInKm,
+      detailLevel: MapDetailLevel.basic,
+    ).toDouble();
     return Column(
       children: [
         Expanded(
@@ -32,6 +38,8 @@ class _FlightPreviewMapWidgetState extends State<FlightPreviewMapWidget> {
                 child: FlightMapPreviewWidget(
                   flightRoute: widget.state.flightRoute,
                   flightInfo: widget.state.flightInfo,
+                  minZoom: MapDownloadConfig.minDownloadZoom.toDouble(),
+                  maxZoom: resolvedMaxZoom,
                 ),
               ),
 

@@ -54,13 +54,13 @@ class MapUtils {
     final lon = center.longitude;
 
     // Europe: typically denser vector tiles
-    if (lat >= 35 && lat <= 72 && lon >= -12 && lon <= 45) return 2;
+    if (lat >= 35 && lat <= 72 && lon >= -12 && lon <= 45) return 1.8;
 
     // East Asia (Japan/Korea/coastal China)
-    if (lat >= 20 && lat <= 50 && lon >= 100 && lon <= 145) return 1.6;
+    if (lat >= 20 && lat <= 50 && lon >= 100 && lon <= 145) return 1.4;
 
     // South Asia
-    if (lat >= 5 && lat <= 35 && lon >= 65 && lon <= 95) return 1.3;
+    if (lat >= 5 && lat <= 35 && lon >= 65 && lon <= 95) return 1.2;
 
     // North America: usually lighter than Europe for this tileset
     if (lat >= 15 && lat <= 75 && lon >= -170 && lon <= -50) return 0.9;

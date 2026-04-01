@@ -5,6 +5,7 @@ import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/entity/map_detail_level.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/map_download_config.dart';
 import 'package:flymap/ui/map/map_utils.dart';
@@ -150,6 +151,10 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   void startDownload() async {
     try {
       final currentState = state as FlightMapPreviewMapState;
+      final effectiveMaxZoom = MapDownloadConfig.resolveMaxZoom(
+        distanceKm: currentState.flightRoute.distanceInKm,
+        detailLevel: MapDetailLevel.basic,
+      );
 
       // Reset state and start creation phase
       emit(MapDownloadingState(progress: 0.0));
@@ -160,7 +165,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
           .call(
             flightRoute: currentState.flightRoute,
             flightInfo: currentState.flightInfo,
-            maxZoom: MapDownloadConfig.maxDownloadZoom,
+            maxZoom: effectiveMaxZoom,
           )
           .listen((event) {
             // Handle different download events

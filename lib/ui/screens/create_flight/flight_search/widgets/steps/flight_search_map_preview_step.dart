@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/map_detail_level.dart';
+import 'package:flymap/map_download_config.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/map/flight_map_preview_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
@@ -28,6 +29,10 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
     final selectedDetailLevel = state.selectedMapDetailLevel;
     final isFreeUserWithProSelection =
         !isProUser && selectedDetailLevel == MapDetailLevel.pro;
+    final resolvedMaxZoom = MapDownloadConfig.resolveMaxZoom(
+      distanceKm: route.distanceInKm,
+      detailLevel: selectedDetailLevel,
+    ).toDouble();
     final estimatedMapSize = MapUtils.estimatedDownloadSizeRangeLabel(
       route: route,
       mapDetailLevel: selectedDetailLevel,
@@ -40,6 +45,8 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
           child: FlightMapPreviewWidget(
             flightRoute: route,
             flightInfo: state.flightInfo,
+            minZoom: MapDownloadConfig.minDownloadZoom.toDouble(),
+            maxZoom: resolvedMaxZoom,
           ),
         ),
         if (state.isTooLongFlight)
