@@ -35,7 +35,8 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
     final isLoading = state.isWikiSuggestionsLoading;
     final hasCandidates = candidates.isNotEmpty;
     final selectedSet = state.selectedArticleUrls.toSet();
-    final isFreeOverLimit = selectedCount > ProLimits.freeWikiArticlesSelectionLimit;
+    final isFreeOverLimit =
+        selectedCount > ProLimits.freeWikiArticlesSelectionLimit;
     final allSelected =
         hasCandidates &&
         candidates.every((candidate) => selectedSet.contains(candidate.url));
@@ -138,56 +139,52 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
             ],
           ),
         ),
-        SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (isProUser && isFreeOverLimit) ...[
-                  const ProActiveBlock(
-                    title: 'Pro active',
-                    message:
-                        'Full articles pack unlocked.',
-                  ),
-                  const SizedBox(height: 8),
-                ],
-                !isProUser && isFreeOverLimit
-                    ? Text(
-                        'Free plan includes up to 3 offline articles. Upgrade to Pro for unlimited articles.',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: DsBrandColors.proAmber,
-                        ),
-                      )
-                    : Text(
-                        'Estimated download size: $estimatedSizeRange',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: !isProUser && isFreeOverLimit
-                      ? PremiumButton(
-                          label: 'Upgrade',
-                          icon: Icons.workspace_premium_rounded,
-                          onPressed: isLoading ? null : onStartDownload,
-                        )
-                      : PrimaryButton(
-                          onPressed: isLoading ? null : onStartDownload,
-                          label: isLoading
-                              ? 'Loading article suggestions...'
-                              : selectedCount > 0
-                              ? 'Download map + $selectedCount article${selectedCount == 1 ? '' : 's'}'
-                              : 'Download map',
-                        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isProUser && isFreeOverLimit) ...[
+                const ProActiveBlock(
+                  title: 'Pro active',
+                  message: 'Full articles pack unlocked.',
                 ),
+                const SizedBox(height: 8),
               ],
-            ),
+              !isProUser && isFreeOverLimit
+                  ? Text(
+                      'Free plan includes up to 3 offline articles. Upgrade to Pro for unlimited articles.',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: DsBrandColors.proAmber,
+                      ),
+                    )
+                  : Text(
+                      'Estimated download size: $estimatedSizeRange',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: !isProUser && isFreeOverLimit
+                    ? PremiumButton(
+                        label: 'Upgrade',
+                        icon: Icons.workspace_premium_rounded,
+                        onPressed: isLoading ? null : onStartDownload,
+                      )
+                    : PrimaryButton(
+                        onPressed: isLoading ? null : onStartDownload,
+                        label: isLoading
+                            ? 'Loading article suggestions...'
+                            : selectedCount > 0
+                            ? 'Download map + $selectedCount article${selectedCount == 1 ? '' : 's'}'
+                            : 'Download map',
+                      ),
+              ),
+            ],
           ),
         ),
       ],

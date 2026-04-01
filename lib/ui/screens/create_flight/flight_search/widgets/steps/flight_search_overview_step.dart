@@ -28,33 +28,23 @@ class FlightSearchOverviewStep extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: SafeArea(
-            top: false,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: FlightInfoWidget(
-                route: route,
-                info: state.flightInfo,
-                isOverviewLoading: state.isOverviewLoading,
-                overviewErrorMessage: state.isOverviewLoading
-                    ? null
-                    : state.errorMessage,
-              ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: FlightInfoWidget(
+              route: route,
+              info: state.flightInfo,
+              isOverviewLoading: state.isOverviewLoading,
+              overviewErrorMessage: state.isOverviewLoading
+                  ? null
+                  : state.errorMessage,
             ),
           ),
         ),
-        SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: PrimaryButton(
-                onPressed: isDownloadEnabled ? onContinue : null,
-                label: buttonText,
-              ),
-            ),
+        Padding(
+          padding: const EdgeInsets.all(DsSpacing.md),
+          child: PrimaryButton(
+            onPressed: isDownloadEnabled ? onContinue : null,
+            label: buttonText,
           ),
         ),
       ],

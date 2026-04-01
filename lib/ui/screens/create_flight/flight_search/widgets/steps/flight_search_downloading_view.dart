@@ -36,14 +36,8 @@ class FlightSearchDownloadingView extends StatelessWidget {
             ),
           ),
         ),
-        const SafeArea(
-          top: false,
-          minimum: EdgeInsets.fromLTRB(
-            DsSpacing.lg,
-            DsSpacing.sm,
-            DsSpacing.lg,
-            DsSpacing.lg,
-          ),
+        const Padding(
+          padding: EdgeInsets.all(DsSpacing.md),
           child: InlineMessage(
             message: 'Do not close this screen until download completes',
             tone: DsMessageTone.info,

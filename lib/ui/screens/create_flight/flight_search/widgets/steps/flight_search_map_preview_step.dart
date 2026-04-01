@@ -4,7 +4,6 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/map/flight_map_pr
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/map/map_utils.dart';
-import 'package:flymap/ui/widgets/pro_widgets.dart';
 
 class FlightSearchMapPreviewStep extends StatelessWidget {
   const FlightSearchMapPreviewStep({
@@ -54,79 +53,68 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-        SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _MapDetailLevelButton(
-                        label: 'Basic',
-                        icon: Icons.map_outlined,
-                        selected: selectedDetailLevel == MapDetailLevel.basic,
-                        onPressed: () =>
-                            onSelectMapDetailLevel(MapDetailLevel.basic),
-                      ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: _MapDetailLevelButton(
+                      label: 'Basic',
+                      icon: Icons.map_outlined,
+                      selected: selectedDetailLevel == MapDetailLevel.basic,
+                      onPressed: () =>
+                          onSelectMapDetailLevel(MapDetailLevel.basic),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _MapDetailLevelButton(
-                        label: 'Pro',
-                        icon: Icons.workspace_premium_rounded,
-                        selected: selectedDetailLevel == MapDetailLevel.pro,
-                        selectedBorderColor: DsBrandColors.proAmber,
-                        onPressed: () =>
-                            onSelectMapDetailLevel(MapDetailLevel.pro),
-                      ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _MapDetailLevelButton(
+                      label: 'Pro',
+                      icon: Icons.workspace_premium_rounded,
+                      selected: selectedDetailLevel == MapDetailLevel.pro,
+                      selectedBorderColor: DsBrandColors.proAmber,
+                      onPressed: () =>
+                          onSelectMapDetailLevel(MapDetailLevel.pro),
                     ),
-                    const SizedBox(width: 4),
-                    IconButton(
-                      onPressed: () => _showMapDetailLevelInfoDialog(context),
-                      tooltip: 'Map detail info',
-                      icon: const Icon(Icons.info_outline_rounded, size: 18),
-                      visualDensity: VisualDensity.compact,
-                      constraints: const BoxConstraints(
-                        minWidth: 32,
-                        minHeight: 32,
-                      ),
-                    ),
-                  ],
-                ),
-                if (!state.isTooLongFlight) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    'Estimated map download size: $estimatedMapSize',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 4),
+                  IconButton(
+                    onPressed: () => _showMapDetailLevelInfoDialog(context),
+                    tooltip: 'Map detail info',
+                    icon: const Icon(Icons.info_outline_rounded, size: 18),
+                    visualDensity: VisualDensity.compact,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
                     ),
                   ),
                 ],
+              ),
+              if (!state.isTooLongFlight) ...[
                 const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: isFreeUserWithProSelection
-                      ? PremiumButton(
-                          onPressed: state.canContinueFromMap
-                              ? onContinue
-                              : null,
-                          label: 'Upgrade to Pro',
-                          icon: Icons.workspace_premium_rounded,
-                        )
-                      : PrimaryButton(
-                          onPressed: state.canContinueFromMap
-                              ? onContinue
-                              : null,
-                          label: 'Continue',
-                        ),
+                Text(
+                  'Estimated map download size: $estimatedMapSize',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
-            ),
+              const SizedBox(height: 10),
+              isFreeUserWithProSelection
+                  ? PremiumButton(
+                      onPressed: state.canContinueFromMap ? onContinue : null,
+                      label: 'Upgrade to Pro',
+                      icon: Icons.workspace_premium_rounded,
+                    )
+                  : PrimaryButton(
+                      onPressed: state.canContinueFromMap ? onContinue : null,
+                      label: 'Continue',
+                    ),
+            ],
           ),
         ),
       ],

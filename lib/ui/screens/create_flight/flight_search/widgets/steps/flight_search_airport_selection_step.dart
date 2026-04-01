@@ -49,109 +49,103 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: SafeArea(
-            bottom: false,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SearchInputField(
-                    controller: searchController,
-                    onChanged: (value) {
-                      if (selectedAirport != null) {
-                        onClearSelectedAirport();
-                      }
-                      onSearchChanged(value);
-                    },
-                    hintText: step == CreateFlightStep.departure
-                        ? 'Search departure airport'
-                        : 'Search arrival airport',
-                    isSelected: selectedAirport != null,
-                    selectedBorderColor: gpsActiveColor,
-                    onClear: onClearSearch,
-                    suffixActions: selectedAirport != null
-                        ? [
-                            IconButton(
-                              icon: Icon(
-                                selectedAirportIsFavorite
-                                    ? Icons.star
-                                    : Icons.star_border,
-                                color: selectedAirportIsFavorite
-                                    ? DsSemanticColors.warning(context)
-                                    : null,
-                              ),
-                              tooltip: selectedAirportIsFavorite
-                                  ? 'Remove favorite'
-                                  : 'Add to favorite',
-                              onPressed: onToggleFavoriteForSelected,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SearchInputField(
+                  controller: searchController,
+                  onChanged: (value) {
+                    if (selectedAirport != null) {
+                      onClearSelectedAirport();
+                    }
+                    onSearchChanged(value);
+                  },
+                  hintText: step == CreateFlightStep.departure
+                      ? 'Search departure airport'
+                      : 'Search arrival airport',
+                  isSelected: selectedAirport != null,
+                  selectedBorderColor: gpsActiveColor,
+                  onClear: onClearSearch,
+                  suffixActions: selectedAirport != null
+                      ? [
+                          IconButton(
+                            icon: Icon(
+                              selectedAirportIsFavorite
+                                  ? Icons.star
+                                  : Icons.star_border,
+                              color: selectedAirportIsFavorite
+                                  ? DsSemanticColors.warning(context)
+                                  : null,
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.close),
-                              tooltip: 'Remove selected airport',
-                              onPressed: onClearSelectedAirport,
-                            ),
-                          ]
-                        : const [],
+                            tooltip: selectedAirportIsFavorite
+                                ? 'Remove favorite'
+                                : 'Add to favorite',
+                            onPressed: onToggleFavoriteForSelected,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            tooltip: 'Remove selected airport',
+                            onPressed: onClearSelectedAirport,
+                          ),
+                        ]
+                      : const [],
+                ),
+                const SizedBox(height: 12),
+                if (isSearchLoading && selectedAirport == null)
+                  const Center(child: CircularProgressIndicator())
+                else if (searchQuery.isNotEmpty &&
+                    results.isEmpty &&
+                    selectedAirport == null)
+                  _EmptySearchResults(step: step)
+                else if (results.isNotEmpty && selectedAirport == null)
+                  _SearchResultList(
+                    airports: results,
+                    onSelectAirport: onSelectAirport,
                   ),
-                  const SizedBox(height: 12),
-                  if (isSearchLoading && selectedAirport == null)
-                    const Center(child: CircularProgressIndicator())
-                  else if (searchQuery.isNotEmpty &&
-                      results.isEmpty &&
-                      selectedAirport == null)
-                    _EmptySearchResults(step: step)
-                  else if (results.isNotEmpty && selectedAirport == null)
-                    _SearchResultList(
-                      airports: results,
-                      onSelectAirport: onSelectAirport,
+                if (favorites.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    'Favorites',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
                     ),
-                  if (favorites.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Text(
-                      'Favorites',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _AirportChipWrap(
-                      airports: favorites,
-                      onSelectAirport: onSelectAirport,
-                      showFavoriteTrailingIcon: true,
-                      onToggleFavorite: onToggleFavoriteForAirport,
-                    ),
-                  ],
-                  if (showPopularAirports) ...[
-                    const SizedBox(height: 16),
-                    Text(
-                      'Popular airports',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _AirportChipWrap(
-                      airports: popular,
-                      onSelectAirport: onSelectAirport,
-                    ),
-                  ],
+                  ),
+                  const SizedBox(height: 10),
+                  _AirportChipWrap(
+                    airports: favorites,
+                    onSelectAirport: onSelectAirport,
+                    showFavoriteTrailingIcon: true,
+                    onToggleFavorite: onToggleFavoriteForAirport,
+                  ),
                 ],
-              ),
+                if (showPopularAirports) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    'Popular airports',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _AirportChipWrap(
+                    airports: popular,
+                    onSelectAirport: onSelectAirport,
+                  ),
+                ],
+              ],
             ),
           ),
         ),
-        SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: PrimaryButton(
-                onPressed: selectedAirport == null ? null : onContinue,
-                label: 'Continue',
-              ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: PrimaryButton(
+              onPressed: selectedAirport == null ? null : onContinue,
+              label: 'Continue',
             ),
           ),
         ),

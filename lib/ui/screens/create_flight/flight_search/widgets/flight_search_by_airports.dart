@@ -106,47 +106,50 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
               ),
               title: Text(FlightSearchStepMeta.titleForStep(state.step)),
             ),
-            body: TweenAnimationBuilder<double>(
-              key: ValueKey(state.step.name),
-              tween: Tween<double>(begin: _stepEnterFrom, end: 0),
-              duration: const Duration(milliseconds: 260),
-              curve: Curves.easeOutCubic,
-              builder: (context, value, child) {
-                return Transform.translate(
-                  offset: Offset(value * MediaQuery.sizeOf(context).width, 0),
-                  child: child,
-                );
-              },
-              child: FlightSearchByAirportsStepContent(
-                state: state,
-                searchController: _searchController,
-                showDownloadSuccess: _showDownloadSuccess,
-                onSearchChanged: cubit.searchAirports,
-                onClearSearch: () {
-                  _searchController.clear();
-                  cubit.searchAirports('');
+            body: SafeArea(
+              top: false,
+              child: TweenAnimationBuilder<double>(
+                key: ValueKey(state.step.name),
+                tween: Tween<double>(begin: _stepEnterFrom, end: 0),
+                duration: const Duration(milliseconds: 260),
+                curve: Curves.easeOutCubic,
+                builder: (context, value, child) {
+                  return Transform.translate(
+                    offset: Offset(value * MediaQuery.sizeOf(context).width, 0),
+                    child: child,
+                  );
                 },
-                onToggleFavoriteForSelected:
-                    cubit.toggleFavoriteForSelectedAirport,
-                onClearSelectedAirport: () {
-                  _searchController.clear();
-                  cubit.clearSelectedAirportForCurrentStep();
-                },
-                onSelectAirport: cubit.selectAirport,
-                onToggleFavoriteForAirport: cubit.toggleFavoriteForAirport,
-                onContinueFromAirportStep: cubit.continueFromAirportStep,
-                onContinueFromMap: () => unawaited(
-                  _handleContinueFromMap(state: state, isProUser: isProUser),
+                child: FlightSearchByAirportsStepContent(
+                  state: state,
+                  searchController: _searchController,
+                  showDownloadSuccess: _showDownloadSuccess,
+                  onSearchChanged: cubit.searchAirports,
+                  onClearSearch: () {
+                    _searchController.clear();
+                    cubit.searchAirports('');
+                  },
+                  onToggleFavoriteForSelected:
+                      cubit.toggleFavoriteForSelectedAirport,
+                  onClearSelectedAirport: () {
+                    _searchController.clear();
+                    cubit.clearSelectedAirportForCurrentStep();
+                  },
+                  onSelectAirport: cubit.selectAirport,
+                  onToggleFavoriteForAirport: cubit.toggleFavoriteForAirport,
+                  onContinueFromAirportStep: cubit.continueFromAirportStep,
+                  onContinueFromMap: () => unawaited(
+                    _handleContinueFromMap(state: state, isProUser: isProUser),
+                  ),
+                  onSelectMapDetailLevel: cubit.selectMapDetailLevel,
+                  onContinueFromOverview: cubit.continueFromOverview,
+                  onToggleWikiArticle: cubit.toggleWikiArticleSelection,
+                  onToggleAllWikiArticles: cubit.toggleAllWikiArticleSelections,
+                  isProUser: isProUser,
+                  onStartDownload: () => unawaited(
+                    _handleStartDownload(state: state, isProUser: isProUser),
+                  ),
+                  onCancelDownload: cubit.cancelDownload,
                 ),
-                onSelectMapDetailLevel: cubit.selectMapDetailLevel,
-                onContinueFromOverview: cubit.continueFromOverview,
-                onToggleWikiArticle: cubit.toggleWikiArticleSelection,
-                onToggleAllWikiArticles: cubit.toggleAllWikiArticleSelections,
-                isProUser: isProUser,
-                onStartDownload: () => unawaited(
-                  _handleStartDownload(state: state, isProUser: isProUser),
-                ),
-                onCancelDownload: cubit.cancelDownload,
               ),
             ),
           ),
