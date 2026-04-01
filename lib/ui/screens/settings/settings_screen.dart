@@ -8,6 +8,7 @@ import 'package:flymap/ui/widgets/pro_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flymap/router/app_router.dart';
 
+import 'widgets/rate_us_setting_item.dart';
 import 'widgets/subscription_top_banner.dart';
 import 'viewmodel/settings_cubit.dart';
 import 'viewmodel/settings_state.dart';
@@ -196,6 +197,8 @@ class _SettingsView extends StatelessWidget {
                       );
                     },
                   ),
+                  const Divider(height: 1),
+                  const RateUsSettingItem(),
                 ],
               );
             },

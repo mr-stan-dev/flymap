@@ -21,26 +21,35 @@ class FlightSearchDownloadingView extends StatelessWidget {
         ? 'Downloading selected articles...'
         : 'Downloading offline map...';
 
-    return ProgressStateView(
-      title: title,
-      progress: state.downloadProgress,
-      showProgress: showProgressBar,
-      secondaryLine: stageLine,
-      trailingAction: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SecondaryButton(
-            onPressed: onCancel,
-            leadingIcon: Icons.close_rounded,
-            label: 'Cancel download',
+    return Column(
+      children: [
+        Expanded(
+          child: ProgressStateView(
+            title: title,
+            progress: state.downloadProgress,
+            showProgress: showProgressBar,
+            secondaryLine: stageLine,
+            trailingAction: SecondaryButton(
+              onPressed: onCancel,
+              leadingIcon: Icons.close_rounded,
+              label: 'Cancel download',
+            ),
           ),
-          const SizedBox(height: DsSpacing.sm),
-          const InlineMessage(
+        ),
+        const SafeArea(
+          top: false,
+          minimum: EdgeInsets.fromLTRB(
+            DsSpacing.lg,
+            DsSpacing.sm,
+            DsSpacing.lg,
+            DsSpacing.lg,
+          ),
+          child: InlineMessage(
             message: 'Do not close this screen until download completes',
             tone: DsMessageTone.info,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
