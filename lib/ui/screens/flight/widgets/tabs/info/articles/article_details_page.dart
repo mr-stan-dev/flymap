@@ -14,9 +14,23 @@ class ArticleDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasHtml = article.contentHtml.trim().isNotEmpty;
-    final htmlContent = hasHtml ? composeScrollableHtml(article) : '';
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final pageBackground = colorScheme.surface;
+    final htmlContent = hasHtml
+        ? composeScrollableHtml(
+            article: article,
+            backgroundColor: pageBackground,
+            textColor: colorScheme.onSurface,
+            mutedTextColor: colorScheme.onSurfaceVariant,
+            linkColor: colorScheme.primary,
+            dividerColor: colorScheme.outlineVariant,
+            isDarkMode: isDarkMode,
+          )
+        : '';
 
     return Scaffold(
+      backgroundColor: pageBackground,
       appBar: AppBar(
         title: Text(article.title),
         actions: [
@@ -28,28 +42,32 @@ class ArticleDetailsPage extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            DsSpacing.md,
-            DsSpacing.sm,
-            DsSpacing.md,
-            DsSpacing.sm,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: hasHtml
-                    ? OfflineArticleHtmlView(
-                        htmlContent: htmlContent,
-                        articleTitle: article.title,
-                      )
-                    : PlainTextArticleView(
-                        article: article,
-                        onOpenSource: () => _openSource(article.sourceUrl),
-                      ),
-              ),
-            ],
+        child: ColoredBox(
+          color: pageBackground,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              DsSpacing.md,
+              DsSpacing.sm,
+              DsSpacing.md,
+              DsSpacing.sm,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: hasHtml
+                      ? OfflineArticleHtmlView(
+                          htmlContent: htmlContent,
+                          articleTitle: article.title,
+                          backgroundColor: pageBackground,
+                        )
+                      : PlainTextArticleView(
+                          article: article,
+                          onOpenSource: () => _openSource(article.sourceUrl),
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

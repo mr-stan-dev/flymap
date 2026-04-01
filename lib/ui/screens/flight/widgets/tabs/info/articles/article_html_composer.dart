@@ -1,24 +1,67 @@
+import 'package:flutter/material.dart';
 import 'package:flymap/entity/flight_article.dart';
 
-String composeScrollableHtml(FlightArticle article) {
+String composeScrollableHtml({
+  required FlightArticle article,
+  required Color backgroundColor,
+  required Color textColor,
+  required Color mutedTextColor,
+  required Color linkColor,
+  required Color dividerColor,
+  required bool isDarkMode,
+}) {
   final summary = article.summary.trim();
+  final bgHex = _cssHex(backgroundColor);
+  final textHex = _cssHex(textColor);
+  final mutedHex = _cssHex(mutedTextColor);
+  final linkHex = _cssHex(linkColor);
+  final dividerHex = _cssHex(dividerColor);
+  final colorScheme = isDarkMode ? 'dark' : 'light';
 
-  const injectedStyles = '''
+  final injectedStyles =
+      '''
 <style>
+  :root {
+    color-scheme: $colorScheme;
+  }
+  html {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: $bgHex !important;
+  }
   body {
     margin: 0 !important;
     padding: 0 !important;
+    background: $bgHex !important;
+    color: $textHex !important;
   }
   .offline-shell {
+    min-height: 100vh;
+    box-sizing: border-box;
     padding: 12px 14px 20px;
+    background: $bgHex !important;
+    color: $textHex !important;
   }
-  .offline-summary {
-    margin: 0 0 12px;
-    color: #4b5563;
+  .offline-shell,
+  .offline-shell * {
+    background-color: transparent !important;
+    color: $textHex !important;
+  }
+  .offline-shell a,
+  .offline-shell a:visited {
+    color: $linkHex !important;
+  }
+  .offline-shell hr {
+    border: 0 !important;
+    border-top: 1px solid $dividerHex !important;
+    margin: 16px 0 !important;
+  }
+  .offline-summary,
+  .offline-meta {
+    color: $mutedHex !important;
   }
   .offline-meta {
     margin: 0 0 6px;
-    color: #6b7280;
     font-size: 13px;
   }
 </style>
@@ -40,10 +83,7 @@ String composeScrollableHtml(FlightArticle article) {
   var html = article.contentHtml;
   // V2 simplification: keep offline articles text-first and ignore all images.
   html = html.replaceAll(RegExp(r'<img\b[^>]*>', caseSensitive: false), '');
-  html = html.replaceFirst(
-    RegExp(r'</head>', caseSensitive: false),
-    '$injectedStyles\n</head>',
-  );
+  html = _injectIntoHead(html, injectedStyles);
   html = html.replaceFirstMapped(
     RegExp(r'<body[^>]*>', caseSensitive: false),
     (match) =>
@@ -60,6 +100,28 @@ String composeScrollableHtml(FlightArticle article) {
   }
 
   return html;
+}
+
+String _injectIntoHead(String html, String styles) {
+  final headClose = RegExp(r'</head>', caseSensitive: false);
+  if (headClose.hasMatch(html)) {
+    return html.replaceFirst(headClose, '$styles\n</head>');
+  }
+
+  final htmlOpen = RegExp(r'<html[^>]*>', caseSensitive: false);
+  if (htmlOpen.hasMatch(html)) {
+    return html.replaceFirstMapped(
+      htmlOpen,
+      (match) => '${match.group(0)}\n<head>\n$styles\n</head>',
+    );
+  }
+
+  return '<head>\n$styles\n</head>\n$html';
+}
+
+String _cssHex(Color color) {
+  final rgb = color.toARGB32() & 0x00FFFFFF;
+  return '#${rgb.toRadixString(16).padLeft(6, '0')}';
 }
 
 String _escapeHtml(String value) {

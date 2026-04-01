@@ -13,11 +13,13 @@ class OfflineArticleHtmlView extends StatefulWidget {
   const OfflineArticleHtmlView({
     required this.htmlContent,
     required this.articleTitle,
+    required this.backgroundColor,
     super.key,
   });
 
   final String htmlContent;
   final String articleTitle;
+  final Color backgroundColor;
 
   @override
   State<OfflineArticleHtmlView> createState() => _OfflineArticleHtmlViewState();
@@ -27,18 +29,33 @@ class _OfflineArticleHtmlViewState extends State<OfflineArticleHtmlView> {
   final _logger = const Logger('OfflineArticleHtmlView');
 
   late final WebViewController _controller;
-  late final Future<void> _initialization;
+  late Future<void> _initialization;
 
   @override
   void initState() {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.disabled)
-      ..setBackgroundColor(Colors.transparent)
+      ..setBackgroundColor(widget.backgroundColor)
       ..setNavigationDelegate(
         NavigationDelegate(onNavigationRequest: _onNavigationRequest),
       );
     _initialization = _loadHtml();
+  }
+
+  @override
+  void didUpdateWidget(covariant OfflineArticleHtmlView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final didHtmlChange = oldWidget.htmlContent != widget.htmlContent;
+    final didBackgroundChange =
+        oldWidget.backgroundColor.toARGB32() !=
+        widget.backgroundColor.toARGB32();
+    if (!didHtmlChange && !didBackgroundChange) return;
+
+    _controller.setBackgroundColor(widget.backgroundColor);
+    setState(() {
+      _initialization = _loadHtml();
+    });
   }
 
   @override
@@ -55,13 +72,16 @@ class _OfflineArticleHtmlViewState extends State<OfflineArticleHtmlView> {
             ),
           );
         }
-        return WebViewWidget(
-          controller: _controller,
-          gestureRecognizers: {
-            Factory<OneSequenceGestureRecognizer>(
-              () => EagerGestureRecognizer(),
-            ),
-          },
+        return ColoredBox(
+          color: widget.backgroundColor,
+          child: WebViewWidget(
+            controller: _controller,
+            gestureRecognizers: {
+              Factory<OneSequenceGestureRecognizer>(
+                () => EagerGestureRecognizer(),
+              ),
+            },
+          ),
         );
       },
     );
