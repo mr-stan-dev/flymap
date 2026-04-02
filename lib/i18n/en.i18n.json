@@ -17,6 +17,7 @@
     "failedToLoadFlights": "Failed to load flights",
     "newFlight": "New flight",
     "welcomeTitle": "Welcome to Flymap",
+    "welcomeTitlePro": "Welcome to Flymap Pro",
     "welcomeSubtitle": "Offline maps for flights",
     "flightsSaved": "Flights saved",
     "storageUsed": "Storage used",
@@ -68,8 +69,8 @@
     "couldNotOpenStorePage": "Could not open store page",
     "proBannerTitle": "Flymap Pro",
     "proBannerTitleActive": "Flymap Pro Active",
-    "proBannerSubtitleActive": "Detailed map mode and unlimited offline articles unlocked.",
-    "proBannerSubtitleFree": "Unlock detailed maps and unlimited offline articles.",
+    "proBannerSubtitleActive": "Detailed map mode and full offline article bundles unlocked.",
+    "proBannerSubtitleFree": "Unlock detailed maps and full offline article bundles",
     "proBannerBadgeActive": "PRO ACTIVE"
   },
   "subscription": {

@@ -115,6 +115,9 @@ class TranslationsHomeEn {
 	/// en: 'Welcome to Flymap'
 	String get welcomeTitle => 'Welcome to Flymap';
 
+	/// en: 'Welcome to Flymap Pro'
+	String get welcomeTitlePro => 'Welcome to Flymap Pro';
+
 	/// en: 'Offline maps for flights'
 	String get welcomeSubtitle => 'Offline maps for flights';
 
@@ -258,11 +261,11 @@ class TranslationsSettingsEn {
 	/// en: 'Flymap Pro Active'
 	String get proBannerTitleActive => 'Flymap Pro Active';
 
-	/// en: 'Detailed map mode and unlimited offline articles unlocked.'
-	String get proBannerSubtitleActive => 'Detailed map mode and unlimited offline articles unlocked.';
+	/// en: 'Detailed map mode and full offline article bundles unlocked.'
+	String get proBannerSubtitleActive => 'Detailed map mode and full offline article bundles unlocked.';
 
-	/// en: 'Unlock detailed maps and unlimited offline articles.'
-	String get proBannerSubtitleFree => 'Unlock detailed maps and unlimited offline articles.';
+	/// en: 'Unlock detailed maps and full offline article bundles'
+	String get proBannerSubtitleFree => 'Unlock detailed maps and full offline article bundles';
 
 	/// en: 'PRO ACTIVE'
 	String get proBannerBadgeActive => 'PRO ACTIVE';
@@ -1230,6 +1233,7 @@ extension on Translations {
 			'home.failedToLoadFlights' => 'Failed to load flights',
 			'home.newFlight' => 'New flight',
 			'home.welcomeTitle' => 'Welcome to Flymap',
+			'home.welcomeTitlePro' => 'Welcome to Flymap Pro',
 			'home.welcomeSubtitle' => 'Offline maps for flights',
 			'home.flightsSaved' => 'Flights saved',
 			'home.storageUsed' => 'Storage used',
@@ -1277,8 +1281,8 @@ extension on Translations {
 			'settings.couldNotOpenStorePage' => 'Could not open store page',
 			'settings.proBannerTitle' => 'Flymap Pro',
 			'settings.proBannerTitleActive' => 'Flymap Pro Active',
-			'settings.proBannerSubtitleActive' => 'Detailed map mode and unlimited offline articles unlocked.',
-			'settings.proBannerSubtitleFree' => 'Unlock detailed maps and unlimited offline articles.',
+			'settings.proBannerSubtitleActive' => 'Detailed map mode and full offline article bundles unlocked.',
+			'settings.proBannerSubtitleFree' => 'Unlock detailed maps and full offline article bundles',
 			'settings.proBannerBadgeActive' => 'PRO ACTIVE',
 			'subscription.screenTitle' => 'Subscription',
 			'subscription.pullToRefresh' => 'Pull down to refresh your subscription status.',

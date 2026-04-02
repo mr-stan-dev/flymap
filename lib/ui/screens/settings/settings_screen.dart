@@ -38,10 +38,6 @@ class _SettingsView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(context.t.settings.title),
-            if (isProUser) ...[
-              const SizedBox(width: 8),
-              const ProBadge(compact: true),
-            ],
           ],
         ),
       ),

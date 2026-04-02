@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flymap/i18n/strings.g.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_state.dart';
+import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
+
+import 'home_summary_header_free.dart';
+import 'home_summary_header_pro.dart';
 
 class HomeSummaryHeader extends StatelessWidget {
   const HomeSummaryHeader({required this.statistics, super.key});
@@ -9,103 +13,11 @@ class HomeSummaryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          colors: [
-            colorScheme.primary.withValues(alpha: 0.15),
-            colorScheme.primary.withValues(alpha: 0.3),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            context.t.home.welcomeTitle,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            context.t.home.welcomeSubtitle,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _SummaryPill(
-                icon: Icons.flight,
-                label: context.t.home.flightsSaved,
-                value: '${statistics.totalFlights}',
-              ),
-              _SummaryPill(
-                icon: Icons.map,
-                label: context.t.home.storageUsed,
-                value: statistics.formattedTotalMapSize,
-              ),
-            ],
-          ),
-        ],
-      ),
+    final isProUser = context.select(
+      (SubscriptionCubit cubit) => cubit.state.isPro,
     );
-  }
-}
-
-class _SummaryPill extends StatelessWidget {
-  const _SummaryPill({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  final IconData icon;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: colorScheme.surface.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: colorScheme.primary),
-          const SizedBox(width: 6),
-          Text(
-            '$label: ',
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          Text(
-            value,
-            style: Theme.of(
-              context,
-            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
-          ),
-        ],
-      ),
-    );
+    return isProUser
+        ? HomeSummaryHeaderPro(statistics: statistics)
+        : HomeSummaryHeaderFree(statistics: statistics);
   }
 }

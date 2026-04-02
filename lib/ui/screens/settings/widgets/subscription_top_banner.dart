@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart';
+import 'package:flymap/ui/widgets/premium_surface_effects.dart';
 
-class SubscriptionTopBanner extends StatefulWidget {
+class SubscriptionTopBanner extends StatelessWidget {
   const SubscriptionTopBanner({
     required this.state,
     required this.onManage,
@@ -14,26 +15,10 @@ class SubscriptionTopBanner extends StatefulWidget {
   final VoidCallback onManage;
 
   @override
-  State<SubscriptionTopBanner> createState() => _SubscriptionTopBannerState();
-}
-
-class _SubscriptionTopBannerState extends State<SubscriptionTopBanner>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 3000),
-  )..repeat();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final state = widget.state;
+    final state = this.state;
     final isPro = state.isPro;
+    final isLightTheme = Theme.of(context).brightness == Brightness.light;
     final cardRadius = BorderRadius.circular(DsRadii.xl);
     final title = isPro
         ? context.t.settings.proBannerTitleActive
@@ -47,9 +32,12 @@ class _SubscriptionTopBannerState extends State<SubscriptionTopBanner>
     final badgeLabel = isPro
         ? context.t.settings.proBannerBadgeActive
         : context.t.common.upgrade.toUpperCase();
+    final gradientColors = isPro
+        ? PremiumSurfaceGradients.pro(isLightTheme: isLightTheme)
+        : PremiumSurfaceGradients.free(isLightTheme: isLightTheme);
 
     return GestureDetector(
-      onTap: widget.onManage,
+      onTap: onManage,
       child: ClipRRect(
         borderRadius: cardRadius,
         clipBehavior: Clip.antiAlias,
@@ -62,17 +50,7 @@ class _SubscriptionTopBannerState extends State<SubscriptionTopBanner>
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: isPro
-                        ? const [
-                            Color(0xFF4D3300),
-                            Color(0xFF936000),
-                            Color(0xFFD59000),
-                          ]
-                        : const [
-                            Color(0xFF13213E),
-                            Color(0xFF1D3B69),
-                            Color(0xFF2A5E9C),
-                          ],
+                    colors: gradientColors,
                   ),
                   border: Border.all(
                     color: isPro
@@ -82,13 +60,7 @@ class _SubscriptionTopBannerState extends State<SubscriptionTopBanner>
                 ),
               ),
             ),
-            Positioned.fill(
-              child: CustomPaint(
-                painter: _DiagonalStripesPainter(
-                  color: Colors.white.withValues(alpha: 0.05),
-                ),
-              ),
-            ),
+            Positioned.fill(child: PremiumDiagonalStripesOverlay()),
             Positioned(
               right: -18,
               top: -26,
@@ -99,14 +71,7 @@ class _SubscriptionTopBannerState extends State<SubscriptionTopBanner>
               ),
             ),
             Positioned.fill(
-              child: IgnorePointer(
-                child: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, _) {
-                    return _BannerGradientShimmer(value: _controller.value);
-                  },
-                ),
-              ),
+              child: IgnorePointer(child: PremiumAnimatedShimmerOverlay()),
             ),
             Padding(
               padding: const EdgeInsets.all(DsSpacing.md),
@@ -191,64 +156,5 @@ class _BannerBadge extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _BannerGradientShimmer extends StatelessWidget {
-  const _BannerGradientShimmer({required this.value});
-
-  final double value;
-
-  @override
-  Widget build(BuildContext context) {
-    final center = -0.4 + (value * 1.8);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.transparent,
-            Colors.white.withValues(alpha: 0.04),
-            Colors.white.withValues(alpha: 0.11),
-            Colors.white.withValues(alpha: 0.04),
-            Colors.transparent,
-          ],
-          stops: [
-            (center - 0.14).clamp(0.0, 1.0),
-            (center - 0.05).clamp(0.0, 1.0),
-            center.clamp(0.0, 1.0),
-            (center + 0.05).clamp(0.0, 1.0),
-            (center + 0.14).clamp(0.0, 1.0),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DiagonalStripesPainter extends CustomPainter {
-  const _DiagonalStripesPainter({required this.color});
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1.0;
-    const spacing = 14.0;
-    for (double x = -size.height; x < size.width; x += spacing) {
-      canvas.drawLine(
-        Offset(x, 0),
-        Offset(x + size.height, size.height),
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DiagonalStripesPainter oldDelegate) {
-    return oldDelegate.color != color;
   }
 }
