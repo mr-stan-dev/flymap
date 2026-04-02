@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
@@ -40,7 +41,7 @@ class _SubscriptionManagementScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Subscription')),
+      appBar: AppBar(title: Text(context.t.subscription.screenTitle)),
       body: SafeArea(
         child: BlocBuilder<SubscriptionCubit, SubscriptionState>(
           builder: (context, state) {
@@ -60,16 +61,16 @@ class _SubscriptionManagementScreenState
                   _buildStatusCard(context, state),
                   const SizedBox(height: 8),
                   Text(
-                    'Pull down to refresh your subscription status.',
+                    context.t.subscription.pullToRefresh,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 12),
                   SectionCard(
-                    title: 'Need help?',
+                    title: context.t.subscription.needHelp,
                     child: SecondaryButton(
-                      label: 'Contact support',
+                      label: context.t.subscription.contactSupport,
                       leadingIcon: Icons.support_agent_rounded,
                       onPressed: () => _contactSupport(context),
                     ),
@@ -86,13 +87,13 @@ class _SubscriptionManagementScreenState
   Widget _buildStatusCard(BuildContext context, SubscriptionState state) {
     final statusText = switch (state.phase) {
       SubscriptionPhase.unknown ||
-      SubscriptionPhase.loading => 'Checking your subscription status...',
-      SubscriptionPhase.pro => 'Flymap Pro is active.',
-      SubscriptionPhase.free => 'You are on Free plan.',
+      SubscriptionPhase.loading => context.t.subscription.checkingStatus,
+      SubscriptionPhase.pro => context.t.subscription.proActive,
+      SubscriptionPhase.free => context.t.subscription.freePlan,
     };
 
     return SectionCard(
-      title: 'Flymap Pro',
+      title: context.t.subscription.cardTitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -106,43 +107,51 @@ class _SubscriptionManagementScreenState
                 ),
           const SizedBox(height: 12),
           _MetaRow(
-            label: 'Status',
-            value: state.isPro ? 'Active' : 'Not active',
+            label: context.t.subscription.status,
+            value: state.isPro
+                ? context.t.subscription.active
+                : context.t.subscription.notActive,
           ),
           _MetaRow(
-            label: 'Entitlement',
-            value: state.status?.entitlementId ?? 'Flymap Pro',
+            label: context.t.subscription.entitlement,
+            value:
+                state.status?.entitlementId ?? context.t.subscription.cardTitle,
           ),
           _MetaRow(
-            label: 'Expires',
-            value: _formatDateTime(state.status?.expiresAt) ?? 'No expiration',
+            label: context.t.subscription.expires,
+            value:
+                _formatDateTime(state.status?.expiresAt) ??
+                context.t.subscription.noExpiration,
           ),
           _MetaRow(
-            label: 'Last update',
-            value: _formatDateTime(state.lastUpdatedAt) ?? 'Unknown',
+            label: context.t.subscription.lastUpdate,
+            value:
+                _formatDateTime(state.lastUpdatedAt) ??
+                context.t.subscription.unknown,
           ),
           const SizedBox(height: 8),
           if (state.isPro)
             TertiaryButton(
-              label: 'Manage subscription',
+              label: context.t.subscription.manageSubscription,
               leadingIcon: Icons.storefront_rounded,
               trailingIcon: Icons.open_in_new_rounded,
               onPressed: () => _openStoreSubscriptions(
+                context: context,
                 messenger: ScaffoldMessenger.of(context),
                 platform: Theme.of(context).platform,
               ),
             )
           else
             PremiumButton(
-              label: 'Upgrade to Pro',
+              label: context.t.subscription.upgradeToPro,
               onPressed: _isPaywallLoading ? null : () => _openPaywall(context),
               isLoading: _isPaywallLoading,
             ),
           const SizedBox(height: 8),
           Text(
             state.isPro
-                ? 'You can cancel or change billing in your App Store or Google Play subscription settings.'
-                : 'Free users can upgrade to Pro to unlock premium features.',
+                ? context.t.subscription.proManageHint
+                : context.t.subscription.freeUpgradeHint,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -208,17 +217,18 @@ class _SubscriptionManagementScreenState
     final uri = Uri(
       scheme: 'mailto',
       path: _supportEmail,
-      queryParameters: const {'subject': 'Flymap subscription support'},
+      queryParameters: {'subject': context.t.subscription.supportEmailSubject},
     );
     final launched = await launchUrl(uri);
     if (!launched && context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Could not open email app')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.t.subscription.couldNotOpenEmailApp)),
+      );
     }
   }
 
   Future<void> _openStoreSubscriptions({
+    required BuildContext context,
     required ScaffoldMessengerState messenger,
     required TargetPlatform platform,
   }) async {
@@ -230,7 +240,11 @@ class _SubscriptionManagementScreenState
     final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!opened) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Could not open subscription settings')),
+        SnackBar(
+          content: Text(
+            context.t.subscription.couldNotOpenSubscriptionSettings,
+          ),
+        ),
       );
     }
   }
@@ -243,12 +257,15 @@ class _SubscriptionManagementScreenState
     try {
       final result = await cubit.presentPaywallIfNeeded();
       final message = switch (result) {
-        SubscriptionPaywallResult.purchased => 'Flymap Pro activated.',
-        SubscriptionPaywallResult.restored => 'Flymap Pro restored.',
-        SubscriptionPaywallResult.cancelled => 'Upgrade cancelled.',
-        SubscriptionPaywallResult.notPresented =>
-          'No paywall available right now.',
-        SubscriptionPaywallResult.error => 'Failed to open paywall.',
+        SubscriptionPaywallResult.purchased =>
+          context.t.settings.flymapProActivated,
+        SubscriptionPaywallResult.restored =>
+          context.t.subscription.proRestored,
+        SubscriptionPaywallResult.cancelled =>
+          context.t.settings.upgradeCancelled,
+        SubscriptionPaywallResult.notPresented => context.t.settings.noPaywall,
+        SubscriptionPaywallResult.error =>
+          context.t.subscription.failedOpenPaywall,
       };
       messenger.showSnackBar(SnackBar(content: Text(message)));
     } finally {

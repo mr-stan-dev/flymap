@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/gps_data.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 
 class MapGpsStatusBadge extends StatelessWidget {
@@ -58,6 +59,7 @@ class MapGpsStatusBadge extends StatelessWidget {
   }
 
   _MapGpsStatusView _statusView(BuildContext context) {
+    final t = context.t;
     final success = DsSemanticColors.success(context);
     final warning = DsSemanticColors.warning(context);
     final error = DsSemanticColors.error(context);
@@ -75,26 +77,28 @@ class MapGpsStatusBadge extends StatelessWidget {
             warning: warning,
             error: error,
           ),
-          label: 'GPS ${_qualityLabel(quality)}',
+          label: t.flight.dashboard.gpsQuality(
+            quality: _qualityLabel(context, quality),
+          ),
         );
       case GpsStatus.searching:
         return _MapGpsStatusView(
           icon: Icons.gps_not_fixed_rounded,
           color: info,
-          label: 'GPS searching',
+          label: t.flight.dashboard.gpsSearchingLabel,
           searching: true,
         );
       case GpsStatus.permissionsNotGranted:
         return _MapGpsStatusView(
           icon: Icons.location_disabled_rounded,
           color: warning,
-          label: 'GPS permission needed',
+          label: t.flight.dashboard.gpsPermissionNeededLabel,
         );
       case GpsStatus.off:
         return _MapGpsStatusView(
           icon: Icons.gps_off_rounded,
           color: error,
-          label: 'GPS off',
+          label: t.flight.dashboard.gpsOffLabel,
         );
     }
   }
@@ -122,14 +126,15 @@ class MapGpsStatusBadge extends StatelessWidget {
     }
   }
 
-  String _qualityLabel(_SignalQuality quality) {
+  String _qualityLabel(BuildContext context, _SignalQuality quality) {
+    final t = context.t;
     switch (quality) {
       case _SignalQuality.good:
-        return 'Good';
+        return t.flight.dashboard.signalGood;
       case _SignalQuality.poor:
-        return 'Poor';
+        return t.flight.dashboard.signalPoor;
       case _SignalQuality.bad:
-        return 'Bad';
+        return t.flight.dashboard.signalBad;
     }
   }
 }

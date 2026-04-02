@@ -1,5 +1,6 @@
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/i18n/strings.g.dart';
 
 class RouteCopyBuilder {
   const RouteCopyBuilder._();
@@ -10,16 +11,16 @@ class RouteCopyBuilder {
     final distanceKm = route.distanceInKm.toStringAsFixed(0);
 
     return [
-      'Flymap Route',
+      t.flight.info.copyRouteTitle,
       '',
       '${departure.displayCode} -> ${arrival.displayCode}',
-      'Route code: ${route.routeCode}',
-      'Distance: $distanceKm km',
+      t.flight.info.copyRouteCode(routeCode: route.routeCode),
+      t.flight.info.copyDistance(distance: distanceKm),
       '',
-      'From',
+      t.flight.info.copyFrom,
       _airportSummary(departure),
       '',
-      'To',
+      t.flight.info.copyTo,
       _airportSummary(arrival),
     ].join('\n');
   }
@@ -28,9 +29,12 @@ class RouteCopyBuilder {
     final iata = _codeOrFallback(airport.iataCode);
     final icao = _codeOrFallback(airport.icaoCode);
     return [
-      'City: ${airport.city}, ${airport.countryCode}',
-      'Airport: ${airport.name}',
-      'Codes: IATA $iata | ICAO $icao',
+      t.flight.info.copyCity(
+        city: airport.city,
+        countryCode: airport.countryCode,
+      ),
+      t.flight.info.copyAirport(airport: airport.name),
+      t.flight.info.copyCodes(iata: iata, icao: icao),
     ].join('\n');
   }
 

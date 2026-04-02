@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
@@ -13,32 +14,12 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  static const _pages = <_OnboardingPageData>[
-    _OnboardingPageData(
-      imageAsset: 'assets/images/onboarding1.webp',
-      title: 'Explore the world from above',
-      subtitle:
-          'From coastlines to mountain ranges, every route feels like a new adventure.',
-    ),
-    _OnboardingPageData(
-      imageAsset: 'assets/images/onboarding2.webp',
-      title: 'Turn every flight into a story',
-      subtitle:
-          'Follow your path in real time and enjoy the journey, not just the destination.',
-    ),
-    _OnboardingPageData(
-      imageAsset: 'assets/images/onboarding3.webp',
-      title: 'Download maps before takeoff',
-      subtitle:
-          'To enjoy your offline in-flight experience, download your map before switching to flight mode.',
-    ),
-  ];
-
+  static const _pageCount = 3;
   final PageController _pageController = PageController();
   int _pageIndex = 0;
   bool _isFinishing = false;
 
-  bool get _isLastPage => _pageIndex == _pages.length - 1;
+  bool get _isLastPage => _pageIndex == _pageCount - 1;
 
   @override
   void dispose() {
@@ -49,6 +30,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final pages = <_OnboardingPageData>[
+      _OnboardingPageData(
+        imageAsset: 'assets/images/onboarding1.webp',
+        title: context.t.onboarding.page1Title,
+        subtitle: context.t.onboarding.page1Subtitle,
+      ),
+      _OnboardingPageData(
+        imageAsset: 'assets/images/onboarding2.webp',
+        title: context.t.onboarding.page2Title,
+        subtitle: context.t.onboarding.page2Subtitle,
+      ),
+      _OnboardingPageData(
+        imageAsset: 'assets/images/onboarding3.webp',
+        title: context.t.onboarding.page3Title,
+        subtitle: context.t.onboarding.page3Subtitle,
+      ),
+    ];
 
     return Scaffold(
       body: SafeArea(
@@ -61,7 +59,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: _isLastPage
                     ? const SizedBox(height: 40)
                     : TertiaryButton(
-                        label: 'Skip',
+                        label: context.t.onboarding.skip,
                         onPressed: _isFinishing ? null : _finishOnboarding,
                         expand: false,
                       ),
@@ -69,14 +67,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Expanded(
                 child: PageView.builder(
                   controller: _pageController,
-                  itemCount: _pages.length,
+                  itemCount: pages.length,
                   onPageChanged: (index) {
                     setState(() {
                       _pageIndex = index;
                     });
                   },
                   itemBuilder: (context, index) {
-                    final data = _pages[index];
+                    final data = pages[index];
                     return Center(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -109,7 +107,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(_pages.length, (index) {
+                children: List.generate(_pageCount, (index) {
                   final isActive = index == _pageIndex;
                   return AnimatedContainer(
                     duration: DsMotion.fast,
@@ -128,7 +126,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
               const SizedBox(height: 16),
               PrimaryButton(
-                label: _isLastPage ? 'Start exploring' : 'Next',
+                label: _isLastPage
+                    ? context.t.onboarding.startExploring
+                    : context.t.onboarding.next,
                 isLoading: _isFinishing,
                 onPressed: _isFinishing
                     ? null

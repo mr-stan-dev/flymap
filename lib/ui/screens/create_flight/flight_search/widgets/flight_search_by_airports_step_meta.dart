@@ -1,19 +1,20 @@
 import 'package:flymap/entity/airport.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
 
 class FlightSearchStepMeta {
   static String titleForStep(CreateFlightStep step) {
     switch (step) {
       case CreateFlightStep.departure:
-        return 'Choose departure airport';
+        return t.createFlight.steps.departureTitle;
       case CreateFlightStep.arrival:
-        return 'Choose arrival airport';
+        return t.createFlight.steps.arrivalTitle;
       case CreateFlightStep.mapPreview:
-        return 'Map preview';
+        return t.createFlight.steps.mapPreviewTitle;
       case CreateFlightStep.overview:
-        return 'Route overview';
+        return t.createFlight.steps.overviewTitle;
       case CreateFlightStep.wikipediaArticles:
-        return 'Wikipedia articles';
+        return t.createFlight.steps.wikipediaTitle;
     }
   }
 

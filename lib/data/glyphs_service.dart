@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -48,8 +47,9 @@ class GlyphsService {
   }
 
   Future<List<String>> _getGlyphAssets() async {
-    final AssetManifest assetManifest =
-        await AssetManifest.loadFromAssetBundle(rootBundle);
+    final AssetManifest assetManifest = await AssetManifest.loadFromAssetBundle(
+      rootBundle,
+    );
     final List<String> assets = assetManifest.listAssets();
     return assets
         .where(

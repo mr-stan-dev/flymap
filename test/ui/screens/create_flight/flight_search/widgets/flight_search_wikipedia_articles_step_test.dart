@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/entity/wiki_article_candidate.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/widgets/steps/flight_search_wikipedia_articles_step.dart';
 
 void main() {
+  setUpAll(() {
+    LocaleSettings.setLocaleSync(AppLocale.en);
+  });
+
   group('FlightSearchWikipediaArticlesStep', () {
     testWidgets('shows full article list for free users', (tester) async {
       final state = FlightSearchScreenState.initial().copyWith(
@@ -13,7 +19,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        _testApp(
           home: Scaffold(
             body: FlightSearchWikipediaArticlesStep(
               state: state,
@@ -43,7 +49,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        _testApp(
           home: Scaffold(
             body: FlightSearchWikipediaArticlesStep(
               state: state,
@@ -78,7 +84,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        _testApp(
           home: Scaffold(
             body: FlightSearchWikipediaArticlesStep(
               state: state,
@@ -98,6 +104,17 @@ void main() {
       );
     });
   });
+}
+
+Widget _testApp({required Widget home}) {
+  return TranslationProvider(
+    child: MaterialApp(
+      locale: AppLocale.en.flutterLocale,
+      supportedLocales: AppLocaleUtils.supportedLocales,
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      home: home,
+    ),
+  );
 }
 
 List<WikiArticleCandidate> _candidates(int count) {

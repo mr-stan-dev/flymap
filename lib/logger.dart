@@ -8,7 +8,8 @@ class Logger {
   void log(String message) {
     if (kDebugMode) {
       final now = DateTime.now();
-      final logTime = '(${now.hour}-${now.minute}-${now.second}-${now.millisecond})';
+      final logTime =
+          '(${now.hour}-${now.minute}-${now.second}-${now.millisecond})';
       print('$logTime [$name] $message');
     }
   }

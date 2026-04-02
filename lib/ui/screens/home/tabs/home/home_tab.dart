@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_cubit.dart';
@@ -48,15 +49,15 @@ class _HomeTabContentState extends State<_HomeTabContent> {
           builder: (context, state) {
             switch (state) {
               case HomeTabLoading():
-                return const LoadingStateView(title: 'Loading flights...');
+                return LoadingStateView(title: context.t.home.loadingFlights);
               case HomeTabSuccess():
                 return HomeTabLoaded(state);
               case HomeTabError():
                 return ErrorStateView(
-                  title: 'Failed to load flights',
+                  title: context.t.home.failedToLoadFlights,
                   message: state.message,
                   onRetry: () => context.read<HomeTabCubit>().retry(),
-                  retryLabel: 'Retry',
+                  retryLabel: context.t.common.retry,
                 );
             }
           },

@@ -22,12 +22,12 @@ class City extends Equatable {
 
   @override
   List<Object?> get props => [
-        name,
-        asciiName,
-        countryCode,
-        population,
-        elevation,
-        timezone,
-        latLon,
-      ];
+    name,
+    asciiName,
+    countryCode,
+    population,
+    elevation,
+    timezone,
+    latLon,
+  ];
 }

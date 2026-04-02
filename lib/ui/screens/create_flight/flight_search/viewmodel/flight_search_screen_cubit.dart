@@ -9,6 +9,7 @@ import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/entity/map_detail_level.dart';
 import 'package:flymap/entity/wiki_article_candidate.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/map_download_config.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
@@ -55,9 +56,6 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
   StreamSubscription? _downloadSubscription;
   bool _downloadCancelled = false;
 
-  static const _tooLongRouteMessage =
-      'Downloading routes over 5,000 km is not supported yet.';
-
   int get _freeWikiArticlesSelectionLimit =>
       ProLimits.freeWikiArticlesSelectionLimit;
 
@@ -76,9 +74,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     } catch (e) {
       _logger.error('Failed to initialize create-flight flow: $e');
       emit(
-        state.copyWith(
-          errorMessage: 'Failed to load airports. Please try again.',
-        ),
+        state.copyWith(errorMessage: t.createFlight.errors.failedLoadAirports),
       );
     }
   }
@@ -120,7 +116,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         state.copyWith(
           isSearchLoading: false,
           searchResults: const [],
-          errorMessage: 'Airport search failed. Try another query.',
+          errorMessage: t.createFlight.errors.airportSearchFailed,
         ),
       );
     }
@@ -482,7 +478,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             articleDownloadTotal: selectedUrls.length,
             articleDownloadFailed: selectedUrls.length,
             downloadProgress: 0.0,
-            errorMessage: 'Some articles failed. Continuing with map download.',
+            errorMessage: t.createFlight.errors.someArticlesFailed,
           ),
         );
       }
@@ -675,7 +671,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
       );
       final isTooLong = route.distanceInKm > 5000.0;
       final info = isTooLong
-          ? const FlightInfo(_tooLongRouteMessage, [])
+          ? FlightInfo(t.createFlight.mapPreview.routeTooLong, const [])
           : FlightInfo.empty;
 
       emit(
@@ -701,7 +697,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
           isPreviewLoading: false,
           isWikiSuggestionsLoading: false,
           isOverviewLoading: false,
-          errorMessage: 'Failed to build route preview. Please try again.',
+          errorMessage: t.createFlight.errors.failedBuildPreview,
         ),
       );
     }
@@ -737,8 +733,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         state.copyWith(
           isOverviewLoading: false,
           isWikiSuggestionsLoading: false,
-          errorMessage:
-              'Could not load route overview. You can still continue.',
+          errorMessage: t.createFlight.errors.overviewUnavailableContinue,
         ),
       );
       return;

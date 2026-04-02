@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 
 class ShareFlymapWatermark extends StatelessWidget {
   const ShareFlymapWatermark({super.key});
@@ -14,7 +15,7 @@ class ShareFlymapWatermark extends StatelessWidget {
       child: Stack(
         children: [
           Text(
-            'Flymap',
+            t.shareFlight.watermark,
             style: textStyle?.copyWith(
               foreground: Paint()
                 ..style = PaintingStyle.stroke
@@ -23,7 +24,7 @@ class ShareFlymapWatermark extends StatelessWidget {
             ),
           ),
           Text(
-            'Flymap',
+            t.shareFlight.watermark,
             style: textStyle?.copyWith(
               color: colorScheme.onSurface.withValues(alpha: 0.12),
             ),

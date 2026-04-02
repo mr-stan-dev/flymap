@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_state.dart';
 
 class HomeSummaryHeader extends StatelessWidget {
@@ -30,14 +31,14 @@ class HomeSummaryHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Welcome to Flymap',
+            context.t.home.welcomeTitle,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 6),
           Text(
-            'Offline maps for flights',
+            context.t.home.welcomeSubtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -49,12 +50,12 @@ class HomeSummaryHeader extends StatelessWidget {
             children: [
               _SummaryPill(
                 icon: Icons.flight,
-                label: 'Flights saved',
+                label: context.t.home.flightsSaved,
                 value: '${statistics.totalFlights}',
               ),
               _SummaryPill(
                 icon: Icons.map,
-                label: 'Storage used',
+                label: context.t.home.storageUsed,
                 value: statistics.formattedTotalMapSize,
               ),
             ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/map_detail_level.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/map_download_config.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/map/flight_map_preview_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
@@ -53,7 +54,7 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
             child: Text(
-              'Downloading routes over 5,000 km is not supported yet.',
+              context.t.createFlight.mapPreview.routeTooLong,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.error,
               ),
@@ -70,7 +71,7 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _MapDetailLevelButton(
-                      label: 'Basic',
+                      label: context.t.createFlight.mapPreview.basic,
                       icon: Icons.map_outlined,
                       selected: selectedDetailLevel == MapDetailLevel.basic,
                       onPressed: () =>
@@ -80,7 +81,7 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: _MapDetailLevelButton(
-                      label: 'Pro',
+                      label: context.t.createFlight.mapPreview.pro,
                       icon: Icons.workspace_premium_rounded,
                       selected: selectedDetailLevel == MapDetailLevel.pro,
                       selectedBorderColor: DsBrandColors.proAmber,
@@ -91,7 +92,8 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
                   const SizedBox(width: 4),
                   IconButton(
                     onPressed: () => _showMapDetailLevelInfoDialog(context),
-                    tooltip: 'Map detail info',
+                    tooltip:
+                        context.t.createFlight.mapPreview.mapDetailInfoTooltip,
                     icon: const Icon(Icons.info_outline_rounded, size: 18),
                     visualDensity: VisualDensity.compact,
                     constraints: const BoxConstraints(
@@ -104,7 +106,9 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
               if (!state.isTooLongFlight) ...[
                 const SizedBox(height: 10),
                 Text(
-                  'Estimated map download size: $estimatedMapSize',
+                  context.t.createFlight.mapPreview.estimatedMapSize(
+                    size: estimatedMapSize,
+                  ),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -114,12 +118,12 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
               isFreeUserWithProSelection
                   ? PremiumButton(
                       onPressed: state.canContinueFromMap ? onContinue : null,
-                      label: 'Upgrade to Pro',
+                      label: context.t.createFlight.mapPreview.upgradeToPro,
                       icon: Icons.workspace_premium_rounded,
                     )
                   : PrimaryButton(
                       onPressed: state.canContinueFromMap ? onContinue : null,
-                      label: 'Continue',
+                      label: context.t.common.kContinue,
                     ),
             ],
           ),
@@ -133,20 +137,16 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Map options'),
+          title: Text(context.t.createFlight.mapPreview.optionsTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Basic map has lower zoom but download is faster and uses less storage. \n \nPro gives you a higher zoom, more details but download size is bigger.',
-              ),
-            ],
+            children: [Text(context.t.createFlight.mapPreview.optionsBody)],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('OK'),
+              child: Text(context.t.common.ok),
             ),
           ],
         );

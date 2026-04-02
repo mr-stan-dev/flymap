@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/airport.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
 
@@ -63,8 +64,8 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
                     onSearchChanged(value);
                   },
                   hintText: step == CreateFlightStep.departure
-                      ? 'Search departure airport'
-                      : 'Search arrival airport',
+                      ? context.t.createFlight.search.departureHint
+                      : context.t.createFlight.search.arrivalHint,
                   isSelected: selectedAirport != null,
                   selectedBorderColor: gpsActiveColor,
                   onClear: onClearSearch,
@@ -80,13 +81,17 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
                                   : null,
                             ),
                             tooltip: selectedAirportIsFavorite
-                                ? 'Remove favorite'
-                                : 'Add to favorite',
+                                ? context.t.createFlight.search.removeFavorite
+                                : context.t.createFlight.search.addFavorite,
                             onPressed: onToggleFavoriteForSelected,
                           ),
                           IconButton(
                             icon: const Icon(Icons.close),
-                            tooltip: 'Remove selected airport',
+                            tooltip: context
+                                .t
+                                .createFlight
+                                .search
+                                .removeSelectedAirport,
                             onPressed: onClearSelectedAirport,
                           ),
                         ]
@@ -107,7 +112,7 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
                 if (favorites.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Text(
-                    'Favorites',
+                    context.t.createFlight.search.favorites,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
@@ -123,7 +128,7 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
                 if (showPopularAirports) ...[
                   const SizedBox(height: 16),
                   Text(
-                    'Popular airports',
+                    context.t.createFlight.search.popularAirports,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
@@ -145,7 +150,7 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
             height: 52,
             child: PrimaryButton(
               onPressed: selectedAirport == null ? null : onContinue,
-              label: 'Continue',
+              label: context.t.common.kContinue,
             ),
           ),
         ),
@@ -174,7 +179,10 @@ class _AirportChipWrap extends StatelessWidget {
       runSpacing: 8,
       children: airports.map((airport) {
         return SelectionChip(
-          label: '${airport.displayCode} · ${airport.city}',
+          label: context.t.createFlight.search.airportCodeCity(
+            code: airport.displayCode,
+            city: airport.city,
+          ),
           onPressed: () => onSelectAirport(airport),
           onDeleted: showFavoriteTrailingIcon && onToggleFavorite != null
               ? () => onToggleFavorite!(airport)
@@ -187,7 +195,7 @@ class _AirportChipWrap extends StatelessWidget {
                 )
               : null,
           deleteTooltip: showFavoriteTrailingIcon
-              ? 'Remove from favorites'
+              ? context.t.createFlight.search.removeFromFavorites
               : null,
         );
       }).toList(),
@@ -219,7 +227,10 @@ class _SearchResultList extends StatelessWidget {
           visualDensity: const VisualDensity(vertical: -2),
           contentPadding: const EdgeInsets.symmetric(horizontal: 8),
           title: Text(
-            '${airport.name} (${airport.displayCode})',
+            context.t.createFlight.search.airportNameCode(
+              name: airport.name,
+              code: airport.displayCode,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -237,8 +248,8 @@ class _EmptySearchResults extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = step == CreateFlightStep.departure
-        ? 'No departure airports found.'
-        : 'No arrival airports found.';
+        ? context.t.createFlight.search.noDepartureFound
+        : context.t.createFlight.search.noArrivalFound;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Text(

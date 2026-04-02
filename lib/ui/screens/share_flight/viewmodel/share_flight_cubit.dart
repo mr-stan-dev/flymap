@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/mappers/flight_map_mapper.dart';
 import 'package:flymap/entity/flight.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/map_download_config.dart';
 import 'package:path/path.dart' as p;
@@ -55,7 +56,7 @@ class ShareFlightCubit extends Cubit<ShareFlightState> {
           state.copyWith(
             status: ShareFlightStatus.ready,
             styleString: _fallbackStyleUrl,
-            errorMessage: 'Offline map missing. Using online style.',
+            errorMessage: t.shareFlight.offlineMapMissing,
           ),
         );
         return;
@@ -79,7 +80,7 @@ class ShareFlightCubit extends Cubit<ShareFlightState> {
         state.copyWith(
           status: ShareFlightStatus.ready,
           styleString: _fallbackStyleUrl,
-          errorMessage: 'Failed to load offline style. Using online style.',
+          errorMessage: t.shareFlight.offlineStyleFailed,
         ),
       );
     }
@@ -98,7 +99,7 @@ class ShareFlightCubit extends Cubit<ShareFlightState> {
         emit(
           state.copyWith(
             status: ShareFlightStatus.ready,
-            errorMessage: 'Could not capture route screenshot',
+            errorMessage: t.shareFlight.captureFailed,
           ),
         );
         return;
@@ -107,8 +108,10 @@ class ShareFlightCubit extends Cubit<ShareFlightState> {
       final route = state.flight.route;
       await Share.shareXFiles(
         [XFile(screenshotPath)],
-        text:
-            'Flight route ${route.departure.displayCode}-${route.arrival.displayCode}',
+        text: t.shareFlight.shareText(
+          from: route.departure.displayCode,
+          to: route.arrival.displayCode,
+        ),
         sharePositionOrigin: sharePositionOrigin,
       );
       emit(state.copyWith(status: ShareFlightStatus.ready, clearError: true));
@@ -117,7 +120,7 @@ class ShareFlightCubit extends Cubit<ShareFlightState> {
       emit(
         state.copyWith(
           status: ShareFlightStatus.ready,
-          errorMessage: 'Failed to share route screenshot',
+          errorMessage: t.shareFlight.shareFailed,
         ),
       );
     }

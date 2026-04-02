@@ -24,7 +24,9 @@ class FlightPreviewAppBar extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Container(
             decoration: BoxDecoration(
-              color: context.colorTheme.backgroundPrimary.withValues(alpha: 0.7),
+              color: context.colorTheme.backgroundPrimary.withValues(
+                alpha: 0.7,
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Padding(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 
 class GpsAccuracyBanner extends StatelessWidget {
@@ -23,7 +24,10 @@ class GpsAccuracyBanner extends StatelessWidget {
           Icon(Icons.gps_fixed, size: 14, color: status.color),
           const SizedBox(width: 8),
           Text(
-            'GPS Accuracy: ${status.label} (±${accuracy.toStringAsFixed(0)}m)',
+            context.t.flight.dashboard.gpsAccuracy(
+              label: status.label,
+              accuracy: accuracy.toStringAsFixed(0),
+            ),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: status.color,
               fontWeight: FontWeight.bold,
@@ -36,12 +40,21 @@ class GpsAccuracyBanner extends StatelessWidget {
 
   _GpsAccuracyStatus _status(BuildContext context, double value) {
     if (value < 10) {
-      return _GpsAccuracyStatus('Excellent', DsSemanticColors.success(context));
+      return _GpsAccuracyStatus(
+        context.t.flight.dashboard.accuracyExcellent,
+        DsSemanticColors.success(context),
+      );
     }
     if (value < 25) {
-      return _GpsAccuracyStatus('Good', DsSemanticColors.warning(context));
+      return _GpsAccuracyStatus(
+        context.t.flight.dashboard.accuracyGood,
+        DsSemanticColors.warning(context),
+      );
     }
-    return _GpsAccuracyStatus('Poor', DsSemanticColors.error(context));
+    return _GpsAccuracyStatus(
+      context.t.flight.dashboard.accuracyPoor,
+      DsSemanticColors.error(context),
+    );
   }
 }
 

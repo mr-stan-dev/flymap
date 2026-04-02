@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/shared/flight_overview_content.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
@@ -24,13 +25,19 @@ class FlightInfoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
+    final t = context.t;
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Flight route (~ ${MapUtils.distanceFormatted(departure: route.departure, arrival: route.arrival)})',
+            t.preview.flightRoute(
+              distance: MapUtils.distanceFormatted(
+                departure: route.departure,
+                arrival: route.arrival,
+              ),
+            ),
             style: context.textTheme.title24Medium,
           ),
           const SizedBox(height: 16),
@@ -41,7 +48,7 @@ class FlightInfoWidget extends StatelessWidget {
                 child: _buildAirportInfo(
                   context,
                   route.departure,
-                  'Departure',
+                  t.flight.info.departure,
                   Icons.flight_takeoff,
                   primary,
                 ),
@@ -60,7 +67,7 @@ class FlightInfoWidget extends StatelessWidget {
                 child: _buildAirportInfo(
                   context,
                   route.arrival,
-                  'Arrival',
+                  t.flight.info.arrival,
                   Icons.flight_land,
                   primary,
                 ),
@@ -84,19 +91,25 @@ class FlightInfoWidget extends StatelessWidget {
       children: [
         if (hasOverviewSignal) ...[
           const SizedBox(height: 24),
-          Text('Overview', style: context.textTheme.title24Medium),
+          Text(
+            context.t.flight.info.overviewTitle,
+            style: context.textTheme.title24Medium,
+          ),
           const SizedBox(height: 8),
           FlightOverviewContent(
             overview: info.overview,
             isLoading: isOverviewLoading,
             errorMessage: overviewErrorMessage,
-            loadingMessage: 'Building route overview...',
-            emptyMessage: 'Overview is not available yet for this route.',
+            loadingMessage: context.t.flight.info.overviewLoading,
+            emptyMessage: context.t.flight.info.overviewEmpty,
           ),
         ],
         if ((info.poi.isNotEmpty)) ...[
           const SizedBox(height: 24),
-          Text('You\'ll fly over', style: context.textTheme.title24Medium),
+          Text(
+            context.t.flight.info.flyOverTitle,
+            style: context.textTheme.title24Medium,
+          ),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,

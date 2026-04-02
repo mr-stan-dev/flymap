@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_state.dart';
@@ -38,7 +39,7 @@ class HomeTabCubit extends Cubit<HomeTabState> {
         ),
       );
     } catch (e) {
-      emit(HomeTabError('Failed to load data: $e'));
+      emit(HomeTabError(t.home.failedToLoadFlights));
     }
   }
 
@@ -105,13 +106,13 @@ class HomeTabCubit extends Cubit<HomeTabState> {
       if (currentState is HomeTabSuccess) {
         emit(
           HomeTabError(
-            'Failed to refresh data: $e',
+            t.home.failedToLoadFlights,
             statistics: currentState.statistics,
             upcomingFlights: currentState.flights,
           ),
         );
       } else {
-        emit(HomeTabError('Failed to refresh data: $e'));
+        emit(HomeTabError(t.home.failedToLoadFlights));
       }
     }
   }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/entity/map_detail_level.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/subscription/pro_limits.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_cubit.dart';
@@ -188,13 +189,13 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
         );
         return;
       case SubscriptionPaywallResult.cancelled:
-        _showSnackBar('Upgrade cancelled.');
+        _showSnackBar(context.t.createFlight.paywall.upgradeCancelled);
         return;
       case SubscriptionPaywallResult.notPresented:
-        _showSnackBar('No paywall available right now.');
+        _showSnackBar(context.t.createFlight.paywall.noPaywall);
         return;
       case SubscriptionPaywallResult.error:
-        _showSnackBar('Failed to open paywall.');
+        _showSnackBar(context.t.createFlight.paywall.failedOpenPaywall);
         return;
     }
   }
@@ -220,13 +221,13 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
         await context.read<FlightSearchScreenCubit>().continueFromMap();
         return;
       case SubscriptionPaywallResult.cancelled:
-        _showSnackBar('Upgrade cancelled.');
+        _showSnackBar(context.t.createFlight.paywall.upgradeCancelled);
         return;
       case SubscriptionPaywallResult.notPresented:
-        _showSnackBar('No paywall available right now.');
+        _showSnackBar(context.t.createFlight.paywall.noPaywall);
         return;
       case SubscriptionPaywallResult.error:
-        _showSnackBar('Failed to open paywall.');
+        _showSnackBar(context.t.createFlight.paywall.failedOpenPaywall);
         return;
     }
   }

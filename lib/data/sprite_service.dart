@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -47,8 +46,9 @@ class SpriteService {
   }
 
   Future<List<String>> _getSpriteAssets() async {
-    final AssetManifest assetManifest =
-        await AssetManifest.loadFromAssetBundle(rootBundle);
+    final AssetManifest assetManifest = await AssetManifest.loadFromAssetBundle(
+      rootBundle,
+    );
     final List<String> assets = assetManifest.listAssets();
     return assets
         .where(

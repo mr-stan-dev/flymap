@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 
 class WeakSignalBanner extends StatelessWidget {
@@ -6,8 +7,8 @@ class WeakSignalBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const InlineMessage(
-      message: 'Weak GPS signal. Values may drift until accuracy improves.',
+    return InlineMessage(
+      message: context.t.flight.dashboard.weakSignalBanner,
       tone: DsMessageTone.warning,
       icon: Icons.network_check,
     );

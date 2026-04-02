@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 
 class SearchingGpsView extends StatelessWidget {
   const SearchingGpsView({super.key});
@@ -19,14 +20,14 @@ class SearchingGpsView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Acquiring GPS signal',
+                context.t.flight.dashboard.acquiringGpsSignal,
                 style: Theme.of(
                   context,
                 ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 4),
               Text(
-                'Keep the device steady and in open sky for a reliable fix.',
+                context.t.flight.dashboard.acquiringGpsHint,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),

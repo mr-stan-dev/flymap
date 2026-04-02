@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/shared/flight_overview_content.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/section_card.dart';
 
@@ -17,13 +18,13 @@ class OverviewSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InfoSectionCard(
-      title: 'Overview',
+      title: context.t.flight.info.overviewTitle,
       child: FlightOverviewContent(
         overview: overview,
         isLoading: isLoading,
         errorMessage: errorMessage,
-        loadingMessage: 'Building route overview...',
-        emptyMessage: 'Overview is not available yet for this route.',
+        loadingMessage: context.t.flight.info.overviewLoading,
+        emptyMessage: context.t.flight.info.overviewEmpty,
       ),
     );
   }

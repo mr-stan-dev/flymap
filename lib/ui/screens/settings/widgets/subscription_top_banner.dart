@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart';
 
@@ -34,16 +35,18 @@ class _SubscriptionTopBannerState extends State<SubscriptionTopBanner>
     final state = widget.state;
     final isPro = state.isPro;
     final cardRadius = BorderRadius.circular(DsRadii.xl);
-    final title = isPro ? 'Flymap Pro Active' : 'Flymap Pro';
+    final title = isPro
+        ? context.t.settings.proBannerTitleActive
+        : context.t.settings.proBannerTitle;
     final subtitle = switch (state.phase) {
       SubscriptionPhase.unknown ||
-      SubscriptionPhase.loading => 'Checking your subscription status.',
-      SubscriptionPhase.pro =>
-        'Detailed map mode and unlimited offline articles unlocked.',
-      SubscriptionPhase.free =>
-        'Unlock detailed maps and unlimited offline articles.',
+      SubscriptionPhase.loading => context.t.subscription.checkingStatus,
+      SubscriptionPhase.pro => context.t.settings.proBannerSubtitleActive,
+      SubscriptionPhase.free => context.t.settings.proBannerSubtitleFree,
     };
-    final badgeLabel = isPro ? 'PRO ACTIVE' : 'UPGRADE';
+    final badgeLabel = isPro
+        ? context.t.settings.proBannerBadgeActive
+        : context.t.common.upgrade.toUpperCase();
 
     return GestureDetector(
       onTap: widget.onManage,

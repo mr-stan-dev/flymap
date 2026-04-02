@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/gps_data_provider.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/gps_data.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
@@ -69,13 +70,18 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
       // Delete flight record (service handles file cleanup)
       final ok = await _repository.deleteFlight(flight.id);
       if (!ok) {
-        emit(FlightScreenError('Failed to delete flight', flight: flight));
+        emit(FlightScreenError(t.home.failedDeleteFlight, flight: flight));
         return;
       }
 
-      emit(const FlightScreenDeleted('Flight deleted'));
+      emit(FlightScreenDeleted(t.flight.deleted));
     } catch (e) {
-      emit(FlightScreenError('Error deleting flight: $e', flight: flight));
+      emit(
+        FlightScreenError(
+          t.flight.deleteError(error: e.toString()),
+          flight: flight,
+        ),
+      );
     }
   }
 

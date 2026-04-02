@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/repository/subscription_repository.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
@@ -39,7 +40,7 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
       emit(
         state.copyWith(
           phase: SubscriptionPhase.free,
-          errorMessage: 'Subscription service is temporarily unavailable.',
+          errorMessage: t.subscription.serviceUnavailable,
           isProductsLoading: false,
         ),
       );

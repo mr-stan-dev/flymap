@@ -5,10 +5,10 @@ import 'package:url_launcher/url_launcher.dart';
 class FlightOverviewContent extends StatelessWidget {
   const FlightOverviewContent({
     required this.overview,
+    required this.loadingMessage,
+    required this.emptyMessage,
     this.isLoading = false,
     this.errorMessage,
-    this.loadingMessage = 'Building route overview...',
-    this.emptyMessage = 'Overview is not available yet for this route.',
     super.key,
   });
 

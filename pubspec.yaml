@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   firebase_core: ^4.0.0
   firebase_analytics: ^12.0.0
@@ -39,6 +41,8 @@ dependencies:
   webview_flutter: ^4.13.0
   purchases_flutter: ^9.15.1
   purchases_ui_flutter: ^9.15.1
+  slang: ^4.8.0
+  slang_flutter: ^4.8.0
 
 dev_dependencies:
   flutter_test:
@@ -46,6 +50,7 @@ dev_dependencies:
 
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.13.1
+  slang_build_runner: ^4.8.0
 
 flutter:
   uses-material-design: true

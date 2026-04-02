@@ -9,6 +9,7 @@ import 'package:flymap/data/local/mappers/flight_map_mapper.dart';
 import 'package:flymap/data/tiles_downloader/mbtiles_validator.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/gps_data.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/map_download_config.dart';
 import 'package:flymap/ui/map/layers/flight_route_map_layers.dart';
@@ -74,7 +75,7 @@ class _FlightMapState extends State<FlightMap> {
     final storedPath = widget.flight.flightMap?.filePath ?? '';
     if (storedPath.isEmpty) {
       _logger.log('No MBTiles file path found');
-      _setMapLoadError('Offline map is not available for this flight.');
+      _setMapLoadError(t.flight.map.offlineNotAvailable);
       return;
     }
 
@@ -91,9 +92,7 @@ class _FlightMapState extends State<FlightMap> {
 
     if (!await file.exists()) {
       _logger.error('MBTiles file not found: $resolvedPath');
-      _setMapLoadError(
-        'Offline map file is missing. Please re-download this route.',
-      );
+      _setMapLoadError(t.flight.map.offlineMissing);
       return;
     }
     _logger.log('Loading mbtiles: $fileName');
@@ -109,8 +108,7 @@ class _FlightMapState extends State<FlightMap> {
         '${validationResult.errorMessage}',
       );
       _setMapLoadError(
-        validationResult.errorMessage ??
-            'Offline map validation failed. Please re-download this route.',
+        validationResult.errorMessage ?? t.flight.map.validationFailed,
       );
       return;
     }
@@ -134,7 +132,7 @@ class _FlightMapState extends State<FlightMap> {
       });
     } catch (e) {
       _logger.error('Error loading style from assets: $e');
-      _setMapLoadError('Could not load offline map style.');
+      _setMapLoadError(t.flight.map.loadStyleFailed);
     }
   }
 
@@ -367,7 +365,7 @@ class _FlightMapState extends State<FlightMap> {
   Widget build(BuildContext context) {
     if (_styleString == null) {
       return MapStyleLoadingView(
-        message: _mapLoadError ?? 'Loading map style...',
+        message: _mapLoadError ?? t.flight.map.loadingStyle,
         isError: _mapLoadError != null,
       );
     }

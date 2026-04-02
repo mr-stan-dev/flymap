@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/entity/gps_data.dart';
+import 'package:flymap/i18n/strings.g.dart';
 
 class FlightStatusRibbon extends StatelessWidget {
   const FlightStatusRibbon({
@@ -36,7 +37,7 @@ class FlightStatusRibbon extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Navigation',
+            context.t.flight.dashboard.navigation,
             style: Theme.of(
               context,
             ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
@@ -51,7 +52,10 @@ class FlightStatusRibbon extends StatelessWidget {
                 label:
                     '${route.departure.displayCode} → ${route.arrival.displayCode}',
               ),
-              _Pill(icon: Icons.explore_outlined, label: 'Heading $heading'),
+              _Pill(
+                icon: Icons.explore_outlined,
+                label: context.t.flight.dashboard.heading(heading: heading),
+              ),
               _Pill(icon: Icons.place_outlined, label: position),
             ],
           ),

@@ -6,6 +6,7 @@ import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/entity/map_detail_level.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/map_download_config.dart';
 import 'package:flymap/ui/map/map_utils.dart';
@@ -48,8 +49,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     final hasInternet = await _connectivity.hasInternetConnectivity();
 
     if (!hasInternet) {
-      final msg =
-          'No internet connection. Please check your connection and try again.';
+      final msg = t.createFlight.errors.noInternet;
       emit(FlightMapPreviewError(msg));
       return;
     }
@@ -61,7 +61,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
           break;
       }
     } catch (e) {
-      emit(FlightMapPreviewError('Error initializing: $e'));
+      emit(FlightMapPreviewError(t.createFlight.errors.failedBuildPreview));
     }
   }
 
@@ -89,10 +89,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
         FlightMapPreviewMapState(
           flightRoute: route,
           flightInfo: isTooLong
-              ? FlightInfo(
-                  'Right now, flights longer than 5,000 km aren’t calculated as accurately as we’d like - but we’re working hard to make sure long flights are supported soon!',
-                  [],
-                )
+              ? FlightInfo(t.createFlight.overview.longFlightOverview, [])
               : FlightInfo.empty,
           currentZoom: zoomLevel,
           isTooLongFlight: isTooLong,
@@ -102,7 +99,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
       );
     } catch (e) {
       _logger.error(e);
-      emit(FlightMapPreviewError('Error during flight preview'));
+      emit(FlightMapPreviewError(t.createFlight.errors.failedBuildPreview));
     }
   }
 
@@ -132,7 +129,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
           currentState.copyWith(
             isOverviewLoading: false,
             overviewErrorMessage:
-                'Could not load route overview. You can still download the map.',
+                t.createFlight.errors.overviewUnavailableContinue,
           ),
         );
       }
@@ -214,7 +211,9 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
       emit(
         MapDownloadingState(
           progress: 0.0,
-          errorMessage: 'Failed to start download: $e',
+          errorMessage: t.createFlight.errors.failedStartDownload(
+            error: e.toString(),
+          ),
         ),
       );
     }

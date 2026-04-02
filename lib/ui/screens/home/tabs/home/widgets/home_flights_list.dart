@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/size_utils.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
@@ -59,14 +60,14 @@ class HomeFlightsList extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'No flights yet',
+              context.t.home.noFlightsTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 4),
             Text(
-              'Create your first flight to see route details here.',
+              context.t.home.noFlightsSubtitle,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -109,7 +110,7 @@ class _FlightsSectionHeader extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            'Flights ($count)',
+            context.t.home.flightsCount(count: count),
             style: context.textTheme.title24Medium,
           ),
         ),
@@ -193,28 +194,30 @@ class _FlightCard extends StatelessWidget {
                   ),
                 ),
                 StatusChip(
-                  label: hasOfflineMap ? 'Saved offline' : 'Needs map',
+                  label: hasOfflineMap
+                      ? context.t.home.statusSavedOffline
+                      : context.t.home.statusNeedsMap,
                   tone: hasOfflineMap
                       ? StatusChipTone.success
                       : StatusChipTone.warning,
                 ),
                 PopupMenuButton<_FlightCardAction>(
-                  tooltip: 'Flight actions',
+                  tooltip: context.t.home.flightActions,
                   onSelected: (value) =>
                       _onActionSelected(context, value: value, flight: flight),
-                  itemBuilder: (context) => const [
+                  itemBuilder: (context) => [
                     PopupMenuItem(
                       value: _FlightCardAction.open,
-                      child: Text('Open'),
+                      child: Text(context.t.home.open),
                     ),
                     PopupMenuItem(
                       value: _FlightCardAction.share,
-                      child: Text('Share route'),
+                      child: Text(context.t.home.shareRoute),
                     ),
                     PopupMenuDivider(),
                     PopupMenuItem(
                       value: _FlightCardAction.delete,
-                      child: Text('Delete flight'),
+                      child: Text(context.t.home.deleteFlight),
                     ),
                   ],
                 ),
@@ -232,7 +235,10 @@ class _FlightCard extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
-                MetaPill(icon: Icons.route, text: '$distanceKm km'),
+                MetaPill(
+                  icon: Icons.route,
+                  text: context.t.flight.info.distanceKm(distance: distanceKm),
+                ),
                 MetaPill(icon: Icons.map_outlined, text: offlineSize),
                 MetaPill(
                   icon: Icons.schedule,
@@ -267,7 +273,7 @@ class _FlightCard extends StatelessWidget {
         );
         if (!deleted && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to delete flight')),
+            SnackBar(content: Text(context.t.home.failedDeleteFlight)),
           );
         }
     }
@@ -275,7 +281,7 @@ class _FlightCard extends StatelessWidget {
 
   String _formatOfflineSize(Flight flight) {
     final bytes = _mapSizeBytes(flight);
-    if (bytes <= 0) return 'No offline map';
+    if (bytes <= 0) return t.home.noOfflineMap;
     return SizeUtils.formatBytes(bytes);
   }
 
@@ -286,10 +292,12 @@ class _FlightCard extends StatelessWidget {
 
   String _createdLabel(DateTime createdAt) {
     final delta = DateTime.now().difference(createdAt);
-    if (delta.inDays >= 1) return '${delta.inDays}d ago';
-    if (delta.inHours >= 1) return '${delta.inHours}h ago';
-    if (delta.inMinutes >= 1) return '${delta.inMinutes}m ago';
-    return 'Just now';
+    if (delta.inDays >= 1) return t.home.daysAgo(days: delta.inDays);
+    if (delta.inHours >= 1) return t.home.hoursAgo(hours: delta.inHours);
+    if (delta.inMinutes >= 1) {
+      return t.home.minutesAgo(minutes: delta.inMinutes);
+    }
+    return t.home.justNow;
   }
 }
 
@@ -299,11 +307,11 @@ extension _HomeFlightsSortLabel on HomeFlightsSort {
   String get label {
     switch (this) {
       case HomeFlightsSort.mostRecent:
-        return 'Most recent';
+        return t.home.sort.mostRecent;
       case HomeFlightsSort.longestDistance:
-        return 'Longest';
+        return t.home.sort.longest;
       case HomeFlightsSort.alphabetical:
-        return 'A-Z';
+        return t.home.sort.alphabetical;
     }
   }
 }

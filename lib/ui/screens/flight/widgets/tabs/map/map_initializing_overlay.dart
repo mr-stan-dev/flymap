@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 
 class MapInitializingOverlay extends StatelessWidget {
   const MapInitializingOverlay({super.key});
@@ -8,13 +9,13 @@ class MapInitializingOverlay extends StatelessWidget {
     return Positioned.fill(
       child: Container(
         color: Theme.of(context).colorScheme.surface,
-        child: const Center(
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(),
+              const CircularProgressIndicator(),
               SizedBox(height: 16),
-              Text('Initializing map...'),
+              Text(context.t.flight.map.initializing),
             ],
           ),
         ),

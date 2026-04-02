@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -10,7 +11,7 @@ class AboutScreen extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('About Flymap')),
+      appBar: AppBar(title: Text(context.t.about.title)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(DsSpacing.md),
@@ -37,7 +38,7 @@ class AboutScreen extends StatelessWidget {
                       const SizedBox(width: DsSpacing.sm),
                       Expanded(
                         child: Text(
-                          'Welcome to Flymap',
+                          context.t.about.welcome,
                           style: textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.w700,
                           ),
@@ -47,28 +48,28 @@ class AboutScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: DsSpacing.sm),
                   Text(
-                    'Flymap keeps your route visible in the air. Plan the trip, download your map on the ground, and track your flight offline with confidence.',
+                    context.t.about.intro,
                     style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: DsSpacing.sm),
-                  const Wrap(
+                  Wrap(
                     spacing: DsSpacing.xs,
                     runSpacing: DsSpacing.xs,
                     children: [
                       StatusChip(
-                        label: 'Offline map',
+                        label: context.t.about.chipOffline,
                         tone: StatusChipTone.info,
                         icon: Icons.download_for_offline_rounded,
                       ),
                       StatusChip(
-                        label: 'Live dashboard',
+                        label: context.t.about.chipDashboard,
                         tone: StatusChipTone.neutral,
                         icon: Icons.speed_rounded,
                       ),
                       StatusChip(
-                        label: 'Route sharing',
+                        label: context.t.about.chipSharing,
                         tone: StatusChipTone.success,
                         icon: Icons.ios_share_rounded,
                       ),
@@ -78,89 +79,68 @@ class AboutScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: DsSpacing.md),
-            const InfoBanner(
-              message:
-                  'Before takeoff, download your route map. In flight mode, internet access may be limited or unavailable.',
+            InfoBanner(
+              message: context.t.about.infoBanner,
               tone: DsMessageTone.info,
               icon: Icons.download_for_offline_rounded,
             ),
             const SizedBox(height: DsSpacing.md),
-            const SectionCard(
-              title: 'What You Can Do',
+            SectionCard(
+              title: context.t.about.whatYouCanDo,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _AboutFeature(
                     icon: Icons.route_rounded,
-                    title: 'Plan your route',
-                    text:
-                        'Choose departure and arrival airports, then preview the path before downloading.',
+                    title: context.t.about.featurePlanTitle,
+                    text: context.t.about.featurePlanText,
                   ),
                   SizedBox(height: DsSpacing.xs),
                   _AboutFeature(
                     icon: Icons.explore_rounded,
-                    title: 'Track flight data',
-                    text:
-                        'Use Dashboard to monitor heading, speed, altitude, and route progress.',
+                    title: context.t.about.featureTrackTitle,
+                    text: context.t.about.featureTrackText,
                   ),
                   SizedBox(height: DsSpacing.xs),
                   _AboutFeature(
                     icon: Icons.info_outline_rounded,
-                    title: 'Check route details',
-                    text:
-                        'Open the Info tab for airport details and a clean route overview.',
+                    title: context.t.about.featureDetailsTitle,
+                    text: context.t.about.featureDetailsText,
                   ),
                   SizedBox(height: DsSpacing.xs),
                   _AboutFeature(
                     icon: Icons.ios_share_rounded,
-                    title: 'Share your journey',
-                    text:
-                        'Generate and share a flight map screenshot with route highlights.',
+                    title: context.t.about.featureShareTitle,
+                    text: context.t.about.featureShareText,
                   ),
                 ],
               ),
             ),
             const SizedBox(height: DsSpacing.md),
-            const SectionCard(
-              title: 'Quick Start',
+            SectionCard(
+              title: context.t.about.quickStart,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _AboutStep(index: 1, text: 'Tap New flight on Home.'),
+                  _AboutStep(index: 1, text: context.t.about.step1),
                   SizedBox(height: DsSpacing.xs),
-                  _AboutStep(
-                    index: 2,
-                    text: 'Choose departure and arrival airports.',
-                  ),
+                  _AboutStep(index: 2, text: context.t.about.step2),
                   SizedBox(height: DsSpacing.xs),
-                  _AboutStep(
-                    index: 3,
-                    text:
-                        'Open Map preview and download the map before the flight.',
-                  ),
+                  _AboutStep(index: 3, text: context.t.about.step3),
                   SizedBox(height: DsSpacing.xs),
-                  _AboutStep(
-                    index: 4,
-                    text:
-                        'Open your flight and use Map, Dashboard, and Info in the air.',
-                  ),
+                  _AboutStep(index: 4, text: context.t.about.step4),
                 ],
               ),
             ),
             const SizedBox(height: DsSpacing.md),
-            const SectionCard(
-              title: 'Tips For Better GPS',
+            SectionCard(
+              title: context.t.about.tips,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _AboutTip(
-                    text: 'For stronger GPS signal, sit closer to a window.',
-                  ),
+                  _AboutTip(text: context.t.about.tip1),
                   SizedBox(height: DsSpacing.xs),
-                  _AboutTip(
-                    text:
-                        'Signal can drop in the middle of the aircraft. Flymap keeps the last known route view while searching.',
-                  ),
+                  _AboutTip(text: context.t.about.tip2),
                 ],
               ),
             ),

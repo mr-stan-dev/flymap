@@ -1,10 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flymap/cubit_state_observer.dart';
 import 'package:flymap/data/glyphs_service.dart';
 import 'package:flymap/data/local/app_database.dart';
 import 'package:flymap/data/sprite_service.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/ui/theme/app_theme.dart';
 import 'package:get_it/get_it.dart';
@@ -31,7 +33,8 @@ void main() async {
       .hasSeenOnboarding();
 
   Bloc.observer = CubitStateObserver.create();
-  runApp(MyApp(showOnboarding: !hasSeenOnboarding));
+  LocaleSettings.setLocaleSync(AppLocale.en);
+  runApp(TranslationProvider(child: MyApp(showOnboarding: !hasSeenOnboarding)));
 }
 
 class MyApp extends StatefulWidget {
@@ -60,11 +63,14 @@ class _MyAppState extends State<MyApp> {
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settings) {
           return MaterialApp.router(
-            title: 'Flymap',
+            title: t.appName,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: settings.themeMode,
             debugShowCheckedModeBanner: false,
+            locale: TranslationProvider.of(context).flutterLocale,
+            supportedLocales: AppLocaleUtils.supportedLocales,
+            localizationsDelegates: GlobalMaterialLocalizations.delegates,
             routerConfig: router,
           );
         },

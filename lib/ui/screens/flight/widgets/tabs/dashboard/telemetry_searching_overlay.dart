@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 
 class TelemetrySearchingOverlay extends StatelessWidget {
   const TelemetrySearchingOverlay({
@@ -51,7 +52,7 @@ class TelemetrySearchingOverlay extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'Searching for GPS',
+                      context.t.flight.dashboard.gpsSearching,
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),

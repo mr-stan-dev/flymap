@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -17,9 +18,12 @@ class RateUsSettingItem extends StatelessWidget {
 
     return ListTile(
       leading: const Icon(Icons.star_rate_rounded),
-      title: Text('Rate us', style: theme.textTheme.titleMedium),
+      title: Text(
+        context.t.settings.rateUs,
+        style: theme.textTheme.titleMedium,
+      ),
       subtitle: Text(
-        'Leave a review on the store',
+        context.t.settings.rateUsSubtitle,
         style: theme.textTheme.bodyMedium?.copyWith(color: onSurface),
       ),
       trailing: const Icon(Icons.chevron_right),
@@ -36,7 +40,7 @@ class RateUsSettingItem extends StatelessWidget {
       if (opened) return;
     }
     messenger.showSnackBar(
-      const SnackBar(content: Text('Could not open store page')),
+      SnackBar(content: Text(context.t.settings.couldNotOpenStorePage)),
     );
   }
 

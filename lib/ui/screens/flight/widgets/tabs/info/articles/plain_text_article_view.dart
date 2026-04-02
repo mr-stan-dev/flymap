@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/flight_article.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 
 class PlainTextArticleView extends StatelessWidget {
@@ -29,7 +30,10 @@ class PlainTextArticleView extends StatelessWidget {
           ],
           SelectableText(article.contentPlainText),
           const SizedBox(height: DsSpacing.md),
-          SelectionChip(label: 'Open Source', onPressed: onOpenSource),
+          SelectionChip(
+            label: context.t.flight.info.openSource,
+            onPressed: onOpenSource,
+          ),
           const SizedBox(height: DsSpacing.sm),
           Text(
             article.attributionText,

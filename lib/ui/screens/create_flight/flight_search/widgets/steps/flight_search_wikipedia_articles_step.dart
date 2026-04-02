@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/subscription/pro_limits.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/map/map_utils.dart';
@@ -48,16 +49,18 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             children: [
               Text(
-                'Download articles to read during the flight',
+                context.t.createFlight.wikipedia.title,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
               Text(
                 isLoading
-                    ? 'Finding route-related articles...'
+                    ? context.t.createFlight.wikipedia.loadingIntro
                     : hasCandidates
-                    ? 'Based on your route we found ${candidates.length} articles which may be interesting for you. Select to download them for offline reading'
-                    : 'No route-related Wikipedia articles found. You can continue with map download only.',
+                    ? context.t.createFlight.wikipedia.foundIntro(
+                        count: candidates.length,
+                      )
+                    : context.t.createFlight.wikipedia.emptyIntro,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -70,7 +73,9 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      '$selectedCount selected',
+                      context.t.createFlight.wikipedia.selectedCount(
+                        count: selectedCount,
+                      ),
                       style: Theme.of(context).textTheme.labelLarge,
                     ),
                     const Spacer(),
@@ -81,7 +86,11 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
                             ? Icons.check_box_rounded
                             : Icons.check_box_outline_blank_rounded,
                       ),
-                      label: Text(allSelected ? 'Unselect all' : 'Select all'),
+                      label: Text(
+                        allSelected
+                            ? context.t.createFlight.wikipedia.unselectAll
+                            : context.t.createFlight.wikipedia.selectAll,
+                      ),
                     ),
                   ],
                 ),
@@ -146,21 +155,23 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (isProUser && isFreeOverLimit) ...[
-                const ProActiveBlock(
-                  title: 'Pro active',
-                  message: 'Full articles pack unlocked.',
+                ProActiveBlock(
+                  title: context.t.createFlight.wikipedia.proActiveTitle,
+                  message: context.t.createFlight.wikipedia.proActiveMessage,
                 ),
                 const SizedBox(height: 8),
               ],
               !isProUser && isFreeOverLimit
                   ? Text(
-                      'Free plan includes up to 3 offline articles. Upgrade to Pro for unlimited articles.',
+                      context.t.createFlight.wikipedia.freeLimitHint,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: DsBrandColors.proAmber,
                       ),
                     )
                   : Text(
-                      'Estimated download size: $estimatedSizeRange',
+                      context.t.createFlight.wikipedia.estimatedDownloadSize(
+                        size: estimatedSizeRange,
+                      ),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -171,17 +182,30 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
                 height: 52,
                 child: !isProUser && isFreeOverLimit
                     ? PremiumButton(
-                        label: 'Upgrade',
+                        label: context.t.createFlight.wikipedia.upgrade,
                         icon: Icons.workspace_premium_rounded,
                         onPressed: isLoading ? null : onStartDownload,
                       )
                     : PrimaryButton(
                         onPressed: isLoading ? null : onStartDownload,
                         label: isLoading
-                            ? 'Loading article suggestions...'
+                            ? context
+                                  .t
+                                  .createFlight
+                                  .wikipedia
+                                  .loadingSuggestions
                             : selectedCount > 0
-                            ? 'Download map + $selectedCount article${selectedCount == 1 ? '' : 's'}'
-                            : 'Download map',
+                            ? selectedCount == 1
+                                  ? context
+                                        .t
+                                        .createFlight
+                                        .wikipedia
+                                        .downloadMapPlusOne
+                                  : context.t.createFlight.wikipedia
+                                        .downloadMapPlusMany(
+                                          count: selectedCount,
+                                        )
+                            : context.t.createFlight.wikipedia.downloadMapOnly,
                       ),
               ),
             ],
@@ -196,9 +220,11 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
     if (uri == null) return;
     final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Could not open link')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.t.createFlight.wikipedia.couldNotOpenLink),
+        ),
+      );
     }
   }
 }

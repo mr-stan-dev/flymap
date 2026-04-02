@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
 
@@ -18,8 +19,8 @@ class FlightSearchDownloadingView extends StatelessWidget {
     final showProgressBar =
         state.downloadStage != DownloadStage.downloadingArticles;
     final title = state.downloadStage == DownloadStage.downloadingArticles
-        ? 'Downloading selected articles...'
-        : 'Downloading offline map...';
+        ? context.t.createFlight.downloading.articlesTitle
+        : context.t.createFlight.downloading.mapTitle;
 
     return Column(
       children: [
@@ -32,14 +33,14 @@ class FlightSearchDownloadingView extends StatelessWidget {
             trailingAction: SecondaryButton(
               onPressed: onCancel,
               leadingIcon: Icons.close_rounded,
-              label: 'Cancel download',
+              label: context.t.createFlight.downloading.cancelDownload,
             ),
           ),
         ),
-        const Padding(
+        Padding(
           padding: EdgeInsets.all(DsSpacing.md),
           child: InlineMessage(
-            message: 'Do not close this screen until download completes',
+            message: context.t.createFlight.downloading.doNotClose,
             tone: DsMessageTone.info,
           ),
         ),
@@ -53,29 +54,42 @@ class FlightSearchDownloadingView extends StatelessWidget {
         final total = state.articleDownloadTotal;
         final completed = state.articleDownloadCompleted;
         final failed = state.articleDownloadFailed;
-        if (total <= 0) return 'Preparing article downloads...';
+        if (total <= 0) return t.createFlight.downloading.preparingArticles;
         if (failed > 0) {
-          return 'Articles: $completed/$total ($failed failed)';
+          return t.createFlight.downloading.articlesProgressWithFailed(
+            completed: completed,
+            total: total,
+            failed: failed,
+          );
         }
-        return 'Articles: $completed/$total';
+        return t.createFlight.downloading.articlesProgress(
+          completed: completed,
+          total: total,
+        );
       case DownloadStage.initializing:
-        return 'Preparing map download...';
+        return t.createFlight.downloading.preparingMap;
       case DownloadStage.computingTiles:
         return state.downloadTileCount == null
-            ? 'Computing map tiles...'
-            : 'Computing map tiles (${state.downloadTileCount})...';
+            ? t.createFlight.downloading.computingTiles
+            : t.createFlight.downloading.computingTilesWithCount(
+                count: state.downloadTileCount!,
+              );
       case DownloadStage.startingWorkers:
-        return 'Preparing for download...';
+        return t.createFlight.downloading.preparingForDownload;
       case DownloadStage.downloading:
-        return 'Downloaded: ${_formatDownloadedMb(state.downloadedBytes)}';
+        return t.createFlight.downloading.downloaded(
+          size: _formatDownloadedMb(state.downloadedBytes),
+        );
       case DownloadStage.finalizing:
-        return 'Finalizing map package...';
+        return t.createFlight.downloading.finalizing;
       case DownloadStage.verifying:
-        return 'Verifying map package...';
+        return t.createFlight.downloading.verifying;
       case DownloadStage.completed:
       case DownloadStage.failed:
       case DownloadStage.idle:
-        return 'Downloaded: ${_formatDownloadedMb(state.downloadedBytes)}';
+        return t.createFlight.downloading.downloaded(
+          size: _formatDownloadedMb(state.downloadedBytes),
+        );
     }
   }
 

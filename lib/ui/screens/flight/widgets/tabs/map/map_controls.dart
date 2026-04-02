@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 
 class FlightMapControls extends StatefulWidget {
@@ -85,7 +86,9 @@ class _FlightMapControlsState extends State<FlightMapControls>
                 backgroundColor: buttonBg,
                 foregroundColor: colorScheme.onSurface,
                 mini: true,
-                tooltip: widget.is3D ? 'Switch to 2D' : 'Switch to 3D',
+                tooltip: widget.is3D
+                    ? context.t.flight.map.switchTo2D
+                    : context.t.flight.map.switchTo3D,
                 onPressed: () {
                   widget.onToggle3D();
                 },
@@ -107,7 +110,9 @@ class _FlightMapControlsState extends State<FlightMapControls>
                       : buttonBg,
                   foregroundColor: colorScheme.onSurface,
                   mini: true,
-                  tooltip: widget.followUser ? 'Uncenter map' : 'Center on me',
+                  tooltip: widget.followUser
+                      ? context.t.flight.map.uncenterMap
+                      : context.t.flight.map.centerOnMe,
                   onPressed: widget.onToggleFollowUser,
                   child: Icon(
                     widget.followUser ? Icons.gps_fixed : Icons.gps_not_fixed,

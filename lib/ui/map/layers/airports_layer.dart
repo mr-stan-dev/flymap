@@ -79,9 +79,7 @@ class AirportsLayer extends MapLayer {
                 airport.latLon.latitude,
               ],
             },
-            'properties': <String, dynamic>{
-              'code': airport.displayCode,
-            },
+            'properties': <String, dynamic>{'code': airport.displayCode},
           },
         )
         .toList(),

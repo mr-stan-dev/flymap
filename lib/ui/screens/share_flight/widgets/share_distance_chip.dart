@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 
 const double shareDistanceChipWidth = 184;
 const double shareDistanceChipHeight = 58;
@@ -10,9 +11,12 @@ class ShareDistanceChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final distanceLabel = '${distanceKm.toStringAsFixed(0)} km';
+    final distanceLabel = t.shareFlight.distanceKm(
+      distance: distanceKm.toStringAsFixed(0),
+    );
 
     return Container(
       width: shareDistanceChipWidth,
@@ -44,7 +48,7 @@ class ShareDistanceChip extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Flight distance',
+            t.shareFlight.flightDistance,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: textTheme.labelSmall?.copyWith(

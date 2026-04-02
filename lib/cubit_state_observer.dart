@@ -24,7 +24,9 @@ class CubitStateObserver extends BlocObserver {
   @override
   void onChange(BlocBase bloc, Change change) {
     if (kDebugMode) {
-      _logger.log('[${bloc.runtimeType.toString()}] nextState: ${change.nextState}');
+      _logger.log(
+        '[${bloc.runtimeType.toString()}] nextState: ${change.nextState}',
+      );
     }
     super.onChange(bloc, change);
   }

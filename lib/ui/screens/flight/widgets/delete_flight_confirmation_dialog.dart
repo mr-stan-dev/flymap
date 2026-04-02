@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/size_utils.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 
@@ -26,19 +27,16 @@ class DeleteFlightConfirmationDialog extends StatelessWidget {
     final storageLabel = SizeUtils.formatBytes(reclaimedBytes);
 
     return AlertDialog(
-      title: const Text('Are you sure?'),
-      content: Text(
-        'This will permanently delete this flight.\n\n'
-        'Space to be regained: $storageLabel.',
-      ),
+      title: Text(context.t.flight.deleteDialogTitle),
+      content: Text(context.t.flight.deleteDialogMessage(size: storageLabel)),
       actions: [
         SecondaryButton(
-          label: 'Cancel',
+          label: context.t.common.cancel,
           onPressed: () => Navigator.of(context).pop(false),
           expand: false,
         ),
         DestructiveButton(
-          label: 'Yes',
+          label: context.t.flight.yes,
           onPressed: () => Navigator.of(context).pop(true),
           expand: false,
         ),

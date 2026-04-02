@@ -12,7 +12,6 @@ class MapTile {
 
 /// Utility class to convert between tile and lat/lon coordinates
 class TileUtils {
-
   /// Converts latitude & longitude to XYZ tile coordinates at a given zoom level
   static MapTile xyzFromLatLon(LatLng latLon, int zoom) {
     final n = math.pow(2, zoom).toDouble();

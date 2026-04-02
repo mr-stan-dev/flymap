@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 
 class FlightDownloadCompletion extends StatelessWidget {
@@ -6,10 +7,10 @@ class FlightDownloadCompletion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SuccessStateView(
-      title: 'Download Complete!',
-      subtitle: 'Flight has been saved',
-      footer: 'Navigating to home...',
+    return SuccessStateView(
+      title: context.t.preview.downloadComplete,
+      subtitle: context.t.preview.flightSaved,
+      footer: context.t.preview.navigatingHome,
     );
   }
 }

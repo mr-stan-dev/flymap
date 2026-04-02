@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/gps_data.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/compass_rose_painter.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/metric_row.dart';
 
@@ -36,6 +37,7 @@ class _FlightCompassWidgetState extends State<FlightCompassWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final course = widget.gpsData?.course ?? 0;
@@ -57,7 +59,7 @@ class _FlightCompassWidgetState extends State<FlightCompassWidget> {
                   Expanded(
                     child: _buildLabeledMetric(
                       context,
-                      label: 'Speed',
+                      label: t.flight.info.speed,
                       child: _buildSpeedIndicator(context),
                     ),
                   ),
@@ -65,7 +67,7 @@ class _FlightCompassWidgetState extends State<FlightCompassWidget> {
                   Expanded(
                     child: _buildLabeledMetric(
                       context,
-                      label: 'Altitude',
+                      label: t.flight.info.altitude,
                       child: _buildAltitudeIndicator(context),
                     ),
                   ),
@@ -74,7 +76,7 @@ class _FlightCompassWidgetState extends State<FlightCompassWidget> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Aircraft heading',
+              t.flight.dashboard.aircraftHeading,
               style: theme.textTheme.labelMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: colorScheme.onSurfaceVariant,
@@ -138,7 +140,9 @@ class _FlightCompassWidgetState extends State<FlightCompassWidget> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
-                        'HDG ${course.toStringAsFixed(0)}°',
+                        t.flight.dashboard.headingShort(
+                          heading: course.toStringAsFixed(0),
+                        ),
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onSurfaceVariant,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
@@ -36,25 +37,26 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _tabIndex,
         onTap: (index) => setState(() => _tabIndex = index),
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.map_outlined),
-            activeIcon: Icon(Icons.map),
-            label: 'Map',
+            icon: const Icon(Icons.map_outlined),
+            activeIcon: const Icon(Icons.map),
+            label: t.flight.tabMap,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.speed_outlined),
-            activeIcon: Icon(Icons.speed),
-            label: 'Dashboard',
+            icon: const Icon(Icons.speed_outlined),
+            activeIcon: const Icon(Icons.speed),
+            label: t.flight.tabDashboard,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.info_outline),
-            activeIcon: Icon(Icons.info),
-            label: 'Info',
+            icon: const Icon(Icons.info_outline),
+            activeIcon: const Icon(Icons.info),
+            label: t.flight.tabInfo,
           ),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
@@ -36,7 +37,7 @@ class _SettingsView extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Settings'),
+            Text(context.t.settings.title),
             if (isProUser) ...[
               const SizedBox(width: 8),
               const ProBadge(compact: true),
@@ -49,7 +50,7 @@ class _SettingsView extends StatelessWidget {
           return BlocBuilder<SettingsCubit, SettingsState>(
             builder: (context, state) {
               if (state.isLoading) {
-                return const LoadingStateView(title: 'Loading settings...');
+                return LoadingStateView(title: context.t.settings.loading);
               }
               final theme = Theme.of(context);
               final sectionBg = theme.colorScheme.surfaceContainerHighest;
@@ -68,31 +69,35 @@ class _SettingsView extends StatelessWidget {
                     color: sectionBg,
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                     child: Text(
-                      'Appearance',
+                      context.t.settings.appearance,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                   _SettingItem(
-                    title: 'Theme',
+                    title: context.t.settings.theme,
                     subtitle: state.themeMode == ThemeMode.dark
-                        ? 'Dark'
-                        : 'Light',
+                        ? context.t.settings.dark
+                        : context.t.settings.light,
                     leading: const Icon(Icons.dark_mode),
                     onTap: () async {
+                      final darkLabel = context.t.settings.dark;
+                      final lightLabel = context.t.settings.light;
                       final selected = await _showOptions(
                         context,
-                        title: 'Theme',
-                        options: const ['Dark', 'Light'],
+                        title: context.t.settings.theme,
+                        options: [darkLabel, lightLabel],
                         current: state.themeMode == ThemeMode.dark
-                            ? 'Dark'
-                            : 'Light',
+                            ? darkLabel
+                            : lightLabel,
                       );
                       if (!context.mounted) return;
                       if (selected != null) {
                         context.read<SettingsCubit>().setTheme(
-                          selected == 'Dark' ? ThemeMode.dark : ThemeMode.light,
+                          selected == darkLabel
+                              ? ThemeMode.dark
+                              : ThemeMode.light,
                         );
                       }
                     },
@@ -105,20 +110,20 @@ class _SettingsView extends StatelessWidget {
                     color: sectionBg,
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                     child: Text(
-                      'Units',
+                      context.t.settings.units,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                   _SettingItem(
-                    title: 'Altitude',
+                    title: context.t.settings.altitude,
                     subtitle: state.altitudeUnit,
                     leading: const Icon(Icons.height),
                     onTap: () async {
                       final selected = await _showOptions(
                         context,
-                        title: 'Altitude unit',
+                        title: context.t.settings.altitudeUnit,
                         options: const ['ft', 'm'],
                         current: state.altitudeUnit,
                       );
@@ -130,13 +135,13 @@ class _SettingsView extends StatelessWidget {
                   ),
                   const Divider(height: 1),
                   _SettingItem(
-                    title: 'Speed',
+                    title: context.t.settings.speed,
                     subtitle: state.speedUnit,
                     leading: const Icon(Icons.speed),
                     onTap: () async {
                       final selected = await _showOptions(
                         context,
-                        title: 'Speed unit',
+                        title: context.t.settings.speedUnit,
                         options: const ['km/h', 'mph'],
                         current: state.speedUnit,
                       );
@@ -148,13 +153,13 @@ class _SettingsView extends StatelessWidget {
                   ),
                   const Divider(height: 1),
                   _SettingItem(
-                    title: 'Time format',
+                    title: context.t.settings.timeFormat,
                     subtitle: state.timeFormat,
                     leading: const Icon(Icons.access_time),
                     onTap: () async {
                       final selected = await _showOptions(
                         context,
-                        title: 'Time format',
+                        title: context.t.settings.timeFormat,
                         options: const ['24h', '12h'],
                         current: state.timeFormat,
                       );
@@ -171,15 +176,15 @@ class _SettingsView extends StatelessWidget {
                     color: sectionBg,
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                     child: Text(
-                      'About',
+                      context.t.settings.about,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                   _SettingItem(
-                    title: 'About',
-                    subtitle: 'Learn more about the app',
+                    title: context.t.settings.about,
+                    subtitle: context.t.settings.aboutSubtitle,
                     leading: const Icon(Icons.info_outline),
                     onTap: () {
                       AppRouter.goToAbout(context);
@@ -187,8 +192,8 @@ class _SettingsView extends StatelessWidget {
                   ),
                   const Divider(height: 1),
                   _SettingItem(
-                    title: 'Privacy Policy',
-                    subtitle: 'Read our privacy policy',
+                    title: context.t.settings.privacyPolicy,
+                    subtitle: context.t.settings.privacyPolicySubtitle,
                     leading: const Icon(Icons.privacy_tip_outlined),
                     onTap: () async {
                       await _openExternalUrl(
@@ -223,23 +228,23 @@ class _SettingsView extends StatelessWidget {
       case SubscriptionPaywallResult.purchased:
       case SubscriptionPaywallResult.restored:
         messenger.showSnackBar(
-          const SnackBar(content: Text('Flymap Pro activated.')),
+          SnackBar(content: Text(context.t.settings.flymapProActivated)),
         );
         AppRouter.goToSubscriptionManagement(context);
         return;
       case SubscriptionPaywallResult.cancelled:
         messenger.showSnackBar(
-          const SnackBar(content: Text('Upgrade cancelled.')),
+          SnackBar(content: Text(context.t.settings.upgradeCancelled)),
         );
         return;
       case SubscriptionPaywallResult.notPresented:
         messenger.showSnackBar(
-          const SnackBar(content: Text('No paywall available right now.')),
+          SnackBar(content: Text(context.t.settings.noPaywall)),
         );
         return;
       case SubscriptionPaywallResult.error:
         messenger.showSnackBar(
-          const SnackBar(content: Text('Failed to open paywall.')),
+          SnackBar(content: Text(context.t.settings.failedOpenPaywall)),
         );
         return;
     }
@@ -249,9 +254,9 @@ class _SettingsView extends StatelessWidget {
     final uri = Uri.parse(url);
     final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!ok && context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Could not open $url')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.t.settings.couldNotOpenUrl(url: url))),
+      );
     }
   }
 
@@ -292,7 +297,7 @@ class _SettingsView extends StatelessWidget {
           ),
           actions: [
             TertiaryButton(
-              label: 'Cancel',
+              label: context.t.common.cancel,
               onPressed: () => Navigator.of(ctx).pop(),
               expand: false,
             ),

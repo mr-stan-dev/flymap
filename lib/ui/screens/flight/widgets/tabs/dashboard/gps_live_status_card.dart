@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/entity/gps_data.dart';
+import 'package:flymap/i18n/strings.g.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 
 class GpsLiveStatusCard extends StatefulWidget {
   const GpsLiveStatusCard({
@@ -138,49 +139,55 @@ class _GpsLiveStatusCardState extends State<GpsLiveStatusCard> {
         return _GpsStatusViewData(
           color: errorColor,
           icon: Icons.gps_off_rounded,
-          title: 'GPS off',
-          subtitle: 'Enable location services to start tracking.',
+          title: context.t.flight.dashboard.gpsOff,
+          subtitle: context.t.flight.dashboard.gpsOffHint,
         );
       case GpsStatus.permissionsNotGranted:
         return _GpsStatusViewData(
           color: warningColor,
           icon: Icons.location_disabled_rounded,
-          title: 'Location permission required',
-          subtitle: 'Grant permission to access live flight telemetry.',
+          title: context.t.flight.dashboard.gpsPermissionRequired,
+          subtitle: context.t.flight.dashboard.gpsPermissionHint,
         );
       case GpsStatus.searching:
         return _GpsStatusViewData(
           color: infoColor,
           icon: Icons.gps_not_fixed_rounded,
-          title: 'Searching for GPS',
-          subtitle: 'Looking for a reliable signal',
+          title: context.t.flight.dashboard.gpsSearching,
+          subtitle: context.t.flight.dashboard.gpsSearchingHint,
         );
       case GpsStatus.weakSignal:
         return _GpsStatusViewData(
           color: warningColor,
           icon: Icons.network_check_rounded,
-          title: 'Weak GPS signal',
+          title: context.t.flight.dashboard.gpsWeak,
           subtitle: age == null
-              ? 'Signal is unstable. Keep device in open sky.'
-              : 'Signal unstable. Last fix ${_ageLabel(age)}.',
+              ? context.t.flight.dashboard.gpsWeakHint
+              : context.t.flight.dashboard.gpsWeakHintWithAge(
+                  age: _ageLabel(age),
+                ),
         );
       case GpsStatus.gpsActive:
         return _GpsStatusViewData(
           color: successColor,
           icon: Icons.gps_fixed_rounded,
-          title: 'GPS active',
+          title: context.t.flight.dashboard.gpsActive,
           subtitle: age == null
-              ? 'Receiving live telemetry.'
-              : 'Last GPS update ${_ageLabel(age)}.',
+              ? context.t.flight.dashboard.gpsActiveHint
+              : context.t.flight.dashboard.gpsActiveHintWithAge(
+                  age: _ageLabel(age),
+                ),
         );
     }
   }
 
   String _ageLabel(Duration age) {
-    if (age.inSeconds < 1) return 'just now';
-    if (age.inSeconds < 60) return '${age.inSeconds}s ago';
+    if (age.inSeconds < 1) return t.flight.dashboard.ageJustNow;
+    if (age.inSeconds < 60) {
+      return t.flight.dashboard.ageSeconds(seconds: age.inSeconds);
+    }
     final minutes = age.inMinutes;
-    return '${minutes}m ago';
+    return t.flight.dashboard.ageMinutes(minutes: minutes);
   }
 }
 
@@ -263,13 +270,13 @@ class _SignalStrengthBadge extends StatelessWidget {
   String _labelForQuality(_SignalQuality quality) {
     switch (quality) {
       case _SignalQuality.good:
-        return 'Good';
+        return t.flight.dashboard.signalGood;
       case _SignalQuality.poor:
-        return 'Poor';
+        return t.flight.dashboard.signalPoor;
       case _SignalQuality.bad:
-        return 'Bad';
+        return t.flight.dashboard.signalBad;
       case _SignalQuality.searching:
-        return 'Searching';
+        return t.flight.dashboard.signalSearching;
     }
   }
 

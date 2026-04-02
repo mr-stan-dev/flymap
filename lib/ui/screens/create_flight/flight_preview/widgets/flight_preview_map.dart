@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/map_detail_level.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/map_download_config.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/info/flight_info_widget.dart';
@@ -23,6 +24,7 @@ class _FlightPreviewMapWidgetState extends State<FlightPreviewMapWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     final colorScheme = Theme.of(context).colorScheme;
     final resolvedMaxZoom = MapDownloadConfig.resolveMaxZoom(
       distanceKm: widget.state.flightRoute.distanceInKm,
@@ -134,8 +136,8 @@ class _FlightPreviewMapWidgetState extends State<FlightPreviewMapWidget> {
                       context.read<FlightPreviewCubit>().startDownload();
                     },
               label: widget.state.isTooLongFlight
-                  ? 'Too long flight (> 5000km)'
-                  : 'Download',
+                  ? t.createFlight.overview.tooLongFlightButton
+                  : t.preview.download,
             ),
           ),
         ),

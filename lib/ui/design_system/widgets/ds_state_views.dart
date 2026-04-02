@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/tokens/ds_icon_sizes.dart';
 import 'package:flymap/ui/design_system/tokens/ds_semantic_colors.dart';
 import 'package:flymap/ui/design_system/tokens/ds_spacing.dart';
@@ -90,17 +91,18 @@ class ErrorStateView extends StatelessWidget {
     required this.title,
     required this.message,
     this.onRetry,
-    this.retryLabel = 'Try again',
+    this.retryLabel,
     super.key,
   });
 
   final String title;
   final String message;
   final VoidCallback? onRetry;
-  final String retryLabel;
+  final String? retryLabel;
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     final errorColor = DsSemanticColors.error(context);
     return Center(
       child: Padding(
@@ -129,7 +131,7 @@ class ErrorStateView extends StatelessWidget {
             if (onRetry != null) ...[
               const SizedBox(height: DsSpacing.lg),
               PrimaryButton(
-                label: retryLabel,
+                label: retryLabel ?? t.common.retry,
                 onPressed: onRetry,
                 leadingIcon: Icons.refresh,
                 expand: false,

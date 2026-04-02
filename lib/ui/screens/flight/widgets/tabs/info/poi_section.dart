@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/flight_poi.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/section_card.dart';
 
@@ -11,9 +12,9 @@ class PoiSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InfoSectionCard(
-      title: 'Points of Interest',
+      title: context.t.flight.info.pointsOfInterestTitle,
       child: poi.isEmpty
-          ? const Text('No POIs available yet.')
+          ? Text(context.t.flight.info.noPoi)
           : Wrap(
               spacing: DsSpacing.xs,
               runSpacing: DsSpacing.xs,
@@ -58,14 +59,15 @@ class _PoiDetailsSheet extends StatelessWidget {
         children: [
           Text(item.name, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: DsSpacing.xs),
-          if (item.type.trim().isNotEmpty) Text('Type: ${item.type}'),
+          if (item.type.trim().isNotEmpty)
+            Text(context.t.flight.info.poiType(type: item.type)),
           if (item.description.trim().isNotEmpty) ...[
             const SizedBox(height: DsSpacing.xs),
             Text(item.description),
           ],
           if (item.flyView.trim().isNotEmpty) ...[
             const SizedBox(height: DsSpacing.xs),
-            Text('Fly-over: ${item.flyView}'),
+            Text(context.t.flight.info.poiFlyOver(view: item.flyView)),
           ],
           if (item.wiki.trim().isNotEmpty) ...[
             const SizedBox(height: DsSpacing.xs),

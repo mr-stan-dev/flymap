@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/widgets/delete_flight_confirmation_dialog.dart';
@@ -104,19 +105,19 @@ class FlightAppBar extends StatelessWidget {
                             onSelected: (value) async {
                               await _handleMenuAction(context, value);
                             },
-                            itemBuilder: (context) => const [
+                            itemBuilder: (context) => [
                               PopupMenuItem(
                                 value: 'share_route',
-                                child: Text('Share route'),
+                                child: Text(context.t.flight.shareRoute),
                               ),
                               PopupMenuItem(
                                 value: 'copy_route',
-                                child: Text('Copy route'),
+                                child: Text(context.t.flight.copyRoute),
                               ),
                               PopupMenuDivider(),
                               PopupMenuItem(
                                 value: 'delete_flight',
-                                child: Text('Delete flight'),
+                                child: Text(context.t.flight.deleteFlight),
                               ),
                             ],
                           ),
@@ -142,9 +143,9 @@ class FlightAppBar extends StatelessWidget {
         final routeSummary = RouteCopyBuilder.build(flight.route);
         await Clipboard.setData(ClipboardData(text: routeSummary));
         if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Route summary copied')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(context.t.flight.routeSummaryCopied)),
+          );
         }
         break;
       case 'delete_flight':

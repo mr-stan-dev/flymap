@@ -8,7 +8,7 @@ class WaypointsLayer extends MapLayer {
   late LineOptions lineOptions;
 
   WaypointsLayer(List<ll.LatLng> waypoints) {
-    lineOptions =  LineOptions(
+    lineOptions = LineOptions(
       lineJoin: 'round',
       geometry: waypoints.toGeometry(),
       lineColor: AppColoursCommon.brandTeal.toHexStringRGB(),

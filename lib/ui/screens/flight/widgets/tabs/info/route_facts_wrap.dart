@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/i18n/strings.g.dart';
 
 class RouteFactsWrap extends StatelessWidget {
   const RouteFactsWrap({required this.route, super.key});
@@ -14,7 +15,9 @@ class RouteFactsWrap extends StatelessWidget {
       children: [
         _FactChip(
           icon: Icons.route,
-          label: '${route.distanceInKm.toStringAsFixed(0)} km',
+          label: context.t.flight.info.distanceKm(
+            distance: route.distanceInKm.toStringAsFixed(0),
+          ),
         ),
         _FactChip(
           icon: Icons.flight_takeoff,

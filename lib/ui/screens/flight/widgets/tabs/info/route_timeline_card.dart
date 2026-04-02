@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 
 class RouteTimelineCard extends StatelessWidget {
@@ -9,8 +10,9 @@ class RouteTimelineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     return SectionCard(
-      title: 'Route timeline',
+      title: t.flight.info.routeTimelineTitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -22,7 +24,9 @@ class RouteTimelineCard extends StatelessWidget {
             _connector(context),
             _TimelineRow(
               icon: Icons.more_horiz,
-              label: '${route.waypoints.length} planned waypoints',
+              label: t.flight.info.plannedWaypoints(
+                count: route.waypoints.length,
+              ),
             ),
           ],
           _connector(context),

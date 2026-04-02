@@ -62,15 +62,15 @@ class CitiesDatabase {
     if (rows.isEmpty) return [];
 
     // Headers reference based on previous filter_cities.py output:
-    // ['Name', 'ASCII Name', 'Country Code', 'Country name EN', 'Country Code 2', 
+    // ['Name', 'ASCII Name', 'Country Code', 'Country name EN', 'Country Code 2',
     //  'Population', 'Elevation', 'DIgital Elevation Model', 'Timezone', 'LABEL EN', 'Coordinates']
-    
+
     final cities = <City>[];
 
     // Skip header row
     final headerRow = rows[0];
     final coordIndex = headerRow.indexOf('Coordinates');
-    
+
     for (int i = 1; i < rows.length; i++) {
       final row = rows[i];
       if (row.length <= coordIndex) continue;
@@ -88,10 +88,10 @@ class CitiesDatabase {
       try {
         final population = int.tryParse(popStr) ?? 0;
         final elevation = int.tryParse(elevationStr); // Can be null
-        
+
         final coordParts = coordStr.split(',');
         if (coordParts.length != 2) continue;
-        
+
         final lat = double.parse(coordParts[0].trim());
         final lon = double.parse(coordParts[1].trim());
 
@@ -143,7 +143,7 @@ class CitiesDatabase {
     // Usually corridors are local. If minLon and maxLon are far apart (e.g., -170 and 170),
     // we might have a crossing.
     // For now, using standard min/max check.
-    
+
     // 2. Iterate cities
     for (final city in _cities) {
       final lat = city.latLon.latitude;
@@ -159,7 +159,7 @@ class CitiesDatabase {
         results.add(city);
       }
     }
-    
+
     return results;
   }
 
@@ -167,15 +167,20 @@ class CitiesDatabase {
   bool _isPointInPolygon(LatLng point, List<LatLng> polygon) {
     bool isInside = false;
     int j = polygon.length - 1;
-    
+
     for (int i = 0; i < polygon.length; i++) {
-      if ((polygon[i].latitude > point.latitude) != (polygon[j].latitude > point.latitude) &&
-          (point.longitude < (polygon[j].longitude - polygon[i].longitude) * (point.latitude - polygon[i].latitude) / (polygon[j].latitude - polygon[i].latitude) + polygon[i].longitude)) {
+      if ((polygon[i].latitude > point.latitude) !=
+              (polygon[j].latitude > point.latitude) &&
+          (point.longitude <
+              (polygon[j].longitude - polygon[i].longitude) *
+                      (point.latitude - polygon[i].latitude) /
+                      (polygon[j].latitude - polygon[i].latitude) +
+                  polygon[i].longitude)) {
         isInside = !isInside;
       }
       j = i;
     }
-    
+
     return isInside;
   }
 }

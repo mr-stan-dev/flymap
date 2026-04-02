@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/flight_article.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/articles/article_html_composer.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/articles/offline_article_html_view.dart';
@@ -35,7 +36,7 @@ class ArticleDetailsPage extends StatelessWidget {
         title: Text(article.title),
         actions: [
           IconButton(
-            tooltip: 'Open source page',
+            tooltip: context.t.flight.info.openSourcePageTooltip,
             onPressed: () => _openSource(article.sourceUrl),
             icon: const Icon(Icons.open_in_new_rounded),
           ),

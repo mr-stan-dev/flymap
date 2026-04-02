@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/entity/gps_data.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -39,7 +40,7 @@ class RouteProgressCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Route progress',
+                context.t.flight.dashboard.routeProgress,
                 style: Theme.of(
                   context,
                 ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
@@ -79,22 +80,28 @@ class RouteProgressCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _Metric(
-                  label: 'Covered',
-                  value: '${coveredKm.toStringAsFixed(0)} km',
+                  label: context.t.flight.dashboard.covered,
+                  value: context.t.flight.info.distanceKm(
+                    distance: coveredKm.toStringAsFixed(0),
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _Metric(
-                  label: 'Remaining',
-                  value: '${remainingKm.toStringAsFixed(0)} km',
+                  label: context.t.flight.dashboard.remaining,
+                  value: context.t.flight.info.distanceKm(
+                    distance: remainingKm.toStringAsFixed(0),
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _Metric(
-                  label: 'Total',
-                  value: '${totalKm.toStringAsFixed(0)} km',
+                  label: context.t.flight.dashboard.total,
+                  value: context.t.flight.info.distanceKm(
+                    distance: totalKm.toStringAsFixed(0),
+                  ),
                 ),
               ),
             ],

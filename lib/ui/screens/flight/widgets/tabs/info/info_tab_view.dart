@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/info_content.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/shared/tab_state_placeholder.dart';
@@ -35,9 +36,9 @@ class FlightInfoTabView extends StatelessWidget {
       }
     }
 
-    return const FlightTabStatePlaceholder(
+    return FlightTabStatePlaceholder(
       icon: Icons.info_outline,
-      text: 'Loading route information...',
+      text: context.t.flight.info.loadingRouteInformation,
     );
   }
 }

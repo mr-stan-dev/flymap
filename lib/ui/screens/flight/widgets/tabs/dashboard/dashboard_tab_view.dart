@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/gps_data.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/dashboard_panel.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/gps_live_status_card.dart';
@@ -34,9 +35,9 @@ class FlightDashboardTabView extends StatelessWidget {
       );
     }
 
-    return const FlightTabStatePlaceholder(
+    return FlightTabStatePlaceholder(
       icon: Icons.sensors,
-      text: 'Preparing dashboard...',
+      text: context.t.flight.dashboard.preparingDashboard,
     );
   }
 }

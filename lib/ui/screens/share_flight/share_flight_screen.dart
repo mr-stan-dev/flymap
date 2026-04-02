@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/flight.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/shared/tab_state_placeholder.dart';
 import 'package:flymap/ui/screens/share_flight/viewmodel/share_flight_cubit.dart';
@@ -51,7 +52,7 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Share flight')),
+      appBar: AppBar(title: Text(context.t.shareFlight.title)),
       body: BlocConsumer<ShareFlightCubit, ShareFlightState>(
         listenWhen: (previous, current) {
           return previous.errorMessage != current.errorMessage &&
@@ -70,9 +71,9 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
             children: [
               Expanded(
                 child: style == null
-                    ? const FlightTabStatePlaceholder(
+                    ? FlightTabStatePlaceholder(
                         icon: Icons.map_outlined,
-                        text: 'Preparing share preview map...',
+                        text: context.t.shareFlight.preparingMap,
                       )
                     : RepaintBoundary(
                         key: _mapCaptureKey,
@@ -183,8 +184,8 @@ class _ShareFlightViewState extends State<_ShareFlightView> {
                   child: PrimaryButton(
                     key: _shareButtonKey,
                     label: state.isSharing
-                        ? 'Preparing screenshot...'
-                        : 'Share',
+                        ? context.t.shareFlight.preparingScreenshot
+                        : context.t.shareFlight.share,
                     onPressed: state.isLoading || state.isSharing
                         ? null
                         : () => _shareRoute(context),
