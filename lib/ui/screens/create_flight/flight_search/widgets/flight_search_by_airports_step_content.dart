@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/map_detail_level.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_download_completion.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/widgets/flight_search_by_airports_step_meta.dart';
@@ -8,6 +9,7 @@ import 'package:flymap/ui/screens/create_flight/flight_search/widgets/steps/flig
 import 'package:flymap/ui/screens/create_flight/flight_search/widgets/steps/flight_search_downloading_view.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/widgets/steps/flight_search_map_preview_step.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/widgets/steps/flight_search_overview_step.dart';
+import 'package:flymap/ui/screens/create_flight/flight_search/widgets/steps/flight_search_route_not_supported_step.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/widgets/steps/flight_search_wikipedia_articles_step.dart';
 
 class FlightSearchByAirportsStepContent extends StatelessWidget {
@@ -22,6 +24,7 @@ class FlightSearchByAirportsStepContent extends StatelessWidget {
     required this.onSelectAirport,
     required this.onToggleFavoriteForAirport,
     required this.onContinueFromAirportStep,
+    required this.onBackFromRouteNotSupported,
     required this.onContinueFromMap,
     required this.onSelectMapDetailLevel,
     required this.onContinueFromOverview,
@@ -43,6 +46,7 @@ class FlightSearchByAirportsStepContent extends StatelessWidget {
   final Future<void> Function(Airport airport) onSelectAirport;
   final Future<void> Function(Airport airport) onToggleFavoriteForAirport;
   final VoidCallback onContinueFromAirportStep;
+  final VoidCallback onBackFromRouteNotSupported;
   final VoidCallback onContinueFromMap;
   final ValueChanged<MapDetailLevel> onSelectMapDetailLevel;
   final VoidCallback onContinueFromOverview;
@@ -104,6 +108,20 @@ class FlightSearchByAirportsStepContent extends StatelessWidget {
           onSelectAirport: onSelectAirport,
           onToggleFavoriteForAirport: onToggleFavoriteForAirport,
           onContinue: onContinueFromAirportStep,
+        );
+      case CreateFlightStep.routeNotSupported:
+        final route = state.flightRoute;
+        if (route == null) {
+          return Center(
+            child: Text(context.t.createFlight.overview.routeNotReady),
+          );
+        }
+        return FlightSearchRouteNotSupportedStep(
+          route: route,
+          message:
+              state.errorMessage ??
+              context.t.createFlight.mapPreview.routeNotSupportedMsg,
+          onBack: onBackFromRouteNotSupported,
         );
       case CreateFlightStep.mapPreview:
         return FlightSearchMapPreviewStep(

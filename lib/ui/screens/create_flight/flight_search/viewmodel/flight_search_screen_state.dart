@@ -8,6 +8,7 @@ import 'package:flymap/entity/wiki_article_candidate.dart';
 enum CreateFlightStep {
   departure,
   arrival,
+  routeNotSupported,
   mapPreview,
   overview,
   wikipediaArticles,
@@ -127,10 +128,7 @@ class FlightSearchScreenState extends Equatable {
   final String? downloadErrorMessage;
 
   bool get canContinueFromMap =>
-      flightRoute != null &&
-      !isPreviewLoading &&
-      !isDownloading &&
-      !isTooLongFlight;
+      flightRoute != null && !isPreviewLoading && !isDownloading;
 
   FlightSearchScreenState copyWith({
     CreateFlightStep? step,

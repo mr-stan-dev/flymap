@@ -3,6 +3,24 @@ import 'package:flymap/entity/map_detail_level.dart';
 import 'package:flymap/map_download_config.dart';
 
 void main() {
+  group('MapDownloadConfig.resolveRouteLength', () {
+    test(
+      'classifies short, mid, long, superLong route buckets by thresholds',
+      () {
+        expect(MapDownloadConfig.resolveRouteLength(2400.0), RouteLength.short);
+        expect(MapDownloadConfig.resolveRouteLength(2500.0), RouteLength.short);
+        expect(MapDownloadConfig.resolveRouteLength(2500.1), RouteLength.mid);
+        expect(MapDownloadConfig.resolveRouteLength(5000.0), RouteLength.mid);
+        expect(MapDownloadConfig.resolveRouteLength(5000.1), RouteLength.long);
+        expect(MapDownloadConfig.resolveRouteLength(10000.0), RouteLength.long);
+        expect(
+          MapDownloadConfig.resolveRouteLength(10000.1),
+          RouteLength.superLong,
+        );
+      },
+    );
+  });
+
   group('MapDownloadConfig.resolveMaxZoom', () {
     test('uses inclusive short-route boundary at 2500km', () {
       expect(
@@ -35,6 +53,40 @@ void main() {
           detailLevel: MapDetailLevel.pro,
         ),
         10,
+      );
+    });
+
+    test('reduces max zoom by one more step for routes above 5000km', () {
+      expect(
+        MapDownloadConfig.resolveMaxZoom(
+          distanceKm: 5000.1,
+          detailLevel: MapDetailLevel.basic,
+        ),
+        8,
+      );
+      expect(
+        MapDownloadConfig.resolveMaxZoom(
+          distanceKm: 5000.1,
+          detailLevel: MapDetailLevel.pro,
+        ),
+        9,
+      );
+    });
+
+    test('reduces max zoom by one more step for routes above 10000km', () {
+      expect(
+        MapDownloadConfig.resolveMaxZoom(
+          distanceKm: 10000.1,
+          detailLevel: MapDetailLevel.basic,
+        ),
+        7,
+      );
+      expect(
+        MapDownloadConfig.resolveMaxZoom(
+          distanceKm: 10000.1,
+          detailLevel: MapDetailLevel.pro,
+        ),
+        8,
       );
     });
   });

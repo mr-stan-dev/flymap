@@ -50,17 +50,6 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
             maxZoom: resolvedMaxZoom,
           ),
         ),
-        if (state.isTooLongFlight)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-            child: Text(
-              context.t.createFlight.mapPreview.routeTooLong,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.error,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
           child: Column(
@@ -89,7 +78,21 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
                           onSelectMapDetailLevel(MapDetailLevel.pro),
                     ),
                   ),
-                  const SizedBox(width: 4),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      context.t.createFlight.mapPreview.estimatedMapSize(
+                        size: estimatedMapSize,
+                      ),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
                   IconButton(
                     onPressed: () => _showMapDetailLevelInfoDialog(context),
                     tooltip:
@@ -103,17 +106,6 @@ class FlightSearchMapPreviewStep extends StatelessWidget {
                   ),
                 ],
               ),
-              if (!state.isTooLongFlight) ...[
-                const SizedBox(height: 10),
-                Text(
-                  context.t.createFlight.mapPreview.estimatedMapSize(
-                    size: estimatedMapSize,
-                  ),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
               const SizedBox(height: 10),
               isFreeUserWithProSelection
                   ? PremiumButton(

@@ -130,14 +130,10 @@ class _FlightPreviewMapWidgetState extends State<FlightPreviewMapWidget> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: PrimaryButton(
-              onPressed: widget.state.isTooLongFlight
-                  ? null
-                  : () {
-                      context.read<FlightPreviewCubit>().startDownload();
-                    },
-              label: widget.state.isTooLongFlight
-                  ? t.createFlight.overview.tooLongFlightButton
-                  : t.preview.download,
+              onPressed: () {
+                context.read<FlightPreviewCubit>().startDownload();
+              },
+              label: t.preview.download,
             ),
           ),
         ),

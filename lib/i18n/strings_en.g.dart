@@ -67,6 +67,9 @@ class TranslationsCommonEn {
 	/// en: 'Continue'
 	String get kContinue => 'Continue';
 
+	/// en: 'Back'
+	String get back => 'Back';
+
 	/// en: 'Cancel'
 	String get cancel => 'Cancel';
 
@@ -654,6 +657,9 @@ class TranslationsCreateFlightStepsEn {
 	/// en: 'Choose arrival airport'
 	String get arrivalTitle => 'Choose arrival airport';
 
+	/// en: 'Route not supported'
+	String get routeNotSupportedTitle => 'Route not supported';
+
 	/// en: 'Map preview'
 	String get mapPreviewTitle => 'Map preview';
 
@@ -717,8 +723,8 @@ class TranslationsCreateFlightMapPreviewEn {
 
 	// Translations
 
-	/// en: 'Downloading routes over 5,000 km is not supported yet.'
-	String get routeTooLong => 'Downloading routes over 5,000 km is not supported yet.';
+	/// en: 'Sorry, antimeridian flights are not supported yet.'
+	String get routeNotSupportedMsg => 'Sorry, antimeridian flights are not supported yet.';
 
 	/// en: 'Basic'
 	String get basic => 'Basic';
@@ -729,8 +735,8 @@ class TranslationsCreateFlightMapPreviewEn {
 	/// en: 'Map detail info'
 	String get mapDetailInfoTooltip => 'Map detail info';
 
-	/// en: 'Estimated map download size: $size'
-	String estimatedMapSize({required Object size}) => 'Estimated map download size: ${size}';
+	/// en: 'Estimated map size: $size'
+	String estimatedMapSize({required Object size}) => 'Estimated map size: ${size}';
 
 	/// en: 'Upgrade to Pro'
 	String get upgradeToPro => 'Upgrade to Pro';
@@ -738,8 +744,8 @@ class TranslationsCreateFlightMapPreviewEn {
 	/// en: 'Map options'
 	String get optionsTitle => 'Map options';
 
-	/// en: 'Basic map has lower zoom but download is faster and uses less storage. Detailed gives you a higher zoom and more detail, but the download size is bigger.'
-	String get optionsBody => 'Basic map has lower zoom but download is faster and uses less storage.\n\nDetailed gives you a higher zoom and more detail, but the download size is bigger.';
+	/// en: 'Basic: lower zoom, faster download, less storage Pro: higher zoom, more detail, larger download Route is approximate — actual path may vary (especially long-haul)'
+	String get optionsBody => 'Basic: lower zoom, faster download, less storage\n\nPro: higher zoom, more detail, larger download\n\nRoute is approximate — actual path may vary (especially long-haul)';
 }
 
 // Path: createFlight.overview
@@ -1211,6 +1217,7 @@ extension on Translations {
 		return switch (path) {
 			'appName' => 'Flymap',
 			'common.kContinue' => 'Continue',
+			'common.back' => 'Back',
 			'common.cancel' => 'Cancel',
 			'common.ok' => 'OK',
 			'common.retry' => 'Retry',
@@ -1301,6 +1308,7 @@ extension on Translations {
 			'subscription.serviceUnavailable' => 'Subscription service is temporarily unavailable.',
 			'createFlight.steps.departureTitle' => 'Choose departure airport',
 			'createFlight.steps.arrivalTitle' => 'Choose arrival airport',
+			'createFlight.steps.routeNotSupportedTitle' => 'Route not supported',
 			'createFlight.steps.mapPreviewTitle' => 'Map preview',
 			'createFlight.steps.overviewTitle' => 'Route overview',
 			'createFlight.steps.wikipediaTitle' => 'Wikipedia articles',
@@ -1316,14 +1324,14 @@ extension on Translations {
 			'createFlight.search.noArrivalFound' => 'No arrival airports found.',
 			'createFlight.search.airportCodeCity' => ({required Object code, required Object city}) => '${code} · ${city}',
 			'createFlight.search.airportNameCode' => ({required Object name, required Object code}) => '${name} (${code})',
-			'createFlight.mapPreview.routeTooLong' => 'Downloading routes over 5,000 km is not supported yet.',
+			'createFlight.mapPreview.routeNotSupportedMsg' => 'Sorry, antimeridian flights are not supported yet.',
 			'createFlight.mapPreview.basic' => 'Basic',
 			'createFlight.mapPreview.pro' => 'Pro',
 			'createFlight.mapPreview.mapDetailInfoTooltip' => 'Map detail info',
-			'createFlight.mapPreview.estimatedMapSize' => ({required Object size}) => 'Estimated map download size: ${size}',
+			'createFlight.mapPreview.estimatedMapSize' => ({required Object size}) => 'Estimated map size: ${size}',
 			'createFlight.mapPreview.upgradeToPro' => 'Upgrade to Pro',
 			'createFlight.mapPreview.optionsTitle' => 'Map options',
-			'createFlight.mapPreview.optionsBody' => 'Basic map has lower zoom but download is faster and uses less storage.\n\nDetailed gives you a higher zoom and more detail, but the download size is bigger.',
+			'createFlight.mapPreview.optionsBody' => 'Basic: lower zoom, faster download, less storage\n\nPro: higher zoom, more detail, larger download\n\nRoute is approximate — actual path may vary (especially long-haul)',
 			'createFlight.overview.routeNotReady' => 'Route is not ready yet.',
 			'createFlight.overview.tooLongFlightButton' => 'Too long flight (> 5000km)',
 			'createFlight.overview.longFlightOverview' => 'Right now, flights longer than 5,000 km aren’t calculated as accurately as we’d like - but we’re working hard to make sure long flights are supported soon!',

@@ -177,6 +177,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         );
         break;
       case CreateFlightStep.mapPreview:
+      case CreateFlightStep.routeNotSupported:
       case CreateFlightStep.overview:
       case CreateFlightStep.wikipediaArticles:
         break;
@@ -187,6 +188,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     final airport = switch (state.step) {
       CreateFlightStep.departure => state.selectedDeparture,
       CreateFlightStep.arrival => state.selectedArrival,
+      CreateFlightStep.routeNotSupported ||
       CreateFlightStep.mapPreview ||
       CreateFlightStep.overview ||
       CreateFlightStep.wikipediaArticles => null,
@@ -213,6 +215,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     final selected = switch (state.step) {
       CreateFlightStep.departure => state.selectedDeparture,
       CreateFlightStep.arrival => state.selectedArrival,
+      CreateFlightStep.routeNotSupported ||
       CreateFlightStep.mapPreview ||
       CreateFlightStep.overview ||
       CreateFlightStep.wikipediaArticles => null,
@@ -250,6 +253,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         );
         break;
       case CreateFlightStep.mapPreview:
+      case CreateFlightStep.routeNotSupported:
       case CreateFlightStep.overview:
       case CreateFlightStep.wikipediaArticles:
         break;
@@ -311,6 +315,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         await _preparePreview();
         break;
       case CreateFlightStep.mapPreview:
+      case CreateFlightStep.routeNotSupported:
       case CreateFlightStep.overview:
       case CreateFlightStep.wikipediaArticles:
         break;
@@ -340,7 +345,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
   }
 
   void continueFromOverview() {
-    if (state.flightRoute == null || state.isTooLongFlight) return;
+    if (state.flightRoute == null) return;
     emit(
       state.copyWith(
         step: CreateFlightStep.wikipediaArticles,
@@ -389,7 +394,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
   Future<void> startDownload({required bool isPro}) async {
     if (state.isDownloading) return;
     final route = state.flightRoute;
-    if (route == null || state.isTooLongFlight) return;
+    if (route == null) return;
 
     _downloadCancelled = false;
     await _downloadSubscription?.cancel();
@@ -622,6 +627,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         );
         return false;
       case CreateFlightStep.mapPreview:
+      case CreateFlightStep.routeNotSupported:
         final arrivalIsFavorite = await _isFavorite(state.selectedArrival);
         final arrivalSearchLabel = state.selectedArrival == null
             ? ''
@@ -669,27 +675,38 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         departure: departure,
         arrival: arrival,
       );
-      final isTooLong = route.distanceInKm > 5000.0;
-      final info = isTooLong
-          ? FlightInfo(t.createFlight.mapPreview.routeTooLong, const [])
-          : FlightInfo.empty;
+      if (_isAntimeridianRoute(route)) {
+        emit(
+          state.copyWith(
+            step: CreateFlightStep.routeNotSupported,
+            flightRoute: route,
+            isPreviewLoading: false,
+            isWikiSuggestionsLoading: false,
+            isOverviewLoading: false,
+            isTooLongFlight: true,
+            flightInfo: FlightInfo.empty,
+            articleCandidates: const [],
+            clearSelectedArticleUrls: true,
+            errorMessage: t.createFlight.mapPreview.routeNotSupportedMsg,
+          ),
+        );
+        return;
+      }
 
       emit(
         state.copyWith(
           flightRoute: route,
           isPreviewLoading: false,
-          isTooLongFlight: isTooLong,
-          flightInfo: info,
+          isTooLongFlight: false,
+          flightInfo: FlightInfo.empty,
           articleCandidates: const [],
           clearSelectedArticleUrls: true,
-          isWikiSuggestionsLoading: !isTooLong,
-          isOverviewLoading: !isTooLong,
+          isWikiSuggestionsLoading: true,
+          isOverviewLoading: true,
         ),
       );
 
-      if (!isTooLong) {
-        unawaited(_prefetchOverview(route));
-      }
+      unawaited(_prefetchOverview(route));
     } catch (e) {
       _logger.error('Failed to prepare map preview: $e');
       emit(
@@ -862,6 +879,19 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     final primary = airport.primaryCode.trim().toUpperCase();
     if (primary.isNotEmpty) return primary;
     return airport.displayCode.trim().toUpperCase();
+  }
+
+  bool _isAntimeridianRoute(FlightRoute route) {
+    final points = route.waypoints.length >= 2
+        ? route.waypoints
+        : [route.departure.latLon, route.arrival.latLon];
+    for (var i = 1; i < points.length; i++) {
+      final deltaLon = points[i].longitude - points[i - 1].longitude;
+      if (deltaLon.abs() > 180) {
+        return true;
+      }
+    }
+    return false;
   }
 
   String _airportSearchLabel(Airport airport) =>

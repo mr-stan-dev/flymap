@@ -61,7 +61,9 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
           );
         }
 
-        if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
+        if (state.errorMessage != null &&
+            state.errorMessage!.isNotEmpty &&
+            state.step != CreateFlightStep.routeNotSupported) {
           ScaffoldMessenger.of(
             listenerContext,
           ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
@@ -138,6 +140,8 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
                   onSelectAirport: cubit.selectAirport,
                   onToggleFavoriteForAirport: cubit.toggleFavoriteForAirport,
                   onContinueFromAirportStep: cubit.continueFromAirportStep,
+                  onBackFromRouteNotSupported: () =>
+                      unawaited(_onBackPressed(context)),
                   onContinueFromMap: () => unawaited(
                     _handleContinueFromMap(state: state, isProUser: isProUser),
                   ),

@@ -9,6 +9,8 @@ class FlightSearchStepMeta {
         return t.createFlight.steps.departureTitle;
       case CreateFlightStep.arrival:
         return t.createFlight.steps.arrivalTitle;
+      case CreateFlightStep.routeNotSupported:
+        return t.createFlight.steps.routeNotSupportedTitle;
       case CreateFlightStep.mapPreview:
         return t.createFlight.steps.mapPreviewTitle;
       case CreateFlightStep.overview:
@@ -24,6 +26,8 @@ class FlightSearchStepMeta {
         return 0;
       case CreateFlightStep.arrival:
         return 1;
+      case CreateFlightStep.routeNotSupported:
+        return 2;
       case CreateFlightStep.mapPreview:
         return 2;
       case CreateFlightStep.overview:

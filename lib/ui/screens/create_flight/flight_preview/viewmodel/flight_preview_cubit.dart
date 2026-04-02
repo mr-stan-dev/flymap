@@ -74,26 +74,25 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
         departure: airports.departure,
         arrival: airports.arrival,
       );
+      if (_isAntimeridianRoute(route)) {
+        emit(
+          FlightMapPreviewError(t.createFlight.mapPreview.routeNotSupportedMsg),
+        );
+        return;
+      }
 
       final zoomLevel = MapUtils.calculateZoomLevel(
         departure: airports.departure,
         arrival: airports.arrival,
       );
-
-      final isTooLong = route.distanceInKm > 5000.0;
-
-      if (!isTooLong) {
-        unawaited(_loadFlightOverview(route));
-      }
+      unawaited(_loadFlightOverview(route));
       emit(
         FlightMapPreviewMapState(
           flightRoute: route,
-          flightInfo: isTooLong
-              ? FlightInfo(t.createFlight.overview.longFlightOverview, [])
-              : FlightInfo.empty,
+          flightInfo: FlightInfo.empty,
           currentZoom: zoomLevel,
-          isTooLongFlight: isTooLong,
-          isOverviewLoading: !isTooLong,
+          isTooLongFlight: false,
+          isOverviewLoading: true,
           overviewErrorMessage: null,
         ),
       );
@@ -241,4 +240,17 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   /// Get center point between airports
   LatLng get center =>
       MapUtils.center(departure: params.departure, arrival: params.arrival);
+
+  bool _isAntimeridianRoute(FlightRoute route) {
+    final points = route.waypoints.length >= 2
+        ? route.waypoints
+        : [route.departure.latLon, route.arrival.latLon];
+    for (var i = 1; i < points.length; i++) {
+      final deltaLon = points[i].longitude - points[i - 1].longitude;
+      if (deltaLon.abs() > 180) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

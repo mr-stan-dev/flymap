@@ -21,11 +21,6 @@ class FlightSearchOverviewStep extends StatelessWidget {
       return Center(child: Text(context.t.createFlight.overview.routeNotReady));
     }
 
-    final isDownloadEnabled = !state.isTooLongFlight;
-    final buttonText = state.isTooLongFlight
-        ? context.t.createFlight.overview.tooLongFlightButton
-        : context.t.common.kContinue;
-
     return Column(
       children: [
         Expanded(
@@ -44,8 +39,8 @@ class FlightSearchOverviewStep extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(DsSpacing.md),
           child: PrimaryButton(
-            onPressed: isDownloadEnabled ? onContinue : null,
-            label: buttonText,
+            onPressed: onContinue,
+            label: context.t.common.kContinue,
           ),
         ),
       ],

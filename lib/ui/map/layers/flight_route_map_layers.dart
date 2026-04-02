@@ -52,7 +52,7 @@ class FlightRouteMapLayers {
     final routeGeoJson = <String, dynamic>{
       'type': 'FeatureCollection',
       'features': [
-        {
+        <String, dynamic>{
           'type': 'Feature',
           'properties': <String, dynamic>{},
           'geometry': <String, dynamic>{

@@ -2,6 +2,7 @@
   "appName": "Flymap",
   "common": {
     "continue": "Continue",
+    "back": "Back",
     "cancel": "Cancel",
     "ok": "OK",
     "retry": "Retry",
@@ -103,6 +104,7 @@
     "steps": {
       "departureTitle": "Choose departure airport",
       "arrivalTitle": "Choose arrival airport",
+      "routeNotSupportedTitle": "Route not supported",
       "mapPreviewTitle": "Map preview",
       "overviewTitle": "Route overview",
       "wikipediaTitle": "Wikipedia articles"
@@ -122,14 +124,14 @@
       "airportNameCode": "$name ($code)"
     },
     "mapPreview": {
-      "routeTooLong": "Downloading routes over 5,000 km is not supported yet.",
+      "routeNotSupportedMsg": "Sorry, antimeridian flights are not supported yet.",
       "basic": "Basic",
       "pro": "Pro",
       "mapDetailInfoTooltip": "Map detail info",
-      "estimatedMapSize": "Estimated map download size: $size",
+      "estimatedMapSize": "Estimated map size: $size",
       "upgradeToPro": "Upgrade to Pro",
       "optionsTitle": "Map options",
-      "optionsBody": "Basic map has lower zoom but download is faster and uses less storage.\n\nDetailed gives you a higher zoom and more detail, but the download size is bigger."
+      "optionsBody": "Basic: lower zoom, faster download, less storage\n\nPro: higher zoom, more detail, larger download\n\nRoute is approximate — actual path may vary (especially long-haul)"
     },
     "overview": {
       "routeNotReady": "Route is not ready yet.",
