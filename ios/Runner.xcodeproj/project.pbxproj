@@ -12,10 +12,10 @@
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		4118C2A0673222A26C77F4DD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5607A58949E3C0019FEFD0C8 /* GoogleService-Info.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
-		A1B2C3D4E5F60718293A4B5D /* NativeCaptureDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* NativeCaptureDelegate.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		A1B2C3D4E5F60718293A4B5D /* NativeCaptureDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* NativeCaptureDelegate.swift */; };
 		B269D597E98532F1E731E077 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9519CC24B0A60BBDCAAC7C68 /* Pods_Runner.framework */; };
 		E6988C7611DF75F72BCF616C /* MBTilesURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 990BCB24EB902B24533C430D /* MBTilesURLProtocol.swift */; };
 		EAB4DB447AE3E23E3F46957E /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA9DA849E0C6676B694819B6 /* Pods_RunnerTests.framework */; };
@@ -56,7 +56,6 @@
 		5DB09CF08F462A5EA28E0A4C /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718293A4B5C /* NativeCaptureDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeCaptureDelegate.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		9519CC24B0A60BBDCAAC7C68 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
@@ -67,6 +66,7 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		990BCB24EB902B24533C430D /* MBTilesURLProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MBTilesURLProtocol.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5C /* NativeCaptureDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeCaptureDelegate.swift; sourceTree = "<group>"; };
 		D294FAE886774EFF56EA04EC /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
 		DD383BDACC73FC20E3A562D7 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		EA9DA849E0C6676B694819B6 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -170,7 +170,6 @@
 				D294FAE886774EFF56EA04EC /* Pods-RunnerTests.release.xcconfig */,
 				5DB09CF08F462A5EA28E0A4C /* Pods-RunnerTests.profile.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -196,23 +195,23 @@
 			productReference = 331C8081294A63A400263BE5 /* RunnerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-			97C146ED1CF9000F007C117D /* Runner */ = {
-				isa = PBXNativeTarget;
-				buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
-				buildPhases = (
-					F40F05EA227A0CDA49193D98 /* [CP] Check Pods Manifest.lock */,
-					9740EEB61CF901F6004384FC /* Run Script */,
-					97C146EA1CF9000F007C117D /* Sources */,
-					97C146EB1CF9000F007C117D /* Frameworks */,
-					97C146EC1CF9000F007C117D /* Resources */,
-					9705A1C41CF9048500538489 /* Embed Frameworks */,
-					3B06AD1E1E4923F5004D2608 /* Thin Binary */,
-					56837B5B5786E8240B375E74 /* [CP] Embed Pods Frameworks */,
-					A9F0D34C2F4E42AA9B2C18D1 /* Generate MapLibre dSYM */,
-				);
-				buildRules = (
-				);
-				dependencies = (
+		97C146ED1CF9000F007C117D /* Runner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
+			buildPhases = (
+				F40F05EA227A0CDA49193D98 /* [CP] Check Pods Manifest.lock */,
+				9740EEB61CF901F6004384FC /* Run Script */,
+				97C146EA1CF9000F007C117D /* Sources */,
+				97C146EB1CF9000F007C117D /* Frameworks */,
+				97C146EC1CF9000F007C117D /* Resources */,
+				9705A1C41CF9048500538489 /* Embed Frameworks */,
+				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
+				56837B5B5786E8240B375E74 /* [CP] Embed Pods Frameworks */,
+				A9F0D34C2F4E42AA9B2C18D1 /* Generate MapLibre dSYM */,
+			);
+			buildRules = (
+			);
+			dependencies = (
 			);
 			name = Runner;
 			productName = Runner;
@@ -314,10 +313,10 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-			9740EEB61CF901F6004384FC /* Run Script */ = {
-				isa = PBXShellScriptBuildPhase;
-				alwaysOutOfDate = 1;
-				buildActionMask = 2147483647;
+		9740EEB61CF901F6004384FC /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
@@ -326,27 +325,27 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-				shellPath = /bin/sh;
-				shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
-			};
-			A9F0D34C2F4E42AA9B2C18D1 /* Generate MapLibre dSYM */ = {
-				isa = PBXShellScriptBuildPhase;
-				buildActionMask = 2147483647;
-				files = (
-				);
-				inputPaths = (
-				);
-				name = "Generate MapLibre dSYM";
-				outputPaths = (
-				);
-				runOnlyForDeploymentPostprocessing = 0;
-				shellPath = /bin/sh;
-				shellScript = "set -e\nif [ \"$CONFIGURATION\" != \"Release\" ]; then\n  exit 0\nfi\n\nMAPLIBRE_BIN=\"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MapLibre.framework/MapLibre\"\nMAPLIBRE_DSYM_DIR=\"${DWARF_DSYM_FOLDER_PATH}/MapLibre.framework.dSYM\"\nMAPLIBRE_DSYM_BIN=\"${MAPLIBRE_DSYM_DIR}/Contents/Resources/DWARF/MapLibre\"\n\nif [ ! -f \"$MAPLIBRE_BIN\" ]; then\n  echo \"MapLibre binary not found at ${MAPLIBRE_BIN}; skipping dSYM generation.\"\n  exit 0\nfi\n\nif [ -f \"$MAPLIBRE_DSYM_BIN\" ]; then\n  echo \"MapLibre dSYM already exists.\"\n  exit 0\nfi\n\necho \"Generating MapLibre.framework.dSYM...\"\ndsymutil \"$MAPLIBRE_BIN\" -o \"$MAPLIBRE_DSYM_DIR\" || true\n\nif [ -f \"$MAPLIBRE_DSYM_BIN\" ]; then\n  dwarfdump --uuid \"$MAPLIBRE_DSYM_BIN\" || true\nfi\n";
-				showEnvVarsInLog = 0;
-			};
-			DE265C41039F067F11682963 /* [CP] Check Pods Manifest.lock */ = {
-				isa = PBXShellScriptBuildPhase;
-				buildActionMask = 2147483647;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
+		};
+		A9F0D34C2F4E42AA9B2C18D1 /* Generate MapLibre dSYM */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate MapLibre dSYM";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nif [ \"$CONFIGURATION\" != \"Release\" ]; then\n  exit 0\nfi\n\nMAPLIBRE_BIN=\"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MapLibre.framework/MapLibre\"\nMAPLIBRE_DSYM_DIR=\"${DWARF_DSYM_FOLDER_PATH}/MapLibre.framework.dSYM\"\nMAPLIBRE_DSYM_BIN=\"${MAPLIBRE_DSYM_DIR}/Contents/Resources/DWARF/MapLibre\"\n\nif [ ! -f \"$MAPLIBRE_BIN\" ]; then\n  echo \"MapLibre binary not found at ${MAPLIBRE_BIN}; skipping dSYM generation.\"\n  exit 0\nfi\n\nif [ -f \"$MAPLIBRE_DSYM_BIN\" ]; then\n  echo \"MapLibre dSYM already exists.\"\n  exit 0\nfi\n\necho \"Generating MapLibre.framework.dSYM...\"\ndsymutil \"$MAPLIBRE_BIN\" -o \"$MAPLIBRE_DSYM_DIR\" || true\n\nif [ -f \"$MAPLIBRE_DSYM_BIN\" ]; then\n  dwarfdump --uuid \"$MAPLIBRE_DSYM_BIN\" || true\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		DE265C41039F067F11682963 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
@@ -498,6 +497,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 89PFYADY47;
 				ENABLE_BITCODE = NO;
@@ -509,6 +510,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.flymap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -556,6 +558,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 89PFYADY47;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.flymap.RunnerTests;
@@ -682,6 +685,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 89PFYADY47;
 				ENABLE_BITCODE = NO;
@@ -693,6 +698,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.flymap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -706,6 +712,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 89PFYADY47;
 				ENABLE_BITCODE = NO;
@@ -717,6 +725,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.flymap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

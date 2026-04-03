@@ -1,9 +1,14 @@
-.PHONY: run-debug rd build-android-release bar build-ios-release bir test t analyze a release rel
+.PHONY: run-debug rd prepare prep build-android-release bar build-ios-release bir test t analyze a release rel
 
 run-debug:
 	flutter run --dart-define-from-file=env/app_config.debug.json
 
 rd: run-debug
+
+prepare:
+	flutter build ios --config-only --release --dart-define-from-file=env/app_config.prod.json
+
+prep: prepare
 
 build-android-release:
 	flutter build appbundle --release --dart-define-from-file=env/app_config.prod.json
