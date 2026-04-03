@@ -1,3 +1,7 @@
+import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flymap/analytics/app_analytics_initializer.dart';
+import 'package:flymap/crashlytics/app_crashlytics.dart';
+import 'package:flymap/crashlytics/app_crashlytics_initializer.dart';
 import 'package:flymap/data/api/flight_info_api.dart';
 import 'package:flymap/data/api/flight_info_api_mapper.dart';
 import 'package:flymap/data/local/airports_database.dart';
@@ -25,6 +29,15 @@ class DiModule {
   final i = GetIt.I;
 
   void register() {
+    i.registerLazySingleton<AppAnalytics>(() => FirebaseAppAnalytics());
+    i.registerLazySingleton<AppAnalyticsInitializer>(
+      () => AppAnalyticsInitializer(analytics: i.get<AppAnalytics>()),
+    );
+    i.registerLazySingleton<AppCrashlytics>(() => FirebaseAppCrashlytics());
+    i.registerLazySingleton<AppCrashlyticsInitializer>(
+      () => AppCrashlyticsInitializer(crashlytics: i.get<AppCrashlytics>()),
+    );
+
     i.registerLazySingleton<AirportsDatabase>(() => AirportsDatabase.instance);
 
     // Register database

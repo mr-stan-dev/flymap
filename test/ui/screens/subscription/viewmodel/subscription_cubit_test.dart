@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/repository/subscription_repository.dart';
+import 'package:flymap/subscription/paywall_source.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/subscription/subscription_status.dart';
@@ -11,11 +13,13 @@ import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart
 void main() {
   group('SubscriptionCubit', () {
     late _FakeSubscriptionRepository repository;
+    late _FakeAppAnalytics analytics;
     late SubscriptionCubit cubit;
 
     setUp(() {
       repository = _FakeSubscriptionRepository();
-      cubit = SubscriptionCubit(repository: repository);
+      analytics = _FakeAppAnalytics();
+      cubit = SubscriptionCubit(repository: repository, analytics: analytics);
     });
 
     tearDown(() async {
@@ -98,6 +102,72 @@ void main() {
       expect(cubit.state.products, hasLength(1));
       expect(cubit.state.products.first.packageId, 'weekly');
     });
+
+    test('maps create-flight source for wiki-only gate', () async {
+      repository.paywallResult = SubscriptionPaywallResult.cancelled;
+
+      await cubit.presentPaywallForCreateFlight(
+        shouldUpgradeForArticles: true,
+        shouldUpgradeForMapConfig: false,
+      );
+
+      final event = analytics.events.single as PaywallResultEvent;
+      expect(event.source, PaywallSource.wikiLimit);
+      expect(event.result, SubscriptionPaywallResult.cancelled);
+    });
+
+    test('maps create-flight source for map-only gate', () async {
+      repository.paywallResult = SubscriptionPaywallResult.cancelled;
+
+      await cubit.presentPaywallForCreateFlight(
+        shouldUpgradeForArticles: false,
+        shouldUpgradeForMapConfig: true,
+      );
+
+      final event = analytics.events.single as PaywallResultEvent;
+      expect(event.source, PaywallSource.mapPro);
+      expect(event.result, SubscriptionPaywallResult.cancelled);
+    });
+
+    test('maps create-flight source for combined gate', () async {
+      repository.paywallResult = SubscriptionPaywallResult.cancelled;
+
+      await cubit.presentPaywallForCreateFlight(
+        shouldUpgradeForArticles: true,
+        shouldUpgradeForMapConfig: true,
+      );
+
+      final event = analytics.events.single as PaywallResultEvent;
+      expect(event.source, PaywallSource.wikiAndMapPro);
+      expect(event.result, SubscriptionPaywallResult.cancelled);
+    });
+
+    test('logs settings paywall result and refreshes on purchased', () async {
+      repository.paywallResult = SubscriptionPaywallResult.purchased;
+
+      final result = await cubit.presentPaywallFromSettings();
+
+      expect(result, SubscriptionPaywallResult.purchased);
+      expect(repository.refreshCallCount, 1);
+      final event = analytics.events.single as PaywallResultEvent;
+      expect(event.source, PaywallSource.settingsBanner);
+      expect(event.result, SubscriptionPaywallResult.purchased);
+    });
+
+    test(
+      'logs subscription-management paywall result without refresh on cancelled',
+      () async {
+        repository.paywallResult = SubscriptionPaywallResult.cancelled;
+
+        final result = await cubit.presentPaywallFromSubscriptionManagement();
+
+        expect(result, SubscriptionPaywallResult.cancelled);
+        expect(repository.refreshCallCount, 0);
+        final event = analytics.events.single as PaywallResultEvent;
+        expect(event.source, PaywallSource.subscriptionManagement);
+        expect(event.result, SubscriptionPaywallResult.cancelled);
+      },
+    );
   });
 }
 
@@ -116,6 +186,9 @@ class _FakeSubscriptionRepository implements SubscriptionRepository {
   SubscriptionStatus initializeResult = _status(isPro: false);
   SubscriptionStatus refreshResult = _status(isPro: false);
   SubscriptionStatus restoreResult = _status(isPro: false);
+  SubscriptionPaywallResult paywallResult =
+      SubscriptionPaywallResult.notPresented;
+  int refreshCallCount = 0;
   List<SubscriptionProduct> products = const [];
 
   @override
@@ -134,7 +207,7 @@ class _FakeSubscriptionRepository implements SubscriptionRepository {
 
   @override
   Future<SubscriptionPaywallResult> presentPaywallIfNeeded() async {
-    return SubscriptionPaywallResult.notPresented;
+    return paywallResult;
   }
 
   @override
@@ -151,12 +224,35 @@ class _FakeSubscriptionRepository implements SubscriptionRepository {
   }
 
   @override
-  Future<SubscriptionStatus> refresh() async => refreshResult;
+  Future<SubscriptionStatus> refresh() async {
+    refreshCallCount++;
+    return refreshResult;
+  }
 
   @override
   Future<SubscriptionStatus> restorePurchases() async => restoreResult;
 
   void emit(SubscriptionStatus status) {
     _controller.add(status);
+  }
+}
+
+class _FakeAppAnalytics implements AppAnalytics {
+  final List<AnalyticsEvent> events = <AnalyticsEvent>[];
+
+  @override
+  Future<void> setGlobalContext({
+    required String appVersion,
+    required String buildNumber,
+    required String platform,
+    required String appEnv,
+  }) async {}
+
+  @override
+  Future<void> setSubscriptionContext({required bool isPro}) async {}
+
+  @override
+  Future<void> log(AnalyticsEvent event) async {
+    events.add(event);
   }
 }

@@ -1,22 +1,28 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/repository/subscription_repository.dart';
+import 'package:flymap/subscription/paywall_source.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/subscription/subscription_status.dart';
 
 import 'subscription_state.dart';
 
 class SubscriptionCubit extends Cubit<SubscriptionState> {
-  SubscriptionCubit({required SubscriptionRepository repository})
-    : _repository = repository,
-      super(const SubscriptionState()) {
+  SubscriptionCubit({
+    required SubscriptionRepository repository,
+    required AppAnalytics analytics,
+  }) : _repository = repository,
+       _analytics = analytics,
+       super(const SubscriptionState()) {
     _statusSubscription = _repository.statusStream.listen(_onStatusUpdate);
   }
 
   final SubscriptionRepository _repository;
+  final AppAnalytics _analytics;
   final _logger = const Logger('SubscriptionCubit');
 
   StreamSubscription<SubscriptionStatus>? _statusSubscription;
@@ -71,8 +77,36 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
     _emitStatus(status);
   }
 
-  Future<SubscriptionPaywallResult> presentPaywallIfNeeded() async {
+  Future<SubscriptionPaywallResult> presentPaywallForCreateFlight({
+    required bool shouldUpgradeForArticles,
+    required bool shouldUpgradeForMapConfig,
+  }) async {
+    final source = shouldUpgradeForArticles && shouldUpgradeForMapConfig
+        ? PaywallSource.wikiAndMapPro
+        : shouldUpgradeForArticles
+        ? PaywallSource.wikiLimit
+        : PaywallSource.mapPro;
+    return _presentPaywallIfNeeded(source: source);
+  }
+
+  Future<SubscriptionPaywallResult> presentPaywallFromSettings() async {
+    return _presentPaywallIfNeeded(source: PaywallSource.settingsBanner);
+  }
+
+  Future<SubscriptionPaywallResult>
+  presentPaywallFromSubscriptionManagement() async {
+    return _presentPaywallIfNeeded(
+      source: PaywallSource.subscriptionManagement,
+    );
+  }
+
+  Future<SubscriptionPaywallResult> _presentPaywallIfNeeded({
+    required PaywallSource source,
+  }) async {
     final result = await _repository.presentPaywallIfNeeded();
+    unawaited(
+      _analytics.log(PaywallResultEvent(source: source, result: result)),
+    );
     if (result == SubscriptionPaywallResult.purchased ||
         result == SubscriptionPaywallResult.restored) {
       await refresh();
@@ -90,6 +124,7 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
   }
 
   void _emitStatus(SubscriptionStatus status) {
+    unawaited(_analytics.setSubscriptionContext(isPro: status.isPro));
     emit(
       state.copyWith(
         phase: status.isPro ? SubscriptionPhase.pro : SubscriptionPhase.free,

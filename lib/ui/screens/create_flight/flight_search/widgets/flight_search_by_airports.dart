@@ -182,7 +182,10 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
     }
 
     final subscriptionCubit = context.read<SubscriptionCubit>();
-    final result = await subscriptionCubit.presentPaywallIfNeeded();
+    final result = await subscriptionCubit.presentPaywallForCreateFlight(
+      shouldUpgradeForArticles: shouldUpgradeForArticles,
+      shouldUpgradeForMapConfig: shouldUpgradeForMapConfig,
+    );
     if (!mounted) return;
 
     switch (result) {
@@ -216,7 +219,10 @@ class _FlightSearchByAirportsState extends State<FlightSearchByAirports> {
     }
 
     final subscriptionCubit = context.read<SubscriptionCubit>();
-    final result = await subscriptionCubit.presentPaywallIfNeeded();
+    final result = await subscriptionCubit.presentPaywallForCreateFlight(
+      shouldUpgradeForArticles: false,
+      shouldUpgradeForMapConfig: true,
+    );
     if (!mounted) return;
 
     switch (result) {

@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flymap/main.dart';
+import 'package:flymap/app/flymap_app.dart';
 
 void main() {
-  test('MyApp can be instantiated', () {
-    const app = MyApp(showOnboarding: false);
+  test('FlymapApp can be instantiated', () {
+    const app = FlymapApp(showOnboarding: false);
 
     expect(app.showOnboarding, isFalse);
   });

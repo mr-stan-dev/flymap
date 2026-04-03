@@ -255,7 +255,7 @@ class _SubscriptionManagementScreenState
     final cubit = context.read<SubscriptionCubit>();
     final messenger = ScaffoldMessenger.of(context);
     try {
-      final result = await cubit.presentPaywallIfNeeded();
+      final result = await cubit.presentPaywallFromSubscriptionManagement();
       final message = switch (result) {
         SubscriptionPaywallResult.purchased =>
           context.t.settings.flymapProActivated,

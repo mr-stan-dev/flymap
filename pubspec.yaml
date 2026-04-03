@@ -14,6 +14,7 @@ dependencies:
 
   firebase_core: ^4.0.0
   firebase_analytics: ^12.0.0
+  firebase_crashlytics: ^5.0.0
   cloud_functions: ^6.0.0
   
   http: ^1.1.0
@@ -41,6 +42,7 @@ dependencies:
   webview_flutter: ^4.13.0
   purchases_flutter: ^9.15.1
   purchases_ui_flutter: ^9.15.1
+  package_info_plus: ^8.3.0
   slang: ^4.8.0
   slang_flutter: ^4.8.0
 

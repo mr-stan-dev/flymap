@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/entity/airport.dart';
@@ -32,6 +35,8 @@ void main() {
         buildWikipediaCandidatesUseCase: _FakeBuildWikipediaCandidatesUseCase(),
         downloadWikipediaArticlesUseCase: wikiDownloadUseCase,
         getFlightInfoUseCase: _FakeGetFlightInfoUseCase(),
+        analytics: _FakeAppAnalytics(),
+        crashlytics: _FakeAppCrashlytics(),
       );
       cubit.setStateForTest(
         cubit.state.copyWith(
@@ -283,6 +288,8 @@ class _TestFlightSearchScreenCubit extends FlightSearchScreenCubit {
     required super.buildWikipediaCandidatesUseCase,
     required super.downloadWikipediaArticlesUseCase,
     required super.getFlightInfoUseCase,
+    required super.analytics,
+    required super.crashlytics,
   }) : super(autoInitialize: false);
 
   void setStateForTest(FlightSearchScreenState state) => emit(state);
@@ -387,4 +394,45 @@ class _FakeGetFlightInfoUseCase implements GetFlightInfoUseCase {
     required String airportArrival,
     required List<LatLng> waypoints,
   }) async => const [];
+}
+
+class _FakeAppAnalytics implements AppAnalytics {
+  @override
+  Future<void> setGlobalContext({
+    required String appVersion,
+    required String buildNumber,
+    required String platform,
+    required String appEnv,
+  }) async {}
+
+  @override
+  Future<void> setSubscriptionContext({required bool isPro}) async {}
+
+  @override
+  Future<void> log(AnalyticsEvent event) async {}
+}
+
+class _FakeAppCrashlytics implements AppCrashlytics {
+  @override
+  Future<void> recordError(
+    Object error,
+    StackTrace stackTrace, {
+    String? reason,
+    bool fatal = false,
+  }) async {}
+
+  @override
+  Future<void> recordFlutterError(FlutterErrorDetails details) async {}
+
+  @override
+  Future<void> setCollectionEnabled(bool enabled) async {}
+
+  @override
+  Future<void> setContext({
+    String? screen,
+    int? routeLengthKm,
+    String? mapDetail,
+    int? articlesSelectedCount,
+    String? downloadStage,
+  }) async {}
 }

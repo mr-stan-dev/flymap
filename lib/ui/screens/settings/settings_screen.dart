@@ -32,9 +32,7 @@ class _SettingsView extends StatelessWidget {
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(context.t.settings.title),
-          ],
+          children: [Text(context.t.settings.title)],
         ),
       ),
       body: BlocBuilder<SubscriptionCubit, SubscriptionState>(
@@ -225,7 +223,7 @@ class _SettingsView extends StatelessWidget {
       return;
     }
 
-    final result = await subscriptionCubit.presentPaywallIfNeeded();
+    final result = await subscriptionCubit.presentPaywallFromSettings();
     if (!context.mounted) return;
 
     switch (result) {

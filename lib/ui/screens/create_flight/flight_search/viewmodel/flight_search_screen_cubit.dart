@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/entity/airport.dart';
@@ -30,6 +32,8 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     required BuildWikipediaCandidatesUseCase buildWikipediaCandidatesUseCase,
     required DownloadWikipediaArticlesUseCase downloadWikipediaArticlesUseCase,
     required GetFlightInfoUseCase getFlightInfoUseCase,
+    required AppAnalytics analytics,
+    required AppCrashlytics crashlytics,
     bool autoInitialize = true,
   }) : _airportsDb = airportsDb,
        _favoritesRepository = favoritesRepository,
@@ -38,6 +42,8 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
        _buildWikipediaCandidatesUseCase = buildWikipediaCandidatesUseCase,
        _downloadWikipediaArticlesUseCase = downloadWikipediaArticlesUseCase,
        _getFlightInfoUseCase = getFlightInfoUseCase,
+       _analytics = analytics,
+       _crashlytics = crashlytics,
        super(FlightSearchScreenState.initial()) {
     if (autoInitialize) {
       _initialize();
@@ -52,6 +58,8 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
   final BuildWikipediaCandidatesUseCase _buildWikipediaCandidatesUseCase;
   final DownloadWikipediaArticlesUseCase _downloadWikipediaArticlesUseCase;
   final GetFlightInfoUseCase _getFlightInfoUseCase;
+  final AppAnalytics _analytics;
+  final AppCrashlytics _crashlytics;
 
   StreamSubscription? _downloadSubscription;
   bool _downloadCancelled = false;
@@ -415,6 +423,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
       distanceKm: route.distanceInKm,
       detailLevel: state.selectedMapDetailLevel,
     );
+    final routeLengthKm = route.distanceInKm;
 
     emit(
       state.copyWith(
@@ -432,6 +441,27 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         downloadDone: false,
         clearDownloadErrorMessage: true,
         clearErrorMessage: true,
+      ),
+    );
+    unawaited(
+      _analytics.log(
+        DownloadStartedEvent(
+          routeLengthKm: routeLengthKm,
+          mapDetail: state.selectedMapDetailLevel,
+          articlesSelectedCount: selectedUrls.length,
+          isProUser: isPro,
+        ),
+      ),
+    );
+    unawaited(
+      _crashlytics.setContext(
+        screen: 'create_flight_download',
+        routeLengthKm: routeLengthKm.round(),
+        mapDetail: state.selectedMapDetailLevel.name,
+        articlesSelectedCount: selectedUrls.length,
+        downloadStage: hasArticlePhase
+            ? 'downloading_articles'
+            : 'initializing',
       ),
     );
 
@@ -474,6 +504,13 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         _logger.error(
           'Article download failed; continuing with map-only download: $e',
         );
+        unawaited(
+          _crashlytics.recordError(
+            e,
+            StackTrace.current,
+            reason: 'article_download_failed',
+          ),
+        );
         if (_downloadCancelled || isClosed) return;
         emit(
           state.copyWith(
@@ -492,97 +529,163 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     if (_downloadCancelled || isClosed) return;
 
     final infoForSave = baseInfo.copyWith(articles: downloadedArticles);
-    _downloadSubscription = _downloadMapUseCase
-        .call(
-          flightRoute: route,
-          flightInfo: infoForSave,
-          maxZoom: effectiveMaxZoom,
-        )
-        .listen((event) {
-          if (_downloadCancelled || isClosed) return;
-          switch (event) {
-            case DownloadMapProgress():
-              emit(
-                state.copyWith(
-                  isDownloading: true,
-                  downloadProgress: event.progress.clamp(0.0, 1.0),
-                  downloadedBytes: event.downloadedBytes,
-                  downloadStage: DownloadStage.downloading,
-                  downloadDone: false,
-                ),
-              );
-              break;
-            case DownloadMapDone():
-              emit(
-                state.copyWith(
-                  isDownloading: false,
-                  downloadProgress: 1.0,
-                  downloadedBytes: event.fileSize,
-                  downloadStage: DownloadStage.completed,
-                  downloadDone: true,
-                  clearDownloadErrorMessage: true,
-                ),
-              );
-              break;
-            case DownloadMapError():
-              emit(
-                state.copyWith(
-                  isDownloading: false,
-                  downloadStage: DownloadStage.failed,
-                  downloadErrorMessage: event.errorMsg,
-                ),
-              );
-              break;
-            case DownloadMapInitializing():
-              emit(
-                state.copyWith(
-                  isDownloading: true,
-                  downloadedBytes: 0,
-                  downloadStage: DownloadStage.initializing,
-                  downloadProgress: 0.0,
-                  downloadDone: false,
-                  clearDownloadTileCount: true,
-                  clearDownloadWorkerCount: true,
-                  clearDownloadErrorMessage: true,
-                ),
-              );
-              break;
-            case DownloadMapComputingTiles():
-              emit(
-                state.copyWith(
-                  isDownloading: true,
-                  downloadStage: DownloadStage.computingTiles,
-                  downloadTileCount: event.totalTiles,
-                ),
-              );
-              break;
-            case DownloadMapStartingWorkers():
-              emit(
-                state.copyWith(
-                  isDownloading: true,
-                  downloadStage: DownloadStage.startingWorkers,
-                  downloadWorkerCount: event.workerCount,
-                ),
-              );
-              break;
-            case DownloadMapFinalizing():
-              emit(
-                state.copyWith(
-                  isDownloading: true,
-                  downloadStage: DownloadStage.finalizing,
-                ),
-              );
-              break;
-            case DownloadMapVerifying():
-              emit(
-                state.copyWith(
-                  isDownloading: true,
-                  downloadStage: DownloadStage.verifying,
-                ),
-              );
-              break;
-          }
-        });
+    try {
+      _downloadSubscription = _downloadMapUseCase
+          .call(
+            flightRoute: route,
+            flightInfo: infoForSave,
+            maxZoom: effectiveMaxZoom,
+          )
+          .listen((event) {
+            if (_downloadCancelled || isClosed) return;
+            switch (event) {
+              case DownloadMapProgress():
+                emit(
+                  state.copyWith(
+                    isDownloading: true,
+                    downloadProgress: event.progress.clamp(0.0, 1.0),
+                    downloadedBytes: event.downloadedBytes,
+                    downloadStage: DownloadStage.downloading,
+                    downloadDone: false,
+                  ),
+                );
+                break;
+              case DownloadMapDone():
+                unawaited(
+                  _analytics.log(
+                    DownloadCompletedEvent(
+                      routeLengthKm: routeLengthKm,
+                      articlesDownloadedCount: downloadedArticles.length,
+                      mapSizeBytes: event.fileSize,
+                    ),
+                  ),
+                );
+                unawaited(_crashlytics.setContext(downloadStage: 'completed'));
+                emit(
+                  state.copyWith(
+                    isDownloading: false,
+                    downloadProgress: 1.0,
+                    downloadedBytes: event.fileSize,
+                    downloadStage: DownloadStage.completed,
+                    downloadDone: true,
+                    clearDownloadErrorMessage: true,
+                  ),
+                );
+                break;
+              case DownloadMapError():
+                unawaited(
+                  _analytics.log(
+                    DownloadFailedEvent(
+                      stage: 'map_download',
+                      errorType: 'map_download_error',
+                      routeLengthKm: routeLengthKm,
+                    ),
+                  ),
+                );
+                unawaited(_crashlytics.setContext(downloadStage: 'failed'));
+                unawaited(
+                  _crashlytics.recordError(
+                    Exception(event.errorMsg),
+                    StackTrace.current,
+                    reason: 'map_download_failed',
+                  ),
+                );
+                emit(
+                  state.copyWith(
+                    isDownloading: false,
+                    downloadStage: DownloadStage.failed,
+                    downloadErrorMessage: event.errorMsg,
+                  ),
+                );
+                break;
+              case DownloadMapInitializing():
+                unawaited(
+                  _crashlytics.setContext(downloadStage: 'initializing'),
+                );
+                emit(
+                  state.copyWith(
+                    isDownloading: true,
+                    downloadedBytes: 0,
+                    downloadStage: DownloadStage.initializing,
+                    downloadProgress: 0.0,
+                    downloadDone: false,
+                    clearDownloadTileCount: true,
+                    clearDownloadWorkerCount: true,
+                    clearDownloadErrorMessage: true,
+                  ),
+                );
+                break;
+              case DownloadMapComputingTiles():
+                unawaited(
+                  _crashlytics.setContext(downloadStage: 'computing_tiles'),
+                );
+                emit(
+                  state.copyWith(
+                    isDownloading: true,
+                    downloadStage: DownloadStage.computingTiles,
+                    downloadTileCount: event.totalTiles,
+                  ),
+                );
+                break;
+              case DownloadMapStartingWorkers():
+                unawaited(
+                  _crashlytics.setContext(downloadStage: 'starting_workers'),
+                );
+                emit(
+                  state.copyWith(
+                    isDownloading: true,
+                    downloadStage: DownloadStage.startingWorkers,
+                    downloadWorkerCount: event.workerCount,
+                  ),
+                );
+                break;
+              case DownloadMapFinalizing():
+                unawaited(_crashlytics.setContext(downloadStage: 'finalizing'));
+                emit(
+                  state.copyWith(
+                    isDownloading: true,
+                    downloadStage: DownloadStage.finalizing,
+                  ),
+                );
+                break;
+              case DownloadMapVerifying():
+                unawaited(_crashlytics.setContext(downloadStage: 'verifying'));
+                emit(
+                  state.copyWith(
+                    isDownloading: true,
+                    downloadStage: DownloadStage.verifying,
+                  ),
+                );
+                break;
+            }
+          });
+    } catch (e, stackTrace) {
+      unawaited(
+        _analytics.log(
+          DownloadFailedEvent(
+            stage: 'start',
+            errorType: e.runtimeType.toString(),
+            routeLengthKm: routeLengthKm,
+          ),
+        ),
+      );
+      unawaited(
+        _crashlytics.recordError(
+          e,
+          stackTrace,
+          reason: 'map_download_stream_setup_failed',
+        ),
+      );
+      emit(
+        state.copyWith(
+          isDownloading: false,
+          downloadStage: DownloadStage.failed,
+          downloadErrorMessage: t.createFlight.errors.failedStartDownload(
+            error: e.toString(),
+          ),
+        ),
+      );
+    }
   }
 
   void cancelDownload() {
@@ -675,7 +778,37 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
         departure: departure,
         arrival: arrival,
       );
+      final routeLength = MapDownloadConfig.resolveRouteLength(
+        route.distanceInKm,
+      );
+      unawaited(
+        _analytics.log(
+          SearchRoutePreparedEvent(
+            routeLengthKm: route.distanceInKm,
+            routeLength: routeLength,
+            mapDetail: state.selectedMapDetailLevel,
+          ),
+        ),
+      );
+      unawaited(
+        _crashlytics.setContext(
+          screen: 'create_flight_map_preview',
+          routeLengthKm: route.distanceInKm.round(),
+          mapDetail: state.selectedMapDetailLevel.name,
+        ),
+      );
       if (_isAntimeridianRoute(route)) {
+        unawaited(
+          _analytics.log(
+            SearchRouteNotSupportedEvent(
+              reason: 'antimeridian',
+              routeLengthKm: route.distanceInKm,
+            ),
+          ),
+        );
+        unawaited(
+          _crashlytics.setContext(screen: 'create_flight_route_not_supported'),
+        );
         emit(
           state.copyWith(
             step: CreateFlightStep.routeNotSupported,
@@ -707,8 +840,15 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
       );
 
       unawaited(_prefetchOverview(route));
-    } catch (e) {
+    } catch (e, stackTrace) {
       _logger.error('Failed to prepare map preview: $e');
+      unawaited(
+        _crashlytics.recordError(
+          e,
+          stackTrace,
+          reason: 'prepare_preview_failed',
+        ),
+      );
       emit(
         state.copyWith(
           isPreviewLoading: false,
