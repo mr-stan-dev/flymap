@@ -632,6 +632,12 @@ class TranslationsOnboardingEn {
 
 	/// en: 'To enjoy your offline in-flight experience, download your map before switching to flight mode.'
 	String get page3Subtitle => 'To enjoy your offline in-flight experience, download your map before switching to flight mode.';
+
+	/// en: 'Privacy by design'
+	String get page4Title => 'Privacy by design';
+
+	/// en: 'Your location stays on your device. We don’t collect or share it.'
+	String get page4Subtitle => 'Your location stays on your device. We don’t collect or share it.';
 }
 
 // Path: home.sort
@@ -1541,6 +1547,8 @@ extension on Translations {
 			'onboarding.page2Subtitle' => 'Follow your path in real time and enjoy the journey, not just the destination.',
 			'onboarding.page3Title' => 'Download maps before takeoff',
 			'onboarding.page3Subtitle' => 'To enjoy your offline in-flight experience, download your map before switching to flight mode.',
+			'onboarding.page4Title' => 'Privacy by design',
+			'onboarding.page4Subtitle' => 'Your location stays on your device. We don’t collect or share it.',
 			_ => null,
 		};
 	}

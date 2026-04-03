@@ -40,6 +40,7 @@ dependencies:
   flutter_markdown: ^0.7.4+3
   html: ^0.15.6
   webview_flutter: ^4.13.0
+  flutter_svg: ^2.0.10+1
   purchases_flutter: ^9.15.1
   purchases_ui_flutter: ^9.15.1
   package_info_plus: ^8.3.0
@@ -68,10 +69,8 @@ flutter:
     - assets/glyphs/Noto Sans Medium/
     - assets/glyphs/Noto Sans Bold/
     - assets/app_icon.png
-    - assets/images/onboarding1.webp
-    - assets/images/onboarding2.webp
-    - assets/images/onboarding3.webp
-    - assets/images/wikipedia_logo_icon.webp
+    - assets/images/
+    - assets/images/icons/
 
 flutter_launcher_icons:
   android: true
