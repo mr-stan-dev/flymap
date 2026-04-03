@@ -5,7 +5,6 @@ import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart';
-import 'package:flymap/ui/widgets/pro_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flymap/router/app_router.dart';
 
@@ -29,9 +28,6 @@ class _SettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isProUser = context.select(
-      (SubscriptionCubit cubit) => cubit.state.isPro,
-    );
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -195,6 +191,18 @@ class _SettingsView extends StatelessWidget {
                       await _openExternalUrl(
                         context,
                         'https://www.apptractor.dev/projects/flymap/privacy',
+                      );
+                    },
+                  ),
+                  const Divider(height: 1),
+                  _SettingItem(
+                    title: context.t.settings.termsOfService,
+                    subtitle: context.t.settings.termsOfServiceSubtitle,
+                    leading: const Icon(Icons.description_outlined),
+                    onTap: () async {
+                      await _openExternalUrl(
+                        context,
+                        'https://www.apptractor.dev/projects/flymap/terms',
                       );
                     },
                   ),

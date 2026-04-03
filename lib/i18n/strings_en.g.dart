@@ -231,6 +231,12 @@ class TranslationsSettingsEn {
 	/// en: 'Read our privacy policy'
 	String get privacyPolicySubtitle => 'Read our privacy policy';
 
+	/// en: 'Terms of Service'
+	String get termsOfService => 'Terms of Service';
+
+	/// en: 'Read our terms of service'
+	String get termsOfServiceSubtitle => 'Read our terms of service';
+
 	/// en: 'Flymap Pro activated.'
 	String get flymapProActivated => 'Flymap Pro activated.';
 
@@ -1271,6 +1277,8 @@ extension on Translations {
 			'settings.aboutSubtitle' => 'Learn more about the app',
 			'settings.privacyPolicy' => 'Privacy Policy',
 			'settings.privacyPolicySubtitle' => 'Read our privacy policy',
+			'settings.termsOfService' => 'Terms of Service',
+			'settings.termsOfServiceSubtitle' => 'Read our terms of service',
 			'settings.flymapProActivated' => 'Flymap Pro activated.',
 			'settings.upgradeCancelled' => 'Upgrade cancelled.',
 			'settings.noPaywall' => 'No paywall available right now.',
