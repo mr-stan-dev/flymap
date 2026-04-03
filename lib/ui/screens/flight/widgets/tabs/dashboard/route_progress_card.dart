@@ -129,7 +129,7 @@ class RouteProgressCard extends StatelessWidget {
       arrival: route.arrival.latLon,
     );
 
-    if (distanceToArrivalKm > distanceToDepartureKm) return 0;
+  if (distanceToArrivalKm > airportToAirportDistanceKm) return 0;
 
     final span = distanceToDepartureKm + distanceToArrivalKm;
     if (span <= 0) return 0;
