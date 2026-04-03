@@ -47,6 +47,7 @@ class FlightSearchScreenState extends Equatable {
     required this.isPreviewLoading,
     required this.isOverviewLoading,
     required this.isTooLongFlight,
+    required this.hasInternetForMapPreview,
     required this.isDownloading,
     required this.downloadProgress,
     required this.downloadedBytes,
@@ -81,6 +82,7 @@ class FlightSearchScreenState extends Equatable {
       isPreviewLoading: false,
       isOverviewLoading: false,
       isTooLongFlight: false,
+      hasInternetForMapPreview: true,
       isDownloading: false,
       downloadProgress: 0.0,
       downloadedBytes: 0,
@@ -114,6 +116,7 @@ class FlightSearchScreenState extends Equatable {
   final bool isPreviewLoading;
   final bool isOverviewLoading;
   final bool isTooLongFlight;
+  final bool hasInternetForMapPreview;
   final bool isDownloading;
   final double downloadProgress;
   final int downloadedBytes;
@@ -153,6 +156,7 @@ class FlightSearchScreenState extends Equatable {
     bool? isPreviewLoading,
     bool? isOverviewLoading,
     bool? isTooLongFlight,
+    bool? hasInternetForMapPreview,
     bool? isDownloading,
     double? downloadProgress,
     int? downloadedBytes,
@@ -198,6 +202,8 @@ class FlightSearchScreenState extends Equatable {
       isPreviewLoading: isPreviewLoading ?? this.isPreviewLoading,
       isOverviewLoading: isOverviewLoading ?? this.isOverviewLoading,
       isTooLongFlight: isTooLongFlight ?? this.isTooLongFlight,
+      hasInternetForMapPreview:
+          hasInternetForMapPreview ?? this.hasInternetForMapPreview,
       isDownloading: isDownloading ?? this.isDownloading,
       downloadProgress: downloadProgress ?? this.downloadProgress,
       downloadedBytes: downloadedBytes ?? this.downloadedBytes,
@@ -243,6 +249,7 @@ class FlightSearchScreenState extends Equatable {
     isPreviewLoading,
     isOverviewLoading,
     isTooLongFlight,
+    hasInternetForMapPreview,
     isDownloading,
     downloadProgress,
     downloadedBytes,

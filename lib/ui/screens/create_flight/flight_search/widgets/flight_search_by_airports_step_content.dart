@@ -124,6 +124,18 @@ class FlightSearchByAirportsStepContent extends StatelessWidget {
           onBack: onBackFromRouteNotSupported,
         );
       case CreateFlightStep.mapPreview:
+        if (!state.hasInternetForMapPreview) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text(
+                context.t.createFlight.errors.noInternet,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+          );
+        }
         return FlightSearchMapPreviewStep(
           state: state,
           isProUser: isProUser,

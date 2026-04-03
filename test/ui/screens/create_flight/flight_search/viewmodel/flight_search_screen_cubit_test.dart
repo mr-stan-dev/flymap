@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/data/local/airports_database.dart';
+import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_info.dart';
@@ -22,14 +23,17 @@ void main() {
   group('FlightSearchScreenCubit wiki selection', () {
     late _FakeDownloadWikipediaArticlesUseCase wikiDownloadUseCase;
     late _FakeDownloadMapUseCase mapUseCase;
+    late _FakeConnectivityChecker connectivityChecker;
     late _TestFlightSearchScreenCubit cubit;
 
     setUp(() {
       wikiDownloadUseCase = _FakeDownloadWikipediaArticlesUseCase();
       mapUseCase = _FakeDownloadMapUseCase();
+      connectivityChecker = _FakeConnectivityChecker();
       cubit = _TestFlightSearchScreenCubit(
         airportsDb: _FakeAirportsDatabase(),
         favoritesRepository: _FakeFavoriteAirportsRepository(),
+        connectivityChecker: connectivityChecker,
         routeProvider: _FakeRouteProvider(),
         downloadMapUseCase: mapUseCase,
         buildWikipediaCandidatesUseCase: _FakeBuildWikipediaCandidatesUseCase(),
@@ -209,6 +213,24 @@ void main() {
 
       expect(mapUseCase.lastMaxZoom, 10);
     });
+
+    test('offline map preview shows error state flag', () async {
+      final route = _route();
+      connectivityChecker.hasInternet = false;
+      cubit.setStateForTest(
+        cubit.state.copyWith(
+          step: CreateFlightStep.arrival,
+          selectedDeparture: route.departure,
+          selectedArrival: route.arrival,
+        ),
+      );
+
+      await cubit.continueFromAirportStep();
+
+      expect(cubit.state.step, CreateFlightStep.mapPreview);
+      expect(cubit.state.isPreviewLoading, isFalse);
+      expect(cubit.state.hasInternetForMapPreview, isFalse);
+    });
   });
 }
 
@@ -283,6 +305,7 @@ class _TestFlightSearchScreenCubit extends FlightSearchScreenCubit {
   _TestFlightSearchScreenCubit({
     required super.airportsDb,
     required super.favoritesRepository,
+    required super.connectivityChecker,
     required super.routeProvider,
     required super.downloadMapUseCase,
     required super.buildWikipediaCandidatesUseCase,
@@ -293,6 +316,15 @@ class _TestFlightSearchScreenCubit extends FlightSearchScreenCubit {
   }) : super(autoInitialize: false);
 
   void setStateForTest(FlightSearchScreenState state) => emit(state);
+}
+
+class _FakeConnectivityChecker implements ConnectivityChecker {
+  bool hasInternet = true;
+
+  @override
+  Future<bool> hasInternetConnectivity({
+    Duration timeout = const Duration(seconds: 2),
+  }) async => hasInternet;
 }
 
 class _FakeAirportsDatabase implements AirportsDatabase {

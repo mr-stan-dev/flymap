@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
+import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_cubit.dart';
@@ -21,6 +22,7 @@ class FlightSearchScreen extends StatelessWidget {
       create: (context) => FlightSearchScreenCubit(
         airportsDb: GetIt.I.get(),
         favoritesRepository: GetIt.I.get<FavoriteAirportsRepository>(),
+        connectivityChecker: GetIt.I.get<ConnectivityChecker>(),
         routeProvider: GetIt.I.get<FlightRouteProvider>(),
         downloadMapUseCase: GetIt.I.get<DownloadMapUseCase>(),
         buildWikipediaCandidatesUseCase: GetIt.I

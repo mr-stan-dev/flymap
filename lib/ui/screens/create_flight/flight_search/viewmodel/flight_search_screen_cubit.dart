@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/data/local/airports_database.dart';
+import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_article.dart';
@@ -27,6 +28,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
   FlightSearchScreenCubit({
     required AirportsDatabase airportsDb,
     required FavoriteAirportsRepository favoritesRepository,
+    required ConnectivityChecker connectivityChecker,
     required FlightRouteProvider routeProvider,
     required DownloadMapUseCase downloadMapUseCase,
     required BuildWikipediaCandidatesUseCase buildWikipediaCandidatesUseCase,
@@ -37,6 +39,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     bool autoInitialize = true,
   }) : _airportsDb = airportsDb,
        _favoritesRepository = favoritesRepository,
+       _connectivityChecker = connectivityChecker,
        _routeProvider = routeProvider,
        _downloadMapUseCase = downloadMapUseCase,
        _buildWikipediaCandidatesUseCase = buildWikipediaCandidatesUseCase,
@@ -53,6 +56,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
   final _logger = Logger('FlightSearchScreenCubit');
   final AirportsDatabase _airportsDb;
   final FavoriteAirportsRepository _favoritesRepository;
+  final ConnectivityChecker _connectivityChecker;
   final FlightRouteProvider _routeProvider;
   final DownloadMapUseCase _downloadMapUseCase;
   final BuildWikipediaCandidatesUseCase _buildWikipediaCandidatesUseCase;
@@ -157,6 +161,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             isPreviewLoading: false,
             isOverviewLoading: false,
             isTooLongFlight: false,
+            hasInternetForMapPreview: true,
             clearErrorMessage: true,
             clearDownloadErrorMessage: true,
           ),
@@ -179,6 +184,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             isPreviewLoading: false,
             isOverviewLoading: false,
             isTooLongFlight: false,
+            hasInternetForMapPreview: true,
             clearErrorMessage: true,
             clearDownloadErrorMessage: true,
           ),
@@ -244,6 +250,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             searchQuery: '',
             searchResults: const [],
             isSearchLoading: false,
+            hasInternetForMapPreview: true,
             clearErrorMessage: true,
           ),
         );
@@ -256,6 +263,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             searchQuery: '',
             searchResults: const [],
             isSearchLoading: false,
+            hasInternetForMapPreview: true,
             clearErrorMessage: true,
           ),
         );
@@ -291,6 +299,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             isPreviewLoading: false,
             isOverviewLoading: false,
             isTooLongFlight: false,
+            hasInternetForMapPreview: true,
             clearErrorMessage: true,
             clearDownloadErrorMessage: true,
           ),
@@ -316,6 +325,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             isPreviewLoading: true,
             isOverviewLoading: false,
             isTooLongFlight: false,
+            hasInternetForMapPreview: true,
             clearErrorMessage: true,
             clearDownloadErrorMessage: true,
           ),
@@ -725,6 +735,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             searchResults: const [],
             isSearchLoading: false,
             selectedAirportIsFavorite: departureIsFavorite,
+            hasInternetForMapPreview: true,
             clearErrorMessage: true,
           ),
         );
@@ -742,6 +753,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
             searchResults: const [],
             isSearchLoading: false,
             selectedAirportIsFavorite: arrivalIsFavorite,
+            hasInternetForMapPreview: true,
             clearErrorMessage: true,
             clearDownloadErrorMessage: true,
           ),
@@ -774,6 +786,20 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
     if (departure == null || arrival == null) return;
 
     try {
+      final hasInternet = await _connectivityChecker.hasInternetConnectivity();
+      if (!hasInternet) {
+        emit(
+          state.copyWith(
+            isPreviewLoading: false,
+            isWikiSuggestionsLoading: false,
+            isOverviewLoading: false,
+            hasInternetForMapPreview: false,
+            clearErrorMessage: true,
+          ),
+        );
+        return;
+      }
+
       final route = _routeProvider.getRoute(
         departure: departure,
         arrival: arrival,
@@ -831,6 +857,7 @@ class FlightSearchScreenCubit extends Cubit<FlightSearchScreenState> {
           flightRoute: route,
           isPreviewLoading: false,
           isTooLongFlight: false,
+          hasInternetForMapPreview: true,
           flightInfo: FlightInfo.empty,
           articleCandidates: const [],
           clearSelectedArticleUrls: true,
