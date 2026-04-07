@@ -84,6 +84,9 @@ class TranslationsCommonEn {
 
 	/// en: 'Loading...'
 	String get loading => 'Loading...';
+
+	/// en: 'Read more'
+	String get readMore => 'Read more';
 }
 
 // Path: home
@@ -750,6 +753,12 @@ class TranslationsCreateFlightMapPreviewEn {
 	/// en: 'Map detail info'
 	String get mapDetailInfoTooltip => 'Map detail info';
 
+	/// en: 'Legend'
+	String get legendButton => 'Legend';
+
+	/// en: 'POI legend'
+	String get legendTitle => 'POI legend';
+
 	/// en: 'Estimated map size: $size'
 	String estimatedMapSize({required Object size}) => 'Estimated map size: ${size}';
 
@@ -774,11 +783,8 @@ class TranslationsCreateFlightOverviewEn {
 	/// en: 'Route is not ready yet.'
 	String get routeNotReady => 'Route is not ready yet.';
 
-	/// en: 'Too long flight (> 5000km)'
-	String get tooLongFlightButton => 'Too long flight (> 5000km)';
-
-	/// en: 'Right now, flights longer than 5,000 km aren’t calculated as accurately as we’d like - but we’re working hard to make sure long flights are supported soon!'
-	String get longFlightOverview => 'Right now, flights longer than 5,000 km aren’t calculated as accurately as we’d like - but we’re working hard to make sure long flights are supported soon!';
+	/// en: 'With Flymap Pro, discover more interesting places along your route.'
+	String get proPoiUpsell => 'With Flymap Pro, discover more interesting places along your route.';
 }
 
 // Path: createFlight.wikipedia
@@ -855,11 +861,62 @@ class TranslationsCreateFlightDownloadingEn {
 	/// en: 'Downloading offline map...'
 	String get mapTitle => 'Downloading offline map...';
 
+	/// en: 'Map'
+	String get mapSectionTitle => 'Map';
+
+	/// en: 'Places'
+	String get poiSectionTitle => 'Places';
+
+	/// en: 'Articles'
+	String get articlesSectionTitle => 'Articles';
+
 	/// en: 'Cancel download'
 	String get cancelDownload => 'Cancel download';
 
 	/// en: 'Do not close this screen until download completes'
 	String get doNotClose => 'Do not close this screen until download completes';
+
+	/// en: 'Current'
+	String get currentStep => 'Current';
+
+	/// en: 'Pending'
+	String get pending => 'Pending';
+
+	/// en: 'In progress'
+	String get inProgress => 'In progress';
+
+	/// en: 'Completed'
+	String get completed => 'Completed';
+
+	/// en: 'Completed with issues'
+	String get completedWithIssues => 'Completed with issues';
+
+	/// en: 'Failed'
+	String get failed => 'Failed';
+
+	/// en: 'Skipped'
+	String get skipped => 'Skipped';
+
+	/// en: 'Waiting for map download...'
+	String get waitingForMap => 'Waiting for map download...';
+
+	/// en: 'Map download failed.'
+	String get mapFailed => 'Map download failed.';
+
+	/// en: 'No place summaries selected.'
+	String get noPoiSelected => 'No place summaries selected.';
+
+	/// en: 'Preparing place summaries...'
+	String get preparingPoi => 'Preparing place summaries...';
+
+	/// en: 'Places: $completed/$total'
+	String poiProgress({required Object completed, required Object total}) => 'Places: ${completed}/${total}';
+
+	/// en: 'Places: $completed/$total ($failed failed)'
+	String poiProgressWithFailed({required Object completed, required Object total, required Object failed}) => 'Places: ${completed}/${total} (${failed} failed)';
+
+	/// en: 'No articles selected.'
+	String get noArticlesSelected => 'No articles selected.';
 
 	/// en: 'Preparing article downloads...'
 	String get preparingArticles => 'Preparing article downloads...';
@@ -908,6 +965,9 @@ class TranslationsCreateFlightErrorsEn {
 
 	/// en: 'Some articles failed. Continuing with map download.'
 	String get someArticlesFailed => 'Some articles failed. Continuing with map download.';
+
+	/// en: 'Map downloaded. Some optional content could not be downloaded.'
+	String get someOptionalDownloadsFailed => 'Map downloaded. Some optional content could not be downloaded.';
 
 	/// en: 'Failed to build route preview. Please try again.'
 	String get failedBuildPreview => 'Failed to build route preview. Please try again.';
@@ -1146,8 +1206,8 @@ class TranslationsFlightInfoEn {
 	/// en: 'Loading route information...'
 	String get loadingRouteInformation => 'Loading route information...';
 
-	/// en: 'You'll fly over'
-	String get flyOverTitle => 'You\'ll fly over';
+	/// en: 'Highlights along you route'
+	String get flyOverTitle => 'Highlights along you route';
 
 	/// en: 'Airports'
 	String get airportsTitle => 'Airports';
@@ -1238,6 +1298,7 @@ extension on Translations {
 			'common.retry' => 'Retry',
 			'common.upgrade' => 'Upgrade',
 			'common.loading' => 'Loading...',
+			'common.readMore' => 'Read more',
 			'home.title' => 'Home',
 			'home.aboutTooltip' => 'About',
 			'home.settingsTooltip' => 'Settings',
@@ -1346,13 +1407,14 @@ extension on Translations {
 			'createFlight.mapPreview.basic' => 'Basic',
 			'createFlight.mapPreview.pro' => 'Pro',
 			'createFlight.mapPreview.mapDetailInfoTooltip' => 'Map detail info',
+			'createFlight.mapPreview.legendButton' => 'Legend',
+			'createFlight.mapPreview.legendTitle' => 'POI legend',
 			'createFlight.mapPreview.estimatedMapSize' => ({required Object size}) => 'Estimated map size: ${size}',
 			'createFlight.mapPreview.upgradeToPro' => 'Upgrade to Pro',
 			'createFlight.mapPreview.optionsTitle' => 'Map options',
 			'createFlight.mapPreview.optionsBody' => 'Basic: lower zoom, faster download, less storage\n\nPro: higher zoom, more detail, larger download\n\nRoute is approximate — actual path may vary (especially long-haul)',
 			'createFlight.overview.routeNotReady' => 'Route is not ready yet.',
-			'createFlight.overview.tooLongFlightButton' => 'Too long flight (> 5000km)',
-			'createFlight.overview.longFlightOverview' => 'Right now, flights longer than 5,000 km aren’t calculated as accurately as we’d like - but we’re working hard to make sure long flights are supported soon!',
+			'createFlight.overview.proPoiUpsell' => 'With Flymap Pro, discover more interesting places along your route.',
 			'createFlight.wikipedia.title' => 'Download articles to read during the flight',
 			'createFlight.wikipedia.loadingIntro' => 'Finding route-related articles...',
 			'createFlight.wikipedia.foundIntro' => ({required Object count}) => 'Based on your route we found ${count} articles which may be interesting for you. Select to download them for offline reading',
@@ -1372,8 +1434,25 @@ extension on Translations {
 			'createFlight.wikipedia.couldNotOpenLink' => 'Could not open link',
 			'createFlight.downloading.articlesTitle' => 'Downloading selected articles...',
 			'createFlight.downloading.mapTitle' => 'Downloading offline map...',
+			'createFlight.downloading.mapSectionTitle' => 'Map',
+			'createFlight.downloading.poiSectionTitle' => 'Places',
+			'createFlight.downloading.articlesSectionTitle' => 'Articles',
 			'createFlight.downloading.cancelDownload' => 'Cancel download',
 			'createFlight.downloading.doNotClose' => 'Do not close this screen until download completes',
+			'createFlight.downloading.currentStep' => 'Current',
+			'createFlight.downloading.pending' => 'Pending',
+			'createFlight.downloading.inProgress' => 'In progress',
+			'createFlight.downloading.completed' => 'Completed',
+			'createFlight.downloading.completedWithIssues' => 'Completed with issues',
+			'createFlight.downloading.failed' => 'Failed',
+			'createFlight.downloading.skipped' => 'Skipped',
+			'createFlight.downloading.waitingForMap' => 'Waiting for map download...',
+			'createFlight.downloading.mapFailed' => 'Map download failed.',
+			'createFlight.downloading.noPoiSelected' => 'No place summaries selected.',
+			'createFlight.downloading.preparingPoi' => 'Preparing place summaries...',
+			'createFlight.downloading.poiProgress' => ({required Object completed, required Object total}) => 'Places: ${completed}/${total}',
+			'createFlight.downloading.poiProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Places: ${completed}/${total} (${failed} failed)',
+			'createFlight.downloading.noArticlesSelected' => 'No articles selected.',
 			'createFlight.downloading.preparingArticles' => 'Preparing article downloads...',
 			'createFlight.downloading.articlesProgress' => ({required Object completed, required Object total}) => 'Articles: ${completed}/${total}',
 			'createFlight.downloading.articlesProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Articles: ${completed}/${total} (${failed} failed)',
@@ -1387,6 +1466,7 @@ extension on Translations {
 			'createFlight.errors.failedLoadAirports' => 'Failed to load airports. Please try again.',
 			'createFlight.errors.airportSearchFailed' => 'Airport search failed. Try another query.',
 			'createFlight.errors.someArticlesFailed' => 'Some articles failed. Continuing with map download.',
+			'createFlight.errors.someOptionalDownloadsFailed' => 'Map downloaded. Some optional content could not be downloaded.',
 			'createFlight.errors.failedBuildPreview' => 'Failed to build route preview. Please try again.',
 			'createFlight.errors.overviewUnavailableContinue' => 'Could not load route overview. You can still continue.',
 			'createFlight.errors.noInternet' => 'No internet connection. Please check your connection and try again.',
@@ -1477,7 +1557,7 @@ extension on Translations {
 			'flight.info.overviewLoading' => 'Building route overview...',
 			'flight.info.overviewEmpty' => 'Overview is not available yet for this route.',
 			'flight.info.loadingRouteInformation' => 'Loading route information...',
-			'flight.info.flyOverTitle' => 'You\'ll fly over',
+			'flight.info.flyOverTitle' => 'Highlights along you route',
 			'flight.info.airportsTitle' => 'Airports',
 			'flight.info.departure' => 'Departure',
 			'flight.info.arrival' => 'Arrival',

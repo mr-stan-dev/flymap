@@ -37,6 +37,10 @@ class DownloadWikipediaArticlesUseCase {
     _cancelled = true;
   }
 
+  Future<void> cleanupBundleMedia(String bundleId) async {
+    await _articleClient.cleanupBundleMedia(bundleId);
+  }
+
   Future<WikipediaArticlesDownloadResult> call({
     required String bundleId,
     required List<String> articleUrls,

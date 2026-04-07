@@ -1,24 +1,27 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flymap/data/wiki/wikimedia_api_client.dart';
 import 'package:flymap/data/wiki/wikipedia_url_utils.dart';
 import 'package:flymap/entity/flight_article.dart';
 import 'package:flymap/logger.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as html_parser;
-import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 class WikipediaArticleClient {
+  WikipediaArticleClient({required WikimediaApiClient apiClient})
+    : _apiClient = apiClient;
+
   static const _requestTimeout = Duration(seconds: 12);
-  static const _userAgent = 'Flymap/0.3 (offline-flight-map-app)';
   static const _minRequestInterval = Duration(milliseconds: 180);
   static const _downloadImages = false;
 
   static const maxImageBytesPerFile = 1048576; // 1 MB
 
   final _logger = const Logger('WikipediaArticleClient');
+  final WikimediaApiClient _apiClient;
   DateTime? _lastRequestStartedAt;
 
   static const _blockedTags = <String>{
@@ -148,15 +151,24 @@ class WikipediaArticleClient {
     }
   }
 
+  Future<void> cleanupBundleMedia(String bundleId) async {
+    final safeBundleId = _sanitizePathPart(bundleId);
+    final docsDir = await getApplicationDocumentsDirectory();
+    final bundleDir = Directory(
+      p.join(docsDir.path, 'article_media', safeBundleId),
+    );
+    if (await bundleDir.exists()) {
+      await bundleDir.delete(recursive: true);
+    }
+  }
+
   Future<Map<String, dynamic>?> _fetchSummary(WikipediaArticleRef ref) async {
     final uri = Uri.https(
       '${ref.languageCode}.wikipedia.org',
       '/api/rest_v1/page/summary/${ref.encodedTitle}',
     );
     await _throttleRequests();
-    final response = await http
-        .get(uri, headers: const {'User-Agent': _userAgent})
-        .timeout(_requestTimeout);
+    final response = await _apiClient.get(uri, timeout: _requestTimeout);
     if (response.statusCode != 200) return null;
     final dynamic body = jsonDecode(response.body);
     if (body is! Map) return null;
@@ -176,9 +188,7 @@ class WikipediaArticleClient {
     });
 
     await _throttleRequests();
-    final response = await http
-        .get(uri, headers: const {'User-Agent': _userAgent})
-        .timeout(_requestTimeout);
+    final response = await _apiClient.get(uri, timeout: _requestTimeout);
 
     if (response.statusCode != 200) return null;
 
@@ -203,9 +213,7 @@ class WikipediaArticleClient {
     });
 
     await _throttleRequests();
-    final response = await http
-        .get(uri, headers: const {'User-Agent': _userAgent})
-        .timeout(_requestTimeout);
+    final response = await _apiClient.get(uri, timeout: _requestTimeout);
     if (response.statusCode != 200) return null;
     final dynamic body = jsonDecode(response.body);
     if (body is! Map) return null;
@@ -572,9 +580,7 @@ class WikipediaArticleClient {
     if (uri == null) return null;
 
     await _throttleRequests();
-    final response = await http
-        .get(uri, headers: const {'User-Agent': _userAgent})
-        .timeout(_requestTimeout);
+    final response = await _apiClient.get(uri, timeout: _requestTimeout);
 
     if (response.statusCode != 200) {
       _logger.log(

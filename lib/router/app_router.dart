@@ -1,10 +1,11 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/ui/screens/about/about_screen.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
+import 'package:flymap/ui/screens/create_flight/airport_selection/airport_selection_screen.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_args.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_screen.dart';
-import 'package:flymap/ui/screens/create_flight/flight_search/flight_search_screen.dart';
 import 'package:flymap/ui/screens/flight/flight_screen.dart';
 import 'package:flymap/ui/screens/home/home_screen.dart';
 import 'package:flymap/ui/screens/onboarding/onboarding_screen.dart';
@@ -16,8 +17,8 @@ import 'package:go_router/go_router.dart';
 /// App router configuration using go_router
 class AppRouter {
   static const String homeRoute = '/';
-  static const String flightMapPreviewRoute = '/flightPreview';
-  static const String flightSearchRoute = '/flight-number';
+  static const String flightSearchRoute = '/flight-search';
+  static const String flightPreviewRoute = '/flight-preview';
   static const String flightRoute = '/flight';
   static const String shareFlightRoute = '/share-flight';
   static const String settingsRoute = '/settings';
@@ -47,28 +48,26 @@ class AppRouter {
           builder: (context, state) => const OnboardingScreen(),
         ),
 
-        // Flight Number Screen route
+        // Flight Search screen route
         GoRoute(
           path: flightSearchRoute,
           name: 'flight-search',
-          builder: (context, state) => const FlightSearchScreen(),
+          builder: (context, state) => const AirportSelectionScreen(),
         ),
 
-        // Flight Map Preview route
         GoRoute(
-          path: flightMapPreviewRoute,
-          name: 'create_flight-map-preview',
+          path: flightPreviewRoute,
+          name: 'flight-preview',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>?;
-            final params = extra?['params'] as FlightPreviewParams?;
-
-            switch (params) {
-              case null:
-                // TODO: Handle this case.
-                throw UnimplementedError();
-              case FlightPreviewAirports():
-                return FlightPreviewScreen(airports: params);
+            final departure = extra?['departure'] as Airport?;
+            final arrival = extra?['arrival'] as Airport?;
+            if (departure == null || arrival == null) {
+              return const AirportSelectionScreen();
             }
+            return FlightPreviewScreen(
+              args: FlightPreviewArgs(departure: departure, arrival: arrival),
+            );
           },
         ),
 
@@ -125,17 +124,21 @@ class AppRouter {
     context.go(homeRoute);
   }
 
-  /// Navigate to create_flight map preview with create_flight
-  static void goToFlightPreviewScreen(
-    BuildContext context, {
-    required FlightPreviewParams params,
-  }) {
-    context.push(flightMapPreviewRoute, extra: {'params': params});
-  }
-
   /// Navigate to flight screen with flight
   static void goToFlight(BuildContext context, {required Flight flight}) {
     context.push(flightRoute, extra: {'flight': flight});
+  }
+
+  /// Navigate to flight preview with selected airports
+  static void goToFlightPreview(
+    BuildContext context, {
+    required Airport departure,
+    required Airport arrival,
+  }) {
+    context.push(
+      flightPreviewRoute,
+      extra: {'departure': departure, 'arrival': arrival},
+    );
   }
 
   /// Navigate to share flight screen with flight

@@ -1,9 +1,9 @@
 import 'package:flymap/entity/flight_info.dart';
-import 'package:flymap/entity/flight_poi.dart';
+import 'package:flymap/entity/route_poi_summary.dart';
 import 'package:flymap/entity/flight_article.dart';
 
 import 'flight_article_db_mapper.dart';
-import 'flight_poi_db_mapper.dart';
+import 'route_poi_summary_db_mapper.dart';
 import 'mapper_utils.dart';
 
 class FlightInfoDBKeys {
@@ -13,20 +13,20 @@ class FlightInfoDBKeys {
 }
 
 class FlightInfoDbMapper {
-  final FlightPoiDbMapper _poiMapper;
+  final RoutePoiSummaryDbMapper _poiMapper;
   final FlightArticleDbMapper _articleMapper;
 
   FlightInfoDbMapper({
-    FlightPoiDbMapper? poiMapper,
+    RoutePoiSummaryDbMapper? poiMapper,
     FlightArticleDbMapper? articleMapper,
-  }) : _poiMapper = poiMapper ?? FlightPoiDbMapper(),
+  }) : _poiMapper = poiMapper ?? RoutePoiSummaryDbMapper(),
        _articleMapper = articleMapper ?? FlightArticleDbMapper();
 
   FlightInfo toFlightInfo(Map<String, dynamic> map) {
     final poiList = map.getListOfMaps(FlightInfoDBKeys.poi);
-    final List<FlightPoi> pois = poiList
+    final List<RoutePoiSummary> pois = poiList
         .map(_poiMapper.fromDb)
-        .whereType<FlightPoi>()
+        .whereType<RoutePoiSummary>()
         .toList();
     final articleList = map.getListOfMaps(FlightInfoDBKeys.articles);
     final List<FlightArticle> articles = articleList

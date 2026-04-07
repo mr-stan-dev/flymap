@@ -6,15 +6,19 @@ String composeScrollableHtml({
   required Color backgroundColor,
   required Color textColor,
   required Color mutedTextColor,
-  required Color linkColor,
   required Color dividerColor,
   required bool isDarkMode,
 }) {
   final summary = article.summary.trim();
   final bgHex = _cssHex(backgroundColor);
   final textHex = _cssHex(textColor);
+  final subtleLinkColor = Color.lerp(
+    textColor,
+    const Color(0xFF3A8DFF),
+    isDarkMode ? 0.48 : 0.70,
+  )!;
+  final linkHex = _cssHex(subtleLinkColor);
   final mutedHex = _cssHex(mutedTextColor);
-  final linkHex = _cssHex(linkColor);
   final dividerHex = _cssHex(dividerColor);
   final colorScheme = isDarkMode ? 'dark' : 'light';
 
@@ -50,6 +54,7 @@ String composeScrollableHtml({
   .offline-shell a,
   .offline-shell a:visited {
     color: $linkHex !important;
+    text-decoration: none !important;
   }
   .offline-shell hr {
     border: 0 !important;

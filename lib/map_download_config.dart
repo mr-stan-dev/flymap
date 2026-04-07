@@ -15,11 +15,13 @@ class MapDownloadConfig {
   MapDownloadConfig._();
 
   static const int wayPointDensityKm = 100;
-  static const double corridorWidthKm = 320.0;
+  static const double shortCorridorWidthKm = 160.0;
+  static const double midCorridorWidthKm = 240.0;
+  static const double longCorridorWidthKm = 320.0;
 
   static const int minDownloadZoom = 0;
   static const int defaultWorkerCount = 6;
-  static const int seaFilterMinZoom = 6;
+  static const int seaFilterMinZoom = 8;
 
   static const String mapLayerId = 'ofm_vector';
   static const String mbtilesDirectoryName = 'mbtiles';
@@ -42,6 +44,16 @@ class MapDownloadConfig {
       return RouteLength.mid;
     }
     return RouteLength.short;
+  }
+
+  static double resolveCorridorWidthKm(double distanceKm) {
+    if (distanceKm < 2500.0) {
+      return shortCorridorWidthKm;
+    }
+    if (distanceKm < 5000.0) {
+      return midCorridorWidthKm;
+    }
+    return longCorridorWidthKm;
   }
 
   static int resolveMaxZoom({

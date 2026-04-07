@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flymap/entity/flight_poi.dart';
+import 'package:flymap/entity/poi_wiki_preview.dart';
+import 'package:flymap/entity/route_poi_summary.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/poi_preview_bottom_sheet.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/section_card.dart';
 
 class PoiSection extends StatelessWidget {
   const PoiSection({required this.poi, super.key});
 
-  final List<FlightPoi> poi;
+  final List<RoutePoiSummary> poi;
 
   @override
   Widget build(BuildContext context) {
@@ -30,50 +32,23 @@ class PoiSection extends StatelessWidget {
     );
   }
 
-  void _openPoiDetails(BuildContext context, FlightPoi item) {
-    showModalBottomSheet<void>(
+  Future<void> _openPoiDetails(
+    BuildContext context,
+    RoutePoiSummary item,
+  ) async {
+    await showPoiPreviewDialog(
       context: context,
-      showDragHandle: true,
-      builder: (_) => _PoiDetailsSheet(item: item),
-    );
-  }
-}
-
-class _PoiDetailsSheet extends StatelessWidget {
-  const _PoiDetailsSheet({required this.item});
-
-  final FlightPoi item;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        DsSpacing.md,
-        0,
-        DsSpacing.md,
-        DsSpacing.xl,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(item.name, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: DsSpacing.xs),
-          if (item.type.trim().isNotEmpty)
-            Text(context.t.flight.info.poiType(type: item.type)),
-          if (item.description.trim().isNotEmpty) ...[
-            const SizedBox(height: DsSpacing.xs),
-            Text(item.description),
-          ],
-          if (item.flyView.trim().isNotEmpty) ...[
-            const SizedBox(height: DsSpacing.xs),
-            Text(context.t.flight.info.poiFlyOver(view: item.flyView)),
-          ],
-          if (item.wiki.trim().isNotEmpty) ...[
-            const SizedBox(height: DsSpacing.xs),
-            SelectableText(item.wiki),
-          ],
-        ],
+      name: item.name,
+      typeRaw: item.type.rawValue,
+      qid: item.qid,
+      actionMode: PoiPreviewActionMode.openOnly,
+      preloadedPreview: PoiWikiPreview(
+        qid: item.qid,
+        title: item.name,
+        summary: item.description,
+        htmlContent: item.descriptionHtml,
+        sourceUrl: item.wiki,
+        languageCode: 'en',
       ),
     );
   }

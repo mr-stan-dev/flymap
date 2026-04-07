@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flymap/entity/flight_article.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
+import 'package:flymap/ui/screens/common/html_content_page.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/articles/article_html_composer.dart';
-import 'package:flymap/ui/screens/flight/widgets/tabs/info/articles/offline_article_html_view.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/info/articles/plain_text_article_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -24,11 +24,17 @@ class ArticleDetailsPage extends StatelessWidget {
             backgroundColor: pageBackground,
             textColor: colorScheme.onSurface,
             mutedTextColor: colorScheme.onSurfaceVariant,
-            linkColor: colorScheme.primary,
             dividerColor: colorScheme.outlineVariant,
             isDarkMode: isDarkMode,
           )
         : '';
+    if (hasHtml) {
+      return HtmlContentPage(
+        title: article.title,
+        htmlContent: htmlContent,
+        sourceUrl: article.sourceUrl,
+      );
+    }
 
     return Scaffold(
       backgroundColor: pageBackground,
@@ -56,16 +62,10 @@ class ArticleDetailsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: hasHtml
-                      ? OfflineArticleHtmlView(
-                          htmlContent: htmlContent,
-                          articleTitle: article.title,
-                          backgroundColor: pageBackground,
-                        )
-                      : PlainTextArticleView(
-                          article: article,
-                          onOpenSource: () => _openSource(article.sourceUrl),
-                        ),
+                  child: PlainTextArticleView(
+                    article: article,
+                    onOpenSource: () => _openSource(article.sourceUrl),
+                  ),
                 ),
               ],
             ),

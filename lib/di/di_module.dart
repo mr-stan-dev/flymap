@@ -6,24 +6,34 @@ import 'package:flymap/data/api/flight_info_api.dart';
 import 'package:flymap/data/api/flight_info_api_mapper.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/local/app_database.dart';
+import 'package:flymap/data/local/flight_poi_repository_impl.dart';
 import 'package:flymap/data/local/flights_db_service.dart';
+import 'package:flymap/data/local/places_wiki_local_data_source.dart';
 import 'package:flymap/data/local/mappers/flight_db_mapper.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/data/route/great_circle_route_provider.dart';
 import 'package:flymap/data/wiki/wikipedia_article_client.dart';
+import 'package:flymap/data/wiki/wikimedia_api_client.dart';
+import 'package:flymap/data/wiki/wikidata_wikipedia_preview_repository.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
+import 'package:flymap/repository/flight_poi_repository.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
+import 'package:flymap/repository/poi_wiki_preview_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
 import 'package:flymap/subscription/revenuecat_client.dart';
 import 'package:flymap/subscription/revenuecat_env_config.dart';
 import 'package:flymap/subscription/subscription_status_cache.dart';
-import 'package:flymap/usecase/build_wikipedia_candidates_use_case.dart';
+import 'package:flymap/usecase/delete_flight_use_case.dart';
 import 'package:flymap/usecase/download_map_use_case.dart';
+import 'package:flymap/usecase/download_poi_summaries_use_case.dart';
 import 'package:flymap/usecase/download_wikipedia_articles_use_case.dart';
 import 'package:flymap/usecase/get_flight_info_use_case.dart';
+import 'package:flymap/usecase/get_flight_poi_use_case.dart';
+import 'package:flymap/usecase/get_poi_wiki_preview_use_case.dart';
 import 'package:get_it/get_it.dart';
+import 'package:http/http.dart' as http;
 
 class DiModule {
   final i = GetIt.I;
@@ -66,11 +76,15 @@ class DiModule {
         connectivity: GetIt.I.get(),
       ),
     );
-    i.registerLazySingleton<WikipediaArticleClient>(
-      () => WikipediaArticleClient(),
+    i.registerLazySingleton<WikimediaUserAgentProvider>(
+      () => PackageInfoWikimediaUserAgentProvider(),
     );
-    i.registerLazySingleton<BuildWikipediaCandidatesUseCase>(
-      () => const BuildWikipediaCandidatesUseCase(),
+    i.registerLazySingleton<http.Client>(() => http.Client());
+    i.registerLazySingleton<WikimediaApiClient>(
+      () => WikimediaApiClient(httpClient: i.get(), userAgentProvider: i.get()),
+    );
+    i.registerLazySingleton<WikipediaArticleClient>(
+      () => WikipediaArticleClient(apiClient: i.get()),
     );
     i.registerLazySingleton<DownloadWikipediaArticlesUseCase>(
       () => DownloadWikipediaArticlesUseCase(articleClient: GetIt.I.get()),
@@ -82,9 +96,30 @@ class DiModule {
     i.registerLazySingleton<FlightRepository>(
       () => FlightRepository(service: GetIt.I.get()),
     );
+    i.registerLazySingleton<DeleteFlightUseCase>(
+      () => DeleteFlightUseCase(service: GetIt.I.get()),
+    );
 
     i.registerLazySingleton<FavoriteAirportsRepository>(
       () => FavoriteAirportsRepository(),
+    );
+    i.registerLazySingleton<PlacesWikiLocalDataSource>(
+      () => PlacesWikiLocalDataSource(),
+    );
+    i.registerLazySingleton<FlightPOIRepository>(
+      () => LocalFlightPOIRepository(localDataSource: i.get()),
+    );
+    i.registerLazySingleton<GetFlightPOIUseCase>(
+      () => GetFlightPOIUseCase(repository: i.get()),
+    );
+    i.registerLazySingleton<PoiWikiPreviewRepository>(
+      () => WikidataWikipediaPreviewRepository(apiClient: i.get()),
+    );
+    i.registerLazySingleton<GetPoiWikiPreviewUseCase>(
+      () => GetPoiWikiPreviewUseCase(repository: i.get()),
+    );
+    i.registerLazySingleton<DownloadPoiSummariesUseCase>(
+      () => DownloadPoiSummariesUseCase(repository: i.get()),
     );
 
     i.registerLazySingleton<OnboardingRepository>(() => OnboardingRepository());

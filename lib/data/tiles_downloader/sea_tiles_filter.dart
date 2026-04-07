@@ -31,9 +31,44 @@ class SeaTilesFilter {
   /// Filters out sea-only tiles (only for zoom >= minZoomToFilter)
   Future<List<MapTile>> filterTiles(Iterable<MapTile> tiles) async {
     await initialize();
+    final landCache = <String, bool>{};
+
+    bool tileHasLand(MapTile tile) {
+      final key = '${tile.z}/${tile.x}/${tile.y}';
+      final cached = landCache[key];
+      if (cached != null) return cached;
+      final bounds = _tileToBounds(tile.x, tile.y, tile.z);
+      final hasLand = landMaskProvider.tileContainsLand(bounds);
+      landCache[key] = hasLand;
+      return hasLand;
+    }
+
+    bool hasAdjacentLand(MapTile tile) {
+      final maxCoord = (1 << tile.z) - 1;
+      for (var dy = -1; dy <= 1; dy++) {
+        for (var dx = -1; dx <= 1; dx++) {
+          if (dx == 0 && dy == 0) continue;
+          final neighborY = tile.y + dy;
+          if (neighborY < 0 || neighborY > maxCoord) continue;
+          var neighborX = tile.x + dx;
+          if (neighborX < 0) {
+            neighborX += maxCoord + 1;
+          } else if (neighborX > maxCoord) {
+            neighborX -= maxCoord + 1;
+          }
+          if (tileHasLand(MapTile(tile.z, neighborX, neighborY))) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
     final result = <MapTile>[];
     for (final tile in tiles) {
-      if (tile.z >= minZoomToFilter && isSeaTile(tile)) {
+      if (tile.z >= minZoomToFilter &&
+          !tileHasLand(tile) &&
+          !hasAdjacentLand(tile)) {
         // skip sea tile
         continue;
       }

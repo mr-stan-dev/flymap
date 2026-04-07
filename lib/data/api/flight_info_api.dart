@@ -44,7 +44,10 @@ class FlightInfoApi {
       throw const FormatException('Invalid overview response payload');
     }
     final map = decoded.cast<String, dynamic>();
-    return _mapper.toFlightInfo(map);
+    _logger.log('Overview payload keys=[${map.keys.take(10).join(', ')}]');
+    final info = _mapper.toFlightInfo(map);
+    _logger.log('Overview mapped overviewLen=${info.overview.length}');
+    return info;
   }
 
   Future<List<WikiArticleCandidate>> getFlightWikiArticles(

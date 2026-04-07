@@ -15,9 +15,13 @@ class GreatCircleRouteProvider implements FlightRouteProvider {
   @override
   FlightRoute getRoute({required Airport departure, required Airport arrival}) {
     final waypoints = calculateRoute(departure.latLon, arrival.latLon);
+    final routeDistanceKm = MapUtils.distanceKm(
+      departure: departure.latLon,
+      arrival: arrival.latLon,
+    );
     final corridor = corridorProvider.calculateCorridor(
       waypoints,
-      widthKm: MapDownloadConfig.corridorWidthKm,
+      widthKm: MapDownloadConfig.resolveCorridorWidthKm(routeDistanceKm),
     );
     return FlightRoute(
       departure: departure,

@@ -124,7 +124,7 @@ class VectorTilesDownloader {
         allTiles.addAll(TileUtils.tilesForPolygon(polygon, z));
       }
 
-      // Filter out sea tiles for zoom >= 6
+      // Filter out sea tiles from configured sea-filter zoom and above.
       final seaFilter = SeaTilesFilter(
         minZoomToFilter: MapDownloadConfig.seaFilterMinZoom,
       );

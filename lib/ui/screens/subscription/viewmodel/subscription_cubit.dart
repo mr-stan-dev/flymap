@@ -93,6 +93,10 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
     return _presentPaywallIfNeeded(source: PaywallSource.settingsBanner);
   }
 
+  Future<SubscriptionPaywallResult> presentPaywallFromOverviewPoi() async {
+    return _presentPaywallIfNeeded(source: PaywallSource.overviewPoi);
+  }
+
   Future<SubscriptionPaywallResult>
   presentPaywallFromSubscriptionManagement() async {
     return _presentPaywallIfNeeded(

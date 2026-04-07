@@ -92,4 +92,48 @@ void main() {
       expect(result.single.languageCode, 'en');
     });
   });
+
+  group('FlightInfoApiMapper.toFlightInfo', () {
+    test('maps overview and ignores poi payload in active flow', () {
+      final mapper = FlightInfoApiMapper();
+
+      final info = mapper.toFlightInfo({
+        'overview': 'Route overview',
+        'poi': [
+          {
+            'name': 'Alps',
+            'type': 'mountain_range',
+            'coordinates': [46.5, 10.5],
+            'qid': 'Q1286',
+            'sitelinks': 1200,
+          },
+        ],
+      });
+
+      expect(info.overview, 'Route overview');
+      expect(info.poi, isEmpty);
+    });
+
+    test('maps nested overview and ignores nested pois payload', () {
+      final mapper = FlightInfoApiMapper();
+
+      final info = mapper.toFlightInfo({
+        'results': {
+          'overview': 'Nested overview',
+          'pois': [
+            {
+              'title': 'Danube',
+              'place_type': 'river',
+              'lat': 48.2,
+              'lon': 16.37,
+              'id': 'Q1653',
+            },
+          ],
+        },
+      });
+
+      expect(info.overview, 'Nested overview');
+      expect(info.poi, isEmpty);
+    });
+  });
 }

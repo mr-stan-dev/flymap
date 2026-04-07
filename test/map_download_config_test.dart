@@ -91,6 +91,27 @@ void main() {
     });
   });
 
+  group('MapDownloadConfig.resolveCorridorWidthKm', () {
+    test('uses strict corridor width thresholds (<2500, <5000, else)', () {
+      expect(
+        MapDownloadConfig.resolveCorridorWidthKm(2499.9),
+        MapDownloadConfig.shortCorridorWidthKm,
+      );
+      expect(
+        MapDownloadConfig.resolveCorridorWidthKm(2500.0),
+        MapDownloadConfig.midCorridorWidthKm,
+      );
+      expect(
+        MapDownloadConfig.resolveCorridorWidthKm(4999.9),
+        MapDownloadConfig.midCorridorWidthKm,
+      );
+      expect(
+        MapDownloadConfig.resolveCorridorWidthKm(5000.0),
+        MapDownloadConfig.longCorridorWidthKm,
+      );
+    });
+  });
+
   group('MapDownloadConfig.zoomScaleForEstimate', () {
     test('returns expected scale factors around z10 baseline', () {
       expect(MapDownloadConfig.zoomScaleForEstimate(9), 0.5);

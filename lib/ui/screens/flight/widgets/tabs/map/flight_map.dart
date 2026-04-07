@@ -6,18 +6,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/mappers/flight_map_mapper.dart';
+import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/tiles_downloader/mbtiles_validator.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/gps_data.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/map_download_config.dart';
+import 'package:flymap/entity/poi_wiki_preview.dart';
 import 'package:flymap/ui/map/layers/flight_route_map_layers.dart';
+import 'package:flymap/ui/map/layers/poi_layer.dart';
 import 'package:flymap/ui/map/layers/user_layer.dart';
 import 'package:flymap/ui/map/map_utils.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/poi_preview_bottom_sheet.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_controls.dart';
+import 'package:flymap/usecase/get_poi_wiki_preview_use_case.dart';
+import 'package:get_it/get_it.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_gps_status_badge.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_initializing_overlay.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_style_loading_view.dart';
@@ -51,6 +57,14 @@ class _FlightMapState extends State<FlightMap> {
   bool _isApplyingUserLocation = false;
   int? _lastLoggedZoomTenths;
   String? _mapLoadError;
+  bool _routeLayersAdded = false;
+  int _poiSignature = 0;
+  bool _isPoiDialogVisible = false;
+  bool _featureTapListenerAttached = false;
+  late final GetPoiWikiPreviewUseCase _wikiPreviewUseCase = GetIt.I
+      .get<GetPoiWikiPreviewUseCase>();
+  late final ConnectivityChecker _connectivityChecker = GetIt.I
+      .get<ConnectivityChecker>();
 
   late final LatLng _center = LatLng(
     MapUtils.center(
@@ -217,6 +231,10 @@ class _FlightMapState extends State<FlightMap> {
     _pendingGpsData = null;
 
     _mapController!.onSymbolTapped.add(_onSymbolTapped);
+    if (!_featureTapListenerAttached) {
+      controller.onFeatureTapped.add(_onFeatureTapped);
+      _featureTapListenerAttached = true;
+    }
 
     setState(() {
       _mapReady = true;
@@ -257,6 +275,104 @@ class _FlightMapState extends State<FlightMap> {
     await FlightRouteMapLayers.add(
       controller: controller,
       route: widget.flight.route,
+    );
+    _routeLayersAdded = true;
+    await _syncPoiLayer();
+  }
+
+  Future<void> _syncPoiLayer() async {
+    final controller = _mapController;
+    if (!_routeLayersAdded || controller == null) return;
+    final pois = widget.flight.info.poi;
+    final nextSignature = Object.hashAll(pois.map((p) => p.qid));
+    if (_poiSignature == nextSignature) return;
+    _poiSignature = nextSignature;
+    _logger.log('Syncing POI layer count=${pois.length}');
+    await PoiLayer(poi: pois).add(controller);
+  }
+
+  void _onFeatureTapped(
+    Point<double> point,
+    LatLng _,
+    String id,
+    String layerId,
+    Annotation? __,
+  ) {
+    if (layerId != PoiLayer.iconsLayerId &&
+        layerId != PoiLayer.circlesLayerId &&
+        layerId != PoiLayer.labelsLayerId) {
+      return;
+    }
+    unawaited(_handlePoiTapAtPoint(point));
+  }
+
+  Future<void> _handlePoiTapAtPoint(Point<double> point) async {
+    final controller = _mapController;
+    if (controller == null || !_routeLayersAdded || _isPoiDialogVisible) return;
+    try {
+      var features = await controller.queryRenderedFeatures(point, const [
+        PoiLayer.iconsLayerId,
+        PoiLayer.circlesLayerId,
+        PoiLayer.labelsLayerId,
+      ], null);
+      if (features.isEmpty) {
+        final tapRect = Rect.fromCenter(
+          center: Offset(point.x, point.y),
+          width: 56,
+          height: 56,
+        );
+        features = await controller.queryRenderedFeaturesInRect(tapRect, const [
+          PoiLayer.iconsLayerId,
+          PoiLayer.circlesLayerId,
+          PoiLayer.labelsLayerId,
+        ], null);
+      }
+      if (features.isEmpty || !mounted) return;
+      await _showPoiDialogFromFeature(features.first);
+    } catch (e) {
+      _logger.error('Failed to handle POI tap: $e');
+    } finally {
+      _isPoiDialogVisible = false;
+    }
+  }
+
+  Future<void> _showPoiDialogFromFeature(dynamic feature) async {
+    if (!mounted) return;
+    final props = feature is Map ? (feature['properties'] ?? feature) : null;
+    if (props is! Map) return;
+    final name = (props['name'] ?? '').toString().trim();
+    final typeRaw = (props['type'] ?? '').toString().trim();
+    final qid = (props['qid'] ?? '').toString().trim();
+    if (name.isEmpty) return;
+
+    // Use already-downloaded lead section when available — no network needed.
+    final storedPoi = qid.isNotEmpty
+        ? widget.flight.info.poi.where((p) => p.qid == qid).firstOrNull
+        : null;
+    final preloaded = (storedPoi != null && storedPoi.description.isNotEmpty)
+        ? PoiWikiPreview(
+            qid: qid,
+            title: storedPoi.name,
+            summary: storedPoi.description,
+            htmlContent: storedPoi.descriptionHtml,
+            sourceUrl: storedPoi.wiki,
+            languageCode: '',
+          )
+        : null;
+
+    _isPoiDialogVisible = true;
+    final hasInternet = await _connectivityChecker.hasInternetConnectivity();
+    if (!mounted) return;
+    await showPoiPreviewDialog(
+      context: context,
+      name: name,
+      typeRaw: typeRaw,
+      qid: qid,
+      actionMode: hasInternet
+          ? PoiPreviewActionMode.openOnly
+          : PoiPreviewActionMode.none,
+      wikiPreviewUseCase: _wikiPreviewUseCase,
+      preloadedPreview: preloaded,
     );
   }
 
@@ -446,10 +562,15 @@ class _FlightMapState extends State<FlightMap> {
   void dispose() {
     _controlsHideTimer?.cancel();
     _mapController?.onSymbolTapped.remove(_onSymbolTapped);
+    if (_featureTapListenerAttached) {
+      _mapController?.onFeatureTapped.remove(_onFeatureTapped);
+      _featureTapListenerAttached = false;
+    }
     _userCircle = null;
     _userHeadingSymbol = null;
     _mapController = null;
     _mapReady = false;
+    _routeLayersAdded = false;
     super.dispose();
   }
 }

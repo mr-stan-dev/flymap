@@ -7,7 +7,8 @@
     "ok": "OK",
     "retry": "Retry",
     "upgrade": "Upgrade",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "readMore": "Read more"
   },
   "home": {
     "title": "Home",
@@ -131,6 +132,8 @@
       "basic": "Basic",
       "pro": "Pro",
       "mapDetailInfoTooltip": "Map detail info",
+      "legendButton": "Legend",
+      "legendTitle": "POI legend",
       "estimatedMapSize": "Estimated map size: $size",
       "upgradeToPro": "Upgrade to Pro",
       "optionsTitle": "Map options",
@@ -138,8 +141,7 @@
     },
     "overview": {
       "routeNotReady": "Route is not ready yet.",
-      "tooLongFlightButton": "Too long flight (> 5000km)",
-      "longFlightOverview": "Right now, flights longer than 5,000 km aren’t calculated as accurately as we’d like - but we’re working hard to make sure long flights are supported soon!"
+      "proPoiUpsell": "With Flymap Pro, discover more interesting places along your route."
     },
     "wikipedia": {
       "title": "Download articles to read during the flight",
@@ -163,8 +165,25 @@
     "downloading": {
       "articlesTitle": "Downloading selected articles...",
       "mapTitle": "Downloading offline map...",
+      "mapSectionTitle": "Map",
+      "poiSectionTitle": "Places",
+      "articlesSectionTitle": "Articles",
       "cancelDownload": "Cancel download",
       "doNotClose": "Do not close this screen until download completes",
+      "currentStep": "Current",
+      "pending": "Pending",
+      "inProgress": "In progress",
+      "completed": "Completed",
+      "completedWithIssues": "Completed with issues",
+      "failed": "Failed",
+      "skipped": "Skipped",
+      "waitingForMap": "Waiting for map download...",
+      "mapFailed": "Map download failed.",
+      "noPoiSelected": "No place summaries selected.",
+      "preparingPoi": "Preparing place summaries...",
+      "poiProgress": "Places: $completed/$total",
+      "poiProgressWithFailed": "Places: $completed/$total ($failed failed)",
+      "noArticlesSelected": "No articles selected.",
       "preparingArticles": "Preparing article downloads...",
       "articlesProgress": "Articles: $completed/$total",
       "articlesProgressWithFailed": "Articles: $completed/$total ($failed failed)",
@@ -180,6 +199,7 @@
       "failedLoadAirports": "Failed to load airports. Please try again.",
       "airportSearchFailed": "Airport search failed. Try another query.",
       "someArticlesFailed": "Some articles failed. Continuing with map download.",
+      "someOptionalDownloadsFailed": "Map downloaded. Some optional content could not be downloaded.",
       "failedBuildPreview": "Failed to build route preview. Please try again.",
       "overviewUnavailableContinue": "Could not load route overview. You can still continue.",
       "noInternet": "No internet connection. Please check your connection and try again.",
@@ -282,7 +302,7 @@
       "overviewLoading": "Building route overview...",
       "overviewEmpty": "Overview is not available yet for this route.",
       "loadingRouteInformation": "Loading route information...",
-      "flyOverTitle": "You'll fly over",
+      "flyOverTitle": "Highlights along you route",
       "airportsTitle": "Airports",
       "departure": "Departure",
       "arrival": "Arrival",

@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flymap/data/wiki/wikimedia_api_client.dart';
 import 'package:flymap/data/wiki/wikipedia_article_client.dart';
 import 'package:flymap/entity/flight_article.dart';
 import 'package:flymap/usecase/download_wikipedia_articles_use_case.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   group('DownloadWikipediaArticlesUseCase', () {
@@ -84,7 +86,13 @@ FlightArticle _article(String source) {
 }
 
 class _FakeWikipediaArticleClient extends WikipediaArticleClient {
-  _FakeWikipediaArticleClient({required this.responses});
+  _FakeWikipediaArticleClient({required this.responses})
+    : super(
+        apiClient: WikimediaApiClient(
+          httpClient: http.Client(),
+          userAgentProvider: _StaticWikimediaUserAgentProvider(),
+        ),
+      );
 
   final Map<String, FlightArticle?> responses;
   int calls = 0;
@@ -97,4 +105,9 @@ class _FakeWikipediaArticleClient extends WikipediaArticleClient {
     calls++;
     return responses[sourceUrl];
   }
+}
+
+class _StaticWikimediaUserAgentProvider implements WikimediaUserAgentProvider {
+  @override
+  Future<String> getUserAgent() async => 'test-agent';
 }

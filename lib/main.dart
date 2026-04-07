@@ -19,9 +19,10 @@ import 'package:get_it/get_it.dart';
 import 'di/di_module.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   await runZonedGuarded(
     () async {
+      // Must be initialized in the same zone where runApp is called.
+      WidgetsFlutterBinding.ensureInitialized();
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );

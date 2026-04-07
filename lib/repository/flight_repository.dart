@@ -1,5 +1,6 @@
 import 'package:flymap/data/local/flights_db_service.dart';
 import 'package:flymap/entity/flight.dart';
+import 'package:flymap/entity/flight_info.dart';
 
 class FlightRepository {
   final FlightsDBService _flightsService;
@@ -10,6 +11,21 @@ class FlightRepository {
   /// Insert a new flight
   Future<String> insertFlight(Flight flight) async {
     return await _flightsService.insertFlight(flight);
+  }
+
+  Future<String> saveOrUpdateFlight(Flight flight) async {
+    return await _flightsService.saveOrUpdateFlight(flight);
+  }
+
+  Future<Flight?> getFlightById(String flightId) async {
+    return await _flightsService.getFlightById(flightId);
+  }
+
+  Future<bool> updateFlightInfo({
+    required String flightId,
+    required FlightInfo info,
+  }) async {
+    return await _flightsService.updateFlightInfo(flightId, info);
   }
 
   /// Get all flights
@@ -44,8 +60,4 @@ class FlightRepository {
     return totalBytes;
   }
 
-  /// Delete flight by ID
-  Future<bool> deleteFlight(String flightId) async {
-    return await _flightsService.deleteFlight(flightId);
-  }
 }

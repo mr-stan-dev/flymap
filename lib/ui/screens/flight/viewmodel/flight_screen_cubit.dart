@@ -6,8 +6,8 @@ import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/gps_data.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
-import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
+import 'package:flymap/usecase/delete_flight_use_case.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get_it/get_it.dart';
 
@@ -15,7 +15,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   final _logger = Logger('FlightScreenCubit');
   static const _gpsStaleThreshold = Duration(seconds: 20);
   final Flight flight;
-  final FlightRepository _repository = GetIt.I.get();
+  final DeleteFlightUseCase _deleteFlightUseCase = GetIt.I.get();
   final GpsDataProvider _gpsProvider = GpsDataProvider();
   Timer? _gpsCheckTimer;
   int _gpsUpdateTick = 0;
@@ -67,8 +67,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   Future<void> deleteFlight() async {
     emit(const FlightScreenLoading());
     try {
-      // Delete flight record (service handles file cleanup)
-      final ok = await _repository.deleteFlight(flight.id);
+      final ok = await _deleteFlightUseCase(flight.id);
       if (!ok) {
         emit(FlightScreenError(t.home.failedDeleteFlight, flight: flight));
         return;

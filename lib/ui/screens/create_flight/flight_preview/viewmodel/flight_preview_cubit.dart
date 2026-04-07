@@ -1,256 +1,129 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
+import 'package:flymap/entity/airport.dart';
+import 'package:flymap/entity/flight_article.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
+import 'package:flymap/entity/route_poi_summary.dart';
 import 'package:flymap/entity/map_detail_level.dart';
+import 'package:flymap/entity/wiki_article_candidate.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/map_download_config.dart';
-import 'package:flymap/ui/map/map_utils.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_params.dart';
+import 'package:flymap/repository/flight_repository.dart';
+import 'package:flymap/repository/subscription_repository.dart';
+import 'package:flymap/subscription/pro_limits.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
+import 'package:flymap/usecase/delete_flight_use_case.dart';
 import 'package:flymap/usecase/download_map_use_case.dart';
+import 'package:flymap/usecase/download_poi_summaries_use_case.dart';
+import 'package:flymap/usecase/download_wikipedia_articles_use_case.dart';
 import 'package:flymap/usecase/get_flight_info_use_case.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:flymap/usecase/get_flight_poi_use_case.dart';
 
-/// Cubit for managing create_flight map preview state
+part 'delegates/preview_preparation_delegate.dart';
+part 'delegates/map_and_step_navigation_delegate.dart';
+part 'delegates/wiki_selection_delegate.dart';
+part 'delegates/download_flow_delegate.dart';
+
 class FlightPreviewCubit extends Cubit<FlightPreviewState> {
-  final FlightPreviewAirports params;
-  final FlightRouteProvider _routeProvider;
-  final DownloadMapUseCase downloadMapUseCase;
-  final GetFlightInfoUseCase getFlightInfoUseCase;
-  final GetFlightInfoUseCase _getFlightInfoUseCase;
-  final ConnectivityChecker _connectivity;
-
-  StreamSubscription? _downloadSubscription;
+  FlightPreviewCubit({
+    required this.departure,
+    required this.arrival,
+    required ConnectivityChecker connectivityChecker,
+    required FlightRouteProvider routeProvider,
+    required DownloadMapUseCase downloadMapUseCase,
+    required DownloadPoiSummariesUseCase downloadPoiSummariesUseCase,
+    required DownloadWikipediaArticlesUseCase downloadWikipediaArticlesUseCase,
+    required GetFlightInfoUseCase getFlightInfoUseCase,
+    required GetFlightPOIUseCase getFlightPOIUseCase,
+    required FlightRepository flightRepository,
+    required SubscriptionRepository subscriptionRepository,
+    required DeleteFlightUseCase deleteFlightUseCase,
+    required AppAnalytics analytics,
+    required AppCrashlytics crashlytics,
+    bool autoPrepare = true,
+  }) : _analytics = analytics,
+       _crashlytics = crashlytics,
+       super(FlightPreviewState.initial()) {
+    _previewPreparationDelegate = PreviewPreparationDelegate(
+      this,
+      connectivityChecker: connectivityChecker,
+      routeProvider: routeProvider,
+      getFlightInfoUseCase: getFlightInfoUseCase,
+      getFlightPOIUseCase: getFlightPOIUseCase,
+    );
+    _navigationDelegate = MapAndStepNavigationDelegate(this);
+    _wikiSelectionDelegate = WikiSelectionDelegate(this);
+    _downloadFlowDelegate = DownloadFlowDelegate(
+      this,
+      downloadMapUseCase: downloadMapUseCase,
+      downloadPoiSummariesUseCase: downloadPoiSummariesUseCase,
+      downloadWikipediaArticlesUseCase: downloadWikipediaArticlesUseCase,
+      flightRepository: flightRepository,
+      subscriptionRepository: subscriptionRepository,
+      deleteFlightUseCase: deleteFlightUseCase,
+    );
+    if (autoPrepare) {
+      unawaited(preparePreview());
+    }
+  }
 
   final _logger = Logger('FlightPreviewCubit');
+  final AppAnalytics _analytics;
+  final AppCrashlytics _crashlytics;
+  final Airport departure;
+  final Airport arrival;
+  late final PreviewPreparationDelegate _previewPreparationDelegate;
+  late final MapAndStepNavigationDelegate _navigationDelegate;
+  late final WikiSelectionDelegate _wikiSelectionDelegate;
+  late final DownloadFlowDelegate _downloadFlowDelegate;
 
-  FlightPreviewCubit({
-    required this.params,
-    required FlightRouteProvider routeProvider,
-    required this.downloadMapUseCase,
-    required this.getFlightInfoUseCase,
-    required ConnectivityChecker connectivity,
-  }) : _routeProvider = routeProvider,
-       _getFlightInfoUseCase = getFlightInfoUseCase,
-       _connectivity = connectivity,
-       super(const FlightMapPreviewLoading()) {
-    _initialize(params);
+  Future<void> preparePreview() => _previewPreparationDelegate.preparePreview();
+
+  Future<void> continueFromMap() => _navigationDelegate.continueFromMap();
+
+  void selectMapDetailLevel(MapDetailLevel detailLevel) =>
+      _navigationDelegate.selectMapDetailLevel(detailLevel);
+
+  void continueFromOverview() => _navigationDelegate.continueFromOverview();
+
+  void toggleWikiArticleSelection(String url) =>
+      _wikiSelectionDelegate.toggleWikiArticleSelection(url);
+
+  void toggleAllWikiArticleSelections() =>
+      _wikiSelectionDelegate.toggleAllWikiArticleSelections();
+
+  Future<void> startDownload() => _downloadFlowDelegate.startDownload();
+
+  void cancelDownload() => _downloadFlowDelegate.cancelDownload();
+
+  Future<bool> handleBackAction() => _navigationDelegate.handleBackAction();
+
+  Future<void> _prefetchLocalPois(
+    FlightRoute route, {
+    required MapDetailLevel mapDetail,
+  }) => _previewPreparationDelegate.prefetchLocalPois(
+    route: route,
+    mapDetail: mapDetail,
+  );
+
+  Future<void> refreshPoisForPro() async {
+    final route = state.flightRoute;
+    if (route == null) return;
+    await _prefetchLocalPois(route, mapDetail: MapDetailLevel.pro);
   }
 
-  /// Initialize the cubit and calculate route/corridor
-  Future<void> _initialize(FlightPreviewParams params) async {
-    emit(const FlightMapPreviewLoading());
-
-    final hasInternet = await _connectivity.hasInternetConnectivity();
-
-    if (!hasInternet) {
-      final msg = t.createFlight.errors.noInternet;
-      emit(FlightMapPreviewError(msg));
-      return;
-    }
-
-    try {
-      switch (params) {
-        case FlightPreviewAirports():
-          await _calculateRouteAndCorridor(params);
-          break;
-      }
-    } catch (e) {
-      emit(FlightMapPreviewError(t.createFlight.errors.failedBuildPreview));
-    }
-  }
-
-  /// Calculate route and corridor based on departure and arrival airports
-  Future<void> _calculateRouteAndCorridor(
-    FlightPreviewAirports airports,
-  ) async {
-    try {
-      final route = _routeProvider.getRoute(
-        departure: airports.departure,
-        arrival: airports.arrival,
-      );
-      if (_isAntimeridianRoute(route)) {
-        emit(
-          FlightMapPreviewError(t.createFlight.mapPreview.routeNotSupportedMsg),
-        );
-        return;
-      }
-
-      final zoomLevel = MapUtils.calculateZoomLevel(
-        departure: airports.departure,
-        arrival: airports.arrival,
-      );
-      unawaited(_loadFlightOverview(route));
-      emit(
-        FlightMapPreviewMapState(
-          flightRoute: route,
-          flightInfo: FlightInfo.empty,
-          currentZoom: zoomLevel,
-          isTooLongFlight: false,
-          isOverviewLoading: true,
-          overviewErrorMessage: null,
-        ),
-      );
-    } catch (e) {
-      _logger.error(e);
-      emit(FlightMapPreviewError(t.createFlight.errors.failedBuildPreview));
-    }
-  }
-
-  Future<void> _loadFlightOverview(FlightRoute route) async {
-    try {
-      final flightInfo = await _getFlightInfoUseCase.call(
-        airportArrival: route.arrival.name,
-        airportDeparture: route.departure.name,
-        waypoints: route.waypoints,
-      );
-      _logger.log('Flight overview: ${flightInfo.overview}');
-      final currentState = state;
-      if (currentState is FlightMapPreviewMapState && !isClosed) {
-        emit(
-          currentState.copyWith(
-            flightInfo: flightInfo,
-            isOverviewLoading: false,
-            clearOverviewErrorMessage: true,
-          ),
-        );
-      }
-    } catch (e) {
-      _logger.error('_loadPoi error: $e');
-      final currentState = state;
-      if (currentState is FlightMapPreviewMapState && !isClosed) {
-        emit(
-          currentState.copyWith(
-            isOverviewLoading: false,
-            overviewErrorMessage:
-                t.createFlight.errors.overviewUnavailableContinue,
-          ),
-        );
-      }
-    }
-  }
-
-  /// Update zoom level
-  void updateZoom(double zoom) {
-    final currentState = state;
-    if (currentState is FlightMapPreviewMapState) {
-      emit(currentState.copyWith(currentZoom: zoom));
-    }
-  }
-
-  /// Start the download process
-  void startDownload() async {
-    try {
-      final currentState = state as FlightMapPreviewMapState;
-      final effectiveMaxZoom = MapDownloadConfig.resolveMaxZoom(
-        distanceKm: currentState.flightRoute.distanceInKm,
-        detailLevel: MapDetailLevel.basic,
-      );
-
-      // Reset state and start creation phase
-      emit(MapDownloadingState(progress: 0.0));
-      _logger.log('flightInfo (to save): ${currentState.flightInfo}');
-
-      // Initialize offline manager
-      _downloadSubscription = downloadMapUseCase
-          .call(
-            flightRoute: currentState.flightRoute,
-            flightInfo: currentState.flightInfo,
-            maxZoom: effectiveMaxZoom,
-          )
-          .listen((event) {
-            // Handle different download events
-            switch (event) {
-              case DownloadMapProgress():
-                // Update download progress
-                emit(MapDownloadingState(progress: event.progress));
-                break;
-              case DownloadMapDone():
-                // Download completed successfully
-                emit(MapDownloadingState(progress: 1.0));
-                Future.delayed(Duration(seconds: 2), () {
-                  if (!isClosed) {
-                    emit(MapDownloadingState(progress: 1.0, done: true));
-                  }
-                });
-                break;
-              case DownloadMapError():
-                // Handle error
-                emit(
-                  MapDownloadingState(
-                    progress: 0.0,
-                    errorMessage: event.errorMsg,
-                  ),
-                );
-                break;
-              case DownloadMapInitializing():
-                // Start download process
-                emit(MapDownloadingState(progress: 0.0));
-                break;
-              case DownloadMapComputingTiles():
-                // Computing tiles - keep current progress
-                break;
-              case DownloadMapStartingWorkers():
-                // Starting workers - keep current progress
-                break;
-              case DownloadMapFinalizing():
-                // Finalizing - keep current progress
-                break;
-              case DownloadMapVerifying():
-                // Verifying - keep current progress
-                break;
-            }
-          });
-    } catch (e) {
-      emit(
-        MapDownloadingState(
-          progress: 0.0,
-          errorMessage: t.createFlight.errors.failedStartDownload(
-            error: e.toString(),
-          ),
-        ),
-      );
-    }
-  }
-
-  /// Cancel download
-  void cancelDownload() {
-    downloadMapUseCase.cancel();
-    _downloadSubscription?.cancel();
-    _downloadSubscription = null;
-    _calculateRouteAndCorridor(params);
-  }
-
-  /// Retry initialization (public method for error recovery)
-  void retry() {
-    _initialize(params);
-  }
+  void _emitState(FlightPreviewState nextState) => emit(nextState);
 
   @override
   Future<void> close() {
-    _downloadSubscription?.cancel();
+    _downloadFlowDelegate.dispose();
     return super.close();
-  }
-
-  /// Get center point between airports
-  LatLng get center =>
-      MapUtils.center(departure: params.departure, arrival: params.arrival);
-
-  bool _isAntimeridianRoute(FlightRoute route) {
-    final points = route.waypoints.length >= 2
-        ? route.waypoints
-        : [route.departure.latLon, route.arrival.latLon];
-    for (var i = 1; i < points.length; i++) {
-      final deltaLon = points[i].longitude - points[i - 1].longitude;
-      if (deltaLon.abs() > 180) {
-        return true;
-      }
-    }
-    return false;
   }
 }

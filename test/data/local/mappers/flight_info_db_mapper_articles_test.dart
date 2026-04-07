@@ -3,7 +3,9 @@ import 'package:flymap/data/local/mappers/flight_article_db_mapper.dart';
 import 'package:flymap/data/local/mappers/flight_info_db_mapper.dart';
 import 'package:flymap/entity/flight_article.dart';
 import 'package:flymap/entity/flight_info.dart';
-import 'package:flymap/entity/flight_poi.dart';
+import 'package:flymap/entity/flight_poi_type.dart';
+import 'package:flymap/entity/route_poi.dart';
+import 'package:flymap/entity/route_poi_summary.dart';
 import 'package:latlong2/latlong.dart';
 
 void main() {
@@ -13,12 +15,15 @@ void main() {
       final info = FlightInfo(
         'overview',
         [
-          const FlightPoi(
-            coordinates: LatLng(1, 2),
-            type: 'mountain',
+          RoutePoiSummary(
+            poi: const RoutePoi(
+              qid: 'Q786',
+              name: 'Alps',
+              latLon: LatLng(1, 2),
+              type: FlightPoiType.mountain,
+              sitelinks: 100,
+            ),
             description: 'desc',
-            name: 'Alps',
-            flyView: 'left',
             wiki: 'https://en.wikipedia.org/wiki/Alps',
           ),
         ],

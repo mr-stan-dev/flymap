@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/i18n/strings.g.dart';
+import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_state.dart';
 import 'package:flymap/ui/screens/home/tabs/home/widgets/home_flights_list.dart';
@@ -46,7 +47,7 @@ class HomeTabLoaded extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/flight-number'),
+        onPressed: () => context.push(AppRouter.flightSearchRoute),
         icon: const Icon(Icons.flight_takeoff),
         label: Text(context.t.home.newFlight),
       ),

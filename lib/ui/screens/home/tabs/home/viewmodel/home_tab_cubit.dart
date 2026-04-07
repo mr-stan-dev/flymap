@@ -4,6 +4,7 @@ import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_state.dart';
+import 'package:flymap/usecase/delete_flight_use_case.dart';
 import 'package:get_it/get_it.dart';
 
 /// Cubit for managing home tab state
@@ -14,10 +15,12 @@ class HomeTabCubit extends Cubit<HomeTabState> {
 
   HomeTabCubit() : super(const HomeTabLoading()) {
     _repository = GetIt.I<FlightRepository>();
+    _deleteFlightUseCase = GetIt.I<DeleteFlightUseCase>();
     _loadData();
   }
 
   late final FlightRepository _repository;
+  late final DeleteFlightUseCase _deleteFlightUseCase;
 
   /// Load all data for home tab
   Future<void> _loadData() async {
@@ -172,7 +175,7 @@ class HomeTabCubit extends Cubit<HomeTabState> {
 
   Future<bool> deleteFlight(String flightId) async {
     try {
-      final ok = await _repository.deleteFlight(flightId);
+      final ok = await _deleteFlightUseCase(flightId);
       if (!ok) return false;
 
       await refresh();

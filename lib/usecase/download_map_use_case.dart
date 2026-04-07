@@ -102,6 +102,10 @@ class DownloadMapUseCase {
     _currentDownloader?.cancel();
   }
 
+  static String flightIdForRoute(FlightRoute route) {
+    return '${route.routeCode}_${MapDownloadConfig.mapLayerId}';
+  }
+
   Stream<DownloadMapEvent> call({
     required FlightRoute flightRoute,
     required FlightInfo flightInfo,
@@ -126,7 +130,9 @@ class DownloadMapUseCase {
 
       final mapLayer = MapDownloadConfig.mapLayerId;
       final fileName = '${flightRoute.routeCode}_$mapLayer';
-      final id = fileName; // Same key for DB record and MBTiles file
+      final id = flightIdForRoute(
+        flightRoute,
+      ); // Same key for DB record and MBTiles file
 
       // Forward the download stream and handle completion
       await for (final event in downloader.download(fileName)) {
@@ -180,7 +186,7 @@ class DownloadMapUseCase {
         createdAt: DateTime.now(),
       );
       _logger.log('Inserting flight into DB: id=${flight.id}');
-      await _flightsService.insertFlight(flight);
+      await _flightsService.saveOrUpdateFlight(flight);
       _logger.log("Flight saved successfully: '${flight.id}'");
       _logger.log('Flight map path: ${flightMap.filePath}');
       return Result.success(flight: flight);

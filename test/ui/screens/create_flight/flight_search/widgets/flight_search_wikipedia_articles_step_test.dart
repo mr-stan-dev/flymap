@@ -3,8 +3,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/entity/wiki_article_candidate.dart';
 import 'package:flymap/i18n/strings.g.dart';
-import 'package:flymap/ui/screens/create_flight/flight_search/viewmodel/flight_search_screen_state.dart';
-import 'package:flymap/ui/screens/create_flight/flight_search/widgets/steps/flight_search_wikipedia_articles_step.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/wikipedia_articles/flight_search_wikipedia_articles_step.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 
 void main() {
   setUpAll(() {
@@ -13,7 +13,7 @@ void main() {
 
   group('FlightSearchWikipediaArticlesStep', () {
     testWidgets('shows full article list for free users', (tester) async {
-      final state = FlightSearchScreenState.initial().copyWith(
+      final state = FlightPreviewState.initial().copyWith(
         step: CreateFlightStep.wikipediaArticles,
         articleCandidates: _candidates(4),
       );
@@ -43,7 +43,7 @@ void main() {
     });
 
     testWidgets('hides free-limit hint for Pro users', (tester) async {
-      final state = FlightSearchScreenState.initial().copyWith(
+      final state = FlightPreviewState.initial().copyWith(
         step: CreateFlightStep.wikipediaArticles,
         articleCandidates: _candidates(4),
       );
@@ -72,7 +72,7 @@ void main() {
     testWidgets('shows "Upgrade" for free users above 3 selections', (
       tester,
     ) async {
-      final state = FlightSearchScreenState.initial().copyWith(
+      final state = FlightPreviewState.initial().copyWith(
         step: CreateFlightStep.wikipediaArticles,
         articleCandidates: _candidates(4),
         selectedArticleUrls: const [

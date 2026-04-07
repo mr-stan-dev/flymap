@@ -11,7 +11,7 @@ import '../logger.dart';
 /// It prefers a real coastline mask parsed from simplified Natural Earth data
 /// and falls back to coarse continent heuristics if the mask is unavailable.
 class LandMaskProvider {
-  static const String _landMaskAssetPath = 'assets/data/ne_110m_land.geojson';
+  static const String _landMaskAssetPath = 'assets/data/ne_50m_land.geojson';
   static final Logger _logger = Logger('LandMaskProvider');
 
   static final List<_LandPolygon> _sharedLandPolygons = [];
