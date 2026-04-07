@@ -201,6 +201,12 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
       if (!_isConfigured) return _currentStatus;
     }
 
+    // Guard billing availability.
+    final canPay = await _canMakePaymentsSafely();
+    if (!canPay) {
+      return _publishError('Purchases are unavailable on this device.');
+    }
+
     try {
       final snapshot = await _client.purchasePackage(packageId: packageId);
       return _publish(_toStatus(snapshot));
@@ -215,6 +221,13 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
     if (!_isConfigured) {
       await initialize();
       if (!_isConfigured) return SubscriptionPaywallResult.notPresented;
+    }
+
+    // Guard billing availability.
+    final canPay = await _canMakePaymentsSafely();
+    if (!canPay) {
+      _publishError('Purchases are unavailable on this device.');
+      return SubscriptionPaywallResult.notPresented;
     }
 
     try {
@@ -313,6 +326,15 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
       error: message,
     );
     return _publish(status, persist: false);
+  }
+
+  Future<bool> _canMakePaymentsSafely() async {
+    try {
+      return await _client.canMakePayments();
+    } catch (e) {
+      _logger.error('Failed to check billing availability: $e');
+      return false;
+    }
   }
 }
 

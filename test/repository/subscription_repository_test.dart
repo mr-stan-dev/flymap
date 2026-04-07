@@ -191,6 +191,28 @@ void main() {
       expect(repository.currentStatus.isPro, isTrue);
     });
 
+    test('paywall is not presented when billing is unavailable', () async {
+      await repository.initialize();
+      client.canMakePaymentsValue = false;
+
+      final result = await repository.presentPaywallIfNeeded();
+
+      expect(result, SubscriptionPaywallResult.notPresented);
+      expect(client.presentPaywallCalls, 0);
+      expect(repository.currentStatus.error, isNotEmpty);
+    });
+
+    test('purchase is blocked when billing is unavailable', () async {
+      await repository.initialize();
+      client.canMakePaymentsValue = false;
+
+      final status = await repository.purchasePackage(packageId: 'monthly');
+
+      expect(status.isPro, isFalse);
+      expect(status.error, isNotEmpty);
+      expect(client.purchaseCalls, 0);
+    });
+
     test('loads products ordered by configured package IDs', () async {
       client.products = const [
         RevenueCatProductSnapshot(
@@ -247,8 +269,11 @@ class _FakeRevenueCatClient implements RevenueCatClient {
   final _controller = StreamController<RevenueCatCustomerSnapshot>.broadcast();
 
   int configureCalls = 0;
+  int presentPaywallCalls = 0;
+  int purchaseCalls = 0;
   bool throwOnConfigure = false;
   bool throwOnGetCustomerInfo = false;
+  bool canMakePaymentsValue = true;
   RevenueCatCustomerSnapshot getCustomerInfoResult =
       const RevenueCatCustomerSnapshot(entitlements: {});
   RevenueCatCustomerSnapshot restoreResult = const RevenueCatCustomerSnapshot(
@@ -287,7 +312,13 @@ class _FakeRevenueCatClient implements RevenueCatClient {
   Future<SubscriptionPaywallResult> presentPaywallIfNeeded({
     required String entitlementId,
   }) async {
+    presentPaywallCalls++;
     return paywallResult;
+  }
+
+  @override
+  Future<bool> canMakePayments() async {
+    return canMakePaymentsValue;
   }
 
   @override
@@ -302,6 +333,7 @@ class _FakeRevenueCatClient implements RevenueCatClient {
   Future<RevenueCatCustomerSnapshot> purchasePackage({
     required String packageId,
   }) async {
+    purchaseCalls++;
     return getCustomerInfoResult;
   }
 

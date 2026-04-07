@@ -69,6 +69,8 @@ abstract class RevenueCatClient {
     required String packageId,
   });
 
+  Future<bool> canMakePayments();
+
   Future<SubscriptionPaywallResult> presentPaywallIfNeeded({
     required String entitlementId,
   });
@@ -157,6 +159,11 @@ class PurchasesRevenueCatClient implements RevenueCatClient {
 
     final result = await Purchases.purchase(PurchaseParams.package(package));
     return _mapCustomerInfo(result.customerInfo);
+  }
+
+  @override
+  Future<bool> canMakePayments() async {
+    return Purchases.canMakePayments();
   }
 
   @override
