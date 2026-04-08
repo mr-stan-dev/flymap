@@ -20,7 +20,7 @@ class PoiSelectionConfig {
 
   /// Soft caps to keep one type from dominating the map.
   static const int basicSoftCapPerType = 4;
-  static const int proSoftCapPerType = 25;
+  static const int proSoftCapPerType = 40;
 
   static const int basicPrefetchLimit = 1200;
   static const int proPrefetchLimit = 3000;

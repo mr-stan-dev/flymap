@@ -43,6 +43,31 @@ class GetFlightPOIUseCase {
 
   int _rankScore(RoutePoi poi) => poi.sitelinks + _typeInterestBoost(poi.type);
 
+  // Small extra preference during final fill pass so dense mountain regions
+  // (e.g. Alps) are less likely to be outcompeted by low-signal sparse areas.
+  static int _fillNatureBoost(FlightPoiType type) => switch (type) {
+    FlightPoiType.mountain => 80,
+    FlightPoiType.glacier => 60,
+    FlightPoiType.pass => 40,
+    _ => 0,
+  };
+
+  static bool _isMountainFamily(FlightPoiType type) =>
+      type == FlightPoiType.mountain ||
+      type == FlightPoiType.glacier ||
+      type == FlightPoiType.pass;
+
+  static int _segmentMountainDensityBonus({
+    required FlightPoiType type,
+    required int mountainFamilyCountInSegment,
+  }) {
+    if (!_isMountainFamily(type) || mountainFamilyCountInSegment < 4) {
+      return 0;
+    }
+    // Dense mountain segments should favor highest-ranked mountain-family POIs.
+    return math.min(mountainFamilyCountInSegment, 20) * 12;
+  }
+
   Future<List<RoutePoiSummary>> call({
     required FlightRoute route,
     required MapDetailLevel mapDetail,
@@ -182,10 +207,33 @@ class GetFlightPOIUseCase {
       if (selectedQids.contains(item.poi.qid)) continue;
       segments[item.segmentIndex].add(item);
     }
+
+    final segmentMountainFamilyCounts = List<int>.generate(
+      segmentCount,
+      (i) => segments[i]
+          .where((entry) => _isMountainFamily(entry.poi.type))
+          .length,
+      growable: false,
+    );
+
     // Fix 1: Sort each segment bucket by composite rank score.
-    for (final list in segments) {
+    for (var i = 0; i < segments.length; i++) {
+      final list = segments[i];
+      final mountainFamilyCount = segmentMountainFamilyCounts[i];
       list.sort((a, b) {
-        final scoreDiff = _rankScore(b.poi).compareTo(_rankScore(a.poi));
+        final aScore =
+            _rankScore(a.poi) +
+            _segmentMountainDensityBonus(
+              type: a.poi.type,
+              mountainFamilyCountInSegment: mountainFamilyCount,
+            );
+        final bScore =
+            _rankScore(b.poi) +
+            _segmentMountainDensityBonus(
+              type: b.poi.type,
+              mountainFamilyCountInSegment: mountainFamilyCount,
+            );
+        final scoreDiff = bScore.compareTo(aScore);
         if (scoreDiff != 0) return scoreDiff;
         return a.poi.qid.compareTo(b.poi.qid);
       });
@@ -281,7 +329,23 @@ class GetFlightPOIUseCase {
         segmentSelectedCounts[b.segmentIndex],
       );
       if (segmentCountDiff != 0) return segmentCountDiff;
-      final scoreDiff = _rankScore(b.poi).compareTo(_rankScore(a.poi));
+      final aFillScore =
+          _rankScore(a.poi) +
+          _fillNatureBoost(a.poi.type) +
+          _segmentMountainDensityBonus(
+            type: a.poi.type,
+            mountainFamilyCountInSegment: segmentMountainFamilyCounts[a
+                .segmentIndex],
+          );
+      final bFillScore =
+          _rankScore(b.poi) +
+          _fillNatureBoost(b.poi.type) +
+          _segmentMountainDensityBonus(
+            type: b.poi.type,
+            mountainFamilyCountInSegment: segmentMountainFamilyCounts[b
+                .segmentIndex],
+          );
+      final scoreDiff = bFillScore.compareTo(aFillScore);
       if (scoreDiff != 0) return scoreDiff;
       if (a.segmentIndex != b.segmentIndex) {
         return a.segmentIndex.compareTo(b.segmentIndex);
