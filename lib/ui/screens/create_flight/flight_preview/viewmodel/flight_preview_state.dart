@@ -157,12 +157,14 @@ class FlightPreviewState extends Equatable {
     required this.downloadErrorMessage,
   });
 
-  factory FlightPreviewState.initial() {
-    return const FlightPreviewState(
+  factory FlightPreviewState.initial({
+    MapDetailLevel selectedMapDetailLevel = MapDetailLevel.basic,
+  }) {
+    return FlightPreviewState(
       step: CreateFlightStep.mapPreview,
       flightRoute: null,
       flightInfo: FlightInfo.empty,
-      selectedMapDetailLevel: MapDetailLevel.basic,
+      selectedMapDetailLevel: selectedMapDetailLevel,
       articleCandidates: [],
       selectedArticleUrls: [],
       isWikiSuggestionsLoading: false,

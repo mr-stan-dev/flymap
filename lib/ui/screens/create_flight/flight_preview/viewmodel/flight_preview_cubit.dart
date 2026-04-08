@@ -50,7 +50,13 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     bool autoPrepare = true,
   }) : _analytics = analytics,
        _crashlytics = crashlytics,
-       super(FlightPreviewState.initial()) {
+       super(
+         FlightPreviewState.initial(
+           selectedMapDetailLevel: _defaultMapDetailLevel(
+             subscriptionRepository,
+           ),
+         ),
+       ) {
     _previewPreparationDelegate = PreviewPreparationDelegate(
       this,
       connectivityChecker: connectivityChecker,
@@ -120,6 +126,14 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   }
 
   void _emitState(FlightPreviewState nextState) => emit(nextState);
+
+  static MapDetailLevel _defaultMapDetailLevel(
+    SubscriptionRepository subscriptionRepository,
+  ) {
+    return subscriptionRepository.currentStatus.isPro
+        ? MapDetailLevel.pro
+        : MapDetailLevel.basic;
+  }
 
   @override
   Future<void> close() {

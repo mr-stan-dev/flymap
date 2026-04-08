@@ -149,6 +149,31 @@ void main() {
       expect(cubit.state.selectedMapDetailLevel, MapDetailLevel.basic);
     });
 
+    test('default selected map detail level is pro for pro users', () async {
+      final proSubscriptionRepository = _FakeSubscriptionRepository()
+        ..isPro = true;
+      final route = _route();
+      final proCubit = _TestFlightPreviewCubit(
+        departure: route.departure,
+        arrival: route.arrival,
+        connectivityChecker: _FakeConnectivityChecker(),
+        routeProvider: _FakeRouteProvider(),
+        downloadMapUseCase: _FakeDownloadMapUseCase(),
+        downloadPoiSummariesUseCase: _FakeDownloadPoiSummariesUseCase(),
+        downloadWikipediaArticlesUseCase: _FakeDownloadWikipediaArticlesUseCase(),
+        getFlightInfoUseCase: _FakeGetFlightInfoUseCase(),
+        getFlightPOIUseCase: _FakeGetFlightPOIUseCase(),
+        flightRepository: _FakeFlightRepository(),
+        subscriptionRepository: proSubscriptionRepository,
+        deleteFlightUseCase: _FakeDeleteFlightUseCase(),
+        analytics: _FakeAppAnalytics(),
+        crashlytics: _FakeAppCrashlytics(),
+      );
+      addTearDown(proCubit.close);
+
+      expect(proCubit.state.selectedMapDetailLevel, MapDetailLevel.pro);
+    });
+
     test('selectMapDetailLevel updates state in map preview step', () {
       cubit.setStateForTest(
         cubit.state.copyWith(step: CreateFlightStep.mapPreview),
