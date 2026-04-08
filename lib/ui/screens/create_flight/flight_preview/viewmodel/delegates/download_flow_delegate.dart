@@ -219,6 +219,22 @@ class DownloadFlowDelegate {
           flightId: flightId,
           info: enrichedInfo,
         );
+        final poiFailedCount =
+            (result.failedCount + (!persisted ? 1 : 0))
+                .clamp(0, poiToDownloadCount)
+                .toInt();
+        final poiSucceededCount = poiToDownloadCount - poiFailedCount;
+        unawaited(
+          _cubit._analytics.log(
+            PoiDownloadCompletedEvent(
+              routeLengthKm: routeLengthKm,
+              totalCount: poiToDownloadCount,
+              succeededCount: poiSucceededCount,
+              failedCount: poiFailedCount,
+              isProUser: isPro,
+            ),
+          ),
+        );
         poiHadIssues = result.failedCount > 0 || !persisted;
         _cubit._emitState(
           _cubit.state.copyWith(
@@ -237,7 +253,7 @@ class DownloadFlowDelegate {
                     : DownloadSectionStatus.completed,
                 completed: poiToDownloadCount,
                 total: poiToDownloadCount,
-                failed: result.failedCount + (!persisted ? 1 : 0),
+                failed: poiFailedCount,
                 message: poiHadIssues
                     ? t.createFlight.downloading.completedWithIssues
                     : t.createFlight.downloading.completed,
@@ -258,6 +274,17 @@ class DownloadFlowDelegate {
         );
         if (_downloadCancelled || _cubit.isClosed) return;
         poiHadIssues = true;
+        unawaited(
+          _cubit._analytics.log(
+            PoiDownloadCompletedEvent(
+              routeLengthKm: routeLengthKm,
+              totalCount: poiToDownloadCount,
+              succeededCount: 0,
+              failedCount: poiToDownloadCount,
+              isProUser: isPro,
+            ),
+          ),
+        );
         _cubit._emitState(
           _cubit.state.copyWith(
             isDownloading: true,

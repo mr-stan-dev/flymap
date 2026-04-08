@@ -94,7 +94,7 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
   }
 
   Future<SubscriptionPaywallResult> presentPaywallFromOverviewPoi() async {
-    return _presentPaywallIfNeeded(source: PaywallSource.overviewPoi);
+    return _presentPaywallIfNeeded(source: PaywallSource.poiSection);
   }
 
   Future<SubscriptionPaywallResult>

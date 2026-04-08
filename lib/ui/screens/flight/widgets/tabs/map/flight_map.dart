@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/data/local/mappers/flight_map_mapper.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/tiles_downloader/mbtiles_validator.dart';
@@ -61,6 +62,7 @@ class _FlightMapState extends State<FlightMap> {
   int _poiSignature = 0;
   bool _isPoiDialogVisible = false;
   bool _featureTapListenerAttached = false;
+  late final AppAnalytics _analytics = GetIt.I.get<AppAnalytics>();
   late final GetPoiWikiPreviewUseCase _wikiPreviewUseCase = GetIt.I
       .get<GetPoiWikiPreviewUseCase>();
   late final ConnectivityChecker _connectivityChecker = GetIt.I
@@ -344,6 +346,15 @@ class _FlightMapState extends State<FlightMap> {
     final typeRaw = (props['type'] ?? '').toString().trim();
     final qid = (props['qid'] ?? '').toString().trim();
     if (name.isEmpty) return;
+
+    unawaited(
+      _analytics.log(
+        PoiMarkerTappedEvent(
+          source: PoiMarkerTapSource.flightMap,
+          poiType: typeRaw,
+        ),
+      ),
+    );
 
     // Use already-downloaded lead section when available — no network needed.
     final storedPoi = qid.isNotEmpty

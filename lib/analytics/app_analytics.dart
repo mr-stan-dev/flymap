@@ -6,6 +6,8 @@ export 'package:flymap/analytics/events/download_completed_event.dart';
 export 'package:flymap/analytics/events/download_failed_event.dart';
 export 'package:flymap/analytics/events/download_started_event.dart';
 export 'package:flymap/analytics/events/paywall_result_event.dart';
+export 'package:flymap/analytics/events/poi_download_completed_event.dart';
+export 'package:flymap/analytics/events/poi_marker_tapped_event.dart';
 export 'package:flymap/analytics/events/search_route_not_supported_event.dart';
 export 'package:flymap/analytics/events/search_route_prepared_event.dart';
 

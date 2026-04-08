@@ -168,6 +168,17 @@ void main() {
         expect(event.result, SubscriptionPaywallResult.cancelled);
       },
     );
+
+    test('logs POI section paywall source', () async {
+      repository.paywallResult = SubscriptionPaywallResult.cancelled;
+
+      final result = await cubit.presentPaywallFromOverviewPoi();
+
+      expect(result, SubscriptionPaywallResult.cancelled);
+      final event = analytics.events.single as PaywallResultEvent;
+      expect(event.source, PaywallSource.poiSection);
+      expect(event.result, SubscriptionPaywallResult.cancelled);
+    });
   });
 }
 

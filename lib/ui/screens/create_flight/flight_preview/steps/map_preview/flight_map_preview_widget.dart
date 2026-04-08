@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/logger.dart';
@@ -41,6 +42,7 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
   int _poiSignature = 0;
   bool _isPoiDialogVisible = false;
   bool _featureTapListenerAttached = false;
+  late final AppAnalytics _analytics = GetIt.I.get<AppAnalytics>();
   late final GetPoiWikiPreviewUseCase _wikiPreviewUseCase = GetIt.I
       .get<GetPoiWikiPreviewUseCase>();
 
@@ -205,6 +207,15 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
       'POI feature resolved name="$name" type="$typeRaw" qid="$qid" rawType=${feature.runtimeType}',
     );
     if (name.isEmpty || !mounted) return;
+
+    unawaited(
+      _analytics.log(
+        PoiMarkerTappedEvent(
+          source: PoiMarkerTapSource.mapPreview,
+          poiType: typeRaw,
+        ),
+      ),
+    );
 
     _isPoiDialogVisible = true;
     await showPoiPreviewDialog(
