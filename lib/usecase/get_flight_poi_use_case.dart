@@ -5,7 +5,6 @@ import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/entity/map_detail_level.dart';
 import 'package:flymap/entity/route_poi.dart';
 import 'package:flymap/entity/route_poi_summary.dart';
-import 'package:flymap/logger.dart';
 import 'package:flymap/repository/flight_poi_repository.dart';
 import 'package:flymap/usecase/poi_selection_config.dart';
 import 'package:latlong2/latlong.dart';
@@ -14,7 +13,6 @@ class GetFlightPOIUseCase {
   GetFlightPOIUseCase({required FlightPOIRepository repository})
     : _repository = repository;
 
-  final Logger _logger = const Logger('GetFlightPOIUseCase');
   final FlightPOIRepository _repository;
 
   // Fix 1: Per-type visual interest boost added to sitelinks before ranking.
@@ -56,19 +54,11 @@ class GetFlightPOIUseCase {
     final cityCap = PoiSelectionConfig.cityCap(mapDetail);
     final softCapPerType = PoiSelectionConfig.softCapPerType(mapDetail);
     final minCitySegmentGap = PoiSelectionConfig.minCitySegmentGap(mapDetail);
-
-    _logger.log(
-      'Load POIs for route=${route.routeCode} distanceKm=${route.distanceInKm.toStringAsFixed(1)} '
-      'mapDetail=${mapDetail.name} maxPois=$maxPois prefetch=$prefetchLimit '
-      'segments=$segmentCount cityCap=$cityCap softCapPerType=$softCapPerType '
-      'minCityGap=$minCitySegmentGap includeAllVolcanoes=$includeAllVolcanoes',
-    );
     final candidates = await _repository.getRoutePois(
       route: route,
       prefetchLimit: prefetchLimit,
     );
     if (candidates.isEmpty) {
-      _logger.log('No POI candidates from repository');
       return const [];
     }
 
@@ -90,18 +80,6 @@ class GetFlightPOIUseCase {
           ),
         )
         .toList(growable: false);
-
-    final sample = mapped
-        .take(6)
-        .map(
-          (poi) =>
-              '${poi.name}/${poi.type.rawValue}@${(poi.routeProgress ?? 0).toStringAsFixed(2)}',
-        )
-        .join(', ');
-    _logger.log(
-      'Mapped POIs for UI selected=${mapped.length}/${candidates.length}'
-      '${sample.isEmpty ? '' : ' sample=[$sample]'}',
-    );
     return mapped;
   }
 
@@ -127,21 +105,6 @@ class GetFlightPOIUseCase {
     final deduped = uniqueByQid.values
         .where((p) => p.type != FlightPoiType.unknown)
         .toList(growable: false);
-
-    final rankedCandidatesForLog = [...deduped]..sort((a, b) {
-      final scoreDiff = _rankScore(b).compareTo(_rankScore(a));
-      if (scoreDiff != 0) return scoreDiff;
-      final sitelinksDiff = b.sitelinks.compareTo(a.sitelinks);
-      if (sitelinksDiff != 0) return sitelinksDiff;
-      return a.qid.compareTo(b.qid);
-    });
-
-    for (final poi in rankedCandidatesForLog) {
-      _logger.log(
-        'POI candidate name="${poi.name}" qid=${poi.qid} type=${poi.type.rawValue} '
-        'sitelinks=${poi.sitelinks} score=${_rankScore(poi)}',
-      );
-    }
 
     if (deduped.isEmpty || route.waypoints.length < 2 || maxPois <= 0) {
       return const [];
@@ -205,7 +168,6 @@ class GetFlightPOIUseCase {
           ifAbsent: () => 1,
         );
       }
-      _logger.log('Pro volcano include-all selected=${volcanoes.length}');
       if (selected.length >= maxPois) {
         return selected;
       }
@@ -303,21 +265,6 @@ class GetFlightPOIUseCase {
     }
 
     if (selected.length >= maxPois) {
-      final rankedSelectedForLog = [...selected]..sort((a, b) {
-        final scoreDiff = _rankScore(b.poi).compareTo(_rankScore(a.poi));
-        if (scoreDiff != 0) return scoreDiff;
-        final sitelinksDiff = b.poi.sitelinks.compareTo(a.poi.sitelinks);
-        if (sitelinksDiff != 0) return sitelinksDiff;
-        return a.poi.qid.compareTo(b.poi.qid);
-      });
-
-      for (final item in rankedSelectedForLog) {
-        _logger.log(
-          'POI selected name="${item.poi.name}" qid=${item.poi.qid} '
-          'type=${item.poi.type.rawValue} score=${_rankScore(item.poi)} '
-          'segment=${item.segmentIndex} progress=${item.routeProgress.toStringAsFixed(3)}',
-        );
-      }
       return selected;
     }
 
@@ -351,22 +298,6 @@ class GetFlightPOIUseCase {
     for (final item in remaining) {
       if (selected.length >= maxPois) break;
       trySelect(item, enforceSoftCap: false);
-    }
-
-    final rankedSelectedForLog = [...selected]..sort((a, b) {
-      final scoreDiff = _rankScore(b.poi).compareTo(_rankScore(a.poi));
-      if (scoreDiff != 0) return scoreDiff;
-      final sitelinksDiff = b.poi.sitelinks.compareTo(a.poi.sitelinks);
-      if (sitelinksDiff != 0) return sitelinksDiff;
-      return a.poi.qid.compareTo(b.poi.qid);
-    });
-
-    for (final item in rankedSelectedForLog) {
-      _logger.log(
-        'POI selected name="${item.poi.name}" qid=${item.poi.qid} '
-        'type=${item.poi.type.rawValue} score=${_rankScore(item.poi)} '
-        'segment=${item.segmentIndex} progress=${item.routeProgress.toStringAsFixed(3)}',
-      );
     }
 
     return selected;
