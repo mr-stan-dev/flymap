@@ -30,12 +30,8 @@ class RouteCorridorProvider {
       'Last route point: ${route.last.latitude}, ${route.last.longitude}',
     );
 
-    // Extend the route at both ends if buffer radius is specified
-    final bufferRadiusKm = widthKm / 2;
-    List<LatLng> extendedRoute = _extendRouteAtEnds(route, bufferRadiusKm);
-
-    // Generate main corridor using the extended route
-    final finalCorridor = _generateMainCorridor(extendedRoute, widthKm);
+    // Rounded caps already handle corridor ends, so we do not extend the route.
+    final finalCorridor = _generateMainCorridor(route, widthKm);
 
     _logger.log('Final corridor points: ${finalCorridor.length}');
 
@@ -129,13 +125,39 @@ class RouteCorridorProvider {
       rightPoints.add(rightPoint);
     }
 
-    // Create polygon: left points + right points in reverse order
-    List<LatLng> corridor = [];
-    corridor.addAll(leftPoints);
-    corridor.addAll(rightPoints.reversed);
+    // Build corridor with rounded caps to avoid square ends near departure/arrival.
+    final capRadiusKm = widthKm / 2;
+    final startForwardBearing = _calculateBearing(route[0], route[1]);
+    final endForwardBearing = _calculateBearing(
+      route[route.length - 2],
+      route[route.length - 1],
+    );
+    final startCap = _buildRoundedCap(
+      center: route.first,
+      fromPoint: rightPoints.first,
+      toPoint: leftPoints.first,
+      radiusKm: capRadiusKm,
+      preferredMidBearing: _normalizeBearing(startForwardBearing + 180),
+    );
+    final endCap = _buildRoundedCap(
+      center: route.last,
+      fromPoint: leftPoints.last,
+      toPoint: rightPoints.last,
+      radiusKm: capRadiusKm,
+      preferredMidBearing: endForwardBearing,
+    );
 
-    // Smoothly close the polygon to avoid sharp corners
-    // Close the polygon by adding the first point at the end
+    List<LatLng> corridor = [];
+    corridor.addAll(startCap);
+    if (leftPoints.length > 2) {
+      corridor.addAll(leftPoints.sublist(1, leftPoints.length - 1));
+    }
+    corridor.addAll(endCap);
+    if (rightPoints.length > 2) {
+      corridor.addAll(rightPoints.sublist(1, rightPoints.length - 1).reversed);
+    }
+
+    // Close the polygon by adding the first point at the end.
     if (corridor.isNotEmpty &&
         (corridor.first.latitude != corridor.last.latitude ||
             corridor.first.longitude != corridor.last.longitude)) {
@@ -231,6 +253,63 @@ class RouteCorridorProvider {
     return offset;
   }
 
+  /// Build a smooth arc cap between two corridor edge points around [center].
+  ///
+  /// Chooses the arc whose midpoint is closest to [preferredMidBearing].
+  List<LatLng> _buildRoundedCap({
+    required LatLng center,
+    required LatLng fromPoint,
+    required LatLng toPoint,
+    required double radiusKm,
+    required double preferredMidBearing,
+    int segments = 16,
+  }) {
+    final startBearing = _calculateBearing(center, fromPoint);
+    final endBearing = _calculateBearing(center, toPoint);
+
+    final clockwiseDelta = _normalizeBearing(endBearing - startBearing);
+    final counterClockwiseDelta = clockwiseDelta == 0
+        ? -360.0
+        : clockwiseDelta - 360.0;
+
+    final clockwiseMid = _normalizeBearing(startBearing + clockwiseDelta / 2);
+    final counterClockwiseMid = _normalizeBearing(
+      startBearing + counterClockwiseDelta / 2,
+    );
+
+    final clockwiseDistance = _bearingDistance(
+      clockwiseMid,
+      preferredMidBearing,
+    );
+    final counterClockwiseDistance = _bearingDistance(
+      counterClockwiseMid,
+      preferredMidBearing,
+    );
+
+    final selectedDelta = clockwiseDistance <= counterClockwiseDistance
+        ? clockwiseDelta
+        : counterClockwiseDelta;
+
+    final stepCount = segments < 1 ? 1 : segments;
+    final arc = <LatLng>[];
+    for (int i = 0; i <= stepCount; i++) {
+      final t = i / stepCount;
+      final bearing = _normalizeBearing(startBearing + selectedDelta * t);
+      arc.add(_calculatePointAtDistance(center, radiusKm, bearing));
+    }
+    return arc;
+  }
+
+  double _normalizeBearing(double bearing) {
+    final normalized = bearing % 360;
+    return normalized < 0 ? normalized + 360 : normalized;
+  }
+
+  double _bearingDistance(double a, double b) {
+    final diff = (_normalizeBearing(a - b)).abs();
+    return diff > 180 ? 360 - diff : diff;
+  }
+
   /// Calculate bearing between two points
   ///
   /// [start] - Starting point
@@ -273,39 +352,6 @@ class RouteCorridorProvider {
     double arrivalBufferArea = pi * bufferRadiusKm * bufferRadiusKm;
 
     return mainArea + departureBufferArea + arrivalBufferArea;
-  }
-
-  /// Extend the route at both ends by the specified distance
-  List<LatLng> _extendRouteAtEnds(List<LatLng> route, double extensionKm) {
-    if (route.length < 2) return route;
-
-    List<LatLng> extendedRoute = [];
-
-    // Extend at the departure end (first point)
-    final departureBearing = _calculateBearing(route[0], route[1]);
-    final departureExtension = _calculatePointAtDistance(
-      route[0],
-      extensionKm,
-      departureBearing + 180, // Opposite direction
-    );
-    extendedRoute.add(departureExtension);
-
-    // Add all original route points
-    extendedRoute.addAll(route);
-
-    // Extend at the arrival end (last point)
-    final arrivalBearing = _calculateBearing(
-      route[route.length - 2],
-      route[route.length - 1],
-    );
-    final arrivalExtension = _calculatePointAtDistance(
-      route[route.length - 1],
-      extensionKm,
-      arrivalBearing, // Same direction
-    );
-    extendedRoute.add(arrivalExtension);
-
-    return extendedRoute;
   }
 
   /// Calculate distance between two points in kilometers
