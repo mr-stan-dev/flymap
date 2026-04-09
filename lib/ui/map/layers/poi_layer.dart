@@ -97,23 +97,23 @@ class PoiLayer extends MapLayer {
         circleColor: _buildTypeColorExpression(),
         circleStrokeWidth: 1.2,
         circleStrokeColor: Colors.white.toHexStringRGB(),
+        // iOS requires ["zoom"] to be used only as input to top-level
+        // "step"/"interpolate" expressions.
         circleOpacity: <dynamic>[
-          'case',
+          'step',
+          ['zoom'],
+          0.95,
+          7,
           [
-            'all',
-            [
-              '>=',
-              ['zoom'],
-              7,
-            ],
+            'case',
             [
               '==',
               ['get', 'has_icon'],
               true,
             ],
+            0.0,
+            0.95,
           ],
-          0.0,
-          0.95,
         ],
       ),
     );
