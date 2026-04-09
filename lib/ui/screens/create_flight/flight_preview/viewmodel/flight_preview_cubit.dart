@@ -125,7 +125,11 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     await _prefetchLocalPois(route, mapDetail: MapDetailLevel.pro);
   }
 
-  void _emitState(FlightPreviewState nextState) => emit(nextState);
+  void _emitState(FlightPreviewState nextState) {
+    // Async delegate callbacks may complete after the cubit is disposed.
+    if (isClosed) return;
+    emit(nextState);
+  }
 
   static MapDetailLevel _defaultMapDetailLevel(
     SubscriptionRepository subscriptionRepository,
