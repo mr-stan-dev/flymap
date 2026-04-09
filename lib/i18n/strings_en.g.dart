@@ -261,8 +261,62 @@ class TranslationsSettingsEn {
 	/// en: 'Leave a review on the store'
 	String get rateUsSubtitle => 'Leave a review on the store';
 
+	/// en: 'Leave a Feedback'
+	String get leaveFeedback => 'Leave a Feedback';
+
+	/// en: 'Share your thoughts to help us improve'
+	String get leaveFeedbackSubtitle => 'Share your thoughts to help us improve';
+
 	/// en: 'Could not open store page'
 	String get couldNotOpenStorePage => 'Could not open store page';
+
+	/// en: 'Do you like the app?'
+	String get rateDialogTitle => 'Do you like the app?';
+
+	/// en: 'We work hard to make every flight more enjoyable, and your feedback really helps us improve.'
+	String get rateDialogBody => 'We work hard to make every flight more enjoyable, and your feedback really helps us improve.';
+
+	/// en: 'Yes'
+	String get rateDialogYes => 'Yes';
+
+	/// en: 'No'
+	String get rateDialogNo => 'No';
+
+	/// en: 'Leave a Feedback'
+	String get feedbackTitle => 'Leave a Feedback';
+
+	/// en: 'Help us to make Flymap better'
+	String get feedbackBody => 'Help us to make Flymap better';
+
+	/// en: 'Feedback type'
+	String get feedbackCategoryTitle => 'Feedback type';
+
+	/// en: 'General'
+	String get feedbackCategoryGeneral => 'General';
+
+	/// en: 'Feature request'
+	String get feedbackCategoryFeatureRequest => 'Feature request';
+
+	/// en: 'Bug report'
+	String get feedbackCategoryBugReport => 'Bug report';
+
+	/// en: 'Share your feedback...'
+	String get feedbackHint => 'Share your feedback...';
+
+	/// en: 'Email (optional)'
+	String get feedbackEmailHint => 'Email (optional)';
+
+	/// en: 'Please enter a valid email or leave it empty.'
+	String get feedbackEmailInvalid => 'Please enter a valid email or leave it empty.';
+
+	/// en: 'Send'
+	String get feedbackSend => 'Send';
+
+	/// en: 'Thanks for sharing your feedback!'
+	String get feedbackThanks => 'Thanks for sharing your feedback!';
+
+	/// en: 'Couldn't send feedback. Please try again.'
+	String get feedbackSendFailed => 'Couldn\'t send feedback. Please try again.';
 
 	/// en: 'Flymap Pro'
 	String get proBannerTitle => 'Flymap Pro';
@@ -1353,7 +1407,25 @@ extension on Translations {
 			'settings.couldNotOpenUrl' => ({required Object url}) => 'Could not open ${url}',
 			'settings.rateUs' => 'Rate us',
 			'settings.rateUsSubtitle' => 'Leave a review on the store',
+			'settings.leaveFeedback' => 'Leave a Feedback',
+			'settings.leaveFeedbackSubtitle' => 'Share your thoughts to help us improve',
 			'settings.couldNotOpenStorePage' => 'Could not open store page',
+			'settings.rateDialogTitle' => 'Do you like the app?',
+			'settings.rateDialogBody' => 'We work hard to make every flight more enjoyable, and your feedback really helps us improve.',
+			'settings.rateDialogYes' => 'Yes',
+			'settings.rateDialogNo' => 'No',
+			'settings.feedbackTitle' => 'Leave a Feedback',
+			'settings.feedbackBody' => 'Help us to make Flymap better',
+			'settings.feedbackCategoryTitle' => 'Feedback type',
+			'settings.feedbackCategoryGeneral' => 'General',
+			'settings.feedbackCategoryFeatureRequest' => 'Feature request',
+			'settings.feedbackCategoryBugReport' => 'Bug report',
+			'settings.feedbackHint' => 'Share your feedback...',
+			'settings.feedbackEmailHint' => 'Email (optional)',
+			'settings.feedbackEmailInvalid' => 'Please enter a valid email or leave it empty.',
+			'settings.feedbackSend' => 'Send',
+			'settings.feedbackThanks' => 'Thanks for sharing your feedback!',
+			'settings.feedbackSendFailed' => 'Couldn\'t send feedback. Please try again.',
 			'settings.proBannerTitle' => 'Flymap Pro',
 			'settings.proBannerTitleActive' => 'Flymap Pro Active',
 			'settings.proBannerSubtitleActive' => 'Detailed map mode and full offline article bundles unlocked.',

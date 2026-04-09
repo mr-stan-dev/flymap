@@ -8,6 +8,9 @@ import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/entity/map_detail_level.dart';
 import 'package:flymap/i18n/strings.g.dart';
+import 'package:flymap/rating/rate_prompt_policy_service.dart';
+import 'package:flymap/rating/rate_prompt_trigger.dart';
+import 'package:flymap/rating/rate_store_launcher.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
 import 'package:flymap/router/app_router.dart';
@@ -24,6 +27,7 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_download_completion.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
+import 'package:flymap/ui/widgets/rate_app_dialog.dart';
 import 'package:flymap/usecase/download_map_use_case.dart';
 import 'package:flymap/usecase/download_poi_summaries_use_case.dart';
 import 'package:flymap/usecase/download_wikipedia_articles_use_case.dart';
@@ -73,6 +77,7 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
   int _previousStepIndex = 0;
   double _stepEnterFrom = 0.0;
   bool _showDownloadSuccess = false;
+  bool _downloadCompletionHandled = false;
 
   @override
   Widget build(BuildContext context) {
@@ -107,15 +112,9 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
           ).showSnackBar(SnackBar(content: Text(state.downloadErrorMessage!)));
         }
 
-        if (state.downloadDone) {
-          setState(() {
-            _showDownloadSuccess = true;
-          });
-          Future<void>.delayed(const Duration(milliseconds: 900), () {
-            if (!mounted) return;
-            homeRefreshNotifier.value = true;
-            AppRouter.goHome(this.context);
-          });
+        if (state.downloadDone && !_downloadCompletionHandled) {
+          _downloadCompletionHandled = true;
+          unawaited(_handleDownloadCompleted());
         }
       },
       builder: (context, state) {
@@ -382,6 +381,65 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
     if (shouldPop && context.mounted) {
       Navigator.of(context).pop();
     }
+  }
+
+  Future<void> _handleDownloadCompleted() async {
+    if (!mounted) return;
+    setState(() {
+      _showDownloadSuccess = true;
+    });
+
+    // Keep the success state visible first, then ask for feedback
+    // right before the home navigation.
+    await Future<void>.delayed(const Duration(milliseconds: 900));
+    if (!mounted) return;
+
+    await _maybeShowRateDialog();
+    if (!mounted) return;
+
+    homeRefreshNotifier.value = true;
+    AppRouter.goHome(context);
+  }
+
+  Future<void> _maybeShowRateDialog() async {
+    final policy = GetIt.I.get<RatePromptPolicyService>();
+    final shouldShow = await policy.registerTriggerAndShouldShow(
+      RatePromptTrigger.flightMapDownloadSuccess,
+    );
+    if (!shouldShow || !mounted) return;
+
+    final likedApp = await RateAppDialog.show(context);
+    final action = likedApp == true
+        ? 'yes'
+        : likedApp == false
+        ? 'no'
+        : 'dismiss';
+    unawaited(
+      GetIt.I.get<AppAnalytics>().log(
+        RatePromptActionEvent(
+          source: RatePromptTrigger.flightMapDownloadSuccess.name,
+          action: action,
+        ),
+      ),
+    );
+    if (likedApp == true) {
+      await policy.recordAccepted();
+      final opened = await GetIt.I.get<RateStoreLauncher>().openStoreListing();
+      if (!opened && mounted) {
+        _showSnackBar(context, context.t.settings.couldNotOpenStorePage);
+      }
+      return;
+    }
+
+    await policy.recordDeclined();
+    if (!mounted) return;
+    final submitted = await AppRouter.goToFeedback(
+      context,
+      source: 'rate_prompt_declined',
+      isPro: context.read<SubscriptionCubit>().state.isPro,
+    );
+    if (!mounted || !submitted) return;
+    _showSnackBar(context, context.t.settings.feedbackThanks);
   }
 
   int _stepIndex(CreateFlightStep step) {

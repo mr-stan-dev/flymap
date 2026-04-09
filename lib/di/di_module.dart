@@ -2,6 +2,7 @@ import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/analytics/app_analytics_initializer.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics_initializer.dart';
+import 'package:flymap/data/api/feedback_api.dart';
 import 'package:flymap/data/api/flight_info_api.dart';
 import 'package:flymap/data/api/flight_info_api_mapper.dart';
 import 'package:flymap/data/local/airports_database.dart';
@@ -16,6 +17,9 @@ import 'package:flymap/data/route/great_circle_route_provider.dart';
 import 'package:flymap/data/wiki/wikipedia_article_client.dart';
 import 'package:flymap/data/wiki/wikimedia_api_client.dart';
 import 'package:flymap/data/wiki/wikidata_wikipedia_preview_repository.dart';
+import 'package:flymap/rating/rate_prompt_policy_service.dart';
+import 'package:flymap/rating/rate_prompt_repository.dart';
+import 'package:flymap/rating/rate_store_launcher.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/repository/flight_poi_repository.dart';
 import 'package:flymap/repository/flight_repository.dart';
@@ -32,6 +36,7 @@ import 'package:flymap/usecase/download_wikipedia_articles_use_case.dart';
 import 'package:flymap/usecase/get_flight_info_use_case.dart';
 import 'package:flymap/usecase/get_flight_poi_use_case.dart';
 import 'package:flymap/usecase/get_poi_wiki_preview_use_case.dart';
+import 'package:flymap/usecase/submit_feedback_use_case.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
@@ -80,6 +85,19 @@ class DiModule {
       () => PackageInfoWikimediaUserAgentProvider(),
     );
     i.registerLazySingleton<http.Client>(() => http.Client());
+    i.registerLazySingleton<RatePromptRepository>(
+      () => SharedPrefsRatePromptRepository(),
+    );
+    i.registerLazySingleton<RatePromptPolicyService>(
+      () => DefaultRatePromptPolicyService(repository: i.get()),
+    );
+    i.registerLazySingleton<RateStoreLauncher>(
+      () => DefaultRateStoreLauncher(httpClient: i.get()),
+    );
+    i.registerLazySingleton<FeedbackApi>(() => FeedbackApi());
+    i.registerLazySingleton<SubmitFeedbackUseCase>(
+      () => DefaultSubmitFeedbackUseCase(feedbackApi: i.get()),
+    );
     i.registerLazySingleton<WikimediaApiClient>(
       () => WikimediaApiClient(httpClient: i.get(), userAgentProvider: i.get()),
     );

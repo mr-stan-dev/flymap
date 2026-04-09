@@ -13,6 +13,7 @@ class SelectionChip extends StatelessWidget {
     this.deleteIcon,
     this.deleteTooltip,
     this.selected = false,
+    this.showCheckmark = true,
     super.key,
   });
 
@@ -23,6 +24,7 @@ class SelectionChip extends StatelessWidget {
   final Widget? deleteIcon;
   final String? deleteTooltip;
   final bool selected;
+  final bool showCheckmark;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +36,7 @@ class SelectionChip extends StatelessWidget {
       onDeleted: onDeleted,
       deleteIcon: deleteIcon,
       deleteButtonTooltipMessage: deleteTooltip,
+      showCheckmark: showCheckmark,
     );
   }
 }

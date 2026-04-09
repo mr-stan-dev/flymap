@@ -6,12 +6,16 @@ import 'package:flymap/ui/screens/about/about_screen.dart';
 import 'package:flymap/ui/screens/create_flight/airport_selection/airport_selection_screen.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_args.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_screen.dart';
+import 'package:flymap/ui/screens/feedback/feedback_screen.dart';
+import 'package:flymap/ui/screens/feedback/feedback_screen_args.dart';
 import 'package:flymap/ui/screens/flight/flight_screen.dart';
 import 'package:flymap/ui/screens/home/home_screen.dart';
 import 'package:flymap/ui/screens/onboarding/onboarding_screen.dart';
 import 'package:flymap/ui/screens/share_flight/share_flight_screen.dart';
 import 'package:flymap/ui/screens/settings/settings_screen.dart';
 import 'package:flymap/ui/screens/subscription/subscription_management_screen.dart';
+import 'package:flymap/usecase/submit_feedback_use_case.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 /// App router configuration using go_router
@@ -22,6 +26,7 @@ class AppRouter {
   static const String flightRoute = '/flight';
   static const String shareFlightRoute = '/share-flight';
   static const String settingsRoute = '/settings';
+  static const String feedbackRoute = '/feedback';
   static const String subscriptionRoute = '/subscription';
   static const String aboutRoute = '/about';
   static const String onboardingRoute = '/onboarding';
@@ -102,6 +107,20 @@ class AppRouter {
           builder: (context, state) => const SettingsScreen(),
         ),
 
+        GoRoute(
+          path: feedbackRoute,
+          name: 'feedback',
+          builder: (context, state) {
+            final args =
+                state.extra as FeedbackScreenArgs? ??
+                const FeedbackScreenArgs(source: 'unknown', isPro: false);
+            return FeedbackScreen(
+              args: args,
+              submitFeedbackUseCase: GetIt.I.get<SubmitFeedbackUseCase>(),
+            );
+          },
+        ),
+
         // Subscription management route
         GoRoute(
           path: subscriptionRoute,
@@ -149,6 +168,19 @@ class AppRouter {
   /// Navigate to settings
   static void goToSettings(BuildContext context) {
     context.push(settingsRoute);
+  }
+
+  /// Navigate to feedback and return true when submitted.
+  static Future<bool> goToFeedback(
+    BuildContext context, {
+    required String source,
+    required bool isPro,
+  }) async {
+    final result = await context.push<bool>(
+      feedbackRoute,
+      extra: FeedbackScreenArgs(source: source, isPro: isPro),
+    );
+    return result ?? false;
   }
 
   /// Navigate to subscription management

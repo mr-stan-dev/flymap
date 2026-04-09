@@ -8,6 +8,7 @@ import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flymap/router/app_router.dart';
 
+import 'widgets/leave_feedback_setting_item.dart';
 import 'widgets/rate_us_setting_item.dart';
 import 'widgets/subscription_top_banner.dart';
 import 'viewmodel/settings_cubit.dart';
@@ -204,6 +205,8 @@ class _SettingsView extends StatelessWidget {
                       );
                     },
                   ),
+                  const Divider(height: 1),
+                  const LeaveFeedbackSettingItem(),
                   const Divider(height: 1),
                   const RateUsSettingItem(),
                 ],
