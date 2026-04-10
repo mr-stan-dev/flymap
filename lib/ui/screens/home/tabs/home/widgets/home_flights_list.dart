@@ -15,12 +15,14 @@ class HomeFlightsList extends StatelessWidget {
     required this.flights,
     required this.selectedSort,
     required this.onSortChanged,
+    required this.onAddFirstFlight,
     super.key,
   });
 
   final List<Flight> flights;
   final HomeFlightsSort selectedSort;
   final Future<void> Function(HomeFlightsSort sort) onSortChanged;
+  final VoidCallback onAddFirstFlight;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +45,7 @@ class HomeFlightsList extends StatelessWidget {
       final colorScheme = Theme.of(context).colorScheme;
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.fromLTRB(18, 22, 18, 18),
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(16),
@@ -56,22 +58,29 @@ class HomeFlightsList extends StatelessWidget {
             Icon(
               Icons.flight_takeoff,
               color: colorScheme.onSurfaceVariant,
-              size: 30,
+              size: 34,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
               context.t.home.noFlightsTitle,
               style: Theme.of(
                 context,
-              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
             Text(
               context.t.home.noFlightsSubtitle,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            SecondaryButton(
+              label: context.t.home.addFirstFlight,
+              leadingIcon: Icons.add,
+              onPressed: onAddFirstFlight,
             ),
           ],
         ),

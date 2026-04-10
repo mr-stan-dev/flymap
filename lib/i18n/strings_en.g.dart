@@ -115,6 +115,9 @@ class TranslationsHomeEn {
 	/// en: 'New flight'
 	String get newFlight => 'New flight';
 
+	/// en: 'Add first flight'
+	String get addFirstFlight => 'Add first flight';
+
 	/// en: 'Welcome to Flymap'
 	String get welcomeTitle => 'Welcome to Flymap';
 
@@ -133,11 +136,11 @@ class TranslationsHomeEn {
 	/// en: 'Flights ($count)'
 	String flightsCount({required Object count}) => 'Flights (${count})';
 
-	/// en: 'No flights yet'
-	String get noFlightsTitle => 'No flights yet';
+	/// en: 'Ready to explore the world from above?'
+	String get noFlightsTitle => 'Ready to explore the world from above?';
 
-	/// en: 'Create your first flight to see route details here.'
-	String get noFlightsSubtitle => 'Create your first flight to see route details here.';
+	/// en: 'Add your first flight and start discovering your next journey.'
+	String get noFlightsSubtitle => 'Add your first flight and start discovering your next journey.';
 
 	/// en: 'Saved offline'
 	String get statusSavedOffline => 'Saved offline';
@@ -1359,14 +1362,15 @@ extension on Translations {
 			'home.loadingFlights' => 'Loading flights...',
 			'home.failedToLoadFlights' => 'Failed to load flights',
 			'home.newFlight' => 'New flight',
+			'home.addFirstFlight' => 'Add first flight',
 			'home.welcomeTitle' => 'Welcome to Flymap',
 			'home.welcomeTitlePro' => 'Welcome to Flymap Pro',
 			'home.welcomeSubtitle' => 'Offline maps for flights',
 			'home.flightsSaved' => 'Flights saved',
 			'home.storageUsed' => 'Storage used',
 			'home.flightsCount' => ({required Object count}) => 'Flights (${count})',
-			'home.noFlightsTitle' => 'No flights yet',
-			'home.noFlightsSubtitle' => 'Create your first flight to see route details here.',
+			'home.noFlightsTitle' => 'Ready to explore the world from above?',
+			'home.noFlightsSubtitle' => 'Add your first flight and start discovering your next journey.',
 			'home.statusSavedOffline' => 'Saved offline',
 			'home.statusNeedsMap' => 'Needs map',
 			'home.flightActions' => 'Flight actions',
