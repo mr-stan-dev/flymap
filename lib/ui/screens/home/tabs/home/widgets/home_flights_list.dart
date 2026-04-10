@@ -157,6 +157,9 @@ class _FlightsSectionHeader extends StatelessWidget {
 class _FlightCard extends StatelessWidget {
   const _FlightCard({required this.flight});
 
+  // TODO: Re-enable share route menu item after we fix android snapshot.
+  static const bool _shareRouteMenuEnabled = false;
+
   final Flight flight;
 
   @override
@@ -210,10 +213,11 @@ class _FlightCard extends StatelessWidget {
                       value: _FlightCardAction.open,
                       child: Text(context.t.home.open),
                     ),
-                    PopupMenuItem(
-                      value: _FlightCardAction.share,
-                      child: Text(context.t.home.shareRoute),
-                    ),
+                    if (_shareRouteMenuEnabled)
+                      PopupMenuItem(
+                        value: _FlightCardAction.share,
+                        child: Text(context.t.home.shareRoute),
+                      ),
                     PopupMenuDivider(),
                     PopupMenuItem(
                       value: _FlightCardAction.delete,
