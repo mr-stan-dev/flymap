@@ -14,6 +14,8 @@
     "title": "Home",
     "aboutTooltip": "About",
     "settingsTooltip": "Settings",
+    "tabFlights": "Flights",
+    "tabLibrary": "Learn",
     "loadingFlights": "Loading flights...",
     "failedToLoadFlights": "Failed to load flights",
     "newFlight": "New flight",

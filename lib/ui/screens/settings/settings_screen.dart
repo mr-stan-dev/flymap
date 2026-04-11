@@ -19,16 +19,6 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use the app-level SettingsCubit provided in main.dart
-    return const _SettingsView();
-  }
-}
-
-class _SettingsView extends StatelessWidget {
-  const _SettingsView();
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -36,185 +26,194 @@ class _SettingsView extends StatelessWidget {
           children: [Text(context.t.settings.title)],
         ),
       ),
-      body: BlocBuilder<SubscriptionCubit, SubscriptionState>(
-        builder: (context, subscriptionState) {
-          return BlocBuilder<SettingsCubit, SettingsState>(
-            builder: (context, state) {
-              if (state.isLoading) {
-                return LoadingStateView(title: context.t.settings.loading);
-              }
-              final theme = Theme.of(context);
-              final sectionBg = theme.colorScheme.surfaceContainerHighest;
-              return ListView(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
-                    child: SubscriptionTopBanner(
-                      state: subscriptionState,
-                      onManage: () => _openSubscription(context),
-                    ),
-                  ),
-                  // Appearance section
-                  Container(
-                    width: double.infinity,
-                    color: sectionBg,
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                    child: Text(
-                      context.t.settings.appearance,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  _SettingItem(
-                    title: context.t.settings.theme,
-                    subtitle: state.themeMode == ThemeMode.dark
-                        ? context.t.settings.dark
-                        : context.t.settings.light,
-                    leading: const Icon(Icons.dark_mode),
-                    onTap: () async {
-                      final darkLabel = context.t.settings.dark;
-                      final lightLabel = context.t.settings.light;
-                      final selected = await _showOptions(
-                        context,
-                        title: context.t.settings.theme,
-                        options: [darkLabel, lightLabel],
-                        current: state.themeMode == ThemeMode.dark
-                            ? darkLabel
-                            : lightLabel,
-                      );
-                      if (!context.mounted) return;
-                      if (selected != null) {
-                        context.read<SettingsCubit>().setTheme(
-                          selected == darkLabel
-                              ? ThemeMode.dark
-                              : ThemeMode.light,
-                        );
-                      }
-                    },
-                  ),
-                  const Divider(height: 1),
+      body: const SettingsContent(),
+    );
+  }
+}
 
-                  // Units section
-                  Container(
-                    width: double.infinity,
-                    color: sectionBg,
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                    child: Text(
-                      context.t.settings.units,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  _SettingItem(
-                    title: context.t.settings.altitude,
-                    subtitle: state.altitudeUnit,
-                    leading: const Icon(Icons.height),
-                    onTap: () async {
-                      final selected = await _showOptions(
-                        context,
-                        title: context.t.settings.altitudeUnit,
-                        options: const ['ft', 'm'],
-                        current: state.altitudeUnit,
-                      );
-                      if (!context.mounted) return;
-                      if (selected != null) {
-                        context.read<SettingsCubit>().setAltitudeUnit(selected);
-                      }
-                    },
-                  ),
-                  const Divider(height: 1),
-                  _SettingItem(
-                    title: context.t.settings.speed,
-                    subtitle: state.speedUnit,
-                    leading: const Icon(Icons.speed),
-                    onTap: () async {
-                      final selected = await _showOptions(
-                        context,
-                        title: context.t.settings.speedUnit,
-                        options: const ['km/h', 'mph'],
-                        current: state.speedUnit,
-                      );
-                      if (!context.mounted) return;
-                      if (selected != null) {
-                        context.read<SettingsCubit>().setSpeedUnit(selected);
-                      }
-                    },
-                  ),
-                  const Divider(height: 1),
-                  _SettingItem(
-                    title: context.t.settings.timeFormat,
-                    subtitle: state.timeFormat,
-                    leading: const Icon(Icons.access_time),
-                    onTap: () async {
-                      final selected = await _showOptions(
-                        context,
-                        title: context.t.settings.timeFormat,
-                        options: const ['24h', '12h'],
-                        current: state.timeFormat,
-                      );
-                      if (!context.mounted) return;
-                      if (selected != null) {
-                        context.read<SettingsCubit>().setTimeFormat(selected);
-                      }
-                    },
-                  ),
+class SettingsContent extends StatelessWidget {
+  const SettingsContent({super.key});
 
-                  // About section
-                  Container(
-                    width: double.infinity,
-                    color: sectionBg,
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                    child: Text(
-                      context.t.settings.about,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SubscriptionCubit, SubscriptionState>(
+      builder: (context, subscriptionState) {
+        return BlocBuilder<SettingsCubit, SettingsState>(
+          builder: (context, state) {
+            if (state.isLoading) {
+              return LoadingStateView(title: context.t.settings.loading);
+            }
+            final theme = Theme.of(context);
+            final sectionBg = theme.colorScheme.surfaceContainerHighest;
+            return ListView(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+                  child: SubscriptionTopBanner(
+                    state: subscriptionState,
+                    onManage: () => _openSubscription(context),
+                  ),
+                ),
+                // Appearance section
+                Container(
+                  width: double.infinity,
+                  color: sectionBg,
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  child: Text(
+                    context.t.settings.appearance,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  _SettingItem(
-                    title: context.t.settings.about,
-                    subtitle: context.t.settings.aboutSubtitle,
-                    leading: const Icon(Icons.info_outline),
-                    onTap: () {
-                      AppRouter.goToAbout(context);
-                    },
-                  ),
-                  const Divider(height: 1),
-                  _SettingItem(
-                    title: context.t.settings.privacyPolicy,
-                    subtitle: context.t.settings.privacyPolicySubtitle,
-                    leading: const Icon(Icons.privacy_tip_outlined),
-                    onTap: () async {
-                      await _openExternalUrl(
-                        context,
-                        'https://www.apptractor.dev/projects/flymap/privacy',
+                ),
+                _SettingItem(
+                  title: context.t.settings.theme,
+                  subtitle: state.themeMode == ThemeMode.dark
+                      ? context.t.settings.dark
+                      : context.t.settings.light,
+                  leading: const Icon(Icons.dark_mode),
+                  onTap: () async {
+                    final darkLabel = context.t.settings.dark;
+                    final lightLabel = context.t.settings.light;
+                    final selected = await _showOptions(
+                      context,
+                      title: context.t.settings.theme,
+                      options: [darkLabel, lightLabel],
+                      current: state.themeMode == ThemeMode.dark
+                          ? darkLabel
+                          : lightLabel,
+                    );
+                    if (!context.mounted) return;
+                    if (selected != null) {
+                      context.read<SettingsCubit>().setTheme(
+                        selected == darkLabel
+                            ? ThemeMode.dark
+                            : ThemeMode.light,
                       );
-                    },
+                    }
+                  },
+                ),
+                const Divider(height: 1),
+
+                // Units section
+                Container(
+                  width: double.infinity,
+                  color: sectionBg,
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  child: Text(
+                    context.t.settings.units,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const Divider(height: 1),
-                  _SettingItem(
-                    title: context.t.settings.termsOfService,
-                    subtitle: context.t.settings.termsOfServiceSubtitle,
-                    leading: const Icon(Icons.description_outlined),
-                    onTap: () async {
-                      await _openExternalUrl(
-                        context,
-                        'https://www.apptractor.dev/projects/flymap/terms',
-                      );
-                    },
+                ),
+                _SettingItem(
+                  title: context.t.settings.altitude,
+                  subtitle: state.altitudeUnit,
+                  leading: const Icon(Icons.height),
+                  onTap: () async {
+                    final selected = await _showOptions(
+                      context,
+                      title: context.t.settings.altitudeUnit,
+                      options: const ['ft', 'm'],
+                      current: state.altitudeUnit,
+                    );
+                    if (!context.mounted) return;
+                    if (selected != null) {
+                      context.read<SettingsCubit>().setAltitudeUnit(selected);
+                    }
+                  },
+                ),
+                const Divider(height: 1),
+                _SettingItem(
+                  title: context.t.settings.speed,
+                  subtitle: state.speedUnit,
+                  leading: const Icon(Icons.speed),
+                  onTap: () async {
+                    final selected = await _showOptions(
+                      context,
+                      title: context.t.settings.speedUnit,
+                      options: const ['km/h', 'mph'],
+                      current: state.speedUnit,
+                    );
+                    if (!context.mounted) return;
+                    if (selected != null) {
+                      context.read<SettingsCubit>().setSpeedUnit(selected);
+                    }
+                  },
+                ),
+                const Divider(height: 1),
+                _SettingItem(
+                  title: context.t.settings.timeFormat,
+                  subtitle: state.timeFormat,
+                  leading: const Icon(Icons.access_time),
+                  onTap: () async {
+                    final selected = await _showOptions(
+                      context,
+                      title: context.t.settings.timeFormat,
+                      options: const ['24h', '12h'],
+                      current: state.timeFormat,
+                    );
+                    if (!context.mounted) return;
+                    if (selected != null) {
+                      context.read<SettingsCubit>().setTimeFormat(selected);
+                    }
+                  },
+                ),
+
+                // About section
+                Container(
+                  width: double.infinity,
+                  color: sectionBg,
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  child: Text(
+                    context.t.settings.about,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const Divider(height: 1),
-                  const LeaveFeedbackSettingItem(),
-                  const Divider(height: 1),
-                  const RateUsSettingItem(),
-                ],
-              );
-            },
-          );
-        },
-      ),
+                ),
+                _SettingItem(
+                  title: context.t.settings.about,
+                  subtitle: context.t.settings.aboutSubtitle,
+                  leading: const Icon(Icons.info_outline),
+                  onTap: () {
+                    AppRouter.goToAbout(context);
+                  },
+                ),
+                const Divider(height: 1),
+                _SettingItem(
+                  title: context.t.settings.privacyPolicy,
+                  subtitle: context.t.settings.privacyPolicySubtitle,
+                  leading: const Icon(Icons.privacy_tip_outlined),
+                  onTap: () async {
+                    await _openExternalUrl(
+                      context,
+                      'https://www.apptractor.dev/projects/flymap/privacy',
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                _SettingItem(
+                  title: context.t.settings.termsOfService,
+                  subtitle: context.t.settings.termsOfServiceSubtitle,
+                  leading: const Icon(Icons.description_outlined),
+                  onTap: () async {
+                    await _openExternalUrl(
+                      context,
+                      'https://www.apptractor.dev/projects/flymap/terms',
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                const LeaveFeedbackSettingItem(),
+                const Divider(height: 1),
+                const RateUsSettingItem(),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

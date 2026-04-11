@@ -106,6 +106,12 @@ class TranslationsHomeEn {
 	/// en: 'Settings'
 	String get settingsTooltip => 'Settings';
 
+	/// en: 'Flights'
+	String get tabFlights => 'Flights';
+
+	/// en: 'Learn'
+	String get tabLibrary => 'Learn';
+
 	/// en: 'Loading flights...'
 	String get loadingFlights => 'Loading flights...';
 
@@ -1359,6 +1365,8 @@ extension on Translations {
 			'home.title' => 'Home',
 			'home.aboutTooltip' => 'About',
 			'home.settingsTooltip' => 'Settings',
+			'home.tabFlights' => 'Flights',
+			'home.tabLibrary' => 'Learn',
 			'home.loadingFlights' => 'Loading flights...',
 			'home.failedToLoadFlights' => 'Failed to load flights',
 			'home.newFlight' => 'New flight',

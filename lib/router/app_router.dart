@@ -12,7 +12,6 @@ import 'package:flymap/ui/screens/flight/flight_screen.dart';
 import 'package:flymap/ui/screens/home/home_screen.dart';
 import 'package:flymap/ui/screens/onboarding/onboarding_screen.dart';
 import 'package:flymap/ui/screens/share_flight/share_flight_screen.dart';
-import 'package:flymap/ui/screens/settings/settings_screen.dart';
 import 'package:flymap/ui/screens/subscription/subscription_management_screen.dart';
 import 'package:flymap/usecase/submit_feedback_use_case.dart';
 import 'package:get_it/get_it.dart';
@@ -104,7 +103,8 @@ class AppRouter {
         GoRoute(
           path: settingsRoute,
           name: 'settings',
-          builder: (context, state) => const SettingsScreen(),
+          builder: (context, state) =>
+              const HomeScreen(initialTab: HomeRootTab.settings),
         ),
 
         GoRoute(
