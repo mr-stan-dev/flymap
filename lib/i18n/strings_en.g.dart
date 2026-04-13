@@ -46,6 +46,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	late final TranslationsCommonEn common = TranslationsCommonEn.internal(_root);
 	late final TranslationsHomeEn home = TranslationsHomeEn.internal(_root);
+	late final TranslationsLearnEn learn = TranslationsLearnEn.internal(_root);
 	late final TranslationsSettingsEn settings = TranslationsSettingsEn.internal(_root);
 	late final TranslationsSubscriptionEn subscription = TranslationsSubscriptionEn.internal(_root);
 	late final TranslationsCreateFlightEn createFlight = TranslationsCreateFlightEn.internal(_root);
@@ -110,7 +111,7 @@ class TranslationsHomeEn {
 	String get tabFlights => 'Flights';
 
 	/// en: 'Learn'
-	String get tabLibrary => 'Learn';
+	String get tabLearn => 'Learn';
 
 	/// en: 'Loading flights...'
 	String get loadingFlights => 'Loading flights...';
@@ -185,6 +186,51 @@ class TranslationsHomeEn {
 	String minutesAgo({required Object minutes}) => '${minutes} m ago';
 
 	late final TranslationsHomeSortEn sort = TranslationsHomeSortEn.internal(_root);
+}
+
+// Path: learn
+class TranslationsLearnEn {
+	TranslationsLearnEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Loading learning categories...'
+	String get loadingCategories => 'Loading learning categories...';
+
+	/// en: 'Failed to load categories'
+	String get failedToLoadCategories => 'Failed to load categories';
+
+	/// en: 'No categories yet'
+	String get emptyCategoriesTitle => 'No categories yet';
+
+	/// en: 'Learning categories will appear here soon.'
+	String get emptyCategoriesSubtitle => 'Learning categories will appear here soon.';
+
+	/// en: '$count articles'
+	String articlesCount({required Object count}) => '${count} articles';
+
+	/// en: 'Loading articles...'
+	String get loadingArticles => 'Loading articles...';
+
+	/// en: 'Failed to load articles'
+	String get failedToLoadArticles => 'Failed to load articles';
+
+	/// en: 'No articles yet'
+	String get emptyArticlesTitle => 'No articles yet';
+
+	/// en: 'Articles for this category will appear soon.'
+	String get emptyArticlesSubtitle => 'Articles for this category will appear soon.';
+
+	/// en: 'Premium content is available with Pro. Connect to the internet to upgrade.'
+	String get upgradeRequiresInternet => 'Premium content is available with Pro. Connect to the internet to upgrade.';
+
+	/// en: 'You can browse these article titles now. Unlock reading with Flymap Pro.'
+	String get proListPreviewHint => 'You can browse these article titles now. Unlock reading with Flymap Pro.';
+
+	/// en: 'Could not open this article right now.'
+	String get failedToLoadArticle => 'Could not open this article right now.';
 }
 
 // Path: settings
@@ -1366,7 +1412,7 @@ extension on Translations {
 			'home.aboutTooltip' => 'About',
 			'home.settingsTooltip' => 'Settings',
 			'home.tabFlights' => 'Flights',
-			'home.tabLibrary' => 'Learn',
+			'home.tabLearn' => 'Learn',
 			'home.loadingFlights' => 'Loading flights...',
 			'home.failedToLoadFlights' => 'Failed to load flights',
 			'home.newFlight' => 'New flight',
@@ -1394,6 +1440,18 @@ extension on Translations {
 			'home.sort.mostRecent' => 'Most recent',
 			'home.sort.longest' => 'Longest',
 			'home.sort.alphabetical' => 'A-Z',
+			'learn.loadingCategories' => 'Loading learning categories...',
+			'learn.failedToLoadCategories' => 'Failed to load categories',
+			'learn.emptyCategoriesTitle' => 'No categories yet',
+			'learn.emptyCategoriesSubtitle' => 'Learning categories will appear here soon.',
+			'learn.articlesCount' => ({required Object count}) => '${count} articles',
+			'learn.loadingArticles' => 'Loading articles...',
+			'learn.failedToLoadArticles' => 'Failed to load articles',
+			'learn.emptyArticlesTitle' => 'No articles yet',
+			'learn.emptyArticlesSubtitle' => 'Articles for this category will appear soon.',
+			'learn.upgradeRequiresInternet' => 'Premium content is available with Pro. Connect to the internet to upgrade.',
+			'learn.proListPreviewHint' => 'You can browse these article titles now. Unlock reading with Flymap Pro.',
+			'learn.failedToLoadArticle' => 'Could not open this article right now.',
 			'settings.title' => 'Settings',
 			'settings.loading' => 'Loading settings...',
 			'settings.appearance' => 'Appearance',

@@ -62,6 +62,8 @@ flutter:
     - assets/data/iata_airlines.csv # source: https://github.com/benct/iata-utils/blob/master/data/iata_airport_list.csv
     - assets/data/airports.csv # source: https://ourairports.com/data/ filtered by large and medium size in chatgpt
     - assets/data/places_wiki.db
+    - assets/data/learn/
+    - assets/data/learn/articles/
     - assets/data/ne_50m_land.geojson
     - assets/styles/openfreemap_offline_style.json
     - assets/sprites/
@@ -71,6 +73,8 @@ flutter:
     - assets/glyphs/Noto Sans Bold/
     - assets/app_icon.png
     - assets/images/
+    - assets/images/learn/
+    - assets/images/learn/categories/
     - assets/images/icons/
     - assets/images/poi/
 

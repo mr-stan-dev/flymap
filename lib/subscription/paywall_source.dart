@@ -16,6 +16,9 @@ enum PaywallSource {
 
   /// User opened paywall from subscription management screen.
   subscriptionManagement,
+
+  /// User attempted to open locked Learn content.
+  learnLockedContent,
 }
 
 extension PaywallSourceAnalyticsValue on PaywallSource {
@@ -27,6 +30,7 @@ extension PaywallSourceAnalyticsValue on PaywallSource {
       PaywallSource.poiSection => 'poi_section',
       PaywallSource.settingsBanner => 'settings_banner',
       PaywallSource.subscriptionManagement => 'subscription_management',
+      PaywallSource.learnLockedContent => 'learn_locked_content',
     };
   }
 }

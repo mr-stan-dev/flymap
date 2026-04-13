@@ -15,7 +15,7 @@
     "aboutTooltip": "About",
     "settingsTooltip": "Settings",
     "tabFlights": "Flights",
-    "tabLibrary": "Learn",
+    "tabLearn": "Learn",
     "loadingFlights": "Loading flights...",
     "failedToLoadFlights": "Failed to load flights",
     "newFlight": "New flight",
@@ -45,6 +45,20 @@
       "longest": "Longest",
       "alphabetical": "A-Z"
     }
+  },
+  "learn": {
+    "loadingCategories": "Loading learning categories...",
+    "failedToLoadCategories": "Failed to load categories",
+    "emptyCategoriesTitle": "No categories yet",
+    "emptyCategoriesSubtitle": "Learning categories will appear here soon.",
+    "articlesCount": "$count articles",
+    "loadingArticles": "Loading articles...",
+    "failedToLoadArticles": "Failed to load articles",
+    "emptyArticlesTitle": "No articles yet",
+    "emptyArticlesSubtitle": "Articles for this category will appear soon.",
+    "upgradeRequiresInternet": "Premium content is available with Pro. Connect to the internet to upgrade.",
+    "proListPreviewHint": "You can browse these article titles now. Unlock reading with Flymap Pro.",
+    "failedToLoadArticle": "Could not open this article right now."
   },
   "settings": {
     "title": "Settings",

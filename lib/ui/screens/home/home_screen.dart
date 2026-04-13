@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
-import 'package:flymap/ui/screens/home/tabs/library/library_tab.dart';
+import 'package:flymap/ui/screens/home/tabs/learn/learn_tab.dart';
 import 'package:flymap/ui/screens/settings/settings_screen.dart';
 
-enum HomeRootTab { flights, library, settings }
+enum HomeRootTab { flights, learn, settings }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.initialTab = HomeRootTab.flights});
@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(title: Text(_titleForIndex(context, _tabIndex))),
       body: IndexedStack(
         index: _tabIndex,
-        children: const [HomeTab(), LibraryTab(), SettingsContent()],
+        children: const [HomeTab(), LearnTab(), SettingsContent()],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _tabIndex,
@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: const Icon(Icons.school_outlined),
             activeIcon: const Icon(Icons.school),
-            label: context.t.home.tabLibrary,
+            label: context.t.home.tabLearn,
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.settings_outlined),
@@ -60,8 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (HomeRootTab.values[index]) {
       case HomeRootTab.flights:
         return context.t.home.tabFlights;
-      case HomeRootTab.library:
-        return context.t.home.tabLibrary;
+      case HomeRootTab.learn:
+        return context.t.home.tabLearn;
       case HomeRootTab.settings:
         return context.t.settings.title;
     }
