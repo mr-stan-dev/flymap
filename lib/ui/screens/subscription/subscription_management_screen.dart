@@ -59,6 +59,8 @@ class _SubscriptionManagementScreenState
                 padding: const EdgeInsets.all(16),
                 children: [
                   _buildStatusCard(context, state),
+                  const SizedBox(height: 12),
+                  _buildProFeaturesCard(context),
                   const SizedBox(height: 8),
                   Text(
                     context.t.subscription.pullToRefresh,
@@ -168,6 +170,33 @@ class _SubscriptionManagementScreenState
     );
   }
 
+  Widget _buildProFeaturesCard(BuildContext context) {
+    return SectionCard(
+      title: context.t.subscription.proFeaturesTitle,
+      child: Column(
+        children: [
+          _ProFeatureRow(
+            icon: Icons.map_rounded,
+            title: context.t.subscription.proFeatureMapsTitle,
+            text: context.t.subscription.proFeatureMapsText,
+          ),
+          const Divider(height: 24),
+          _ProFeatureRow(
+            icon: Icons.travel_explore_rounded,
+            title: context.t.subscription.proFeaturePoiTitle,
+            text: context.t.subscription.proFeaturePoiText,
+          ),
+          const Divider(height: 24),
+          _ProFeatureRow(
+            icon: Icons.menu_book_rounded,
+            title: context.t.subscription.proFeatureArticlesTitle,
+            text: context.t.subscription.proFeatureArticlesText,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildProStatusBanner(BuildContext context, String text) {
     final theme = Theme.of(context);
     return Container(
@@ -232,6 +261,8 @@ class _SubscriptionManagementScreenState
     required ScaffoldMessengerState messenger,
     required TargetPlatform platform,
   }) async {
+    final couldNotOpenSubscriptionSettings =
+        context.t.subscription.couldNotOpenSubscriptionSettings;
     final uri = switch (platform) {
       TargetPlatform.iOS || TargetPlatform.macOS => _iosSubscriptionsUri,
       TargetPlatform.android => _androidSubscriptionsUri,
@@ -240,11 +271,7 @@ class _SubscriptionManagementScreenState
     final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!opened) {
       messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            context.t.subscription.couldNotOpenSubscriptionSettings,
-          ),
-        ),
+        SnackBar(content: Text(couldNotOpenSubscriptionSettings)),
       );
     }
   }
@@ -254,18 +281,19 @@ class _SubscriptionManagementScreenState
     setState(() => _isPaywallLoading = true);
     final cubit = context.read<SubscriptionCubit>();
     final messenger = ScaffoldMessenger.of(context);
+    final strings = context.t;
     try {
       final result = await cubit.presentPaywallFromSubscriptionManagement();
+      if (!mounted) return;
       final message = switch (result) {
         SubscriptionPaywallResult.purchased =>
-          context.t.settings.flymapProActivated,
-        SubscriptionPaywallResult.restored =>
-          context.t.subscription.proRestored,
+          strings.settings.flymapProActivated,
+        SubscriptionPaywallResult.restored => strings.subscription.proRestored,
         SubscriptionPaywallResult.cancelled =>
-          context.t.settings.upgradeCancelled,
-        SubscriptionPaywallResult.notPresented => context.t.settings.noPaywall,
+          strings.settings.upgradeCancelled,
+        SubscriptionPaywallResult.notPresented => strings.settings.noPaywall,
         SubscriptionPaywallResult.error =>
-          context.t.subscription.failedOpenPaywall,
+          strings.subscription.failedOpenPaywall,
       };
       messenger.showSnackBar(SnackBar(content: Text(message)));
     } finally {
@@ -301,6 +329,71 @@ class _MetaRow extends StatelessWidget {
           Expanded(child: Text(value, style: theme.textTheme.bodyMedium)),
         ],
       ),
+    );
+  }
+}
+
+class _ProFeatureRow extends StatelessWidget {
+  const _ProFeatureRow({
+    required this.icon,
+    required this.title,
+    required this.text,
+  });
+
+  final IconData icon;
+  final String title;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: DsBrandColors.proAmber.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(DsRadii.md),
+          ),
+          child: const Icon(
+            Icons.workspace_premium_rounded,
+            color: DsBrandColors.proAmber,
+            size: 18,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(icon, size: 16, color: DsBrandColors.proAmber),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                text,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

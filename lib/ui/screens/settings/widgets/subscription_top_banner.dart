@@ -16,25 +16,60 @@ class SubscriptionTopBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = this.state;
-    final isPro = state.isPro;
+    return state.isPro
+        ? _SubscribedBanner(state: state, onManage: onManage)
+        : _UpgradeBanner(state: state, onManage: onManage);
+  }
+}
+
+class _BannerBadge extends StatelessWidget {
+  const _BannerBadge({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DsSpacing.sm,
+        vertical: DsSpacing.xxs,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(DsRadii.pill),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.32)),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.35,
+        ),
+      ),
+    );
+  }
+}
+
+class _UpgradeBanner extends StatelessWidget {
+  const _UpgradeBanner({required this.state, required this.onManage});
+
+  final SubscriptionState state;
+  final VoidCallback onManage;
+
+  @override
+  Widget build(BuildContext context) {
     final isLightTheme = Theme.of(context).brightness == Brightness.light;
     final cardRadius = BorderRadius.circular(DsRadii.xl);
-    final title = isPro
-        ? context.t.settings.proBannerTitleActive
-        : context.t.settings.proBannerTitle;
     final subtitle = switch (state.phase) {
       SubscriptionPhase.unknown ||
       SubscriptionPhase.loading => context.t.subscription.checkingStatus,
       SubscriptionPhase.pro => context.t.settings.proBannerSubtitleActive,
       SubscriptionPhase.free => context.t.settings.proBannerSubtitleFree,
     };
-    final badgeLabel = isPro
-        ? context.t.settings.proBannerBadgeActive
-        : context.t.common.upgrade.toUpperCase();
-    final gradientColors = isPro
-        ? PremiumSurfaceGradients.pro(isLightTheme: isLightTheme)
-        : PremiumSurfaceGradients.free(isLightTheme: isLightTheme);
+    final gradientColors = PremiumSurfaceGradients.free(
+      isLightTheme: isLightTheme,
+    );
 
     return GestureDetector(
       onTap: onManage,
@@ -53,14 +88,12 @@ class SubscriptionTopBanner extends StatelessWidget {
                     colors: gradientColors,
                   ),
                   border: Border.all(
-                    color: isPro
-                        ? DsBrandColors.proAmber.withValues(alpha: 0.65)
-                        : Colors.white.withValues(alpha: 0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                   ),
                 ),
               ),
             ),
-            Positioned.fill(child: PremiumDiagonalStripesOverlay()),
+            const Positioned.fill(child: PremiumDiagonalStripesOverlay()),
             Positioned(
               right: -18,
               top: -26,
@@ -70,7 +103,7 @@ class SubscriptionTopBanner extends StatelessWidget {
                 size: 124,
               ),
             ),
-            Positioned.fill(
+            const Positioned.fill(
               child: IgnorePointer(child: PremiumAnimatedShimmerOverlay()),
             ),
             Padding(
@@ -83,10 +116,12 @@ class SubscriptionTopBanner extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _BannerBadge(label: badgeLabel),
+                        _BannerBadge(
+                          label: context.t.common.upgrade.toUpperCase(),
+                        ),
                         const SizedBox(height: DsSpacing.sm),
                         Text(
-                          title,
+                          context.t.settings.proBannerTitle,
                           style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(
                                 fontWeight: FontWeight.w800,
@@ -130,29 +165,93 @@ class SubscriptionTopBanner extends StatelessWidget {
   }
 }
 
-class _BannerBadge extends StatelessWidget {
-  const _BannerBadge({required this.label});
+class _SubscribedBanner extends StatelessWidget {
+  const _SubscribedBanner({required this.state, required this.onManage});
 
-  final String label;
+  final SubscriptionState state;
+  final VoidCallback onManage;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: DsSpacing.sm,
-        vertical: DsSpacing.xxs,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final cardRadius = BorderRadius.circular(DsRadii.xl);
+    final gradientColors = [
+      colorScheme.surfaceContainerHighest.withValues(alpha: 0.9),
+      DsBrandColors.proAmber.withValues(
+        alpha: theme.brightness == Brightness.light ? 0.16 : 0.22,
       ),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(DsRadii.pill),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.32)),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: Colors.white,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.35,
+    ];
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onManage,
+        borderRadius: cardRadius,
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: cardRadius,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: gradientColors,
+            ),
+            border: Border.all(
+              color: DsBrandColors.proAmber.withValues(alpha: 0.4),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: DsSpacing.md,
+              vertical: DsSpacing.sm,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: DsBrandColors.proAmber.withValues(alpha: 0.16),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.workspace_premium_rounded,
+                    color: DsBrandColors.proAmber,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: DsSpacing.sm),
+                Expanded(
+                  child: Text(
+                    context.t.settings.proBannerTitleActive,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: DsSpacing.sm),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: DsSpacing.sm,
+                    vertical: DsSpacing.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface.withValues(alpha: 0.72),
+                    borderRadius: BorderRadius.circular(DsRadii.pill),
+                    border: Border.all(
+                      color: colorScheme.outline.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Text(
+                    context.t.common.manage,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

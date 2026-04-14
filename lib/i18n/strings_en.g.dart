@@ -80,6 +80,9 @@ class TranslationsCommonEn {
 	/// en: 'Retry'
 	String get retry => 'Retry';
 
+	/// en: 'Manage'
+	String get manage => 'Manage';
+
 	/// en: 'Upgrade'
 	String get upgrade => 'Upgrade';
 
@@ -417,6 +420,27 @@ class TranslationsSubscriptionEn {
 
 	/// en: 'Flymap Pro'
 	String get cardTitle => 'Flymap Pro';
+
+	/// en: 'Pro features'
+	String get proFeaturesTitle => 'Pro features';
+
+	/// en: 'Detailed offline maps'
+	String get proFeatureMapsTitle => 'Detailed offline maps';
+
+	/// en: 'Unlock the higher-detail map mode for your downloaded routes.'
+	String get proFeatureMapsText => 'Unlock the higher-detail map mode for your downloaded routes.';
+
+	/// en: 'More route discoveries'
+	String get proFeaturePoiTitle => 'More route discoveries';
+
+	/// en: 'See more interesting places along your route.'
+	String get proFeaturePoiText => 'See more interesting places along your route.';
+
+	/// en: 'Unlimited offline articles'
+	String get proFeatureArticlesTitle => 'Unlimited offline articles';
+
+	/// en: 'The Free plan includes a limited number of offline articles.'
+	String get proFeatureArticlesText => 'The Free plan includes a limited number of offline articles.';
 
 	/// en: 'Checking your subscription status...'
 	String get checkingStatus => 'Checking your subscription status...';
@@ -1411,6 +1435,7 @@ extension on Translations {
 			'common.cancel' => 'Cancel',
 			'common.ok' => 'OK',
 			'common.retry' => 'Retry',
+			'common.manage' => 'Manage',
 			'common.upgrade' => 'Upgrade',
 			'common.loading' => 'Loading...',
 			'common.readMore' => 'Read more',
@@ -1514,6 +1539,13 @@ extension on Translations {
 			'subscription.needHelp' => 'Need help?',
 			'subscription.contactSupport' => 'Contact support',
 			'subscription.cardTitle' => 'Flymap Pro',
+			'subscription.proFeaturesTitle' => 'Pro features',
+			'subscription.proFeatureMapsTitle' => 'Detailed offline maps',
+			'subscription.proFeatureMapsText' => 'Unlock the higher-detail map mode for your downloaded routes.',
+			'subscription.proFeaturePoiTitle' => 'More route discoveries',
+			'subscription.proFeaturePoiText' => 'See more interesting places along your route.',
+			'subscription.proFeatureArticlesTitle' => 'Unlimited offline articles',
+			'subscription.proFeatureArticlesText' => 'The Free plan includes a limited number of offline articles.',
 			'subscription.checkingStatus' => 'Checking your subscription status...',
 			'subscription.proActive' => 'Flymap Pro is active.',
 			'subscription.freePlan' => 'You are on Free plan.',
