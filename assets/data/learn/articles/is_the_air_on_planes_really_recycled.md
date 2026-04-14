@@ -6,15 +6,15 @@ The reality is more controlled than that.
 
 ---
 
-## 🌬 1. Cabin Air Is Not Only One Thing
+## 🌬 1. Cabin Air Is a Managed Mix
 
 Aircraft cabins use a managed airflow system rather than a simple sealed box.
 
 The air environment is handled through:
 
 - fresh outside air supply
-- circulation inside the cabin
-- filtering and system control
+- filtered recirculated cabin air
+- system control of temperature, pressure, and flow
 
 So the cabin is not just filled with the same untouched air forever.
 
@@ -22,7 +22,7 @@ So the cabin is not just filled with the same untouched air forever.
 
 ## ✈️ 2. Airflow Is Continuous
 
-Cabin air is moved and refreshed continuously during the flight.
+Cabin air is moved, filtered, and refreshed continuously during the flight.
 
 This helps maintain:
 
@@ -44,7 +44,7 @@ In reality, aircraft cabin air systems are designed to manage the environment ac
 
 ## ✨ What It Means
 
-The air on planes is managed, circulated, and refreshed as part of a designed cabin system.
+The air on planes is managed, circulated, filtered, and refreshed as part of a designed cabin system.
 
 The myth sounds more alarming than the real process.
 
@@ -65,4 +65,4 @@ People often worry about cabin air because they cannot see the system working, e
 ---
 
 The phrase "recycled air" is only a rough shorthand -  
-it does not describe the cabin environment as simply or negatively as people often assume.
+the real system uses both fresh air and filtered recirculated air.

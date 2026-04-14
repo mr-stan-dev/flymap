@@ -7,13 +7,13 @@ This isn’t your imagination — there’s a real reason behind it.
 
 ---
 
-## 🌌 1. You’re Above Most of the Atmosphere
+## 🌌 1. You’re Above Much of the Thicker Lower Air
 
 On the ground, you’re surrounded by a thick layer of air.
 
 At cruising altitude:
-- you’re above much of that air
-- the atmosphere is thinner
+- you’re above much of the denser lower atmosphere
+- the air around you is thinner
 
 👉 Less air = less scattering of light.
 
@@ -74,7 +74,7 @@ The sky looks different because:
 
 ## 🟢 Quick Fact
 
-Commercial planes fly high enough that pilots can sometimes see a very slight curvature of the Earth’s horizon.
+From a commercial jet, the horizon looks farther away and the sky often shows a stronger light-to-dark gradient than it does from the ground.
 
 ---
 

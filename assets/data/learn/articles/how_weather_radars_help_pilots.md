@@ -25,12 +25,12 @@ These signals:
 Weather radar is especially good at finding:
 
 - rain
-- storm activity
-- dense cloud areas
+- wet hail or ice
+- storm cells with strong precipitation
 
 👉 Stronger returns usually mean:
 - heavier rain
-- more intense conditions
+- more intense precipitation
 
 ---
 
@@ -57,7 +57,7 @@ Using radar, pilots can:
 👉 This helps avoid:
 - strong turbulence
 - heavy rain
-- lightning zones
+- the most active parts of storm cells
 
 ---
 
@@ -77,7 +77,7 @@ Weather radar provides information — but:
 From the cabin:
 
 - clouds may look soft and harmless
-- storm intensity is hidden inside
+- the heaviest precipitation inside them is hidden
 
 👉 Radar reveals what your eyes can’t.
 
@@ -98,7 +98,7 @@ Even if the sky looks calm, pilots are always monitoring what’s ahead.
 ## 💡 Simple Way to Think About It
 
 Weather radar is like:
-> shining an invisible light into clouds… to see what’s really inside them.
+> shining an invisible beam into rainy clouds… to see where the strongest parts are.
 
 ---
 
