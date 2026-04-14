@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
@@ -9,6 +10,7 @@ import 'package:flymap/logger.dart';
 import 'package:flymap/ui/map/layers/flight_route_map_layers.dart';
 import 'package:flymap/ui/map/layers/latlon_utils.dart';
 import 'package:flymap/ui/map/layers/poi_layer.dart';
+import 'package:flymap/ui/map/map_style_safety.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/poi_preview_bottom_sheet.dart';
 import 'package:flymap/usecase/get_poi_wiki_preview_use_case.dart';
@@ -39,6 +41,7 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
   bool _mapReady = false;
   late final FlightRoute route = widget.flightRoute;
   bool _routeLayersAdded = false;
+  int _styleGeneration = 0;
   int _poiSignature = 0;
   bool _isPoiDialogVisible = false;
   bool _featureTapListenerAttached = false;
@@ -51,6 +54,7 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
   ).toMapLatLon();
 
   void _onMapCreated(MapLibreMapController controller) {
+    _invalidateStyleState();
     _mapController = controller;
     if (!_featureTapListenerAttached) {
       controller.onFeatureTapped.add(_onFeatureTapped);
@@ -64,16 +68,30 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
   }
 
   void _onStyleLoaded() {
-    // Style loaded, can now add custom layers
-    if (_mapReady) {
-      // Add a small delay to ensure style is fully loaded
-      Future.delayed(const Duration(milliseconds: 200), () async {
-        if (mounted && _mapController != null) {
-          await _addFlightMapLayers(_mapController!);
-          await _syncPoiLayer();
+    if (!_mapReady) return;
+    final styleGeneration = ++_styleGeneration;
+    _routeLayersAdded = false;
+    _poiSignature = 0;
+
+    // Add a small delay to ensure style is fully loaded.
+    Future.delayed(const Duration(milliseconds: 200), () async {
+      if (!_isCurrentStyleGeneration(styleGeneration)) return;
+      final controller = _mapController;
+      if (controller == null) return;
+
+      try {
+        await _addFlightMapLayers(controller);
+        if (!_isCurrentStyleGeneration(styleGeneration)) return;
+        await _syncPoiLayer(expectedStyleGeneration: styleGeneration);
+      } on PlatformException catch (error) {
+        if (isStaleStylePlatformException(error)) {
+          _logger.log('Skipping stale style map preview update: $error');
+          return;
         }
-      });
-    }
+        _logger.error('Failed to update map preview style layers: $error');
+        return;
+      }
+    });
   }
 
   Future<void> _addFlightMapLayers(MapLibreMapController controller) async {
@@ -85,7 +103,7 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
   void didUpdateWidget(covariant FlightMapPreviewWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.flightInfo != widget.flightInfo) {
-      _syncPoiLayer();
+      unawaited(_syncPoiLayer(expectedStyleGeneration: _styleGeneration));
     }
     final zoomBoundsChanged =
         oldWidget.minZoom != widget.minZoom ||
@@ -110,7 +128,8 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
     await controller.animateCamera(CameraUpdate.zoomTo(clampedZoom));
   }
 
-  Future<void> _syncPoiLayer() async {
+  Future<void> _syncPoiLayer({required int expectedStyleGeneration}) async {
+    if (!_isCurrentStyleGeneration(expectedStyleGeneration)) return;
     final controller = _mapController;
     if (!_routeLayersAdded || controller == null) {
       _logger.log(
@@ -138,7 +157,25 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
       'Applying POI layer count=${widget.flightInfo.poi.length}'
       '${sample.isEmpty ? '' : ' sample=[$sample]'}',
     );
-    await PoiLayer(poi: widget.flightInfo.poi).add(controller);
+    try {
+      await PoiLayer(poi: widget.flightInfo.poi).add(controller);
+    } on PlatformException catch (error) {
+      if (isStaleStylePlatformException(error)) {
+        _logger.log('Skipping stale style POI sync: $error');
+        return;
+      }
+      _logger.error('Failed to sync POI layer: $error');
+    }
+  }
+
+  bool _isCurrentStyleGeneration(int generation) {
+    return mounted && generation == _styleGeneration;
+  }
+
+  void _invalidateStyleState() {
+    _styleGeneration++;
+    _routeLayersAdded = false;
+    _poiSignature = 0;
   }
 
   void _onFeatureTapped(
@@ -268,6 +305,7 @@ class _FlightMapPreviewWidgetState extends State<FlightMapPreviewWidget> {
     _mapController = null;
     _mapReady = false;
     _routeLayersAdded = false;
+    _styleGeneration++;
     super.dispose();
   }
 }

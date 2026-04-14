@@ -18,6 +18,7 @@ import 'package:flymap/entity/poi_wiki_preview.dart';
 import 'package:flymap/ui/map/layers/flight_route_map_layers.dart';
 import 'package:flymap/ui/map/layers/poi_layer.dart';
 import 'package:flymap/ui/map/layers/user_layer.dart';
+import 'package:flymap/ui/map/map_style_safety.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/poi_preview_bottom_sheet.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
@@ -59,6 +60,7 @@ class _FlightMapState extends State<FlightMap> {
   int? _lastLoggedZoomTenths;
   String? _mapLoadError;
   bool _routeLayersAdded = false;
+  int _styleGeneration = 0;
   int _poiSignature = 0;
   bool _isPoiDialogVisible = false;
   bool _featureTapListenerAttached = false;
@@ -228,6 +230,7 @@ class _FlightMapState extends State<FlightMap> {
 
   void _onMapCreated(MapLibreMapController controller) {
     _logger.log('Map created successfully');
+    _invalidateStyleState();
     _mapController = controller;
     _isMapInitialized = false;
     _pendingGpsData = null;
@@ -254,24 +257,43 @@ class _FlightMapState extends State<FlightMap> {
   void _onStyleLoaded() {
     _logger.log('Style loaded successfully');
     if (!_mapReady || !mounted) return;
+    final styleGeneration = ++_styleGeneration;
+    _routeLayersAdded = false;
+    _poiSignature = 0;
+    _isMapInitialized = false;
 
     // Delay camera operations until the native map view has a valid frame.
     // simple delay is sufficient to avoid std::domain_error
     Future.delayed(const Duration(milliseconds: 1000), () async {
-      if (!mounted || _mapController == null) return;
-      await _addFlightMapLayers();
+      if (!_isCurrentStyleGeneration(styleGeneration)) return;
 
-      if (mounted) {
+      try {
+        await _addFlightMapLayers(expectedStyleGeneration: styleGeneration);
+      } on PlatformException catch (error) {
+        if (isStaleStylePlatformException(error)) {
+          _logger.log('Skipping stale flight map style update: $error');
+          return;
+        }
+        _logger.error('Failed to update flight map style layers: $error');
+        return;
+      }
+
+      if (_isCurrentStyleGeneration(styleGeneration)) {
         setState(() {
           _isMapInitialized = true;
         });
       }
 
-      await _flushPendingGpsData();
+      if (_isCurrentStyleGeneration(styleGeneration)) {
+        await _flushPendingGpsData();
+      }
     });
   }
 
-  Future<void> _addFlightMapLayers() async {
+  Future<void> _addFlightMapLayers({
+    required int expectedStyleGeneration,
+  }) async {
+    if (!_isCurrentStyleGeneration(expectedStyleGeneration)) return;
     final controller = _mapController;
     if (controller == null) return;
     await FlightRouteMapLayers.add(
@@ -279,10 +301,11 @@ class _FlightMapState extends State<FlightMap> {
       route: widget.flight.route,
     );
     _routeLayersAdded = true;
-    await _syncPoiLayer();
+    await _syncPoiLayer(expectedStyleGeneration: expectedStyleGeneration);
   }
 
-  Future<void> _syncPoiLayer() async {
+  Future<void> _syncPoiLayer({required int expectedStyleGeneration}) async {
+    if (!_isCurrentStyleGeneration(expectedStyleGeneration)) return;
     final controller = _mapController;
     if (!_routeLayersAdded || controller == null) return;
     final pois = widget.flight.info.poi;
@@ -290,7 +313,25 @@ class _FlightMapState extends State<FlightMap> {
     if (_poiSignature == nextSignature) return;
     _poiSignature = nextSignature;
     _logger.log('Syncing POI layer count=${pois.length}');
-    await PoiLayer(poi: pois).add(controller);
+    try {
+      await PoiLayer(poi: pois).add(controller);
+    } on PlatformException catch (error) {
+      if (isStaleStylePlatformException(error)) {
+        _logger.log('Skipping stale flight map POI sync: $error');
+        return;
+      }
+      _logger.error('Failed to sync flight map POI layer: $error');
+    }
+  }
+
+  bool _isCurrentStyleGeneration(int generation) {
+    return mounted && generation == _styleGeneration;
+  }
+
+  void _invalidateStyleState() {
+    _styleGeneration++;
+    _routeLayersAdded = false;
+    _poiSignature = 0;
   }
 
   void _onFeatureTapped(
@@ -582,6 +623,7 @@ class _FlightMapState extends State<FlightMap> {
     _mapController = null;
     _mapReady = false;
     _routeLayersAdded = false;
+    _styleGeneration++;
     super.dispose();
   }
 }

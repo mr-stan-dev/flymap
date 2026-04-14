@@ -1,8 +1,11 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/ui/map/layers/flight_route_map_layers.dart';
 import 'package:flymap/ui/map/layers/latlon_utils.dart';
+import 'package:flymap/ui/map/map_style_safety.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_initializing_overlay.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -26,6 +29,7 @@ class _ShareFlightMapPreviewState extends State<ShareFlightMapPreview> {
   bool _mapReady = false;
   bool _isMapInitialized = false;
   bool _layersAdded = false;
+  int _styleGeneration = 0;
 
   late final LatLng _center = MapUtils.routeCenter(widget.route).toMapLatLon();
 
@@ -33,12 +37,12 @@ class _ShareFlightMapPreviewState extends State<ShareFlightMapPreview> {
   void didUpdateWidget(covariant ShareFlightMapPreview oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.styleString != widget.styleString) {
-      _layersAdded = false;
-      _isMapInitialized = false;
+      _invalidateStyleState();
     }
   }
 
   void _onMapCreated(MapLibreMapController controller) {
+    _invalidateStyleState();
     _mapController = controller;
     setState(() {
       _mapReady = true;
@@ -47,12 +51,25 @@ class _ShareFlightMapPreviewState extends State<ShareFlightMapPreview> {
 
   void _onStyleLoaded() {
     if (!_mapReady || !mounted || _layersAdded) return;
+    final styleGeneration = ++_styleGeneration;
     _layersAdded = true;
+    _isMapInitialized = false;
 
     Future.delayed(const Duration(milliseconds: 300), () async {
-      if (!mounted || _mapController == null) return;
-      await _addLayers(_mapController!);
-      if (mounted) {
+      if (!_isCurrentStyleGeneration(styleGeneration)) return;
+      final controller = _mapController;
+      if (controller == null) return;
+
+      try {
+        await _addLayers(controller);
+      } on PlatformException catch (error) {
+        if (isStaleStylePlatformException(error)) {
+          return;
+        }
+        return;
+      }
+
+      if (_isCurrentStyleGeneration(styleGeneration)) {
         setState(() {
           _isMapInitialized = true;
         });
@@ -67,6 +84,16 @@ class _ShareFlightMapPreviewState extends State<ShareFlightMapPreview> {
       dashedPathSourceId: 'share-route-source',
       dashedPathLayerId: 'share-route-layer',
     );
+  }
+
+  bool _isCurrentStyleGeneration(int generation) {
+    return mounted && generation == _styleGeneration;
+  }
+
+  void _invalidateStyleState() {
+    _styleGeneration++;
+    _layersAdded = false;
+    _isMapInitialized = false;
   }
 
   @override
@@ -97,6 +124,7 @@ class _ShareFlightMapPreviewState extends State<ShareFlightMapPreview> {
   void dispose() {
     _mapController = null;
     _mapReady = false;
+    _styleGeneration++;
     super.dispose();
   }
 }
