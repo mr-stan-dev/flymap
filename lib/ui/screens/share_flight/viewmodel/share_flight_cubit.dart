@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/crashlytics/app_crashlytics.dart';
+import 'package:flymap/data/map_asset_cache_service.dart';
 import 'package:flymap/data/local/mappers/flight_map_mapper.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/map_download_config.dart';
+import 'package:get_it/get_it.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -14,8 +17,14 @@ import 'package:share_plus/share_plus.dart';
 import 'share_flight_state.dart';
 
 class ShareFlightCubit extends Cubit<ShareFlightState> {
-  ShareFlightCubit({required Flight flight})
-    : super(ShareFlightState.initial(flight: flight)) {
+  ShareFlightCubit({
+    required Flight flight,
+    MapAssetCacheService? mapAssetCacheService,
+    AppCrashlytics? crashlytics,
+  }) : _mapAssetCacheService =
+           mapAssetCacheService ?? GetIt.I.get<MapAssetCacheService>(),
+       _crashlytics = crashlytics ?? GetIt.I.get<AppCrashlytics>(),
+       super(ShareFlightState.initial(flight: flight)) {
     _loadStyle();
   }
 
@@ -23,6 +32,8 @@ class ShareFlightCubit extends Cubit<ShareFlightState> {
       'https://tiles.openfreemap.org/styles/liberty';
   final Logger _logger = const Logger('ShareFlightCubit');
   final FlightMapStyleMapper _styleMapper = FlightMapStyleMapper();
+  final MapAssetCacheService _mapAssetCacheService;
+  final AppCrashlytics _crashlytics;
 
   Future<void> _loadStyle() async {
     try {
@@ -62,6 +73,8 @@ class ShareFlightCubit extends Cubit<ShareFlightState> {
         return;
       }
 
+      _mapAssetCacheService.ensureReadyInBackground();
+
       final style = _styleMapper.mapStyleWithMbtiles(
         styleAsset,
         file.absolute.path,
@@ -74,8 +87,14 @@ class ShareFlightCubit extends Cubit<ShareFlightState> {
           clearError: true,
         ),
       );
-    } catch (e) {
+    } catch (e, stack) {
       _logger.error('Failed to load map style for sharing: $e');
+      await _crashlytics.recordError(
+        e,
+        stack,
+        fatal: false,
+        reason: 'share_flight_prepare_local_style',
+      );
       emit(
         state.copyWith(
           status: ShareFlightStatus.ready,

@@ -5,6 +5,7 @@ import 'package:flymap/crashlytics/app_crashlytics_initializer.dart';
 import 'package:flymap/data/api/feedback_api.dart';
 import 'package:flymap/data/api/flight_info_api.dart';
 import 'package:flymap/data/api/flight_info_api_mapper.dart';
+import 'package:flymap/data/map_asset_cache_service.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/local/app_database.dart';
 import 'package:flymap/data/local/flight_poi_repository_impl.dart';
@@ -85,6 +86,7 @@ class DiModule {
     i.registerLazySingleton<ConnectivityChecker>(
       () => const ConnectivityChecker(),
     );
+    i.registerLazySingleton<MapAssetCacheService>(() => MapAssetCacheService());
 
     i.registerLazySingleton<DownloadMapUseCase>(
       () => DownloadMapUseCase(

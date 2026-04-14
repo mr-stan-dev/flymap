@@ -8,9 +8,8 @@ import 'package:flymap/analytics/app_analytics_initializer.dart';
 import 'package:flymap/app/flymap_app.dart';
 import 'package:flymap/crashlytics/app_crashlytics_initializer.dart';
 import 'package:flymap/cubit_state_observer.dart';
-import 'package:flymap/data/glyphs_service.dart';
+import 'package:flymap/data/map_asset_cache_service.dart';
 import 'package:flymap/data/local/app_database.dart';
-import 'package:flymap/data/sprite_service.dart';
 import 'package:flymap/firebase_options.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
@@ -32,9 +31,6 @@ void main() async {
       await GetIt.I<AppCrashlyticsInitializer>().initialize(
         enableCollection: kReleaseMode,
       );
-
-      await GlyphsService().copyGlyphsToCacheDir();
-      await SpriteService().copySpritesToCacheDir();
       await GetIt.I<AppDatabase>().initialize();
 
       final hasSeenOnboarding = await GetIt.I<OnboardingRepository>()
@@ -47,6 +43,10 @@ void main() async {
           child: FlymapApp(showOnboarding: !hasSeenOnboarding),
         ),
       );
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        GetIt.I<MapAssetCacheService>().ensureReadyInBackground();
+      });
     },
     (error, stack) async {
       if (!GetIt.I.isRegistered<AppCrashlyticsInitializer>()) return;

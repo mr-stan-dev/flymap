@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flymap/crashlytics/app_crashlytics.dart';
+import 'package:flymap/data/map_asset_cache_service.dart';
 import 'package:flymap/data/local/mappers/flight_map_mapper.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/tiles_downloader/mbtiles_validator.dart';
@@ -69,6 +71,9 @@ class _FlightMapState extends State<FlightMap> {
       .get<GetPoiWikiPreviewUseCase>();
   late final ConnectivityChecker _connectivityChecker = GetIt.I
       .get<ConnectivityChecker>();
+  late final MapAssetCacheService _mapAssetCacheService = GetIt.I
+      .get<MapAssetCacheService>();
+  late final AppCrashlytics _crashlytics = GetIt.I.get<AppCrashlytics>();
 
   late final LatLng _center = LatLng(
     MapUtils.center(
@@ -132,6 +137,8 @@ class _FlightMapState extends State<FlightMap> {
     }
 
     try {
+      _mapAssetCacheService.ensureReadyInBackground();
+
       // Load the style from assets
       final styleString = await rootBundle.loadString(
         'assets/styles/openfreemap_offline_style.json',
@@ -148,8 +155,16 @@ class _FlightMapState extends State<FlightMap> {
         _styleString = updated;
         _mapLoadError = null;
       });
-    } catch (e) {
+    } catch (e, stack) {
       _logger.error('Error loading style from assets: $e');
+      unawaited(
+        _crashlytics.recordError(
+          e,
+          stack,
+          fatal: false,
+          reason: 'flight_map_prepare_local_style',
+        ),
+      );
       _setMapLoadError(t.flight.map.loadStyleFailed);
     }
   }
