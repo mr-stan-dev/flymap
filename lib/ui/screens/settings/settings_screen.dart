@@ -8,6 +8,7 @@ import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flymap/router/app_router.dart';
 
+import 'widgets/app_version_footer.dart';
 import 'widgets/leave_feedback_setting_item.dart';
 import 'widgets/rate_us_setting_item.dart';
 import 'widgets/setting_item.dart';
@@ -108,6 +109,7 @@ class SettingsContent extends StatelessWidget {
                     ),
                   ],
                 ),
+                const AppVersionFooter(),
               ],
             );
           },
