@@ -13,6 +13,7 @@ import 'widgets/rate_us_setting_item.dart';
 import 'widgets/setting_item.dart';
 import 'widgets/settings_group_card.dart';
 import 'widgets/subscription_top_banner.dart';
+import 'widgets/theme_setting_item.dart';
 import 'widgets/units_setting_item.dart';
 import 'viewmodel/settings_cubit.dart';
 import 'viewmodel/settings_state.dart';
@@ -56,36 +57,7 @@ class SettingsContent extends StatelessWidget {
                 const SizedBox(height: 12),
                 SettingsGroupCard(
                   title: context.t.settings.appearance,
-                  children: [
-                    SettingItem(
-                      title: context.t.settings.theme,
-                      subtitle: _themeModeLabel(context, state.themeMode),
-                      leading: const Icon(Icons.dark_mode),
-                      onTap: () async {
-                        final systemLabel = context.t.settings.system;
-                        final darkLabel = context.t.settings.dark;
-                        final lightLabel = context.t.settings.light;
-                        final selected = await _showOptions(
-                          context,
-                          title: context.t.settings.theme,
-                          options: [systemLabel, darkLabel, lightLabel],
-                          current: _themeModeLabel(context, state.themeMode),
-                        );
-                        if (!context.mounted) return;
-                        if (selected != null) {
-                          context.read<SettingsCubit>().setTheme(
-                            switch (selected) {
-                              final value when value == darkLabel =>
-                                ThemeMode.dark,
-                              final value when value == lightLabel =>
-                                ThemeMode.light,
-                              _ => ThemeMode.system,
-                            },
-                          );
-                        }
-                      },
-                    ),
-                  ],
+                  children: [ThemeSettingItem(state: state)],
                 ),
                 const SizedBox(height: 12),
                 SettingsGroupCard(
@@ -189,60 +161,5 @@ class SettingsContent extends StatelessWidget {
         SnackBar(content: Text(context.t.settings.couldNotOpenUrl(url: url))),
       );
     }
-  }
-
-  Future<String?> _showOptions(
-    BuildContext context, {
-    required String title,
-    required List<String> options,
-    required String current,
-  }) async {
-    return showDialog<String>(
-      context: context,
-      builder: (ctx) {
-        final colorScheme = Theme.of(ctx).colorScheme;
-        return AlertDialog(
-          title: Text(title),
-          content: ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 280),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: options
-                    .map(
-                      (opt) => ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(opt),
-                        trailing: opt == current
-                            ? Icon(
-                                Icons.check_circle,
-                                color: colorScheme.primary,
-                              )
-                            : null,
-                        onTap: () => Navigator.of(ctx).pop(opt),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          ),
-          actions: [
-            TertiaryButton(
-              label: context.t.common.cancel,
-              onPressed: () => Navigator.of(ctx).pop(),
-              expand: false,
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  String _themeModeLabel(BuildContext context, ThemeMode mode) {
-    return switch (mode) {
-      ThemeMode.dark => context.t.settings.dark,
-      ThemeMode.light => context.t.settings.light,
-      ThemeMode.system => context.t.settings.system,
-    };
   }
 }

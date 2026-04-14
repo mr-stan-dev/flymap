@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/i18n/strings.g.dart';
-import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/settings/viewmodel/settings_cubit.dart';
 import 'package:flymap/ui/screens/settings/viewmodel/settings_state.dart';
 
 import 'setting_item.dart';
-import 'units_section.dart';
+import 'settings_bottom_sheet.dart';
+import 'settings_choice_section.dart';
 
 class UnitsSettingItem extends StatelessWidget {
-  const UnitsSettingItem({
-    required this.state,
-    super.key,
-  });
+  const UnitsSettingItem({required this.state, super.key});
 
   final SettingsState state;
 
@@ -22,7 +19,7 @@ class UnitsSettingItem extends StatelessWidget {
       title: context.t.settings.units,
       leading: const Icon(Icons.straighten),
       subtitle:
-        '${state.altitudeUnit} • ${state.speedUnit} • ${state.timeFormat}',
+          '${state.altitudeUnit} • ${state.speedUnit} • ${state.timeFormat}',
       onTap: () => showUnitsSheet(context, initialState: state),
     );
   }
@@ -43,21 +40,29 @@ Future<void> showUnitsSheet(
     useSafeArea: true,
     showDragHandle: true,
     builder: (ctx) {
-      final theme = Theme.of(ctx);
       return StatefulBuilder(
         builder: (context, setModalState) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          return SettingsBottomSheet(
+            title: context.t.settings.units,
+            onConfirm: () async {
+              if (altitudeUnit != initialState.altitudeUnit) {
+                await cubit.setAltitudeUnit(altitudeUnit);
+              }
+              if (speedUnit != initialState.speedUnit) {
+                await cubit.setSpeedUnit(speedUnit);
+              }
+              if (timeFormat != initialState.timeFormat) {
+                await cubit.setTimeFormat(timeFormat);
+              }
+              if (ctx.mounted) {
+                Navigator.of(ctx).pop();
+              }
+            },
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  context.t.settings.units,
-                  style: theme.textTheme.titleLarge,
-                ),
-                const SizedBox(height: 16),
-                UnitsSection(
+                SettingsChoiceSection(
                   title: context.t.settings.altitudeUnit,
                   options: const ['ft', 'm'],
                   current: altitudeUnit,
@@ -68,7 +73,7 @@ Future<void> showUnitsSheet(
                   },
                 ),
                 const SizedBox(height: 16),
-                UnitsSection(
+                SettingsChoiceSection(
                   title: context.t.settings.speedUnit,
                   options: const ['km/h', 'mph'],
                   current: speedUnit,
@@ -79,7 +84,7 @@ Future<void> showUnitsSheet(
                   },
                 ),
                 const SizedBox(height: 16),
-                UnitsSection(
+                SettingsChoiceSection(
                   title: context.t.settings.timeFormat,
                   options: const ['24h', '12h'],
                   current: timeFormat,
@@ -88,37 +93,6 @@ Future<void> showUnitsSheet(
                       timeFormat = value;
                     });
                   },
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TertiaryButton(
-                        label: context.t.common.cancel,
-                        onPressed: () => Navigator.of(ctx).pop(),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: PrimaryButton(
-                        label: context.t.common.ok,
-                        onPressed: () async {
-                          if (altitudeUnit != initialState.altitudeUnit) {
-                            await cubit.setAltitudeUnit(altitudeUnit);
-                          }
-                          if (speedUnit != initialState.speedUnit) {
-                            await cubit.setSpeedUnit(speedUnit);
-                          }
-                          if (timeFormat != initialState.timeFormat) {
-                            await cubit.setTimeFormat(timeFormat);
-                          }
-                          if (ctx.mounted) {
-                            Navigator.of(ctx).pop();
-                          }
-                        },
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
