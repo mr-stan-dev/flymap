@@ -10,6 +10,8 @@ import 'package:flymap/router/app_router.dart';
 
 import 'widgets/leave_feedback_setting_item.dart';
 import 'widgets/rate_us_setting_item.dart';
+import 'widgets/setting_item.dart';
+import 'widgets/settings_group_card.dart';
 import 'widgets/subscription_top_banner.dart';
 import 'widgets/units_setting_item.dart';
 import 'viewmodel/settings_cubit.dart';
@@ -44,120 +46,90 @@ class SettingsContent extends StatelessWidget {
             if (state.isLoading) {
               return LoadingStateView(title: context.t.settings.loading);
             }
-            final theme = Theme.of(context);
-            final sectionBg = theme.colorScheme.surfaceContainerHighest;
             return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
-                  child: SubscriptionTopBanner(
-                    state: subscriptionState,
-                    onManage: () => _openSubscription(context),
-                  ),
+                SubscriptionTopBanner(
+                  state: subscriptionState,
+                  onManage: () => _openSubscription(context),
                 ),
-                // Appearance section
-                Container(
-                  width: double.infinity,
-                  color: sectionBg,
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                  child: Text(
-                    context.t.settings.appearance,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                _SettingItem(
-                  title: context.t.settings.theme,
-                  subtitle: _themeModeLabel(context, state.themeMode),
-                  leading: const Icon(Icons.dark_mode),
-                  onTap: () async {
-                    final systemLabel = context.t.settings.system;
-                    final darkLabel = context.t.settings.dark;
-                    final lightLabel = context.t.settings.light;
-                    final selected = await _showOptions(
-                      context,
+                const SizedBox(height: 12),
+                SettingsGroupCard(
+                  title: context.t.settings.appearance,
+                  children: [
+                    SettingItem(
                       title: context.t.settings.theme,
-                      options: [systemLabel, darkLabel, lightLabel],
-                      current: _themeModeLabel(context, state.themeMode),
-                    );
-                    if (!context.mounted) return;
-                    if (selected != null) {
-                      context.read<SettingsCubit>().setTheme(
-                        switch (selected) {
-                          final value when value == darkLabel => ThemeMode.dark,
-                          final value when value == lightLabel =>
-                            ThemeMode.light,
-                          _ => ThemeMode.system,
-                        },
-                      );
-                    }
-                  },
-                ),
-                const Divider(height: 1),
-
-                // Units section
-                Container(
-                  width: double.infinity,
-                  color: sectionBg,
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                  child: Text(
-                    context.t.settings.units,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                      subtitle: _themeModeLabel(context, state.themeMode),
+                      leading: const Icon(Icons.dark_mode),
+                      onTap: () async {
+                        final systemLabel = context.t.settings.system;
+                        final darkLabel = context.t.settings.dark;
+                        final lightLabel = context.t.settings.light;
+                        final selected = await _showOptions(
+                          context,
+                          title: context.t.settings.theme,
+                          options: [systemLabel, darkLabel, lightLabel],
+                          current: _themeModeLabel(context, state.themeMode),
+                        );
+                        if (!context.mounted) return;
+                        if (selected != null) {
+                          context.read<SettingsCubit>().setTheme(
+                            switch (selected) {
+                              final value when value == darkLabel =>
+                                ThemeMode.dark,
+                              final value when value == lightLabel =>
+                                ThemeMode.light,
+                              _ => ThemeMode.system,
+                            },
+                          );
+                        }
+                      },
                     ),
-                  ),
+                  ],
                 ),
-                UnitsSettingItem(state: state),
-
-                // About section
-                Container(
-                  width: double.infinity,
-                  color: sectionBg,
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                  child: Text(
-                    context.t.settings.about,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                const SizedBox(height: 12),
+                SettingsGroupCard(
+                  title: context.t.settings.units,
+                  children: [UnitsSettingItem(state: state)],
                 ),
-                _SettingItem(
+                const SizedBox(height: 12),
+                SettingsGroupCard(
                   title: context.t.settings.about,
-                  subtitle: context.t.settings.aboutSubtitle,
-                  leading: const Icon(Icons.info_outline),
-                  onTap: () {
-                    AppRouter.goToAbout(context);
-                  },
+                  children: [
+                    SettingItem(
+                      title: context.t.settings.about,
+                      subtitle: context.t.settings.aboutSubtitle,
+                      leading: const Icon(Icons.info_outline),
+                      onTap: () {
+                        AppRouter.goToAbout(context);
+                      },
+                    ),
+                    SettingItem(
+                      title: context.t.settings.privacyPolicy,
+                      subtitle: context.t.settings.privacyPolicySubtitle,
+                      leading: const Icon(Icons.privacy_tip_outlined),
+                      onTap: () async {
+                        await _openExternalUrl(
+                          context,
+                          'https://www.apptractor.dev/projects/flymap/privacy',
+                        );
+                      },
+                    ),
+                    SettingItem(
+                      title: context.t.settings.termsOfService,
+                      subtitle: context.t.settings.termsOfServiceSubtitle,
+                      leading: const Icon(Icons.description_outlined),
+                      onTap: () async {
+                        await _openExternalUrl(
+                          context,
+                          'https://www.apptractor.dev/projects/flymap/terms',
+                        );
+                      },
+                    ),
+                    const LeaveFeedbackSettingItem(),
+                    const RateUsSettingItem(),
+                  ],
                 ),
-                const Divider(height: 1),
-                _SettingItem(
-                  title: context.t.settings.privacyPolicy,
-                  subtitle: context.t.settings.privacyPolicySubtitle,
-                  leading: const Icon(Icons.privacy_tip_outlined),
-                  onTap: () async {
-                    await _openExternalUrl(
-                      context,
-                      'https://www.apptractor.dev/projects/flymap/privacy',
-                    );
-                  },
-                ),
-                const Divider(height: 1),
-                _SettingItem(
-                  title: context.t.settings.termsOfService,
-                  subtitle: context.t.settings.termsOfServiceSubtitle,
-                  leading: const Icon(Icons.description_outlined),
-                  onTap: () async {
-                    await _openExternalUrl(
-                      context,
-                      'https://www.apptractor.dev/projects/flymap/terms',
-                    );
-                  },
-                ),
-                const Divider(height: 1),
-                const LeaveFeedbackSettingItem(),
-                const Divider(height: 1),
-                const RateUsSettingItem(),
               ],
             );
           },
@@ -266,38 +238,5 @@ class SettingsContent extends StatelessWidget {
       ThemeMode.light => context.t.settings.light,
       ThemeMode.system => context.t.settings.system,
     };
-  }
-}
-
-class _SettingItem extends StatelessWidget {
-  final String title;
-  final String? subtitle;
-  final Icon? leading;
-  final VoidCallback onTap;
-
-  const _SettingItem({
-    required this.title,
-    required this.onTap,
-    this.subtitle,
-    this.leading,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final onSurface = theme.colorScheme.onSurface.withValues(alpha: 0.7);
-
-    return ListTile(
-      leading: leading,
-      title: Text(title, style: theme.textTheme.titleMedium),
-      subtitle: subtitle != null
-          ? Text(
-              subtitle!,
-              style: theme.textTheme.bodyMedium?.copyWith(color: onSurface),
-            )
-          : null,
-      trailing: const Icon(Icons.chevron_right),
-      onTap: onTap,
-    );
   }
 }

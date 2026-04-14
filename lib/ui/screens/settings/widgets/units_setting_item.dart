@@ -5,6 +5,7 @@ import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/settings/viewmodel/settings_cubit.dart';
 import 'package:flymap/ui/screens/settings/viewmodel/settings_state.dart';
 
+import 'setting_item.dart';
 import 'units_section.dart';
 
 class UnitsSettingItem extends StatelessWidget {
@@ -17,17 +18,11 @@ class UnitsSettingItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final onSurface = theme.colorScheme.onSurface.withValues(alpha: 0.7);
-
-    return ListTile(
+    return SettingItem(
+      title: context.t.settings.units,
       leading: const Icon(Icons.straighten),
-      title: Text(context.t.settings.units, style: theme.textTheme.titleMedium),
-      subtitle: Text(
+      subtitle:
         '${state.altitudeUnit} • ${state.speedUnit} • ${state.timeFormat}',
-        style: theme.textTheme.bodyMedium?.copyWith(color: onSurface),
-      ),
-      trailing: const Icon(Icons.chevron_right),
       onTap: () => showUnitsSheet(context, initialState: state),
     );
   }
