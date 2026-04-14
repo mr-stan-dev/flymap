@@ -11,6 +11,7 @@ import 'package:flymap/router/app_router.dart';
 import 'widgets/leave_feedback_setting_item.dart';
 import 'widgets/rate_us_setting_item.dart';
 import 'widgets/subscription_top_banner.dart';
+import 'widgets/units_setting_item.dart';
 import 'viewmodel/settings_cubit.dart';
 import 'viewmodel/settings_state.dart';
 
@@ -107,59 +108,7 @@ class SettingsContent extends StatelessWidget {
                     ),
                   ),
                 ),
-                _SettingItem(
-                  title: context.t.settings.altitude,
-                  subtitle: state.altitudeUnit,
-                  leading: const Icon(Icons.height),
-                  onTap: () async {
-                    final selected = await _showOptions(
-                      context,
-                      title: context.t.settings.altitudeUnit,
-                      options: const ['ft', 'm'],
-                      current: state.altitudeUnit,
-                    );
-                    if (!context.mounted) return;
-                    if (selected != null) {
-                      context.read<SettingsCubit>().setAltitudeUnit(selected);
-                    }
-                  },
-                ),
-                const Divider(height: 1),
-                _SettingItem(
-                  title: context.t.settings.speed,
-                  subtitle: state.speedUnit,
-                  leading: const Icon(Icons.speed),
-                  onTap: () async {
-                    final selected = await _showOptions(
-                      context,
-                      title: context.t.settings.speedUnit,
-                      options: const ['km/h', 'mph'],
-                      current: state.speedUnit,
-                    );
-                    if (!context.mounted) return;
-                    if (selected != null) {
-                      context.read<SettingsCubit>().setSpeedUnit(selected);
-                    }
-                  },
-                ),
-                const Divider(height: 1),
-                _SettingItem(
-                  title: context.t.settings.timeFormat,
-                  subtitle: state.timeFormat,
-                  leading: const Icon(Icons.access_time),
-                  onTap: () async {
-                    final selected = await _showOptions(
-                      context,
-                      title: context.t.settings.timeFormat,
-                      options: const ['24h', '12h'],
-                      current: state.timeFormat,
-                    );
-                    if (!context.mounted) return;
-                    if (selected != null) {
-                      context.read<SettingsCubit>().setTimeFormat(selected);
-                    }
-                  },
-                ),
+                UnitsSettingItem(state: state),
 
                 // About section
                 Container(
