@@ -10,17 +10,12 @@ class LeaveFeedbackSettingItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final onSurface = theme.colorScheme.onSurface.withValues(alpha: 0.7);
 
     return ListTile(
       leading: const Icon(Icons.feedback_outlined),
       title: Text(
         context.t.settings.leaveFeedback,
         style: theme.textTheme.titleMedium,
-      ),
-      subtitle: Text(
-        context.t.settings.leaveFeedbackSubtitle,
-        style: theme.textTheme.bodyMedium?.copyWith(color: onSurface),
       ),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _openFeedback(context),

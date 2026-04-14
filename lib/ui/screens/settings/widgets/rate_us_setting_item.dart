@@ -9,17 +9,12 @@ class RateUsSettingItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final onSurface = theme.colorScheme.onSurface.withValues(alpha: 0.7);
 
     return ListTile(
       leading: const Icon(Icons.star_rate_rounded),
       title: Text(
         context.t.settings.rateUs,
         style: theme.textTheme.titleMedium,
-      ),
-      subtitle: Text(
-        context.t.settings.rateUsSubtitle,
-        style: theme.textTheme.bodyMedium?.copyWith(color: onSurface),
       ),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _openRateUs(context),

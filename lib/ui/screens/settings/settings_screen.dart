@@ -79,7 +79,6 @@ class SettingsContent extends StatelessWidget {
                   children: [
                     SettingItem(
                       title: context.t.settings.about,
-                      subtitle: context.t.settings.aboutSubtitle,
                       leading: const Icon(Icons.info_outline),
                       onTap: () {
                         AppRouter.goToAbout(context);
@@ -87,7 +86,6 @@ class SettingsContent extends StatelessWidget {
                     ),
                     SettingItem(
                       title: context.t.settings.privacyPolicy,
-                      subtitle: context.t.settings.privacyPolicySubtitle,
                       leading: const Icon(Icons.privacy_tip_outlined),
                       onTap: () async {
                         await _openExternalUrl(
@@ -98,7 +96,6 @@ class SettingsContent extends StatelessWidget {
                     ),
                     SettingItem(
                       title: context.t.settings.termsOfService,
-                      subtitle: context.t.settings.termsOfServiceSubtitle,
                       leading: const Icon(Icons.description_outlined),
                       onTap: () async {
                         await _openExternalUrl(
