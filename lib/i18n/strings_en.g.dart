@@ -253,6 +253,9 @@ class TranslationsSettingsEn {
 	/// en: 'Theme'
 	String get theme => 'Theme';
 
+	/// en: 'System'
+	String get system => 'System';
+
 	/// en: 'Dark'
 	String get dark => 'Dark';
 
@@ -1456,6 +1459,7 @@ extension on Translations {
 			'settings.loading' => 'Loading settings...',
 			'settings.appearance' => 'Appearance',
 			'settings.theme' => 'Theme',
+			'settings.system' => 'System',
 			'settings.dark' => 'Dark',
 			'settings.light' => 'Light',
 			'settings.units' => 'Units',

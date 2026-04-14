@@ -69,27 +69,27 @@ class SettingsContent extends StatelessWidget {
                 ),
                 _SettingItem(
                   title: context.t.settings.theme,
-                  subtitle: state.themeMode == ThemeMode.dark
-                      ? context.t.settings.dark
-                      : context.t.settings.light,
+                  subtitle: _themeModeLabel(context, state.themeMode),
                   leading: const Icon(Icons.dark_mode),
                   onTap: () async {
+                    final systemLabel = context.t.settings.system;
                     final darkLabel = context.t.settings.dark;
                     final lightLabel = context.t.settings.light;
                     final selected = await _showOptions(
                       context,
                       title: context.t.settings.theme,
-                      options: [darkLabel, lightLabel],
-                      current: state.themeMode == ThemeMode.dark
-                          ? darkLabel
-                          : lightLabel,
+                      options: [systemLabel, darkLabel, lightLabel],
+                      current: _themeModeLabel(context, state.themeMode),
                     );
                     if (!context.mounted) return;
                     if (selected != null) {
                       context.read<SettingsCubit>().setTheme(
-                        selected == darkLabel
-                            ? ThemeMode.dark
-                            : ThemeMode.light,
+                        switch (selected) {
+                          final value when value == darkLabel => ThemeMode.dark,
+                          final value when value == lightLabel =>
+                            ThemeMode.light,
+                          _ => ThemeMode.system,
+                        },
                       );
                     }
                   },
@@ -258,6 +258,14 @@ class SettingsContent extends StatelessWidget {
         );
       },
     );
+  }
+
+  String _themeModeLabel(BuildContext context, ThemeMode mode) {
+    return switch (mode) {
+      ThemeMode.dark => context.t.settings.dark,
+      ThemeMode.light => context.t.settings.light,
+      ThemeMode.system => context.t.settings.system,
+    };
   }
 }
 

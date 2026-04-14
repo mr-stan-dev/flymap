@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 class SettingsState extends Equatable {
-  final ThemeMode themeMode; // Dark / Light
+  final ThemeMode themeMode; // System / Dark / Light
   final String altitudeUnit; // 'ft' | 'm'
   final String speedUnit; // 'km/h' | 'mph'
   final String timeFormat; // '24h' | '12h'
