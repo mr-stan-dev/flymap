@@ -94,6 +94,14 @@ class SettingsContent extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 SettingsGroupCard(
+                  title: context.t.settings.support,
+                  children: [
+                    const LeaveFeedbackSettingItem(),
+                    const RateUsSettingItem(),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                SettingsGroupCard(
                   title: context.t.settings.about,
                   children: [
                     SettingItem(
@@ -126,8 +134,6 @@ class SettingsContent extends StatelessWidget {
                         );
                       },
                     ),
-                    const LeaveFeedbackSettingItem(),
-                    const RateUsSettingItem(),
                   ],
                 ),
               ],

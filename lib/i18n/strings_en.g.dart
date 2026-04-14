@@ -280,6 +280,9 @@ class TranslationsSettingsEn {
 	/// en: 'Time format'
 	String get timeFormat => 'Time format';
 
+	/// en: 'Support'
+	String get support => 'Support';
+
 	/// en: 'About'
 	String get about => 'About';
 
@@ -1468,6 +1471,7 @@ extension on Translations {
 			'settings.speed' => 'Speed',
 			'settings.speedUnit' => 'Speed unit',
 			'settings.timeFormat' => 'Time format',
+			'settings.support' => 'Support',
 			'settings.about' => 'About',
 			'settings.aboutSubtitle' => 'Learn more about the app',
 			'settings.privacyPolicy' => 'Privacy Policy',
