@@ -1,4 +1,4 @@
-# Home And Learn Empty States
+# Mid Priority: Home And Learn Empty States
 
 ## Goal
 Improve first-run and empty-state UX on Home and Learn with clearer next actions.

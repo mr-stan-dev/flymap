@@ -1,4 +1,4 @@
-# Settings Component System
+# Low Priority: Settings Component System
 
 ## Goal
 Finish extracting reusable settings UI pieces into a small coherent component set.

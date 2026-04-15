@@ -1,4 +1,4 @@
-# Settings Summary Card
+# Mid Priority: Settings Summary Card
 
 ## Goal
 Add a compact summary near the top of Settings that shows current theme and unit choices.

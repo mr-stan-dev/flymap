@@ -1,4 +1,4 @@
-# Settings Secondary Rows Density
+# Low Priority: Settings Secondary Rows Density
 
 ## Goal
 Make support and legal rows slightly denser and visually lighter than primary preference rows.

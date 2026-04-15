@@ -1,4 +1,4 @@
-# Pro UI Patterns Unification
+# Mid Priority: Pro UI Patterns Unification
 
 ## Goal
 Centralize the UI patterns used for Pro status, Pro upsell, and gated feature messaging.

@@ -1,4 +1,4 @@
-# Learn Progress Visibility
+# Mid Priority: Learn Progress Visibility
 
 ## Goal
 Surface reading progress and favorites more clearly in Learn category and article lists.
@@ -11,5 +11,5 @@ The app already has offline learning content, but progress is not yet prominent 
 - local learn repositories and progress/favorites wiring
 
 ## Notes
-- Show the most useful signals first: started, completed, favorite, downloaded if applicable.
+- Show the most useful signals first: started, completed, favorite.
 - Avoid cluttering article tiles.

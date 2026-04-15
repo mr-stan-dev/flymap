@@ -1,4 +1,4 @@
-# Pro Gating Value Pattern
+# Mid Priority: Pro Gating Value Pattern
 
 ## Goal
 Make Pro upsell and gated-value messaging more consistent across route creation and related screens.

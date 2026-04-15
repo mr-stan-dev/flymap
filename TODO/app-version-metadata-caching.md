@@ -1,4 +1,4 @@
-# App Version Metadata Caching
+# Low Priority: App Version Metadata Caching
 
 ## Goal
 Cache app version/build metadata centrally if it ends up being used in multiple places.

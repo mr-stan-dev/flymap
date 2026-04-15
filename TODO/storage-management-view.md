@@ -1,4 +1,4 @@
-# Storage Management View
+# Mid Priority: Storage Management View
 
 ## Goal
 Add a lightweight view for storage usage and cleanup of downloaded maps and articles.

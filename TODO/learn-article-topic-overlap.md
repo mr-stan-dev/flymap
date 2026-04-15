@@ -1,7 +1,7 @@
-# Learn Article Topic Overlap
+# Mid Priority: Learn Article Topic Overlap
 
 ## Goal
-Reduce overlap between similar offline article topics, especially turbulence and jet stream pairs.
+Reduce overlap between similar article topics, especially turbulence and jet stream pairs.
 
 ## Why
 Some articles currently cover nearly the same ground, which makes the learning pack feel padded rather than curated.
