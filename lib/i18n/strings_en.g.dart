@@ -1147,11 +1147,11 @@ class TranslationsFlightMapEn {
 
 	// Translations
 
-	/// en: 'Initializing map...'
-	String get initializing => 'Initializing map...';
+	/// en: 'Loading map'
+	String get initializing => 'Loading map';
 
-	/// en: 'Loading map style...'
-	String get loadingStyle => 'Loading map style...';
+	/// en: 'Loading map'
+	String get loadingStyle => 'Loading map';
 
 	/// en: 'Offline map is not available for this flight.'
 	String get offlineNotAvailable => 'Offline map is not available for this flight.';
@@ -1679,8 +1679,8 @@ extension on Translations {
 			'flight.routeSummaryCopied' => 'Route summary copied',
 			'flight.deleted' => 'Flight deleted',
 			'flight.deleteError' => ({required Object error}) => 'Error deleting flight: ${error}',
-			'flight.map.initializing' => 'Initializing map...',
-			'flight.map.loadingStyle' => 'Loading map style...',
+			'flight.map.initializing' => 'Loading map',
+			'flight.map.loadingStyle' => 'Loading map',
 			'flight.map.offlineNotAvailable' => 'Offline map is not available for this flight.',
 			'flight.map.offlineMissing' => 'Offline map file is missing. Please re-download this route.',
 			'flight.map.validationFailed' => 'Offline map validation failed. Please re-download this route.',

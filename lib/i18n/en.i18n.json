@@ -283,8 +283,8 @@
     "deleted": "Flight deleted",
     "deleteError": "Error deleting flight: $error",
     "map": {
-      "initializing": "Initializing map...",
-      "loadingStyle": "Loading map style...",
+      "initializing": "Loading map",
+      "loadingStyle": "Loading map",
       "offlineNotAvailable": "Offline map is not available for this flight.",
       "offlineMissing": "Offline map file is missing. Please re-download this route.",
       "validationFailed": "Offline map validation failed. Please re-download this route.",

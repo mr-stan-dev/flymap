@@ -20,6 +20,8 @@ class MbtilesValidationResult {
 class MbtilesValidator {
   MbtilesValidator._();
 
+  static final Map<String, MbtilesValidationResult> _validationCache = {};
+
   static Future<MbtilesValidationResult> validate(
     String mbtilesPath, {
     Logger? logger,
@@ -29,12 +31,21 @@ class MbtilesValidator {
 
     try {
       final file = File(mbtilesPath);
-      final size = await file.length();
+      final stat = await file.stat();
+      final size = stat.size;
       log.log('MBTiles size bytes: $size');
       if (size <= 0) {
         return MbtilesValidationResult.invalid(
           'Offline map file is empty. Please re-download this route.',
         );
+      }
+
+      final cacheKey =
+          '$mbtilesPath|$size|${stat.modified.millisecondsSinceEpoch}';
+      final cached = _validationCache[cacheKey];
+      if (cached != null) {
+        log.log('Using cached MBTiles validation result');
+        return cached;
       }
 
       db = await openDatabase(mbtilesPath, readOnly: true);
@@ -69,7 +80,11 @@ class MbtilesValidator {
       log.log('MBTiles tables: ${tables.map((e) => e['name']).toList()}');
       log.log('MBTiles tile count: $tileCount');
       log.log('MBTiles metadata sample: $sampleMetadata');
-      return MbtilesValidationResult.valid();
+      final result = MbtilesValidationResult.valid();
+      _validationCache
+        ..removeWhere((key, _) => key.startsWith('$mbtilesPath|'))
+        ..[cacheKey] = result;
+      return result;
     } catch (e) {
       log.error('MBTiles validation failed: $e');
       return MbtilesValidationResult.invalid(
