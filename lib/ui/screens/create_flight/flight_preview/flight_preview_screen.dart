@@ -140,6 +140,19 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
                 onPressed: () => _onBackPressed(context),
               ),
               title: Text(_titleForState(context, state)),
+              actions: state.step == CreateFlightStep.mapPreview
+                  ? [
+                      IconButton(
+                        tooltip: context
+                            .t
+                            .createFlight
+                            .mapPreview
+                            .mapDetailInfoTooltip,
+                        onPressed: () => _showRouteNoteDialog(context),
+                        icon: const Icon(Icons.info_outline_rounded),
+                      ),
+                    ]
+                  : null,
             ),
             body: SafeArea(
               top: false,
@@ -259,6 +272,24 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
     }
   }
 
+  Future<void> _showRouteNoteDialog(BuildContext context) async {
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(context.t.createFlight.mapPreview.optionsTitle),
+          content: Text(context.t.createFlight.mapPreview.optionsBody),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(context.t.common.ok),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _handleContinueFromMap({
     required BuildContext context,
     required FlightPreviewState state,
@@ -266,6 +297,9 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
     required SubscriptionCubit subscriptionCubit,
   }) async {
     final isProUser = subscriptionCubit.state.isPro;
+    if (isProUser && state.selectedMapDetailLevel != MapDetailLevel.pro) {
+      cubit.selectMapDetailLevel(MapDetailLevel.pro);
+    }
     final shouldUpgradeFirst =
         !isProUser && state.selectedMapDetailLevel == MapDetailLevel.pro;
     if (!shouldUpgradeFirst) {
@@ -306,6 +340,9 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
     required SubscriptionCubit subscriptionCubit,
   }) async {
     final isProUser = subscriptionCubit.state.isPro;
+    if (isProUser && state.selectedMapDetailLevel != MapDetailLevel.pro) {
+      cubit.selectMapDetailLevel(MapDetailLevel.pro);
+    }
     final selectedCount = state.selectedArticleUrls.length;
     final shouldUpgradeForArticles =
         !isProUser && selectedCount > ProLimits.freeWikiArticlesSelectionLimit;

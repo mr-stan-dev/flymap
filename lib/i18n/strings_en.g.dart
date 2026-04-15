@@ -421,14 +421,14 @@ class TranslationsSubscriptionEn {
 	/// en: 'Flymap Pro'
 	String get cardTitle => 'Flymap Pro';
 
-	/// en: 'Pro features'
-	String get proFeaturesTitle => 'Pro features';
+	/// en: 'What Flymap Pro unlocks'
+	String get proFeaturesTitle => 'What Flymap Pro unlocks';
 
 	/// en: 'Detailed offline maps'
 	String get proFeatureMapsTitle => 'Detailed offline maps';
 
-	/// en: 'Unlock the higher-detail map mode for your downloaded routes.'
-	String get proFeatureMapsText => 'Unlock the higher-detail map mode for your downloaded routes.';
+	/// en: 'Get higher-detail offline maps for your saved routes.'
+	String get proFeatureMapsText => 'Get higher-detail offline maps for your saved routes.';
 
 	/// en: 'More route discoveries'
 	String get proFeaturePoiTitle => 'More route discoveries';
@@ -439,8 +439,8 @@ class TranslationsSubscriptionEn {
 	/// en: 'Unlimited offline articles'
 	String get proFeatureArticlesTitle => 'Unlimited offline articles';
 
-	/// en: 'The Free plan includes a limited number of offline articles.'
-	String get proFeatureArticlesText => 'The Free plan includes a limited number of offline articles.';
+	/// en: 'Read offline articles without the Free plan limit.'
+	String get proFeatureArticlesText => 'Read offline articles without the Free plan limit.';
 
 	/// en: 'Checking your subscription status...'
 	String get checkingStatus => 'Checking your subscription status...';
@@ -484,8 +484,8 @@ class TranslationsSubscriptionEn {
 	/// en: 'You can cancel or change billing in your App Store or Google Play subscription settings.'
 	String get proManageHint => 'You can cancel or change billing in your App Store or Google Play subscription settings.';
 
-	/// en: 'Free users can upgrade to Pro to unlock premium features.'
-	String get freeUpgradeHint => 'Free users can upgrade to Pro to unlock premium features.';
+	/// en: 'Upgrade to Pro for detailed offline maps, more route discoveries, and unlimited offline articles.'
+	String get freeUpgradeHint => 'Upgrade to Pro for detailed offline maps, more route discoveries, and unlimited offline articles.';
 
 	/// en: 'Flymap subscription support'
 	String get supportEmailSubject => 'Flymap subscription support';
@@ -889,8 +889,8 @@ class TranslationsCreateFlightMapPreviewEn {
 	/// en: 'Pro'
 	String get pro => 'Pro';
 
-	/// en: 'Map detail info'
-	String get mapDetailInfoTooltip => 'Map detail info';
+	/// en: 'Route note'
+	String get mapDetailInfoTooltip => 'Route note';
 
 	/// en: 'Legend'
 	String get legendButton => 'Legend';
@@ -904,11 +904,20 @@ class TranslationsCreateFlightMapPreviewEn {
 	/// en: 'Upgrade to Pro'
 	String get upgradeToPro => 'Upgrade to Pro';
 
-	/// en: 'Map options'
-	String get optionsTitle => 'Map options';
+	/// en: 'Basic map detail with $count places'
+	String basicHint({required Object count}) => 'Basic map detail with ${count} places';
 
-	/// en: 'Basic: lower zoom, faster download, less storage Pro: higher zoom, more detail, larger download Route is approximate — actual path may vary (especially long-haul)'
-	String get optionsBody => 'Basic: lower zoom, faster download, less storage\n\nPro: higher zoom, more detail, larger download\n\nRoute is approximate — actual path may vary (especially long-haul)';
+	/// en: 'Upgrade for a detailed map with $count places'
+	String proGateHint({required Object count}) => 'Upgrade for a detailed map with ${count} places';
+
+	/// en: 'Detailed offline map with $count places'
+	String proHint({required Object count}) => 'Detailed offline map with ${count} places';
+
+	/// en: 'Approximate route'
+	String get optionsTitle => 'Approximate route';
+
+	/// en: 'Route is approximate — actual path may vary, especially on long-haul flights.'
+	String get optionsBody => 'Route is approximate — actual path may vary, especially on long-haul flights.';
 }
 
 // Path: createFlight.overview
@@ -1539,13 +1548,13 @@ extension on Translations {
 			'subscription.needHelp' => 'Need help?',
 			'subscription.contactSupport' => 'Contact support',
 			'subscription.cardTitle' => 'Flymap Pro',
-			'subscription.proFeaturesTitle' => 'Pro features',
+			'subscription.proFeaturesTitle' => 'What Flymap Pro unlocks',
 			'subscription.proFeatureMapsTitle' => 'Detailed offline maps',
-			'subscription.proFeatureMapsText' => 'Unlock the higher-detail map mode for your downloaded routes.',
+			'subscription.proFeatureMapsText' => 'Get higher-detail offline maps for your saved routes.',
 			'subscription.proFeaturePoiTitle' => 'More route discoveries',
 			'subscription.proFeaturePoiText' => 'See more interesting places along your route.',
 			'subscription.proFeatureArticlesTitle' => 'Unlimited offline articles',
-			'subscription.proFeatureArticlesText' => 'The Free plan includes a limited number of offline articles.',
+			'subscription.proFeatureArticlesText' => 'Read offline articles without the Free plan limit.',
 			'subscription.checkingStatus' => 'Checking your subscription status...',
 			'subscription.proActive' => 'Flymap Pro is active.',
 			'subscription.freePlan' => 'You are on Free plan.',
@@ -1560,7 +1569,7 @@ extension on Translations {
 			'subscription.manageSubscription' => 'Manage subscription',
 			'subscription.upgradeToPro' => 'Upgrade to Pro',
 			'subscription.proManageHint' => 'You can cancel or change billing in your App Store or Google Play subscription settings.',
-			'subscription.freeUpgradeHint' => 'Free users can upgrade to Pro to unlock premium features.',
+			'subscription.freeUpgradeHint' => 'Upgrade to Pro for detailed offline maps, more route discoveries, and unlimited offline articles.',
 			'subscription.supportEmailSubject' => 'Flymap subscription support',
 			'subscription.couldNotOpenEmailApp' => 'Could not open email app',
 			'subscription.couldNotOpenSubscriptionSettings' => 'Could not open subscription settings',
@@ -1588,13 +1597,16 @@ extension on Translations {
 			'createFlight.mapPreview.routeNotSupportedMsg' => 'Sorry, antimeridian flights are not supported yet.',
 			'createFlight.mapPreview.basic' => 'Basic',
 			'createFlight.mapPreview.pro' => 'Pro',
-			'createFlight.mapPreview.mapDetailInfoTooltip' => 'Map detail info',
+			'createFlight.mapPreview.mapDetailInfoTooltip' => 'Route note',
 			'createFlight.mapPreview.legendButton' => 'Legend',
 			'createFlight.mapPreview.legendTitle' => 'POI legend',
 			'createFlight.mapPreview.estimatedMapSize' => ({required Object size}) => 'Estimated map size: ${size}',
 			'createFlight.mapPreview.upgradeToPro' => 'Upgrade to Pro',
-			'createFlight.mapPreview.optionsTitle' => 'Map options',
-			'createFlight.mapPreview.optionsBody' => 'Basic: lower zoom, faster download, less storage\n\nPro: higher zoom, more detail, larger download\n\nRoute is approximate — actual path may vary (especially long-haul)',
+			'createFlight.mapPreview.basicHint' => ({required Object count}) => 'Basic map detail with ${count} places',
+			'createFlight.mapPreview.proGateHint' => ({required Object count}) => 'Upgrade for a detailed map with ${count} places',
+			'createFlight.mapPreview.proHint' => ({required Object count}) => 'Detailed offline map with ${count} places',
+			'createFlight.mapPreview.optionsTitle' => 'Approximate route',
+			'createFlight.mapPreview.optionsBody' => 'Route is approximate — actual path may vary, especially on long-haul flights.',
 			'createFlight.overview.routeNotReady' => 'Route is not ready yet.',
 			'createFlight.overview.proPoiUpsell' => 'With Flymap Pro, discover more interesting places along your route.',
 			'createFlight.wikipedia.title' => 'Download articles to read during the flight',
