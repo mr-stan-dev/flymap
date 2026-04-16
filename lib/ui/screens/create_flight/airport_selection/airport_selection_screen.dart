@@ -103,6 +103,7 @@ class _AirportSelectionScreenState extends State<AirportSelectionScreen> {
                     top: false,
                     child: FlightSearchAirportSelectionStep(
                       step: state.step,
+                      selectedDeparture: state.selectedDeparture,
                       searchController: _searchController,
                       searchQuery: state.searchQuery,
                       isSearchLoading: state.isSearchLoading,
@@ -126,6 +127,8 @@ class _AirportSelectionScreenState extends State<AirportSelectionScreen> {
                       onSelectAirport: cubit.selectAirport,
                       onToggleFavoriteForAirport:
                           cubit.toggleFavoriteForAirport,
+                      onEditDeparture: () =>
+                          unawaited(cubit.handleBackAction()),
                       onContinue: () =>
                           unawaited(_continue(context, cubit, state)),
                     ),

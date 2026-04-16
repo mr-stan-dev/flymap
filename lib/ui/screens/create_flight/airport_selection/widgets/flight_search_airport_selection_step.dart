@@ -7,6 +7,7 @@ import 'package:flymap/ui/screens/create_flight/airport_selection/viewmodel/airp
 class FlightSearchAirportSelectionStep extends StatelessWidget {
   const FlightSearchAirportSelectionStep({
     required this.step,
+    required this.selectedDeparture,
     required this.searchController,
     required this.searchQuery,
     required this.isSearchLoading,
@@ -21,11 +22,13 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
     required this.onClearSelectedAirport,
     required this.onSelectAirport,
     required this.onToggleFavoriteForAirport,
+    required this.onEditDeparture,
     required this.onContinue,
     super.key,
   });
 
   final AirportSelectionStep step;
+  final Airport? selectedDeparture;
   final TextEditingController searchController;
   final String searchQuery;
   final bool isSearchLoading;
@@ -40,6 +43,7 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
   final VoidCallback onClearSelectedAirport;
   final Future<void> Function(Airport airport) onSelectAirport;
   final Future<void> Function(Airport airport) onToggleFavoriteForAirport;
+  final VoidCallback onEditDeparture;
   final VoidCallback onContinue;
 
   @override
@@ -55,6 +59,14 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (step == AirportSelectionStep.arrival &&
+                    selectedDeparture != null) ...[
+                  _SelectedDepartureRow(
+                    airport: selectedDeparture!,
+                    onEdit: onEditDeparture,
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 SearchInputField(
                   controller: searchController,
                   onChanged: (value) {
@@ -155,6 +167,72 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _SelectedDepartureRow extends StatelessWidget {
+  const _SelectedDepartureRow({required this.airport, required this.onEdit});
+
+  final Airport airport;
+  final VoidCallback onEdit;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.42),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.10)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.flight_takeoff_rounded,
+            size: 16,
+            color: colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '${context.t.flight.info.departure}:',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              '${airport.name} (${airport.displayCode})',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          InkWell(
+            onTap: onEdit,
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              child: Text(
+                context.t.common.edit,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

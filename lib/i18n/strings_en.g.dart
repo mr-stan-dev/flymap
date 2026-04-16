@@ -83,6 +83,9 @@ class TranslationsCommonEn {
 	/// en: 'Manage'
 	String get manage => 'Manage';
 
+	/// en: 'Edit'
+	String get edit => 'Edit';
+
 	/// en: 'Upgrade'
 	String get upgrade => 'Upgrade';
 
@@ -931,8 +934,8 @@ class TranslationsCreateFlightOverviewEn {
 	/// en: 'Route is not ready yet.'
 	String get routeNotReady => 'Route is not ready yet.';
 
-	/// en: 'Now showing $current of $total places'
-	String proPoiUpsell({required Object current, required Object total}) => 'Now showing ${current} of ${total} places';
+	/// en: 'Free plan includes basic map and $current places'
+	String proPoiUpsell({required Object current}) => 'Free plan includes basic map and ${current} places';
 }
 
 // Path: createFlight.wikipedia
@@ -1472,6 +1475,7 @@ extension on Translations {
 			'common.ok' => 'OK',
 			'common.retry' => 'Retry',
 			'common.manage' => 'Manage',
+			'common.edit' => 'Edit',
 			'common.upgrade' => 'Upgrade',
 			'common.loading' => 'Loading...',
 			'common.readMore' => 'Read more',
@@ -1635,7 +1639,7 @@ extension on Translations {
 			'createFlight.mapPreview.optionsTitle' => 'Approximate route',
 			'createFlight.mapPreview.optionsBody' => 'Route is approximate — actual path may vary, especially on long-haul flights.',
 			'createFlight.overview.routeNotReady' => 'Route is not ready yet.',
-			'createFlight.overview.proPoiUpsell' => ({required Object current, required Object total}) => 'Now showing ${current} of ${total} places',
+			'createFlight.overview.proPoiUpsell' => ({required Object current}) => 'Free plan includes basic map and ${current} places',
 			'createFlight.wikipedia.title' => 'Select articles to download with map',
 			'createFlight.wikipedia.loadingIntro' => 'Finding route-related articles...',
 			'createFlight.wikipedia.foundIntro' => ({required Object count}) => 'Based on your route we found ${count} relevant articles',

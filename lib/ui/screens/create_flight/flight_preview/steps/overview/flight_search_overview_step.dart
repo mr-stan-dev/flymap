@@ -54,7 +54,6 @@ class FlightSearchOverviewStep extends StatelessWidget {
                               .proGateHint(count: proPoiCount),
                           details: context.t.createFlight.overview.proPoiUpsell(
                             current: currentPoiCount,
-                            total: proPoiCount,
                           ),
                           highlighted: true,
                         ),
