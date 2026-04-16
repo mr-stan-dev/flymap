@@ -4,6 +4,7 @@ import 'package:flymap/entity/airport.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
+import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/ui/screens/create_flight/airport_selection/viewmodel/airport_selection_screen_state.dart';
 import 'package:flymap/ui/screens/create_flight/airport_selection/popular_flights.dart';
 
@@ -11,9 +12,11 @@ class AirportSelectionScreenCubit extends Cubit<AirportSelectionScreenState> {
   AirportSelectionScreenCubit({
     required AirportsDatabase airportsDb,
     required FavoriteAirportsRepository favoritesRepository,
+    required RecentAirportsRepository recentAirportsRepository,
     bool autoInitialize = true,
   }) : _airportsDb = airportsDb,
        _favoritesRepository = favoritesRepository,
+       _recentAirportsRepository = recentAirportsRepository,
        super(AirportSelectionScreenState.initial()) {
     if (autoInitialize) {
       _initialize();
@@ -22,6 +25,7 @@ class AirportSelectionScreenCubit extends Cubit<AirportSelectionScreenState> {
 
   final AirportsDatabase _airportsDb;
   final FavoriteAirportsRepository _favoritesRepository;
+  final RecentAirportsRepository _recentAirportsRepository;
   final _logger = Logger('AirportSelectionScreenCubit');
 
   Future<void> _initialize() async {
@@ -29,10 +33,12 @@ class AirportSelectionScreenCubit extends Cubit<AirportSelectionScreenState> {
       await _airportsDb.initialize();
       final popularAirports = await loadPopularAirports();
       final favoriteAirports = await _loadFavoriteAirports();
+      final recentAirports = await _loadRecentAirports();
       emit(
         state.copyWith(
           popularAirports: popularAirports,
           favoriteAirports: favoriteAirports,
+          recentAirports: recentAirports,
           clearErrorMessage: true,
         ),
       );
@@ -201,6 +207,14 @@ class AirportSelectionScreenCubit extends Cubit<AirportSelectionScreenState> {
     }
   }
 
+  Future<void> saveSelectedAirportsAsRecent() async {
+    final departureCode = _airportCode(state.selectedDeparture);
+    final arrivalCode = _airportCode(state.selectedArrival);
+    await _recentAirportsRepository.addRecents([departureCode, arrivalCode]);
+    final recentAirports = await _loadRecentAirports();
+    emit(state.copyWith(recentAirports: recentAirports));
+  }
+
   Future<bool> handleBackAction() async {
     switch (state.step) {
       case AirportSelectionStep.departure:
@@ -266,6 +280,18 @@ class AirportSelectionScreenCubit extends Cubit<AirportSelectionScreenState> {
     final favoriteCodes = await _favoritesRepository.getFavoriteCodes();
     final airports = <Airport>[];
     for (final code in favoriteCodes) {
+      final airport = _airportsDb.findByCode(code);
+      if (airport != null) {
+        airports.add(airport);
+      }
+    }
+    return airports;
+  }
+
+  Future<List<Airport>> _loadRecentAirports() async {
+    final recentCodes = await _recentAirportsRepository.getRecentCodes();
+    final airports = <Airport>[];
+    for (final code in recentCodes) {
       final airport = _airportsDb.findByCode(code);
       if (airport != null) {
         airports.add(airport);

@@ -14,6 +14,7 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
     required this.selectedAirport,
     required this.selectedAirportIsFavorite,
     required this.favorites,
+    required this.recent,
     required this.popular,
     required this.results,
     required this.onSearchChanged,
@@ -35,6 +36,7 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
   final Airport? selectedAirport;
   final bool selectedAirportIsFavorite;
   final List<Airport> favorites;
+  final List<Airport> recent;
   final List<Airport> popular;
   final List<Airport> results;
   final ValueChanged<String> onSearchChanged;
@@ -48,7 +50,6 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showPopularAirports = searchQuery.trim().isEmpty;
     final gpsActiveColor = DsSemanticColors.success(context);
 
     return Column(
@@ -137,7 +138,21 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
                     onToggleFavorite: onToggleFavoriteForAirport,
                   ),
                 ],
-                if (showPopularAirports) ...[
+                if (recent.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    context.t.createFlight.search.recentAirports,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _AirportChipWrap(
+                    airports: recent,
+                    onSelectAirport: onSelectAirport,
+                  ),
+                ],
+                if (popular.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Text(
                     context.t.createFlight.search.popularAirports,
@@ -253,13 +268,13 @@ class _AirportChipWrap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+      spacing: 6,
+      runSpacing: 6,
       children: airports.map((airport) {
         return SelectionChip(
-          label: context.t.createFlight.search.airportCodeCity(
+          label: context.t.createFlight.search.airportNameCode(
+            name: airport.nameShort,
             code: airport.displayCode,
-            city: airport.city,
           ),
           onPressed: () => onSelectAirport(airport),
           onDeleted: showFavoriteTrailingIcon && onToggleFavorite != null

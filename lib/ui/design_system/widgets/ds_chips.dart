@@ -37,6 +37,9 @@ class SelectionChip extends StatelessWidget {
       deleteIcon: deleteIcon,
       deleteButtonTooltipMessage: deleteTooltip,
       showCheckmark: showCheckmark,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
+      labelPadding: const EdgeInsets.symmetric(horizontal: 4),
     );
   }
 }

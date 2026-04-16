@@ -30,6 +30,7 @@ import 'package:flymap/repository/learn_article_progress_repository.dart';
 import 'package:flymap/repository/learn_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/poi_wiki_preview_repository.dart';
+import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
 import 'package:flymap/subscription/revenuecat_client.dart';
 import 'package:flymap/subscription/revenuecat_env_config.dart';
@@ -133,6 +134,9 @@ class DiModule {
 
     i.registerLazySingleton<FavoriteAirportsRepository>(
       () => FavoriteAirportsRepository(),
+    );
+    i.registerLazySingleton<RecentAirportsRepository>(
+      () => RecentAirportsRepository(),
     );
     i.registerLazySingleton<PlacesWikiLocalDataSource>(
       () => PlacesWikiLocalDataSource(),

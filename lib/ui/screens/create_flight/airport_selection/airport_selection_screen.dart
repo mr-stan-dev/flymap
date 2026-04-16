@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
+import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/create_flight/airport_selection/widgets/flight_search_airport_selection_step.dart';
 import 'package:flymap/ui/screens/create_flight/airport_selection/viewmodel/airport_selection_screen_cubit.dart';
@@ -33,6 +34,7 @@ class _AirportSelectionScreenState extends State<AirportSelectionScreen> {
       create: (_) => AirportSelectionScreenCubit(
         airportsDb: GetIt.I.get(),
         favoritesRepository: GetIt.I.get<FavoriteAirportsRepository>(),
+        recentAirportsRepository: GetIt.I.get<RecentAirportsRepository>(),
       ),
       child:
           BlocConsumer<
@@ -66,11 +68,23 @@ class _AirportSelectionScreenState extends State<AirportSelectionScreen> {
                 state,
               );
               final favoriteCodes = favorites.map(_airportCode).toSet();
+              final recentCodes = <String>{};
+              final recent =
+                  _filterAirportsForCurrentStep(
+                    state.recentAirports,
+                    state,
+                  ).where((airport) {
+                    final code = _airportCode(airport);
+                    if (favoriteCodes.contains(code)) return false;
+                    recentCodes.add(code);
+                    return true;
+                  }).toList();
               final popular =
                   _filterAirportsForCurrentStep(state.popularAirports, state)
                       .where(
                         (airport) =>
-                            !favoriteCodes.contains(_airportCode(airport)),
+                            !favoriteCodes.contains(_airportCode(airport)) &&
+                            !recentCodes.contains(_airportCode(airport)),
                       )
                       .toList();
               final results = _filterAirportsForCurrentStep(
@@ -111,6 +125,7 @@ class _AirportSelectionScreenState extends State<AirportSelectionScreen> {
                       selectedAirportIsFavorite:
                           state.selectedAirportIsFavorite,
                       favorites: favorites,
+                      recent: recent,
                       popular: popular,
                       results: results,
                       onSearchChanged: cubit.searchAirports,
@@ -153,6 +168,7 @@ class _AirportSelectionScreenState extends State<AirportSelectionScreen> {
     final departure = state.selectedDeparture;
     final arrival = state.selectedArrival;
     if (departure == null || arrival == null) return;
+    await cubit.saveSelectedAirportsAsRecent();
     if (!context.mounted) return;
     AppRouter.goToFlightPreview(
       context,

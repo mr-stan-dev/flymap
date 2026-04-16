@@ -856,6 +856,9 @@ class TranslationsCreateFlightSearchEn {
 	/// en: 'Favorites'
 	String get favorites => 'Favorites';
 
+	/// en: 'Recent airports'
+	String get recentAirports => 'Recent airports';
+
 	/// en: 'Popular airports'
 	String get popularAirports => 'Popular airports';
 
@@ -1619,6 +1622,7 @@ extension on Translations {
 			'createFlight.search.addFavorite' => 'Add to favorite',
 			'createFlight.search.removeSelectedAirport' => 'Remove selected airport',
 			'createFlight.search.favorites' => 'Favorites',
+			'createFlight.search.recentAirports' => 'Recent airports',
 			'createFlight.search.popularAirports' => 'Popular airports',
 			'createFlight.search.removeFromFavorites' => 'Remove from favorites',
 			'createFlight.search.noDepartureFound' => 'No departure airports found.',

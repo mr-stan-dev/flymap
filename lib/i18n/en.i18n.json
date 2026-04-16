@@ -166,6 +166,7 @@
       "addFavorite": "Add to favorite",
       "removeSelectedAirport": "Remove selected airport",
       "favorites": "Favorites",
+      "recentAirports": "Recent airports",
       "popularAirports": "Popular airports",
       "removeFromFavorites": "Remove from favorites",
       "noDepartureFound": "No departure airports found.",
