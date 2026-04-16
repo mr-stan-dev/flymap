@@ -132,6 +132,7 @@ class FlightPreviewState extends Equatable {
     required this.step,
     required this.flightRoute,
     required this.flightInfo,
+    required this.proPoiCount,
     required this.selectedMapDetailLevel,
     required this.articleCandidates,
     required this.selectedArticleUrls,
@@ -164,6 +165,7 @@ class FlightPreviewState extends Equatable {
       step: CreateFlightStep.mapPreview,
       flightRoute: null,
       flightInfo: FlightInfo.empty,
+      proPoiCount: null,
       selectedMapDetailLevel: selectedMapDetailLevel,
       articleCandidates: [],
       selectedArticleUrls: [],
@@ -193,6 +195,7 @@ class FlightPreviewState extends Equatable {
   final CreateFlightStep step;
   final FlightRoute? flightRoute;
   final FlightInfo flightInfo;
+  final int? proPoiCount;
   final MapDetailLevel selectedMapDetailLevel;
   final List<WikiArticleCandidate> articleCandidates;
   final List<String> selectedArticleUrls;
@@ -225,6 +228,8 @@ class FlightPreviewState extends Equatable {
     FlightRoute? flightRoute,
     bool clearFlightRoute = false,
     FlightInfo? flightInfo,
+    int? proPoiCount,
+    bool clearProPoiCount = false,
     MapDetailLevel? selectedMapDetailLevel,
     List<WikiArticleCandidate>? articleCandidates,
     List<String>? selectedArticleUrls,
@@ -258,6 +263,7 @@ class FlightPreviewState extends Equatable {
       step: step ?? this.step,
       flightRoute: clearFlightRoute ? null : flightRoute ?? this.flightRoute,
       flightInfo: flightInfo ?? this.flightInfo,
+      proPoiCount: clearProPoiCount ? null : proPoiCount ?? this.proPoiCount,
       selectedMapDetailLevel:
           selectedMapDetailLevel ?? this.selectedMapDetailLevel,
       articleCandidates: articleCandidates ?? this.articleCandidates,
@@ -304,6 +310,7 @@ class FlightPreviewState extends Equatable {
     step,
     flightRoute,
     flightInfo,
+    proPoiCount,
     selectedMapDetailLevel,
     articleCandidates,
     selectedArticleUrls,

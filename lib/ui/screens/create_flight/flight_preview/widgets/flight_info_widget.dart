@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_info.dart';
-import 'package:flymap/entity/flight_poi_type.dart';
 import 'package:flymap/entity/flight_route.dart';
-import 'package:flymap/entity/route_poi_summary.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/map/map_utils.dart';
-import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/poi_preview_bottom_sheet.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/poi_highlights_section.dart';
+import 'package:flymap/ui/screens/shared/airport_info_tile.dart';
 import 'package:flymap/ui/screens/shared/flight_overview_content.dart';
-import 'package:flymap/ui/theme/app_theme_ext.dart';
 
 class FlightInfoWidget extends StatelessWidget {
   final FlightRoute route;
@@ -26,9 +23,9 @@ class FlightInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final primary = theme.colorScheme.primary;
     final t = context.t;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -41,49 +38,59 @@ class FlightInfoWidget extends StatelessWidget {
                 arrival: route.arrival,
               ),
             ),
-            style: context.textTheme.title24Medium,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 16),
-          Row(
+          Column(
             children: [
-              // Departure airport
-              Expanded(
-                child: _buildAirportInfo(
-                  context,
-                  route.departure,
-                  t.flight.info.departure,
-                  Icons.flight_takeoff,
-                  primary,
-                ),
+              AirportInfoTile(
+                icon: Icons.flight_takeoff,
+                title: t.flight.info.departure,
+                code: route.departure.displayCode,
+                subtitle:
+                    '${route.departure.name}, ${route.departure.city}, ${route.departure.countryCode}',
               ),
-              // Arrow
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Icon(
-                  Icons.arrow_forward,
-                  color: theme.colorScheme.onSurfaceVariant,
-                  size: 24,
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: colorScheme.outline.withValues(alpha: 0.18),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Icon(Icons.circle, size: 8, color: colorScheme.outline.withValues(alpha: 0.45)),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: colorScheme.outline.withValues(alpha: 0.18),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              // Arrival airport
-              Expanded(
-                child: _buildAirportInfo(
-                  context,
-                  route.arrival,
-                  t.flight.info.arrival,
-                  Icons.flight_land,
-                  primary,
-                ),
+              AirportInfoTile(
+                icon: Icons.flight_land,
+                title: t.flight.info.arrival,
+                code: route.arrival.displayCode,
+                subtitle:
+                    '${route.arrival.name}, ${route.arrival.city}, ${route.arrival.countryCode}',
               ),
             ],
           ),
-          _flightPoi(context, info),
+          _flightOverview(context, info),
         ],
       ),
     );
   }
 
-  Widget _flightPoi(BuildContext context, FlightInfo info) {
+  Widget _flightOverview(BuildContext context, FlightInfo info) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final hasOverviewSignal =
         isOverviewLoading ||
         (overviewErrorMessage?.trim().isNotEmpty ?? false) ||
@@ -96,157 +103,40 @@ class FlightInfoWidget extends StatelessWidget {
           const SizedBox(height: 24),
           Text(
             context.t.flight.info.overviewTitle,
-            style: context.textTheme.title24Medium,
+            style: theme.textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
-          FlightOverviewContent(
-            overview: info.overview,
-            isLoading: isOverviewLoading,
-            errorMessage: overviewErrorMessage,
-            loadingMessage: context.t.flight.info.overviewLoading,
-            emptyMessage: context.t.flight.info.overviewEmpty,
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest.withValues(
+                alpha: 0.42,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: colorScheme.outline.withValues(alpha: 0.10),
+              ),
+            ),
+            child: FlightOverviewContent(
+              overview: info.overview,
+              isLoading: isOverviewLoading,
+              errorMessage: overviewErrorMessage,
+              loadingMessage: context.t.flight.info.overviewLoading,
+              emptyMessage: context.t.flight.info.overviewEmpty,
+            ),
           ),
         ],
         if ((info.poi.isNotEmpty)) ...[
           const SizedBox(height: 24),
           Text(
-            context.t.flight.info.flyOverTitle,
-            style: context.textTheme.title24Medium,
+            '${context.t.flight.info.flyOverTitle} · ${info.poi.length}',
+            style: theme.textTheme.titleLarge,
           ),
           const SizedBox(height: 10),
-          ..._buildGroupedPoiSections(context, info.poi),
+          PoiHighlightsSection(poi: info.poi),
         ],
       ],
     );
   }
-
-  List<Widget> _buildGroupedPoiSections(
-    BuildContext context,
-    List<RoutePoiSummary> poi,
-  ) {
-    final grouped = _groupPoiByType(poi);
-    final sections = <Widget>[];
-    for (final entry in grouped) {
-      if (sections.isNotEmpty) {
-        sections.add(const SizedBox(height: 10));
-      }
-      sections.add(
-        Text(
-          _formatTypeTitle(entry.type.rawValue),
-          style: context.textTheme.body18Regular,
-        ),
-      );
-      sections.add(const SizedBox(height: 8));
-      sections.add(
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final item in entry.items)
-              ActionChip(
-                label: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: Text(item.name),
-                ),
-                onPressed: () async {
-                  await showPoiPreviewDialog(
-                    context: context,
-                    name: item.name,
-                    typeRaw: item.type.rawValue,
-                    qid: item.qid,
-                  );
-                },
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
-                padding: EdgeInsets.zero,
-                labelPadding: const EdgeInsets.symmetric(horizontal: 6),
-              ),
-          ],
-        ),
-      );
-    }
-    return sections;
-  }
-
-  List<_PoiTypeGroup> _groupPoiByType(List<RoutePoiSummary> poi) {
-    final grouped = <FlightPoiType, List<RoutePoiSummary>>{};
-    for (final item in poi) {
-      final name = item.name.trim();
-      if (name.isEmpty) continue;
-      grouped.putIfAbsent(item.type, () => <RoutePoiSummary>[]).add(item);
-    }
-
-    final sortedTypes = grouped.keys.toList(growable: false)
-      ..sort((a, b) => a.index.compareTo(b.index));
-    return sortedTypes
-        .map(
-          (type) => _PoiTypeGroup(
-            type: type,
-            items: List<RoutePoiSummary>.from(grouped[type] ?? const []),
-          ),
-        )
-        .toList(growable: false);
-  }
-
-  String _formatTypeTitle(String rawType) {
-    final normalized = rawType.trim().toLowerCase();
-    if (normalized.isEmpty || normalized == 'unknown') return 'Other';
-    final words = normalized
-        .replaceAll('-', ' ')
-        .replaceAll('_', ' ')
-        .split(RegExp(r'\s+'))
-        .where((e) => e.isNotEmpty)
-        .toList(growable: false);
-    if (words.isEmpty) return 'Other';
-    return words
-        .map((word) => '${word[0].toUpperCase()}${word.substring(1)}')
-        .join(' ');
-  }
-
-  Widget _buildAirportInfo(
-    BuildContext context,
-    Airport airport,
-    String label,
-    IconData icon,
-    Color color,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: color, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: context.textTheme.body16Medium.copyWith(color: color),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '${airport.name}\n', // For 2 lines
-            style: context.textTheme.body16Regular,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-        ],
-      ),
-    );
-  }
-}
-
-class _PoiTypeGroup {
-  const _PoiTypeGroup({required this.type, required this.items});
-
-  final FlightPoiType type;
-  final List<RoutePoiSummary> items;
 }

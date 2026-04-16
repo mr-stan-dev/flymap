@@ -189,7 +189,7 @@
     },
     "overview": {
       "routeNotReady": "Route is not ready yet.",
-      "proPoiUpsell": "With Flymap Pro, discover more interesting places along your route."
+      "proPoiUpsell": "Free plan includes basic map and $current places"
     },
     "wikipedia": {
       "title": "Select articles to download with map",
@@ -353,10 +353,16 @@
       "overviewLoading": "Building route overview...",
       "overviewEmpty": "Overview is not available yet for this route.",
       "loadingRouteInformation": "Loading route information...",
-      "flyOverTitle": "Highlights along you route",
+      "flyOverTitle": "Highlights of your route",
       "airportsTitle": "Airports",
       "departure": "Departure",
       "arrival": "Arrival",
+      "showAll": "Show all",
+      "showAllCount": "Show all $count",
+      "showLess": "Show less",
+      "sortByRank": "By rank",
+      "sortByRouteProgress": "By route",
+      "sortByType": "By type",
       "routeTimelineTitle": "Route timeline",
       "plannedWaypoints": "$count planned waypoints",
       "pointsOfInterestTitle": "Points of Interest",

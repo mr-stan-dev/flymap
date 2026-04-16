@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flymap/entity/flight_poi_type.dart';
+import 'package:flymap/entity/route_poi_rank.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/entity/map_detail_level.dart';
 import 'package:flymap/entity/route_poi.dart';
@@ -15,33 +16,8 @@ class GetFlightPOIUseCase {
 
   final FlightPOIRepository _repository;
 
-  // Fix 1: Per-type visual interest boost added to sitelinks before ranking.
-  // Values represent "extra sitelinks worth of interest" from a flight window.
-  // Natural spectacles (volcano, glacier, waterfall) are hard to spot and
-  // unique, so they are boosted enough to beat obscure cities with equal
-  // sitelinks counts.
-  //
-  // Using a switch on the exhaustive enum so the compiler enforces that every
-  // future variant gets an explicit value.
-  static int _typeInterestBoost(FlightPoiType type) => switch (type) {
-    FlightPoiType.volcano => 500,
-    FlightPoiType.glacier => 450,
-    FlightPoiType.waterfall => 400,
-    FlightPoiType.mountain => 350,
-    FlightPoiType.island => 350,
-    FlightPoiType.lake => 300,
-    FlightPoiType.desert => 200,
-    FlightPoiType.bay => 150,
-    FlightPoiType.sea => 100,
-    FlightPoiType.river => 100,
-    FlightPoiType.city => 50,
-    FlightPoiType.pass => 50,
-    FlightPoiType.airport => 50,
-    FlightPoiType.region => 0,
-    FlightPoiType.unknown => 0,
-  };
-
-  int _rankScore(RoutePoi poi) => poi.sitelinks + _typeInterestBoost(poi.type);
+  int _rankScore(RoutePoi poi) =>
+      RoutePoiRank.baseScore(type: poi.type, sitelinks: poi.sitelinks);
 
   // Small extra preference during final fill pass so dense mountain regions
   // (e.g. Alps) are less likely to be outcompeted by low-signal sparse areas.
@@ -334,16 +310,16 @@ class GetFlightPOIUseCase {
           _fillNatureBoost(a.poi.type) +
           _segmentMountainDensityBonus(
             type: a.poi.type,
-            mountainFamilyCountInSegment: segmentMountainFamilyCounts[a
-                .segmentIndex],
+            mountainFamilyCountInSegment:
+                segmentMountainFamilyCounts[a.segmentIndex],
           );
       final bFillScore =
           _rankScore(b.poi) +
           _fillNatureBoost(b.poi.type) +
           _segmentMountainDensityBonus(
             type: b.poi.type,
-            mountainFamilyCountInSegment: segmentMountainFamilyCounts[b
-                .segmentIndex],
+            mountainFamilyCountInSegment:
+                segmentMountainFamilyCounts[b.segmentIndex],
           );
       final scoreDiff = bFillScore.compareTo(aFillScore);
       if (scoreDiff != 0) return scoreDiff;

@@ -96,6 +96,7 @@ class PreviewPreparationDelegate {
           isPreviewLoading: false,
           hasInternetForMapPreview: true,
           flightInfo: FlightInfo.empty,
+          clearProPoiCount: true,
           articleCandidates: const [],
           clearSelectedArticleUrls: true,
           isWikiSuggestionsLoading: true,
@@ -109,6 +110,7 @@ class PreviewPreparationDelegate {
           mapDetail: _cubit.state.selectedMapDetailLevel,
         ),
       );
+      unawaited(_prefetchProPoiCount(route));
       unawaited(_prefetchOverview(route));
     } catch (e, stackTrace) {
       _cubit._logger.error('Failed to prepare map preview: $e');
@@ -152,6 +154,9 @@ class PreviewPreparationDelegate {
       _cubit._emitState(
         _cubit.state.copyWith(
           flightInfo: _cubit.state.flightInfo.copyWith(poi: pois),
+          proPoiCount: mapDetail == MapDetailLevel.pro
+              ? pois.length
+              : _cubit.state.proPoiCount,
         ),
       );
       final sample = pois.take(5).map((e) => '${e.name}/${e.type}').join(', ');
@@ -160,6 +165,22 @@ class PreviewPreparationDelegate {
       );
     } catch (e) {
       _cubit._logger.error('Failed to prefetch local route POIs: $e');
+    }
+  }
+
+  Future<void> _prefetchProPoiCount(FlightRoute route) async {
+    try {
+      final pois = await _getFlightPOIUseCase.call(
+        route: route,
+        mapDetail: MapDetailLevel.pro,
+      );
+      final currentRoute = _cubit.state.flightRoute;
+      if (currentRoute == null || currentRoute.routeCode != route.routeCode) {
+        return;
+      }
+      _cubit._emitState(_cubit.state.copyWith(proPoiCount: pois.length));
+    } catch (e) {
+      _cubit._logger.error('Failed to prefetch Pro route POI count: $e');
     }
   }
 

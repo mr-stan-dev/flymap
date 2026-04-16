@@ -931,8 +931,8 @@ class TranslationsCreateFlightOverviewEn {
 	/// en: 'Route is not ready yet.'
 	String get routeNotReady => 'Route is not ready yet.';
 
-	/// en: 'With Flymap Pro, discover more interesting places along your route.'
-	String get proPoiUpsell => 'With Flymap Pro, discover more interesting places along your route.';
+	/// en: 'Now showing $current of $total places'
+	String proPoiUpsell({required Object current, required Object total}) => 'Now showing ${current} of ${total} places';
 }
 
 // Path: createFlight.wikipedia
@@ -1363,8 +1363,8 @@ class TranslationsFlightInfoEn {
 	/// en: 'Loading route information...'
 	String get loadingRouteInformation => 'Loading route information...';
 
-	/// en: 'Highlights along you route'
-	String get flyOverTitle => 'Highlights along you route';
+	/// en: 'Highlights of your route'
+	String get flyOverTitle => 'Highlights of your route';
 
 	/// en: 'Airports'
 	String get airportsTitle => 'Airports';
@@ -1374,6 +1374,24 @@ class TranslationsFlightInfoEn {
 
 	/// en: 'Arrival'
 	String get arrival => 'Arrival';
+
+	/// en: 'Show all'
+	String get showAll => 'Show all';
+
+	/// en: 'Show all $count'
+	String showAllCount({required Object count}) => 'Show all ${count}';
+
+	/// en: 'Show less'
+	String get showLess => 'Show less';
+
+	/// en: 'By rank'
+	String get sortByRank => 'By rank';
+
+	/// en: 'By route'
+	String get sortByRouteProgress => 'By route';
+
+	/// en: 'By type'
+	String get sortByType => 'By type';
 
 	/// en: 'Route timeline'
 	String get routeTimelineTitle => 'Route timeline';
@@ -1617,7 +1635,7 @@ extension on Translations {
 			'createFlight.mapPreview.optionsTitle' => 'Approximate route',
 			'createFlight.mapPreview.optionsBody' => 'Route is approximate — actual path may vary, especially on long-haul flights.',
 			'createFlight.overview.routeNotReady' => 'Route is not ready yet.',
-			'createFlight.overview.proPoiUpsell' => 'With Flymap Pro, discover more interesting places along your route.',
+			'createFlight.overview.proPoiUpsell' => ({required Object current, required Object total}) => 'Now showing ${current} of ${total} places',
 			'createFlight.wikipedia.title' => 'Select articles to download with map',
 			'createFlight.wikipedia.loadingIntro' => 'Finding route-related articles...',
 			'createFlight.wikipedia.foundIntro' => ({required Object count}) => 'Based on your route we found ${count} relevant articles',
@@ -1763,10 +1781,16 @@ extension on Translations {
 			'flight.info.overviewLoading' => 'Building route overview...',
 			'flight.info.overviewEmpty' => 'Overview is not available yet for this route.',
 			'flight.info.loadingRouteInformation' => 'Loading route information...',
-			'flight.info.flyOverTitle' => 'Highlights along you route',
+			'flight.info.flyOverTitle' => 'Highlights of your route',
 			'flight.info.airportsTitle' => 'Airports',
 			'flight.info.departure' => 'Departure',
 			'flight.info.arrival' => 'Arrival',
+			'flight.info.showAll' => 'Show all',
+			'flight.info.showAllCount' => ({required Object count}) => 'Show all ${count}',
+			'flight.info.showLess' => 'Show less',
+			'flight.info.sortByRank' => 'By rank',
+			'flight.info.sortByRouteProgress' => 'By route',
+			'flight.info.sortByType' => 'By type',
 			'flight.info.routeTimelineTitle' => 'Route timeline',
 			'flight.info.plannedWaypoints' => ({required Object count}) => '${count} planned waypoints',
 			'flight.info.pointsOfInterestTitle' => 'Points of Interest',

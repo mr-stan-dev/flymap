@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/map_preview/map_detail_hint.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_info_widget.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
+import 'package:flymap/usecase/poi_selection_config.dart';
 
 class FlightSearchOverviewStep extends StatelessWidget {
   const FlightSearchOverviewStep({
@@ -24,12 +26,13 @@ class FlightSearchOverviewStep extends StatelessWidget {
     if (route == null) {
       return Center(child: Text(context.t.createFlight.overview.routeNotReady));
     }
+    final currentPoiCount = state.flightInfo.poi.length;
+    final proPoiCount = state.proPoiCount ?? PoiSelectionConfig.proMaxPois;
 
     return Column(
       children: [
         Expanded(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Column(
               children: [
                 FlightInfoWidget(
@@ -40,37 +43,28 @@ class FlightSearchOverviewStep extends StatelessWidget {
                       ? null
                       : state.errorMessage,
                 ),
-                if (!isProUser)
+                if (!isProUser && state.flightInfo.poi.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(DsSpacing.md),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerHighest
-                            .withValues(alpha: 0.4),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: DsBrandColors.proAmber.withValues(alpha: 0.5),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        MapDetailHint(
+                          message: context.t.createFlight.mapPreview
+                              .proGateHint(count: proPoiCount),
+                          details: context.t.createFlight.overview.proPoiUpsell(
+                            current: currentPoiCount,
+                            total: proPoiCount,
+                          ),
+                          highlighted: true,
                         ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            context.t.createFlight.overview.proPoiUpsell,
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          const SizedBox(height: DsSpacing.sm),
-                          PremiumButton(
-                            onPressed: onUpgradeToPro,
-                            label: context.t.common.upgrade,
-                            icon: Icons.workspace_premium_rounded,
-                          ),
-                        ],
-                      ),
+                        const SizedBox(height: 12),
+                        PremiumButton(
+                          onPressed: onUpgradeToPro,
+                          label: context.t.common.upgrade,
+                          icon: Icons.workspace_premium_rounded,
+                        ),
+                      ],
                     ),
                   ),
               ],
@@ -78,7 +72,7 @@ class FlightSearchOverviewStep extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(DsSpacing.md),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: PrimaryButton(
             onPressed: onContinue,
             label: context.t.common.kContinue,
