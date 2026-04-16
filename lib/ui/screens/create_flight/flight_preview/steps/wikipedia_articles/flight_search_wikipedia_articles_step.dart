@@ -3,8 +3,8 @@ import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/subscription/pro_limits.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/map/map_utils.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/map_preview/map_detail_hint.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
-import 'package:flymap/ui/widgets/pro_widgets.dart';
 import 'package:flymap/ui/widgets/wikipedia_logo_avatar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -154,29 +154,22 @@ class FlightSearchWikipediaArticlesStep extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (isProUser && isFreeOverLimit) ...[
-                ProActiveBlock(
-                  title: context.t.createFlight.wikipedia.proActiveTitle,
-                  message: context.t.createFlight.wikipedia.proActiveMessage,
-                ),
-                const SizedBox(height: 8),
-              ],
-              !isProUser && isFreeOverLimit
-                  ? Text(
-                      context.t.createFlight.wikipedia.freeLimitHint,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: DsBrandColors.proAmber,
-                      ),
-                    )
-                  : Text(
-                      context.t.createFlight.wikipedia.estimatedDownloadSize(
+              MapDetailHint(
+                message: switch ((isProUser, isFreeOverLimit)) {
+                  (true, _) => context.t.createFlight.wikipedia.proHint,
+                  (false, true) => context.t.createFlight.wikipedia.proGateHint,
+                  _ => context.t.createFlight.wikipedia.basicHint(
+                    count: selectedCount,
+                  ),
+                },
+                details: !isProUser && isFreeOverLimit
+                    ? context.t.createFlight.wikipedia.freeLimitHint
+                    : context.t.createFlight.wikipedia.estimatedDownloadSize(
                         size: estimatedSizeRange,
                       ),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-              const SizedBox(height: 8),
+                highlighted: !isProUser && isFreeOverLimit,
+              ),
+              const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 height: 52,

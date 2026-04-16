@@ -943,14 +943,14 @@ class TranslationsCreateFlightWikipediaEn {
 
 	// Translations
 
-	/// en: 'Download articles to read during the flight'
-	String get title => 'Download articles to read during the flight';
+	/// en: 'Select articles to download with map'
+	String get title => 'Select articles to download with map';
 
 	/// en: 'Finding route-related articles...'
 	String get loadingIntro => 'Finding route-related articles...';
 
-	/// en: 'Based on your route we found $count articles which may be interesting for you. Select to download them for offline reading'
-	String foundIntro({required Object count}) => 'Based on your route we found ${count} articles which may be interesting for you. Select to download them for offline reading';
+	/// en: 'Based on your route we found $count relevant articles'
+	String foundIntro({required Object count}) => 'Based on your route we found ${count} relevant articles';
 
 	/// en: 'No route-related Wikipedia articles found. You can continue with map download only.'
 	String get emptyIntro => 'No route-related Wikipedia articles found. You can continue with map download only.';
@@ -964,20 +964,29 @@ class TranslationsCreateFlightWikipediaEn {
 	/// en: 'Select all'
 	String get selectAll => 'Select all';
 
+	/// en: 'Offline articles selected: $count'
+	String basicHint({required Object count}) => 'Offline articles selected: ${count}';
+
+	/// en: 'Full offline article pack'
+	String get proHint => 'Full offline article pack';
+
+	/// en: 'Upgrade for the full offline article pack'
+	String get proGateHint => 'Upgrade for the full offline article pack';
+
 	/// en: 'Pro active'
 	String get proActiveTitle => 'Pro active';
 
 	/// en: 'Full articles pack unlocked.'
 	String get proActiveMessage => 'Full articles pack unlocked.';
 
-	/// en: 'Free plan includes up to 3 offline articles. Upgrade to Pro for unlimited articles.'
-	String get freeLimitHint => 'Free plan includes up to 3 offline articles. Upgrade to Pro for unlimited articles.';
+	/// en: 'Free plan includes up to 3 offline articles'
+	String get freeLimitHint => 'Free plan includes up to 3 offline articles';
 
 	/// en: 'Estimated download size: $size'
 	String estimatedDownloadSize({required Object size}) => 'Estimated download size: ${size}';
 
-	/// en: 'Upgrade'
-	String get upgrade => 'Upgrade';
+	/// en: 'Upgrade to Pro'
+	String get upgrade => 'Upgrade to Pro';
 
 	/// en: 'Loading article suggestions...'
 	String get loadingSuggestions => 'Loading article suggestions...';
@@ -1609,18 +1618,21 @@ extension on Translations {
 			'createFlight.mapPreview.optionsBody' => 'Route is approximate — actual path may vary, especially on long-haul flights.',
 			'createFlight.overview.routeNotReady' => 'Route is not ready yet.',
 			'createFlight.overview.proPoiUpsell' => 'With Flymap Pro, discover more interesting places along your route.',
-			'createFlight.wikipedia.title' => 'Download articles to read during the flight',
+			'createFlight.wikipedia.title' => 'Select articles to download with map',
 			'createFlight.wikipedia.loadingIntro' => 'Finding route-related articles...',
-			'createFlight.wikipedia.foundIntro' => ({required Object count}) => 'Based on your route we found ${count} articles which may be interesting for you. Select to download them for offline reading',
+			'createFlight.wikipedia.foundIntro' => ({required Object count}) => 'Based on your route we found ${count} relevant articles',
 			'createFlight.wikipedia.emptyIntro' => 'No route-related Wikipedia articles found. You can continue with map download only.',
 			'createFlight.wikipedia.selectedCount' => ({required Object count}) => '${count} selected',
 			'createFlight.wikipedia.unselectAll' => 'Unselect all',
 			'createFlight.wikipedia.selectAll' => 'Select all',
+			'createFlight.wikipedia.basicHint' => ({required Object count}) => 'Offline articles selected: ${count}',
+			'createFlight.wikipedia.proHint' => 'Full offline article pack',
+			'createFlight.wikipedia.proGateHint' => 'Upgrade for the full offline article pack',
 			'createFlight.wikipedia.proActiveTitle' => 'Pro active',
 			'createFlight.wikipedia.proActiveMessage' => 'Full articles pack unlocked.',
-			'createFlight.wikipedia.freeLimitHint' => 'Free plan includes up to 3 offline articles. Upgrade to Pro for unlimited articles.',
+			'createFlight.wikipedia.freeLimitHint' => 'Free plan includes up to 3 offline articles',
 			'createFlight.wikipedia.estimatedDownloadSize' => ({required Object size}) => 'Estimated download size: ${size}',
-			'createFlight.wikipedia.upgrade' => 'Upgrade',
+			'createFlight.wikipedia.upgrade' => 'Upgrade to Pro',
 			'createFlight.wikipedia.loadingSuggestions' => 'Loading article suggestions...',
 			'createFlight.wikipedia.downloadMapOnly' => 'Download map',
 			'createFlight.wikipedia.downloadMapPlusOne' => 'Download map + 1 article',
