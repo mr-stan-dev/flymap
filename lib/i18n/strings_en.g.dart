@@ -253,6 +253,27 @@ class TranslationsSettingsEn {
 	/// en: 'Loading settings...'
 	String get loading => 'Loading settings...';
 
+	/// en: 'Profile'
+	String get profile => 'Profile';
+
+	/// en: 'Name, flying habits, home airport, and interests'
+	String get profileSubtitle => 'Name, flying habits, home airport, and interests';
+
+	/// en: '$name · $code'
+	String profileSummaryNameHome({required Object name, required Object code}) => '${name} · ${code}';
+
+	/// en: 'Home airport: $code'
+	String profileSummaryHome({required Object code}) => 'Home airport: ${code}';
+
+	/// en: 'Tap any item to edit your profile details.'
+	String get profileEditHint => 'Tap any item to edit your profile details.';
+
+	/// en: 'Not set'
+	String get profileNotSet => 'Not set';
+
+	/// en: '$count selected'
+	String profileInterestsSelected({required Object count}) => '${count} selected';
+
 	/// en: 'Appearance'
 	String get appearance => 'Appearance';
 
@@ -754,35 +775,107 @@ class TranslationsOnboardingEn {
 	/// en: 'Skip'
 	String get skip => 'Skip';
 
-	/// en: 'Next'
-	String get next => 'Next';
+	/// en: 'Let's start'
+	String get letsStart => 'Let\'s start';
 
-	/// en: 'Start exploring'
-	String get startExploring => 'Start exploring';
+	/// en: 'Discover what’s below'
+	String get welcomeTitle => 'Discover what’s below';
 
-	/// en: 'Explore the world from above'
-	String get page1Title => 'Explore the world from above';
+	/// en: 'Offline maps and interesting places along your flight'
+	String get welcomeSubtitle => 'Offline maps and interesting places along your flight';
 
-	/// en: 'From coastlines to mountain ranges, every route feels like a new adventure.'
-	String get page1Subtitle => 'From coastlines to mountain ranges, every route feels like a new adventure.';
+	/// en: 'Pick a username'
+	String get nameTitle => 'Pick a username';
 
-	/// en: 'Turn every flight into a story'
-	String get page2Title => 'Turn every flight into a story';
+	/// en: 'Make discovery personal. You can change it anytime.'
+	String get nameSubtitle => 'Make discovery personal. You can change it anytime.';
 
-	/// en: 'Follow your path in real time and enjoy the journey, not just the destination.'
-	String get page2Subtitle => 'Follow your path in real time and enjoy the journey, not just the destination.';
+	/// en: 'How often do you fly?'
+	String get frequencyTitle => 'How often do you fly?';
 
-	/// en: 'Download maps before takeoff'
-	String get page3Title => 'Download maps before takeoff';
+	/// en: 'Flymap will personalize your experience and make suggestions more relevant'
+	String get frequencySubtitle => 'Flymap will personalize your experience and make suggestions more relevant';
 
-	/// en: 'To enjoy your offline in-flight experience, download your map before switching to flight mode.'
-	String get page3Subtitle => 'To enjoy your offline in-flight experience, download your map before switching to flight mode.';
+	/// en: 'This is my first flight'
+	String get frequencyFirstFlight => 'This is my first flight';
 
-	/// en: 'Privacy by design'
-	String get page4Title => 'Privacy by design';
+	/// en: 'A few times a year'
+	String get frequencyFewPerYear => 'A few times a year';
 
-	/// en: 'Your location stays on your device. We don’t collect or share it.'
-	String get page4Subtitle => 'Your location stays on your device. We don’t collect or share it.';
+	/// en: 'About monthly'
+	String get frequencyMonthly => 'About monthly';
+
+	/// en: 'Very often'
+	String get frequencyFrequent => 'Very often';
+
+	/// en: 'Set your home airport'
+	String get homeAirportTitle => 'Set your home airport';
+
+	/// en: 'Get faster flight setup. You can change it anytime.'
+	String get homeAirportSubtitle => 'Get faster flight setup. You can change it anytime.';
+
+	/// en: 'Search home airport'
+	String get homeAirportHint => 'Search home airport';
+
+	/// en: 'Popular airports'
+	String get popularAirports => 'Popular airports';
+
+	/// en: 'Remove home airport'
+	String get removeHomeAirport => 'Remove home airport';
+
+	/// en: 'No airports found for that search.'
+	String get noHomeAirportFound => 'No airports found for that search.';
+
+	/// en: 'What are you interested in?'
+	String get interestsTitle => 'What are you interested in?';
+
+	/// en: 'Choose up to 3 topics to see more relevant places and stories along your flight.'
+	String get interestsSubtitle => 'Choose up to 3 topics to see more relevant places and stories along your flight.';
+
+	/// en: 'Pick up to 3 topics.'
+	String get interestsHelper => 'Pick up to 3 topics.';
+
+	/// en: '$count of $max selected'
+	String interestsSelected({required Object count, required Object max}) => '${count} of ${max} selected';
+
+	/// en: 'Mountains & landscapes'
+	String get interestMountains => 'Mountains & landscapes';
+
+	/// en: 'Cities & skylines'
+	String get interestCities => 'Cities & skylines';
+
+	/// en: 'Coastlines & islands'
+	String get interestCoastlines => 'Coastlines & islands';
+
+	/// en: 'Landmarks & culture'
+	String get interestLandmarks => 'Landmarks & culture';
+
+	/// en: 'Aviation history'
+	String get interestAviationHistory => 'Aviation history';
+
+	/// en: 'Aircraft & engineering'
+	String get interestEngineering => 'Aircraft & engineering';
+
+	/// en: 'Get more from every flight'
+	String get proTitle => 'Get more from every flight';
+
+	/// en: 'Detailed offline maps, more places to discover, and full article packs — even offline'
+	String get proStepSubtitle => 'Detailed offline maps, more places to discover, and full article packs — even offline';
+
+	/// en: 'Unlock Pro'
+	String get unlockPro => 'Unlock Pro';
+
+	/// en: 'Flymap Pro is active'
+	String get proActiveTitle => 'Flymap Pro is active';
+
+	/// en: 'Start my first flight'
+	String get planFirstFlight => 'Start my first flight';
+
+	/// en: 'Plan my first detailed flight'
+	String get planFirstFlightPro => 'Plan my first detailed flight';
+
+	/// en: 'Failed to load your profile.'
+	String get failedLoadProfile => 'Failed to load your profile.';
 }
 
 // Path: home.sort
@@ -1528,6 +1621,13 @@ extension on Translations {
 			'learn.failedToLoadArticle' => 'Could not open this article right now.',
 			'settings.title' => 'Settings',
 			'settings.loading' => 'Loading settings...',
+			'settings.profile' => 'Profile',
+			'settings.profileSubtitle' => 'Name, flying habits, home airport, and interests',
+			'settings.profileSummaryNameHome' => ({required Object name, required Object code}) => '${name} · ${code}',
+			'settings.profileSummaryHome' => ({required Object code}) => 'Home airport: ${code}',
+			'settings.profileEditHint' => 'Tap any item to edit your profile details.',
+			'settings.profileNotSet' => 'Not set',
+			'settings.profileInterestsSelected' => ({required Object count}) => '${count} selected',
 			'settings.appearance' => 'Appearance',
 			'settings.theme' => 'Theme',
 			'settings.system' => 'System',
@@ -1857,16 +1957,40 @@ extension on Translations {
 			'about.tip1' => 'For stronger GPS signal, sit closer to a window.',
 			'about.tip2' => 'Signal can drop in the middle of the aircraft. Flymap keeps the last known route view while searching.',
 			'onboarding.skip' => 'Skip',
-			'onboarding.next' => 'Next',
-			'onboarding.startExploring' => 'Start exploring',
-			'onboarding.page1Title' => 'Explore the world from above',
-			'onboarding.page1Subtitle' => 'From coastlines to mountain ranges, every route feels like a new adventure.',
-			'onboarding.page2Title' => 'Turn every flight into a story',
-			'onboarding.page2Subtitle' => 'Follow your path in real time and enjoy the journey, not just the destination.',
-			'onboarding.page3Title' => 'Download maps before takeoff',
-			'onboarding.page3Subtitle' => 'To enjoy your offline in-flight experience, download your map before switching to flight mode.',
-			'onboarding.page4Title' => 'Privacy by design',
-			'onboarding.page4Subtitle' => 'Your location stays on your device. We don’t collect or share it.',
+			'onboarding.letsStart' => 'Let\'s start',
+			'onboarding.welcomeTitle' => 'Discover what’s below',
+			'onboarding.welcomeSubtitle' => 'Offline maps and interesting places along your flight',
+			'onboarding.nameTitle' => 'Pick a username',
+			'onboarding.nameSubtitle' => 'Make discovery personal. You can change it anytime.',
+			'onboarding.frequencyTitle' => 'How often do you fly?',
+			'onboarding.frequencySubtitle' => 'Flymap will personalize your experience and make suggestions more relevant',
+			'onboarding.frequencyFirstFlight' => 'This is my first flight',
+			'onboarding.frequencyFewPerYear' => 'A few times a year',
+			'onboarding.frequencyMonthly' => 'About monthly',
+			'onboarding.frequencyFrequent' => 'Very often',
+			'onboarding.homeAirportTitle' => 'Set your home airport',
+			'onboarding.homeAirportSubtitle' => 'Get faster flight setup. You can change it anytime.',
+			'onboarding.homeAirportHint' => 'Search home airport',
+			'onboarding.popularAirports' => 'Popular airports',
+			'onboarding.removeHomeAirport' => 'Remove home airport',
+			'onboarding.noHomeAirportFound' => 'No airports found for that search.',
+			'onboarding.interestsTitle' => 'What are you interested in?',
+			'onboarding.interestsSubtitle' => 'Choose up to 3 topics to see more relevant places and stories along your flight.',
+			'onboarding.interestsHelper' => 'Pick up to 3 topics.',
+			'onboarding.interestsSelected' => ({required Object count, required Object max}) => '${count} of ${max} selected',
+			'onboarding.interestMountains' => 'Mountains & landscapes',
+			'onboarding.interestCities' => 'Cities & skylines',
+			'onboarding.interestCoastlines' => 'Coastlines & islands',
+			'onboarding.interestLandmarks' => 'Landmarks & culture',
+			'onboarding.interestAviationHistory' => 'Aviation history',
+			'onboarding.interestEngineering' => 'Aircraft & engineering',
+			'onboarding.proTitle' => 'Get more from every flight',
+			'onboarding.proStepSubtitle' => 'Detailed offline maps, more places to discover, and full article packs — even offline',
+			'onboarding.unlockPro' => 'Unlock Pro',
+			'onboarding.proActiveTitle' => 'Flymap Pro is active',
+			'onboarding.planFirstFlight' => 'Start my first flight',
+			'onboarding.planFirstFlightPro' => 'Plan my first detailed flight',
+			'onboarding.failedLoadProfile' => 'Failed to load your profile.',
 			_ => null,
 		};
 	}

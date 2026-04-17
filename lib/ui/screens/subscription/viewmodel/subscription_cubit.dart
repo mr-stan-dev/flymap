@@ -101,6 +101,10 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
     return _presentPaywallIfNeeded(source: PaywallSource.learnLockedContent);
   }
 
+  Future<SubscriptionPaywallResult> presentPaywallFromOnboarding() async {
+    return _presentPaywallIfNeeded(source: PaywallSource.onboarding);
+  }
+
   Future<SubscriptionPaywallResult>
   presentPaywallFromSubscriptionManagement() async {
     return _presentPaywallIfNeeded(

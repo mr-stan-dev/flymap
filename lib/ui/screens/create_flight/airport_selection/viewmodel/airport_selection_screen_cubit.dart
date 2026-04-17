@@ -4,6 +4,7 @@ import 'package:flymap/entity/airport.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
+import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/ui/screens/create_flight/airport_selection/viewmodel/airport_selection_screen_state.dart';
 import 'package:flymap/ui/screens/create_flight/airport_selection/popular_flights.dart';
@@ -12,10 +13,12 @@ class AirportSelectionScreenCubit extends Cubit<AirportSelectionScreenState> {
   AirportSelectionScreenCubit({
     required AirportsDatabase airportsDb,
     required FavoriteAirportsRepository favoritesRepository,
+    required OnboardingRepository onboardingRepository,
     required RecentAirportsRepository recentAirportsRepository,
     bool autoInitialize = true,
   }) : _airportsDb = airportsDb,
        _favoritesRepository = favoritesRepository,
+       _onboardingRepository = onboardingRepository,
        _recentAirportsRepository = recentAirportsRepository,
        super(AirportSelectionScreenState.initial()) {
     if (autoInitialize) {
@@ -25,20 +28,34 @@ class AirportSelectionScreenCubit extends Cubit<AirportSelectionScreenState> {
 
   final AirportsDatabase _airportsDb;
   final FavoriteAirportsRepository _favoritesRepository;
+  final OnboardingRepository _onboardingRepository;
   final RecentAirportsRepository _recentAirportsRepository;
   final _logger = Logger('AirportSelectionScreenCubit');
 
   Future<void> _initialize() async {
     try {
       await _airportsDb.initialize();
-      final popularAirports = await loadPopularAirports();
+      final popularAirports = await loadPopularAirports(
+        airportsDatabase: _airportsDb,
+      );
       final favoriteAirports = await _loadFavoriteAirports();
       final recentAirports = await _loadRecentAirports();
+      final homeAirport = await _loadHomeAirport();
+      final prefillIsFavorite = await _isFavorite(homeAirport);
+      final prefillQuery = homeAirport == null
+          ? ''
+          : _airportSearchLabel(homeAirport);
       emit(
         state.copyWith(
           popularAirports: popularAirports,
           favoriteAirports: favoriteAirports,
           recentAirports: recentAirports,
+          homeAirport: homeAirport,
+          selectedDeparture: homeAirport,
+          selectedAirportIsFavorite: prefillIsFavorite,
+          searchQuery: prefillQuery,
+          searchResults: const [],
+          isSearchLoading: false,
           clearErrorMessage: true,
         ),
       );
@@ -300,6 +317,13 @@ class AirportSelectionScreenCubit extends Cubit<AirportSelectionScreenState> {
     return airports;
   }
 
+  Future<Airport?> _loadHomeAirport() async {
+    final profile = await _onboardingRepository.getProfile();
+    final code = profile.homeAirportCode;
+    if (code == null || code.isEmpty) return null;
+    return _airportsDb.findByCode(code);
+  }
+
   String _airportCode(Airport? airport) {
     if (airport == null) return '';
     final primary = airport.primaryCode.trim().toUpperCase();
@@ -308,5 +332,5 @@ class AirportSelectionScreenCubit extends Cubit<AirportSelectionScreenState> {
   }
 
   String _airportSearchLabel(Airport airport) =>
-      '${airport.name} (${airport.displayCode})';
+      '${airport.nameShort} (${airport.displayCode})';
 }

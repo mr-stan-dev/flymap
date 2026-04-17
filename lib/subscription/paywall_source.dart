@@ -19,6 +19,9 @@ enum PaywallSource {
 
   /// User attempted to open locked Learn content.
   learnLockedContent,
+
+  /// User opened paywall from onboarding soft Pro step.
+  onboarding,
 }
 
 extension PaywallSourceAnalyticsValue on PaywallSource {
@@ -31,6 +34,7 @@ extension PaywallSourceAnalyticsValue on PaywallSource {
       PaywallSource.settingsBanner => 'settings_banner',
       PaywallSource.subscriptionManagement => 'subscription_management',
       PaywallSource.learnLockedContent => 'learn_locked_content',
+      PaywallSource.onboarding => 'onboarding',
     };
   }
 }

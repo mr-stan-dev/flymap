@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flymap/entity/onboarding_profile.dart';
 import 'package:flutter/material.dart';
 
 class SettingsState extends Equatable {
@@ -6,6 +7,8 @@ class SettingsState extends Equatable {
   final String altitudeUnit; // 'ft' | 'm'
   final String speedUnit; // 'km/h' | 'mph'
   final String timeFormat; // '24h' | '12h'
+  final OnboardingProfile profile;
+  final String? homeAirportDisplayCode;
   final bool isLoading;
 
   const SettingsState({
@@ -13,6 +16,8 @@ class SettingsState extends Equatable {
     this.altitudeUnit = 'ft',
     this.speedUnit = 'km/h',
     this.timeFormat = '24h',
+    this.profile = const OnboardingProfile.empty(),
+    this.homeAirportDisplayCode,
     this.isLoading = true,
   });
 
@@ -21,6 +26,9 @@ class SettingsState extends Equatable {
     String? altitudeUnit,
     String? speedUnit,
     String? timeFormat,
+    OnboardingProfile? profile,
+    String? homeAirportDisplayCode,
+    bool clearHomeAirportDisplayCode = false,
     bool? isLoading,
   }) {
     return SettingsState(
@@ -28,6 +36,10 @@ class SettingsState extends Equatable {
       altitudeUnit: altitudeUnit ?? this.altitudeUnit,
       speedUnit: speedUnit ?? this.speedUnit,
       timeFormat: timeFormat ?? this.timeFormat,
+      profile: profile ?? this.profile,
+      homeAirportDisplayCode: clearHomeAirportDisplayCode
+          ? null
+          : homeAirportDisplayCode ?? this.homeAirportDisplayCode,
       isLoading: isLoading ?? this.isLoading,
     );
   }
@@ -38,6 +50,8 @@ class SettingsState extends Equatable {
     altitudeUnit,
     speedUnit,
     timeFormat,
+    profile,
+    homeAirportDisplayCode,
     isLoading,
   ];
 }

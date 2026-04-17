@@ -12,6 +12,7 @@ import 'package:flymap/ui/screens/flight/flight_screen.dart';
 import 'package:flymap/ui/screens/home/home_screen.dart';
 import 'package:flymap/ui/screens/onboarding/onboarding_screen.dart';
 import 'package:flymap/ui/screens/share_flight/share_flight_screen.dart';
+import 'package:flymap/ui/screens/settings/profile/settings_profile_screen.dart';
 import 'package:flymap/ui/screens/subscription/subscription_management_screen.dart';
 import 'package:flymap/usecase/submit_feedback_use_case.dart';
 import 'package:get_it/get_it.dart';
@@ -29,6 +30,7 @@ class AppRouter {
   static const String subscriptionRoute = '/subscription';
   static const String aboutRoute = '/about';
   static const String onboardingRoute = '/onboarding';
+  static const String settingsProfileRoute = '/settings/profile';
 
   /// Create the router configuration
   static GoRouter createRouter({required bool showOnboarding}) {
@@ -108,6 +110,12 @@ class AppRouter {
         ),
 
         GoRoute(
+          path: settingsProfileRoute,
+          name: 'settings-profile',
+          builder: (context, state) => const SettingsProfileScreen(),
+        ),
+
+        GoRoute(
           path: feedbackRoute,
           name: 'feedback',
           builder: (context, state) {
@@ -143,6 +151,10 @@ class AppRouter {
     context.go(homeRoute);
   }
 
+  static void goToFlightSearch(BuildContext context) {
+    context.go(flightSearchRoute);
+  }
+
   /// Navigate to flight screen with flight
   static void goToFlight(BuildContext context, {required Flight flight}) {
     context.push(flightRoute, extra: {'flight': flight});
@@ -168,6 +180,10 @@ class AppRouter {
   /// Navigate to settings
   static void goToSettings(BuildContext context) {
     context.push(settingsRoute);
+  }
+
+  static Future<void> goToSettingsProfile(BuildContext context) {
+    return context.push(settingsProfileRoute);
   }
 
   /// Navigate to feedback and return true when submitted.

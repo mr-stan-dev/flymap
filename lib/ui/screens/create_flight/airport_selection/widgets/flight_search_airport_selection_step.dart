@@ -17,6 +17,7 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
     required this.recent,
     required this.popular,
     required this.results,
+    required this.homeAirportCode,
     required this.onSearchChanged,
     required this.onClearSearch,
     required this.onToggleFavoriteForSelected,
@@ -39,6 +40,7 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
   final List<Airport> recent;
   final List<Airport> popular;
   final List<Airport> results;
+  final String homeAirportCode;
   final ValueChanged<String> onSearchChanged;
   final VoidCallback onClearSearch;
   final VoidCallback onToggleFavoriteForSelected;
@@ -51,6 +53,11 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gpsActiveColor = DsSemanticColors.success(context);
+    final selectedAirportCode = _airportCode(selectedAirport);
+    final isSelectedAirportHome =
+        selectedAirportCode.isNotEmpty &&
+        homeAirportCode.isNotEmpty &&
+        selectedAirportCode == homeAirportCode;
 
     return Column(
       children: [
@@ -84,20 +91,32 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
                   onClear: onClearSearch,
                   suffixActions: selectedAirport != null
                       ? [
-                          IconButton(
-                            icon: Icon(
-                              selectedAirportIsFavorite
-                                  ? Icons.star
-                                  : Icons.star_border,
-                              color: selectedAirportIsFavorite
-                                  ? DsSemanticColors.warning(context)
-                                  : null,
+                          if (isSelectedAirportHome)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
+                              child: Icon(
+                                Icons.home_rounded,
+                                color: Theme.of(context).colorScheme.primary,
+                                size: 20,
+                              ),
+                            )
+                          else
+                            IconButton(
+                              icon: Icon(
+                                selectedAirportIsFavorite
+                                    ? Icons.star
+                                    : Icons.star_border,
+                                color: selectedAirportIsFavorite
+                                    ? DsSemanticColors.warning(context)
+                                    : null,
+                              ),
+                              tooltip: selectedAirportIsFavorite
+                                  ? context.t.createFlight.search.removeFavorite
+                                  : context.t.createFlight.search.addFavorite,
+                              onPressed: onToggleFavoriteForSelected,
                             ),
-                            tooltip: selectedAirportIsFavorite
-                                ? context.t.createFlight.search.removeFavorite
-                                : context.t.createFlight.search.addFavorite,
-                            onPressed: onToggleFavoriteForSelected,
-                          ),
                           IconButton(
                             icon: const Icon(Icons.close),
                             tooltip: context
@@ -133,6 +152,7 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
                   const SizedBox(height: 10),
                   _AirportChipWrap(
                     airports: favorites,
+                    homeAirportCode: homeAirportCode,
                     onSelectAirport: onSelectAirport,
                     showFavoriteTrailingIcon: true,
                     onToggleFavorite: onToggleFavoriteForAirport,
@@ -183,6 +203,13 @@ class FlightSearchAirportSelectionStep extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _airportCode(Airport? airport) {
+    if (airport == null) return '';
+    final primary = airport.primaryCode.trim().toUpperCase();
+    if (primary.isNotEmpty) return primary;
+    return airport.displayCode.trim().toUpperCase();
   }
 }
 
@@ -256,12 +283,14 @@ class _AirportChipWrap extends StatelessWidget {
   const _AirportChipWrap({
     required this.airports,
     required this.onSelectAirport,
+    this.homeAirportCode = '',
     this.showFavoriteTrailingIcon = false,
     this.onToggleFavorite,
   });
 
   final List<Airport> airports;
   final Future<void> Function(Airport airport) onSelectAirport;
+  final String homeAirportCode;
   final bool showFavoriteTrailingIcon;
   final Future<void> Function(Airport airport)? onToggleFavorite;
 
@@ -271,16 +300,29 @@ class _AirportChipWrap extends StatelessWidget {
       spacing: 6,
       runSpacing: 6,
       children: airports.map((airport) {
+        final code = _airportCode(airport);
+        final isHomeAirport =
+            homeAirportCode.isNotEmpty && code == homeAirportCode;
         return SelectionChip(
           label: context.t.createFlight.search.airportNameCode(
             name: airport.nameShort,
             code: airport.displayCode,
           ),
+          leading: isHomeAirport
+              ? Icon(
+                  Icons.home_rounded,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.primary,
+                )
+              : null,
           onPressed: () => onSelectAirport(airport),
-          onDeleted: showFavoriteTrailingIcon && onToggleFavorite != null
+          onDeleted:
+              showFavoriteTrailingIcon &&
+                  onToggleFavorite != null &&
+                  !isHomeAirport
               ? () => onToggleFavorite!(airport)
               : null,
-          deleteIcon: showFavoriteTrailingIcon
+          deleteIcon: showFavoriteTrailingIcon && !isHomeAirport
               ? Icon(
                   Icons.star,
                   color: DsSemanticColors.warning(context),
@@ -293,6 +335,12 @@ class _AirportChipWrap extends StatelessWidget {
         );
       }).toList(),
     );
+  }
+
+  String _airportCode(Airport airport) {
+    final primary = airport.primaryCode.trim().toUpperCase();
+    if (primary.isNotEmpty) return primary;
+    return airport.displayCode.trim().toUpperCase();
   }
 }
 

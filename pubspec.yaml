@@ -75,7 +75,6 @@ flutter:
     - assets/images/
     - assets/images/learn/
     - assets/images/learn/categories/
-    - assets/images/icons/
     - assets/images/poi/
 
 flutter_launcher_icons:

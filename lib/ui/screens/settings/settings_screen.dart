@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
+import 'package:flymap/ui/screens/onboarding/model/onboarding_profile_ui.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -54,6 +55,22 @@ class SettingsContent extends StatelessWidget {
                 SubscriptionTopBanner(
                   state: subscriptionState,
                   onManage: () => _openSubscription(context),
+                ),
+                const SizedBox(height: 12),
+                SettingsGroupCard(
+                  title: context.t.settings.profile,
+                  children: [
+                    SettingItem(
+                      title: context.t.settings.profile,
+                      subtitle: _profileSubtitle(context, state),
+                      leading: const Icon(Icons.person_outline_rounded),
+                      onTap: () async {
+                        await AppRouter.goToSettingsProfile(context);
+                        if (!context.mounted) return;
+                        await context.read<SettingsCubit>().load();
+                      },
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 SettingsGroupCard(
@@ -113,6 +130,28 @@ class SettingsContent extends StatelessWidget {
         );
       },
     );
+  }
+
+  String _profileSubtitle(BuildContext context, SettingsState state) {
+    final profile = state.profile;
+    final homeCode = state.homeAirportDisplayCode;
+    final displayName = profile.displayName.trim();
+    if (displayName.isNotEmpty && homeCode != null) {
+      return context.t.settings.profileSummaryNameHome(
+        name: displayName,
+        code: homeCode,
+      );
+    }
+    if (displayName.isNotEmpty) {
+      return displayName;
+    }
+    if (homeCode != null) {
+      return context.t.settings.profileSummaryHome(code: homeCode);
+    }
+    if (profile.flyingFrequency != null) {
+      return profile.flyingFrequency!.title(context);
+    }
+    return context.t.settings.profileSubtitle;
   }
 
   Future<void> _openSubscription(BuildContext context) async {

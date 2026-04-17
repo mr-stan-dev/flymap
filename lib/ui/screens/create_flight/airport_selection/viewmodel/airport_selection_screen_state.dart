@@ -9,6 +9,7 @@ class AirportSelectionScreenState extends Equatable {
     required this.popularAirports,
     required this.favoriteAirports,
     required this.recentAirports,
+    required this.homeAirport,
     required this.searchQuery,
     required this.searchResults,
     required this.isSearchLoading,
@@ -24,6 +25,7 @@ class AirportSelectionScreenState extends Equatable {
       popularAirports: [],
       favoriteAirports: [],
       recentAirports: [],
+      homeAirport: null,
       searchQuery: '',
       searchResults: [],
       isSearchLoading: false,
@@ -38,6 +40,7 @@ class AirportSelectionScreenState extends Equatable {
   final List<Airport> popularAirports;
   final List<Airport> favoriteAirports;
   final List<Airport> recentAirports;
+  final Airport? homeAirport;
   final String searchQuery;
   final List<Airport> searchResults;
   final bool isSearchLoading;
@@ -55,6 +58,8 @@ class AirportSelectionScreenState extends Equatable {
     List<Airport>? popularAirports,
     List<Airport>? favoriteAirports,
     List<Airport>? recentAirports,
+    Airport? homeAirport,
+    bool clearHomeAirport = false,
     String? searchQuery,
     List<Airport>? searchResults,
     bool? isSearchLoading,
@@ -71,6 +76,7 @@ class AirportSelectionScreenState extends Equatable {
       popularAirports: popularAirports ?? this.popularAirports,
       favoriteAirports: favoriteAirports ?? this.favoriteAirports,
       recentAirports: recentAirports ?? this.recentAirports,
+      homeAirport: clearHomeAirport ? null : homeAirport ?? this.homeAirport,
       searchQuery: searchQuery ?? this.searchQuery,
       searchResults: searchResults ?? this.searchResults,
       isSearchLoading: isSearchLoading ?? this.isSearchLoading,
@@ -94,6 +100,7 @@ class AirportSelectionScreenState extends Equatable {
     popularAirports,
     favoriteAirports,
     recentAirports,
+    homeAirport,
     searchQuery,
     searchResults,
     isSearchLoading,

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/data/local/airports_database.dart';
+import 'package:flymap/entity/onboarding_profile.dart';
 import 'package:flymap/entity/units.dart';
 import 'package:flymap/repository/metric_units_repository.dart';
+import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/settings_repository.dart';
 
 import 'settings_state.dart';
@@ -9,11 +12,17 @@ import 'settings_state.dart';
 class SettingsCubit extends Cubit<SettingsState> {
   final SettingsRepository _settingsRepo;
   final MetricUnitsRepository _unitsRepo;
+  final OnboardingRepository _onboardingRepository;
+  final AirportsDatabase _airportsDb;
   SettingsCubit({
     SettingsRepository? repository,
     MetricUnitsRepository? unitsRepository,
+    OnboardingRepository? onboardingRepository,
+    AirportsDatabase? airportsDatabase,
   }) : _settingsRepo = repository ?? SettingsRepository(),
        _unitsRepo = unitsRepository ?? MetricUnitsRepository(),
+       _onboardingRepository = onboardingRepository ?? OnboardingRepository(),
+       _airportsDb = airportsDatabase ?? AirportsDatabase.instance,
        super(const SettingsState());
 
   Future<void> load() async {
@@ -22,6 +31,9 @@ class SettingsCubit extends Cubit<SettingsState> {
     final altitude = await _unitsRepo.getAltitudeUnit();
     final speed = await _unitsRepo.getSpeedUnit();
     final time = await _unitsRepo.getTimeFormat();
+    final profile = await _onboardingRepository.getProfile();
+    await _airportsDb.initialize();
+    final homeAirportDisplayCode = _resolveHomeAirportDisplayCode(profile);
 
     emit(
       SettingsState(
@@ -29,6 +41,8 @@ class SettingsCubit extends Cubit<SettingsState> {
         altitudeUnit: _formatAltitude(altitude),
         speedUnit: _formatSpeed(speed),
         timeFormat: _formatTime(time),
+        profile: profile,
+        homeAirportDisplayCode: homeAirportDisplayCode,
         isLoading: false,
       ),
     );
@@ -65,4 +79,11 @@ class SettingsCubit extends Cubit<SettingsState> {
       u == AltitudeUnit.meter ? 'm' : 'ft';
   String _formatSpeed(SpeedUnit u) => u == SpeedUnit.mph ? 'mph' : 'km/h';
   String _formatTime(TimeFormat t) => t == TimeFormat.format12h ? '12h' : '24h';
+
+  String? _resolveHomeAirportDisplayCode(OnboardingProfile profile) {
+    final code = profile.homeAirportCode;
+    if (code == null || code.isEmpty) return null;
+    final airport = _airportsDb.findByCode(code);
+    return airport?.displayCode ?? code;
+  }
 }

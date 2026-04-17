@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
+import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/create_flight/airport_selection/widgets/flight_search_airport_selection_step.dart';
@@ -34,6 +35,7 @@ class _AirportSelectionScreenState extends State<AirportSelectionScreen> {
       create: (_) => AirportSelectionScreenCubit(
         airportsDb: GetIt.I.get(),
         favoritesRepository: GetIt.I.get<FavoriteAirportsRepository>(),
+        onboardingRepository: GetIt.I.get<OnboardingRepository>(),
         recentAirportsRepository: GetIt.I.get<RecentAirportsRepository>(),
       ),
       child:
@@ -63,9 +65,14 @@ class _AirportSelectionScreenState extends State<AirportSelectionScreen> {
             builder: (context, state) {
               final cubit = context.read<AirportSelectionScreenCubit>();
               final selectedAirport = state.selectedAirport;
-              final favorites = _filterAirportsForCurrentStep(
+              final filteredFavorites = _filterAirportsForCurrentStep(
                 state.favoriteAirports,
                 state,
+              );
+              final homeAirport = _filterHomeAirportForCurrentStep(state);
+              final favorites = _pinHomeAirportFirst(
+                filteredFavorites,
+                homeAirport,
               );
               final favoriteCodes = favorites.map(_airportCode).toSet();
               final recentCodes = <String>{};
@@ -98,7 +105,7 @@ class _AirportSelectionScreenState extends State<AirportSelectionScreen> {
                   if (didPop) return;
                   final shouldPop = await cubit.handleBackAction();
                   if (shouldPop && context.mounted) {
-                    Navigator.of(context).pop();
+                    _popOrGoHome(context);
                   }
                 },
                 child: Scaffold(
@@ -128,6 +135,7 @@ class _AirportSelectionScreenState extends State<AirportSelectionScreen> {
                       recent: recent,
                       popular: popular,
                       results: results,
+                      homeAirportCode: _airportCode(homeAirport),
                       onSearchChanged: cubit.searchAirports,
                       onClearSearch: () {
                         _searchController.clear();
@@ -182,8 +190,17 @@ class _AirportSelectionScreenState extends State<AirportSelectionScreen> {
         .read<AirportSelectionScreenCubit>()
         .handleBackAction();
     if (shouldPop && context.mounted) {
-      Navigator.of(context).pop();
+      _popOrGoHome(context);
     }
+  }
+
+  void _popOrGoHome(BuildContext context) {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+      return;
+    }
+    AppRouter.goHome(context);
   }
 
   List<Airport> _filterAirportsForCurrentStep(
@@ -198,6 +215,24 @@ class _AirportSelectionScreenState extends State<AirportSelectionScreen> {
     return airports
         .where((airport) => _airportCode(airport) != departureCode)
         .toList();
+  }
+
+  Airport? _filterHomeAirportForCurrentStep(AirportSelectionScreenState state) {
+    final home = state.homeAirport;
+    if (home == null) return null;
+    if (state.step != AirportSelectionStep.arrival) return home;
+    final departureCode = _airportCode(state.selectedDeparture);
+    if (departureCode.isEmpty) return home;
+    return _airportCode(home) == departureCode ? null : home;
+  }
+
+  List<Airport> _pinHomeAirportFirst(List<Airport> favorites, Airport? home) {
+    if (home == null) return favorites;
+    final homeCode = _airportCode(home);
+    final filtered = favorites
+        .where((airport) => _airportCode(airport) != homeCode)
+        .toList();
+    return [home, ...filtered];
   }
 
   String _airportCode(Airport? airport) {

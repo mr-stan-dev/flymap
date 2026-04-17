@@ -11,6 +11,10 @@ class AirportsDatabase {
   bool _isInitialized = false;
 
   AirportsDatabase._();
+  AirportsDatabase.test({Iterable<Airport> seedAirports = const []}) {
+    _airports.addAll(seedAirports);
+    _isInitialized = true;
+  }
 
   /// Get singleton instance
   static AirportsDatabase get instance {
