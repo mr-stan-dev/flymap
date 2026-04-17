@@ -155,12 +155,6 @@ class TranslationsHomeEn {
 	/// en: 'Add your first flight and start discovering your next journey.'
 	String get noFlightsSubtitle => 'Add your first flight and start discovering your next journey.';
 
-	/// en: 'Saved offline'
-	String get statusSavedOffline => 'Saved offline';
-
-	/// en: 'Needs map'
-	String get statusNeedsMap => 'Needs map';
-
 	/// en: 'Flight actions'
 	String get flightActions => 'Flight actions';
 
@@ -178,6 +172,12 @@ class TranslationsHomeEn {
 
 	/// en: 'No offline map'
 	String get noOfflineMap => 'No offline map';
+
+	/// en: '$count places'
+	String placesCount({required Object count}) => '${count} places';
+
+	/// en: '$count articles'
+	String offlineArticlesCount({required Object count}) => '${count} articles';
 
 	/// en: 'Just now'
 	String get justNow => 'Just now';
@@ -1592,14 +1592,14 @@ extension on Translations {
 			'home.flightsCount' => ({required Object count}) => 'Flights (${count})',
 			'home.noFlightsTitle' => 'Ready to explore the world from above?',
 			'home.noFlightsSubtitle' => 'Add your first flight and start discovering your next journey.',
-			'home.statusSavedOffline' => 'Saved offline',
-			'home.statusNeedsMap' => 'Needs map',
 			'home.flightActions' => 'Flight actions',
 			'home.open' => 'Open',
 			'home.shareRoute' => 'Share route',
 			'home.deleteFlight' => 'Delete flight',
 			'home.failedDeleteFlight' => 'Failed to delete flight',
 			'home.noOfflineMap' => 'No offline map',
+			'home.placesCount' => ({required Object count}) => '${count} places',
+			'home.offlineArticlesCount' => ({required Object count}) => '${count} articles',
 			'home.justNow' => 'Just now',
 			'home.daysAgo' => ({required Object days}) => '${days} d ago',
 			'home.hoursAgo' => ({required Object hours}) => '${hours} h ago',

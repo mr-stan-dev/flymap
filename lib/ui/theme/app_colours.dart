@@ -17,12 +17,12 @@ class AppColoursCommon {
 
 class AppColoursDark {
   // Backgrounds tuned to match ThemeData.dark
-  static const Color backgroundPrimary = Color(0xFF121212); // scaffold
+  static const Color backgroundPrimary = Color(0xFF1C1C1C); // scaffold
   static const Color backgroundSecondary = Color(
-    0xFF1E1E1E,
+    0xFF222222,
   ); // app bar / containers
-  static const Color backgroundTertiary = Color(0xFF2A2A2A); // cards
-  static const Color backgroundQuaternary = Color(0xFF3C3C3C);
+  static const Color backgroundTertiary = Color(0xFF292929); // cards
+  static const Color backgroundQuaternary = Color(0xFF3E3E3E);
 
   static const textPrimary = Color(0xFFE7E7E7);
   static const textSecondary = Color(0xFF9B9B9B);
