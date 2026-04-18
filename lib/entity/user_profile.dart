@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 enum FlyingFrequency { firstFlight, fewPerYear, monthly, frequent }
 
-enum OnboardingInterest {
+enum UsersInterests {
   mountains,
   cities,
   coastlines,
@@ -11,27 +11,24 @@ enum OnboardingInterest {
   engineering,
 }
 
-class OnboardingProfile extends Equatable {
-  const OnboardingProfile({
-    required this.hasCompletedOnboarding,
+class UserProfile extends Equatable {
+  const UserProfile({
     required this.displayName,
     required this.flyingFrequency,
     required this.homeAirportCode,
     required this.interests,
   });
 
-  const OnboardingProfile.empty()
-    : hasCompletedOnboarding = false,
-      displayName = '',
+  const UserProfile.empty()
+    : displayName = '',
       flyingFrequency = null,
       homeAirportCode = null,
       interests = const [];
 
-  final bool hasCompletedOnboarding;
   final String displayName;
   final FlyingFrequency? flyingFrequency;
   final String? homeAirportCode;
-  final List<OnboardingInterest> interests;
+  final List<UsersInterests> interests;
 
   bool get hasInterests => interests.isNotEmpty;
   bool get hasProfileDetails =>
@@ -40,18 +37,15 @@ class OnboardingProfile extends Equatable {
       homeAirportCode != null ||
       interests.isNotEmpty;
 
-  OnboardingProfile copyWith({
-    bool? hasCompletedOnboarding,
+  UserProfile copyWith({
     String? displayName,
     FlyingFrequency? flyingFrequency,
     bool clearFlyingFrequency = false,
     String? homeAirportCode,
     bool clearHomeAirportCode = false,
-    List<OnboardingInterest>? interests,
+    List<UsersInterests>? interests,
   }) {
-    return OnboardingProfile(
-      hasCompletedOnboarding:
-          hasCompletedOnboarding ?? this.hasCompletedOnboarding,
+    return UserProfile(
       displayName: displayName ?? this.displayName,
       flyingFrequency: clearFlyingFrequency
           ? null
@@ -65,7 +59,6 @@ class OnboardingProfile extends Equatable {
 
   @override
   List<Object?> get props => [
-    hasCompletedOnboarding,
     displayName,
     flyingFrequency,
     homeAirportCode,

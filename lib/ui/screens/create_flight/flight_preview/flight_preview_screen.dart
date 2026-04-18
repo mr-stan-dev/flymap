@@ -13,6 +13,7 @@ import 'package:flymap/rating/rate_prompt_trigger.dart';
 import 'package:flymap/rating/rate_store_launcher.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
+import 'package:flymap/repository/user_flight_prefs_repository.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/subscription/pro_limits.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
@@ -32,6 +33,7 @@ import 'package:flymap/usecase/download_map_use_case.dart';
 import 'package:flymap/usecase/download_poi_summaries_use_case.dart';
 import 'package:flymap/usecase/download_wikipedia_articles_use_case.dart';
 import 'package:flymap/usecase/get_flight_info_use_case.dart';
+import 'package:flymap/usecase/get_wiki_articles_use_case.dart';
 import 'package:flymap/usecase/delete_flight_use_case.dart';
 import 'package:flymap/usecase/get_flight_poi_use_case.dart';
 import 'package:get_it/get_it.dart';
@@ -54,7 +56,9 @@ class FlightPreviewScreen extends StatelessWidget {
         downloadWikipediaArticlesUseCase: GetIt.I
             .get<DownloadWikipediaArticlesUseCase>(),
         getFlightInfoUseCase: GetIt.I.get<GetFlightInfoUseCase>(),
+        getWikiArticlesUseCase: GetIt.I.get<GetWikiArticlesUseCase>(),
         getFlightPOIUseCase: GetIt.I.get<GetFlightPOIUseCase>(),
+        userFlightPrefsRepository: GetIt.I.get<UserFlightPrefsRepository>(),
         flightRepository: GetIt.I.get<FlightRepository>(),
         subscriptionRepository: GetIt.I.get<SubscriptionRepository>(),
         deleteFlightUseCase: GetIt.I.get<DeleteFlightUseCase>(),

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/learn_access.dart';
@@ -16,7 +17,11 @@ import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/learn_article_progress_repository.dart';
 import 'package:flymap/repository/learn_repository.dart';
+import 'package:flymap/repository/metric_units_repository.dart';
+import 'package:flymap/repository/onboarding_repository.dart';
+import 'package:flymap/repository/settings_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
+import 'package:flymap/repository/user_flight_prefs_storage.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/subscription/subscription_status.dart';
@@ -145,7 +150,16 @@ Widget _testApp({HomeRootTab initialTab = HomeRootTab.flights}) {
   return TranslationProvider(
     child: MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => SettingsCubit()..load()),
+        BlocProvider(
+          create: (_) => SettingsCubit(
+            repository: SettingsRepository(),
+            unitsRepository: MetricUnitsRepository(),
+            onboardingRepository: OnboardingRepository(
+              prefsStorage: UserFlightPrefsStorage(),
+            ),
+            airportsDatabase: AirportsDatabase.test(seedAirports: const []),
+          )..load(),
+        ),
         BlocProvider(
           create: (_) => SubscriptionCubit(
             repository: _FakeSubscriptionRepository(),

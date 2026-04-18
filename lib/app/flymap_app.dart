@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/i18n/strings.g.dart';
+import 'package:flymap/repository/metric_units_repository.dart';
+import 'package:flymap/repository/onboarding_repository.dart';
+import 'package:flymap/repository/settings_repository.dart';
 import 'package:flymap/ui/screens/settings/viewmodel/settings_cubit.dart';
 import 'package:flymap/ui/screens/settings/viewmodel/settings_state.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
@@ -30,7 +34,14 @@ class _FlymapAppState extends State<FlymapApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => SettingsCubit()..load()),
+        BlocProvider(
+          create: (_) => SettingsCubit(
+            repository: GetIt.I.get<SettingsRepository>(),
+            unitsRepository: GetIt.I.get<MetricUnitsRepository>(),
+            onboardingRepository: GetIt.I.get<OnboardingRepository>(),
+            airportsDatabase: GetIt.I.get<AirportsDatabase>(),
+          )..load(),
+        ),
         BlocProvider(
           create: (_) => SubscriptionCubit(
             repository: GetIt.I.get<SubscriptionRepository>(),

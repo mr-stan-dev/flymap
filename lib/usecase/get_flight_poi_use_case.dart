@@ -1,23 +1,31 @@
 import 'dart:math' as math;
 
 import 'package:flymap/entity/flight_poi_type.dart';
+import 'package:flymap/entity/user_profile.dart';
 import 'package:flymap/entity/route_poi_rank.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/entity/map_detail_level.dart';
 import 'package:flymap/entity/route_poi.dart';
 import 'package:flymap/entity/route_poi_summary.dart';
+import 'package:flymap/entity/user_flight_prefs.dart';
 import 'package:flymap/repository/flight_poi_repository.dart';
 import 'package:flymap/usecase/poi_selection_config.dart';
+import 'package:flymap/usecase/poi_preferences_booster.dart';
 import 'package:latlong2/latlong.dart';
 
 class GetFlightPOIUseCase {
-  GetFlightPOIUseCase({required FlightPOIRepository repository})
-    : _repository = repository;
+  GetFlightPOIUseCase({
+    required FlightPOIRepository repository,
+    required PoiPreferencesBooster preferencesBooster,
+  }) : _repository = repository,
+       _preferencesBooster = preferencesBooster;
 
   final FlightPOIRepository _repository;
+  final PoiPreferencesBooster _preferencesBooster;
 
-  int _rankScore(RoutePoi poi) =>
-      RoutePoiRank.baseScore(type: poi.type, sitelinks: poi.sitelinks);
+  int _rankScore(RoutePoi poi, {required List<UsersInterests> interests}) =>
+      RoutePoiRank.baseScore(type: poi.type, sitelinks: poi.sitelinks) +
+      _preferencesBooster.interestBoostFor(poi.type, interests);
 
   // Small extra preference during final fill pass so dense mountain regions
   // (e.g. Alps) are less likely to be outcompeted by low-signal sparse areas.
@@ -47,7 +55,9 @@ class GetFlightPOIUseCase {
   Future<List<RoutePoiSummary>> call({
     required FlightRoute route,
     required MapDetailLevel mapDetail,
+    UserFlightPrefs? prefs,
   }) async {
+    final interests = prefs?.interests ?? const <UsersInterests>[];
     final includeAllVolcanoes = mapDetail == MapDetailLevel.pro;
     final maxPois = PoiSelectionConfig.maxPois(mapDetail);
     final prefetchLimit = PoiSelectionConfig.prefetchLimit(mapDetail);
@@ -72,6 +82,7 @@ class GetFlightPOIUseCase {
       softCapPerType: softCapPerType,
       minCitySegmentGap: minCitySegmentGap,
       includeAllVolcanoes: includeAllVolcanoes,
+      interests: interests,
     );
     final mapped = selected
         .map(
@@ -93,6 +104,7 @@ class GetFlightPOIUseCase {
     required int softCapPerType,
     required int minCitySegmentGap,
     required bool includeAllVolcanoes,
+    required List<UsersInterests> interests,
   }) {
     // Deduplicate by QID.
     final uniqueByQid = <String, RoutePoi>{};
@@ -149,7 +161,10 @@ class GetFlightPOIUseCase {
               .where((item) => item.poi.type == FlightPoiType.volcano)
               .toList(growable: false)
             ..sort((a, b) {
-              final scoreDiff = _rankScore(b.poi).compareTo(_rankScore(a.poi));
+              final scoreDiff = _rankScore(
+                b.poi,
+                interests: interests,
+              ).compareTo(_rankScore(a.poi, interests: interests));
               if (scoreDiff != 0) return scoreDiff;
               return a.poi.qid.compareTo(b.poi.qid);
             });
@@ -198,13 +213,13 @@ class GetFlightPOIUseCase {
       final mountainFamilyCount = segmentMountainFamilyCounts[i];
       list.sort((a, b) {
         final aScore =
-            _rankScore(a.poi) +
+            _rankScore(a.poi, interests: interests) +
             _segmentMountainDensityBonus(
               type: a.poi.type,
               mountainFamilyCountInSegment: mountainFamilyCount,
             );
         final bScore =
-            _rankScore(b.poi) +
+            _rankScore(b.poi, interests: interests) +
             _segmentMountainDensityBonus(
               type: b.poi.type,
               mountainFamilyCountInSegment: mountainFamilyCount,
@@ -306,7 +321,7 @@ class GetFlightPOIUseCase {
       );
       if (segmentCountDiff != 0) return segmentCountDiff;
       final aFillScore =
-          _rankScore(a.poi) +
+          _rankScore(a.poi, interests: interests) +
           _fillNatureBoost(a.poi.type) +
           _segmentMountainDensityBonus(
             type: a.poi.type,
@@ -314,7 +329,7 @@ class GetFlightPOIUseCase {
                 segmentMountainFamilyCounts[a.segmentIndex],
           );
       final bFillScore =
-          _rankScore(b.poi) +
+          _rankScore(b.poi, interests: interests) +
           _fillNatureBoost(b.poi.type) +
           _segmentMountainDensityBonus(
             type: b.poi.type,

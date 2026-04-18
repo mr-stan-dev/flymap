@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/airports_database.dart';
-import 'package:flymap/entity/onboarding_profile.dart';
+import 'package:flymap/entity/user_profile.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';

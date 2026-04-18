@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/entity/airport.dart';
-import 'package:flymap/entity/onboarding_profile.dart';
+import 'package:flymap/entity/user_profile.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
@@ -77,7 +77,7 @@ class OnboardingProfileFormCubit extends Cubit<OnboardingProfileFormState> {
     await _persistProfile(state.profile.copyWith(flyingFrequency: frequency));
   }
 
-  Future<void> toggleInterest(OnboardingInterest interest) async {
+  Future<void> toggleInterest(UsersInterests interest) async {
     final updated = [...state.profile.interests];
     if (updated.contains(interest)) {
       updated.remove(interest);
@@ -88,7 +88,7 @@ class OnboardingProfileFormCubit extends Cubit<OnboardingProfileFormState> {
     await _persistProfile(state.profile.copyWith(interests: updated));
   }
 
-  Future<void> setInterests(List<OnboardingInterest> interests) async {
+  Future<void> setInterests(List<UsersInterests> interests) async {
     final capped = interests
         .take(OnboardingProfileFormState.maxInterests)
         .toList();
@@ -163,7 +163,7 @@ class OnboardingProfileFormCubit extends Cubit<OnboardingProfileFormState> {
   }
 
   Future<void> completeOnboarding() async {
-    await _persistProfile(state.profile.copyWith(hasCompletedOnboarding: true));
+    await _repository.markSeen();
   }
 
   Future<void> addSelectedHomeAirportToFavorites() async {
@@ -178,7 +178,7 @@ class OnboardingProfileFormCubit extends Cubit<OnboardingProfileFormState> {
   }
 
   Future<void> _persistProfile(
-    OnboardingProfile profile, {
+    UserProfile profile, {
     Airport? homeAirport,
     bool clearHomeAirport = false,
     String? airportQuery,

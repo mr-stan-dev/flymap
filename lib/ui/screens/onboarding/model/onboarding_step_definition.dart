@@ -3,14 +3,7 @@ import 'package:flymap/ui/screens/onboarding/viewmodel/onboarding_profile_form_c
 import 'package:flymap/ui/screens/onboarding/viewmodel/onboarding_profile_form_state.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart';
 
-enum OnboardingStepId {
-  welcome,
-  name,
-  frequency,
-  homeAirport,
-  interests,
-  pro,
-}
+enum OnboardingStepId { welcome, name, frequency, homeAirport, interests, pro }
 
 typedef OnboardingStepWidgetBuilder =
     Widget Function(

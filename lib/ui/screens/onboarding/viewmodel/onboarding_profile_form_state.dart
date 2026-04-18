@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flymap/entity/airport.dart';
-import 'package:flymap/entity/onboarding_profile.dart';
+import 'package:flymap/entity/user_profile.dart';
 
 class OnboardingProfileFormState extends Equatable {
   const OnboardingProfileFormState({
@@ -18,7 +18,7 @@ class OnboardingProfileFormState extends Equatable {
 
   const OnboardingProfileFormState.initial()
     : isLoading = true,
-      profile = const OnboardingProfile.empty(),
+      profile = const UserProfile.empty(),
       homeAirport = null,
       airportQuery = '',
       isAirportSearchLoading = false,
@@ -31,7 +31,7 @@ class OnboardingProfileFormState extends Equatable {
   static const int maxInterests = 3;
 
   final bool isLoading;
-  final OnboardingProfile profile;
+  final UserProfile profile;
   final Airport? homeAirport;
   final String airportQuery;
   final bool isAirportSearchLoading;
@@ -45,7 +45,7 @@ class OnboardingProfileFormState extends Equatable {
 
   OnboardingProfileFormState copyWith({
     bool? isLoading,
-    OnboardingProfile? profile,
+    UserProfile? profile,
     Airport? homeAirport,
     bool clearHomeAirport = false,
     String? airportQuery,

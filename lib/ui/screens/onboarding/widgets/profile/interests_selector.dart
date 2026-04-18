@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flymap/entity/onboarding_profile.dart';
+import 'package:flymap/entity/user_profile.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/onboarding/model/onboarding_profile_ui.dart';
 import 'package:flymap/ui/screens/onboarding/viewmodel/onboarding_profile_form_state.dart';
@@ -11,8 +11,8 @@ class InterestsSelector extends StatelessWidget {
     super.key,
   });
 
-  final List<OnboardingInterest> selectedInterests;
-  final ValueChanged<OnboardingInterest> onToggleInterest;
+  final List<UsersInterests> selectedInterests;
+  final ValueChanged<UsersInterests> onToggleInterest;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class InterestsSelector extends StatelessWidget {
       children: [
         Wrap(
           spacing: 4,
-          children: OnboardingInterest.values.map((interest) {
+          children: UsersInterests.values.map((interest) {
             final isSelected = selectedInterests.contains(interest);
             final canSelect = isSelected || !hasReachedLimit;
             return FilterChip(

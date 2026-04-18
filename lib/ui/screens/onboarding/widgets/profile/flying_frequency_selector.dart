@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flymap/entity/onboarding_profile.dart';
+import 'package:flymap/entity/user_profile.dart';
 import 'package:flymap/ui/screens/onboarding/model/onboarding_profile_ui.dart';
 
 class FlyingFrequencySelector extends StatelessWidget {

@@ -3,9 +3,34 @@ import 'dart:convert';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flymap/data/api/flight_info_api_mapper.dart';
 import 'package:flymap/entity/flight_info.dart';
+import 'package:flymap/entity/user_profile.dart';
 import 'package:flymap/entity/wiki_article_candidate.dart';
 import 'package:flymap/logger.dart';
 import 'package:latlong2/latlong.dart';
+
+Map<String, dynamic> buildFlightInfoFunctionRequest({
+  required String airportDeparture,
+  required String airportArrival,
+  required List<LatLng> waypoints,
+  required int promptVersion,
+  List<UsersInterests>? interests,
+}) {
+  final request = <String, dynamic>{
+    'waypoints': waypoints.map((c) => [c.latitude, c.longitude]).toList(),
+    'airport_departure': airportDeparture,
+    'airport_arrival': airportArrival,
+    'prompt_version': promptVersion.toString(),
+  };
+  final preferenceInterests = interests
+      ?.map((interest) => interest.name)
+      .toList(growable: false);
+  if (preferenceInterests != null && preferenceInterests.isNotEmpty) {
+    request['user_preferences'] = <String, dynamic>{
+      'interests': preferenceInterests,
+    };
+  }
+  return request;
+}
 
 class FlightInfoApi {
   final functions = FirebaseFunctions.instance;
@@ -53,8 +78,9 @@ class FlightInfoApi {
   Future<List<WikiArticleCandidate>> getFlightWikiArticles(
     String airportDeparture,
     String airportArrival,
-    List<LatLng> waypoints,
-  ) async {
+    List<LatLng> waypoints, {
+    List<UsersInterests>? interests,
+  }) async {
     _logger.log(
       'getFlightWikiArticles dep="$airportDeparture" arr="$airportArrival" '
       'waypoints=${waypoints.length} prompt=$_wikiArticlesPromptVersion',
@@ -75,6 +101,7 @@ class FlightInfoApi {
             airportArrival: airportArrival,
             waypoints: waypoints,
             promptVersion: _wikiArticlesPromptVersion,
+            interests: interests,
           ),
         );
     _logger.log(
@@ -100,13 +127,15 @@ class FlightInfoApi {
     required String airportArrival,
     required List<LatLng> waypoints,
     required int promptVersion,
+    List<UsersInterests>? interests,
   }) {
-    return <String, dynamic>{
-      'waypoints': waypoints.map((c) => [c.latitude, c.longitude]).toList(),
-      'airport_departure': airportDeparture,
-      'airport_arrival': airportArrival,
-      'prompt_version': promptVersion.toString(),
-    };
+    return buildFlightInfoFunctionRequest(
+      airportDeparture: airportDeparture,
+      airportArrival: airportArrival,
+      waypoints: waypoints,
+      promptVersion: promptVersion,
+      interests: interests,
+    );
   }
 
   dynamic _decodeFunctionData(dynamic rawData) {

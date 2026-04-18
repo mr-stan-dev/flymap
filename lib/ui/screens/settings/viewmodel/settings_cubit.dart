@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/airports_database.dart';
-import 'package:flymap/entity/onboarding_profile.dart';
+import 'package:flymap/entity/user_profile.dart';
 import 'package:flymap/entity/units.dart';
 import 'package:flymap/repository/metric_units_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
@@ -15,14 +15,14 @@ class SettingsCubit extends Cubit<SettingsState> {
   final OnboardingRepository _onboardingRepository;
   final AirportsDatabase _airportsDb;
   SettingsCubit({
-    SettingsRepository? repository,
-    MetricUnitsRepository? unitsRepository,
-    OnboardingRepository? onboardingRepository,
-    AirportsDatabase? airportsDatabase,
-  }) : _settingsRepo = repository ?? SettingsRepository(),
-       _unitsRepo = unitsRepository ?? MetricUnitsRepository(),
-       _onboardingRepository = onboardingRepository ?? OnboardingRepository(),
-       _airportsDb = airportsDatabase ?? AirportsDatabase.instance,
+    required SettingsRepository repository,
+    required MetricUnitsRepository unitsRepository,
+    required OnboardingRepository onboardingRepository,
+    required AirportsDatabase airportsDatabase,
+  }) : _settingsRepo = repository,
+       _unitsRepo = unitsRepository,
+       _onboardingRepository = onboardingRepository,
+       _airportsDb = airportsDatabase,
        super(const SettingsState());
 
   Future<void> load() async {
@@ -80,7 +80,7 @@ class SettingsCubit extends Cubit<SettingsState> {
   String _formatSpeed(SpeedUnit u) => u == SpeedUnit.mph ? 'mph' : 'km/h';
   String _formatTime(TimeFormat t) => t == TimeFormat.format12h ? '12h' : '24h';
 
-  String? _resolveHomeAirportDisplayCode(OnboardingProfile profile) {
+  String? _resolveHomeAirportDisplayCode(UserProfile profile) {
     final code = profile.homeAirportCode;
     if (code == null || code.isEmpty) return null;
     final airport = _airportsDb.findByCode(code);

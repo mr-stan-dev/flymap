@@ -12,6 +12,7 @@ import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
+import 'package:flymap/repository/user_flight_prefs_storage.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/subscription/subscription_status.dart';
@@ -31,7 +32,9 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     await GetIt.I.reset();
-    GetIt.I.registerSingleton<OnboardingRepository>(OnboardingRepository());
+    GetIt.I.registerSingleton<OnboardingRepository>(
+      OnboardingRepository(prefsStorage: UserFlightPrefsStorage()),
+    );
     GetIt.I.registerSingleton<AppAnalytics>(const _FakeAppAnalytics());
     GetIt.I.registerSingleton<AirportsDatabase>(
       AirportsDatabase.test(seedAirports: _seedAirports),

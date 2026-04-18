@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flymap/entity/onboarding_profile.dart';
+import 'package:flymap/entity/user_profile.dart';
 import 'package:flymap/i18n/strings.g.dart';
 
 extension FlyingFrequencyUi on FlyingFrequency {
@@ -22,28 +22,28 @@ extension FlyingFrequencyUi on FlyingFrequency {
   }
 }
 
-extension OnboardingInterestUi on OnboardingInterest {
+extension UsersInterestsUi on UsersInterests {
   String label(BuildContext context) {
     return switch (this) {
-      OnboardingInterest.mountains => context.t.onboarding.interestMountains,
-      OnboardingInterest.cities => context.t.onboarding.interestCities,
-      OnboardingInterest.coastlines => context.t.onboarding.interestCoastlines,
-      OnboardingInterest.landmarks => context.t.onboarding.interestLandmarks,
-      OnboardingInterest.aviationHistory =>
+      UsersInterests.mountains => context.t.onboarding.interestMountains,
+      UsersInterests.cities => context.t.onboarding.interestCities,
+      UsersInterests.coastlines => context.t.onboarding.interestCoastlines,
+      UsersInterests.landmarks => context.t.onboarding.interestLandmarks,
+      UsersInterests.aviationHistory =>
         context.t.onboarding.interestAviationHistory,
-      OnboardingInterest.engineering =>
+      UsersInterests.engineering =>
         context.t.onboarding.interestEngineering,
     };
   }
 
   IconData get icon {
     return switch (this) {
-      OnboardingInterest.mountains => Icons.terrain_rounded,
-      OnboardingInterest.cities => Icons.location_city_rounded,
-      OnboardingInterest.coastlines => Icons.waves_rounded,
-      OnboardingInterest.landmarks => Icons.account_balance_rounded,
-      OnboardingInterest.aviationHistory => Icons.history_edu_rounded,
-      OnboardingInterest.engineering => Icons.precision_manufacturing_rounded,
+      UsersInterests.mountains => Icons.terrain_rounded,
+      UsersInterests.cities => Icons.location_city_rounded,
+      UsersInterests.coastlines => Icons.waves_rounded,
+      UsersInterests.landmarks => Icons.account_balance_rounded,
+      UsersInterests.aviationHistory => Icons.history_edu_rounded,
+      UsersInterests.engineering => Icons.precision_manufacturing_rounded,
     };
   }
 }

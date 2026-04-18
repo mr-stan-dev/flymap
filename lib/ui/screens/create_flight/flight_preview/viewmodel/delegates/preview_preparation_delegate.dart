@@ -6,17 +6,23 @@ class PreviewPreparationDelegate {
     required ConnectivityChecker connectivityChecker,
     required FlightRouteProvider routeProvider,
     required GetFlightInfoUseCase getFlightInfoUseCase,
+    required GetWikiArticlesUseCase getWikiArticlesUseCase,
     required GetFlightPOIUseCase getFlightPOIUseCase,
+    required UserFlightPrefsRepository userFlightPrefsRepository,
   }) : _connectivityChecker = connectivityChecker,
        _routeProvider = routeProvider,
        _getFlightInfoUseCase = getFlightInfoUseCase,
-       _getFlightPOIUseCase = getFlightPOIUseCase;
+       _getWikiArticlesUseCase = getWikiArticlesUseCase,
+       _getFlightPOIUseCase = getFlightPOIUseCase,
+       _userFlightPrefsRepository = userFlightPrefsRepository;
 
   final FlightPreviewCubit _cubit;
   final ConnectivityChecker _connectivityChecker;
   final FlightRouteProvider _routeProvider;
   final GetFlightInfoUseCase _getFlightInfoUseCase;
+  final GetWikiArticlesUseCase _getWikiArticlesUseCase;
   final GetFlightPOIUseCase _getFlightPOIUseCase;
+  final UserFlightPrefsRepository _userFlightPrefsRepository;
 
   Future<void> preparePreview() async {
     final departure = _cubit.departure;
@@ -104,14 +110,16 @@ class PreviewPreparationDelegate {
         ),
       );
 
+      final userPrefs = await _loadUserPrefs();
       unawaited(
         prefetchLocalPois(
           route: route,
           mapDetail: _cubit.state.selectedMapDetailLevel,
+          userPrefs: userPrefs,
         ),
       );
-      unawaited(_prefetchProPoiCount(route));
-      unawaited(_prefetchOverview(route));
+      unawaited(_prefetchProPoiCount(route, userPrefs: userPrefs));
+      unawaited(_prefetchOverview(route, userPrefs: userPrefs));
     } catch (e, stackTrace) {
       _cubit._logger.error('Failed to prepare map preview: $e');
       unawaited(
@@ -135,14 +143,17 @@ class PreviewPreparationDelegate {
   Future<void> prefetchLocalPois({
     required FlightRoute route,
     required MapDetailLevel mapDetail,
+    UserFlightPrefs? userPrefs,
   }) async {
     try {
       _cubit._logger.log(
         'Prefetch local route POIs start route=${route.routeCode} mapDetail=${mapDetail.name}',
       );
+      final prefs = userPrefs ?? await _loadUserPrefs();
       final pois = await _getFlightPOIUseCase.call(
         route: route,
         mapDetail: mapDetail,
+        prefs: prefs,
       );
       final currentRoute = _cubit.state.flightRoute;
       if (currentRoute == null || currentRoute.routeCode != route.routeCode) {
@@ -168,11 +179,16 @@ class PreviewPreparationDelegate {
     }
   }
 
-  Future<void> _prefetchProPoiCount(FlightRoute route) async {
+  Future<void> _prefetchProPoiCount(
+    FlightRoute route, {
+    UserFlightPrefs? userPrefs,
+  }) async {
     try {
+      final prefs = userPrefs ?? await _loadUserPrefs();
       final pois = await _getFlightPOIUseCase.call(
         route: route,
         mapDetail: MapDetailLevel.pro,
+        prefs: prefs,
       );
       final currentRoute = _cubit.state.flightRoute;
       if (currentRoute == null || currentRoute.routeCode != route.routeCode) {
@@ -184,7 +200,11 @@ class PreviewPreparationDelegate {
     }
   }
 
-  Future<void> _prefetchOverview(FlightRoute route) async {
+  Future<void> _prefetchOverview(
+    FlightRoute route, {
+    UserFlightPrefs? userPrefs,
+  }) async {
+    final prefs = userPrefs ?? await _loadUserPrefs();
     try {
       final info = await _getFlightInfoUseCase.call(
         airportArrival: route.arrival.name,
@@ -218,12 +238,12 @@ class PreviewPreparationDelegate {
     }
 
     try {
-      final suggestedCandidates = await _getFlightInfoUseCase
-          .getWikiArticleCandidates(
-            airportArrival: route.arrival.name,
-            airportDeparture: route.departure.name,
-            waypoints: route.waypoints,
-          );
+      final suggestedCandidates = await _getWikiArticlesUseCase.call(
+        airportArrival: route.arrival.name,
+        airportDeparture: route.departure.name,
+        waypoints: route.waypoints,
+        interests: prefs.interests,
+      );
       _cubit._logger.log(
         'Backend wiki candidates received=${suggestedCandidates.length}',
       );
@@ -279,5 +299,14 @@ class PreviewPreparationDelegate {
       }
     }
     return false;
+  }
+
+  Future<UserFlightPrefs> _loadUserPrefs() async {
+    try {
+      return await _userFlightPrefsRepository.getPrefs();
+    } catch (e) {
+      _cubit._logger.error('Failed to load user flight prefs: $e');
+      return const UserFlightPrefs.empty();
+    }
   }
 }

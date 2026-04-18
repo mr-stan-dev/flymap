@@ -3,9 +3,12 @@ import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight_poi_type.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/entity/map_detail_level.dart';
+import 'package:flymap/entity/user_profile.dart';
 import 'package:flymap/entity/route_poi.dart';
+import 'package:flymap/entity/user_flight_prefs.dart';
 import 'package:flymap/repository/flight_poi_repository.dart';
 import 'package:flymap/usecase/get_flight_poi_use_case.dart';
+import 'package:flymap/usecase/poi_preferences_booster.dart';
 import 'package:flymap/usecase/poi_selection_config.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -13,7 +16,10 @@ void main() {
   group('GetFlightPOIUseCase', () {
     test('basic mode enforces <=10 POIs with strict city cap', () async {
       final repo = _FakeFlightPOIRepository(candidates: _buildCandidates());
-      final useCase = GetFlightPOIUseCase(repository: repo);
+      final useCase = GetFlightPOIUseCase(
+        repository: repo,
+        preferencesBooster: const PoiPreferencesBooster(),
+      );
       final route = _route();
 
       final result = await useCase.call(
@@ -32,7 +38,10 @@ void main() {
 
     test('pro mode allows many POIs but keeps city cap', () async {
       final repo = _FakeFlightPOIRepository(candidates: _buildCandidates());
-      final useCase = GetFlightPOIUseCase(repository: repo);
+      final useCase = GetFlightPOIUseCase(
+        repository: repo,
+        preferencesBooster: const PoiPreferencesBooster(),
+      );
       final route = _route();
 
       final result = await useCase.call(
@@ -51,7 +60,10 @@ void main() {
 
     test('selection is deterministic and spans route segments', () async {
       final repo = _FakeFlightPOIRepository(candidates: _buildCandidates());
-      final useCase = GetFlightPOIUseCase(repository: repo);
+      final useCase = GetFlightPOIUseCase(
+        repository: repo,
+        preferencesBooster: const PoiPreferencesBooster(),
+      );
       final route = _route();
 
       final first = await useCase.call(
@@ -79,7 +91,10 @@ void main() {
         final repo = _FakeFlightPOIRepository(
           candidates: _buildVolcanoHeavyCandidates(volcanoCount),
         );
-        final useCase = GetFlightPOIUseCase(repository: repo);
+        final useCase = GetFlightPOIUseCase(
+          repository: repo,
+          preferencesBooster: const PoiPreferencesBooster(),
+        );
         final route = _route();
 
         final result = await useCase.call(
@@ -94,6 +109,49 @@ void main() {
         expect(result.length, greaterThan(PoiSelectionConfig.proMaxPois));
       },
     );
+
+    test('interest boost can reorder close candidates', () async {
+      final route = _route();
+      final repo = _FakeFlightPOIRepository(
+        candidates: [
+          RoutePoi(
+            qid: 'Q-CITY',
+            name: 'City',
+            latLon: const LatLng(50, 0.10),
+            type: FlightPoiType.city,
+            sitelinks: 2000,
+          ),
+          RoutePoi(
+            qid: 'Q-MOUNTAIN',
+            name: 'Mountain',
+            latLon: const LatLng(50, 0.12),
+            type: FlightPoiType.mountain,
+            sitelinks: 1650,
+          ),
+        ],
+      );
+      final useCase = GetFlightPOIUseCase(
+        repository: repo,
+        preferencesBooster: const PoiPreferencesBooster(),
+      );
+
+      final withoutPrefs = await useCase.call(
+        route: route,
+        mapDetail: MapDetailLevel.basic,
+      );
+      final withPrefs = await useCase.call(
+        route: route,
+        mapDetail: MapDetailLevel.basic,
+        prefs: const UserFlightPrefs(
+          flyingFrequency: null,
+          homeAirportCode: null,
+          interests: [UsersInterests.mountains],
+        ),
+      );
+
+      expect(withoutPrefs.first.type, FlightPoiType.city);
+      expect(withPrefs.first.type, FlightPoiType.mountain);
+    });
   });
 }
 

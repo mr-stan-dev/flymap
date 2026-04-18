@@ -7,12 +7,15 @@ import 'package:flymap/data/route/flight_route_provider.dart';
 import 'package:flymap/entity/airport.dart';
 import 'package:flymap/entity/flight.dart';
 import 'package:flymap/entity/flight_info.dart';
+import 'package:flymap/entity/user_profile.dart';
 import 'package:flymap/entity/route_poi_summary.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/entity/map_detail_level.dart';
+import 'package:flymap/entity/user_flight_prefs.dart';
 import 'package:flymap/entity/wiki_article_candidate.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
+import 'package:flymap/repository/user_flight_prefs_repository.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/subscription/subscription_status.dart';
@@ -22,6 +25,7 @@ import 'package:flymap/usecase/download_map_use_case.dart';
 import 'package:flymap/usecase/download_poi_summaries_use_case.dart';
 import 'package:flymap/usecase/download_wikipedia_articles_use_case.dart';
 import 'package:flymap/usecase/get_flight_info_use_case.dart';
+import 'package:flymap/usecase/get_wiki_articles_use_case.dart';
 import 'package:flymap/usecase/delete_flight_use_case.dart';
 import 'package:flymap/usecase/get_flight_poi_use_case.dart';
 import 'package:latlong2/latlong.dart';
@@ -53,7 +57,9 @@ void main() {
         downloadPoiSummariesUseCase: poiDownloadUseCase,
         downloadWikipediaArticlesUseCase: wikiDownloadUseCase,
         getFlightInfoUseCase: _FakeGetFlightInfoUseCase(),
+        getWikiArticlesUseCase: _FakeGetWikiArticlesUseCase(),
         getFlightPOIUseCase: poiUseCase,
+        userFlightPrefsRepository: _FakeUserFlightPrefsRepository(),
         flightRepository: _FakeFlightRepository(),
         subscriptionRepository: subscriptionRepository,
         deleteFlightUseCase: _FakeDeleteFlightUseCase(),
@@ -160,9 +166,12 @@ void main() {
         routeProvider: _FakeRouteProvider(),
         downloadMapUseCase: _FakeDownloadMapUseCase(),
         downloadPoiSummariesUseCase: _FakeDownloadPoiSummariesUseCase(),
-        downloadWikipediaArticlesUseCase: _FakeDownloadWikipediaArticlesUseCase(),
+        downloadWikipediaArticlesUseCase:
+            _FakeDownloadWikipediaArticlesUseCase(),
         getFlightInfoUseCase: _FakeGetFlightInfoUseCase(),
+        getWikiArticlesUseCase: _FakeGetWikiArticlesUseCase(),
         getFlightPOIUseCase: _FakeGetFlightPOIUseCase(),
+        userFlightPrefsRepository: _FakeUserFlightPrefsRepository(),
         flightRepository: _FakeFlightRepository(),
         subscriptionRepository: proSubscriptionRepository,
         deleteFlightUseCase: _FakeDeleteFlightUseCase(),
@@ -349,7 +358,9 @@ class _TestFlightPreviewCubit extends FlightPreviewCubit {
     required super.downloadPoiSummariesUseCase,
     required super.downloadWikipediaArticlesUseCase,
     required super.getFlightInfoUseCase,
+    required super.getWikiArticlesUseCase,
     required super.getFlightPOIUseCase,
+    required super.userFlightPrefsRepository,
     required super.flightRepository,
     required super.subscriptionRepository,
     required super.deleteFlightUseCase,
@@ -448,12 +459,15 @@ class _FakeGetFlightInfoUseCase implements GetFlightInfoUseCase {
     required String airportArrival,
     required List<LatLng> waypoints,
   }) async => FlightInfo.empty;
+}
 
+class _FakeGetWikiArticlesUseCase implements GetWikiArticlesUseCase {
   @override
-  Future<List<WikiArticleCandidate>> getWikiArticleCandidates({
+  Future<List<WikiArticleCandidate>> call({
     required String airportDeparture,
     required String airportArrival,
     required List<LatLng> waypoints,
+    List<UsersInterests>? interests,
   }) async => const [];
 }
 
@@ -464,10 +478,16 @@ class _FakeGetFlightPOIUseCase implements GetFlightPOIUseCase {
   Future<List<RoutePoiSummary>> call({
     required FlightRoute route,
     required MapDetailLevel mapDetail,
+    UserFlightPrefs? prefs,
   }) async {
     lastRequestedMapDetail = mapDetail;
     return const [];
   }
+}
+
+class _FakeUserFlightPrefsRepository implements UserFlightPrefsRepository {
+  @override
+  Future<UserFlightPrefs> getPrefs() async => const UserFlightPrefs.empty();
 }
 
 class _FakeAppAnalytics implements AppAnalytics {

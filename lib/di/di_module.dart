@@ -28,10 +28,14 @@ import 'package:flymap/repository/flight_poi_repository.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/learn_article_progress_repository.dart';
 import 'package:flymap/repository/learn_repository.dart';
+import 'package:flymap/repository/metric_units_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/poi_wiki_preview_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
+import 'package:flymap/repository/settings_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
+import 'package:flymap/repository/user_flight_prefs_repository.dart';
+import 'package:flymap/repository/user_flight_prefs_storage.dart';
 import 'package:flymap/subscription/revenuecat_client.dart';
 import 'package:flymap/subscription/revenuecat_env_config.dart';
 import 'package:flymap/subscription/subscription_status_cache.dart';
@@ -42,12 +46,14 @@ import 'package:flymap/usecase/download_poi_summaries_use_case.dart';
 import 'package:flymap/usecase/download_wikipedia_articles_use_case.dart';
 import 'package:flymap/usecase/get_flight_info_use_case.dart';
 import 'package:flymap/usecase/get_flight_poi_use_case.dart';
+import 'package:flymap/usecase/get_wiki_articles_use_case.dart';
 import 'package:flymap/usecase/get_learn_article_progress_use_case.dart';
 import 'package:flymap/usecase/get_learn_article_content_use_case.dart';
 import 'package:flymap/usecase/get_learn_categories_use_case.dart';
 import 'package:flymap/usecase/get_learn_category_articles_use_case.dart';
 import 'package:flymap/usecase/mark_learn_article_seen_use_case.dart';
 import 'package:flymap/usecase/get_poi_wiki_preview_use_case.dart';
+import 'package:flymap/usecase/poi_preferences_booster.dart';
 import 'package:flymap/usecase/submit_feedback_use_case.dart';
 import 'package:flymap/usecase/toggle_learn_article_favorite_use_case.dart';
 import 'package:get_it/get_it.dart';
@@ -124,6 +130,9 @@ class DiModule {
     i.registerLazySingleton<GetFlightInfoUseCase>(
       () => GetFlightInfoUseCase(flightInfoApi: GetIt.I.get()),
     );
+    i.registerLazySingleton<GetWikiArticlesUseCase>(
+      () => GetWikiArticlesUseCase(flightInfoApi: GetIt.I.get()),
+    );
 
     i.registerLazySingleton<FlightRepository>(
       () => FlightRepository(service: GetIt.I.get()),
@@ -135,6 +144,10 @@ class DiModule {
     i.registerLazySingleton<FavoriteAirportsRepository>(
       () => FavoriteAirportsRepository(),
     );
+    i.registerLazySingleton<SettingsRepository>(() => SettingsRepository());
+    i.registerLazySingleton<MetricUnitsRepository>(
+      () => MetricUnitsRepository(),
+    );
     i.registerLazySingleton<RecentAirportsRepository>(
       () => RecentAirportsRepository(),
     );
@@ -144,8 +157,12 @@ class DiModule {
     i.registerLazySingleton<FlightPOIRepository>(
       () => LocalFlightPOIRepository(localDataSource: i.get()),
     );
+    i.registerLazySingleton<PoiPreferencesBooster>(
+      () => const PoiPreferencesBooster(),
+    );
     i.registerLazySingleton<GetFlightPOIUseCase>(
-      () => GetFlightPOIUseCase(repository: i.get()),
+      () =>
+          GetFlightPOIUseCase(repository: i.get(), preferencesBooster: i.get()),
     );
     i.registerLazySingleton<PoiWikiPreviewRepository>(
       () => WikidataWikipediaPreviewRepository(apiClient: i.get()),
@@ -157,7 +174,15 @@ class DiModule {
       () => DownloadPoiSummariesUseCase(repository: i.get()),
     );
 
-    i.registerLazySingleton<OnboardingRepository>(() => OnboardingRepository());
+    i.registerLazySingleton<UserFlightPrefsStorage>(
+      () => UserFlightPrefsStorage(),
+    );
+    i.registerLazySingleton<UserFlightPrefsRepository>(
+      () => UserFlightPrefsRepository(storage: i.get()),
+    );
+    i.registerLazySingleton<OnboardingRepository>(
+      () => OnboardingRepository(prefsStorage: i.get()),
+    );
 
     i.registerLazySingleton<LearnPackLocalDb>(() => LearnPackLocalDb());
     i.registerLazySingleton<LearnRepository>(

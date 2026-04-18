@@ -11,12 +11,14 @@ import 'package:flymap/entity/flight_info.dart';
 import 'package:flymap/entity/flight_route.dart';
 import 'package:flymap/entity/route_poi_summary.dart';
 import 'package:flymap/entity/map_detail_level.dart';
+import 'package:flymap/entity/user_flight_prefs.dart';
 import 'package:flymap/entity/wiki_article_candidate.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/map_download_config.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
+import 'package:flymap/repository/user_flight_prefs_repository.dart';
 import 'package:flymap/subscription/pro_limits.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 import 'package:flymap/usecase/delete_flight_use_case.dart';
@@ -24,6 +26,7 @@ import 'package:flymap/usecase/download_map_use_case.dart';
 import 'package:flymap/usecase/download_poi_summaries_use_case.dart';
 import 'package:flymap/usecase/download_wikipedia_articles_use_case.dart';
 import 'package:flymap/usecase/get_flight_info_use_case.dart';
+import 'package:flymap/usecase/get_wiki_articles_use_case.dart';
 import 'package:flymap/usecase/get_flight_poi_use_case.dart';
 
 part 'delegates/preview_preparation_delegate.dart';
@@ -41,7 +44,9 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     required DownloadPoiSummariesUseCase downloadPoiSummariesUseCase,
     required DownloadWikipediaArticlesUseCase downloadWikipediaArticlesUseCase,
     required GetFlightInfoUseCase getFlightInfoUseCase,
+    required GetWikiArticlesUseCase getWikiArticlesUseCase,
     required GetFlightPOIUseCase getFlightPOIUseCase,
+    required UserFlightPrefsRepository userFlightPrefsRepository,
     required FlightRepository flightRepository,
     required SubscriptionRepository subscriptionRepository,
     required DeleteFlightUseCase deleteFlightUseCase,
@@ -62,7 +67,9 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
       connectivityChecker: connectivityChecker,
       routeProvider: routeProvider,
       getFlightInfoUseCase: getFlightInfoUseCase,
+      getWikiArticlesUseCase: getWikiArticlesUseCase,
       getFlightPOIUseCase: getFlightPOIUseCase,
+      userFlightPrefsRepository: userFlightPrefsRepository,
     );
     _navigationDelegate = MapAndStepNavigationDelegate(this);
     _wikiSelectionDelegate = WikiSelectionDelegate(this);

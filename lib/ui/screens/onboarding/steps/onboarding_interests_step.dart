@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flymap/entity/onboarding_profile.dart';
+import 'package:flymap/entity/user_profile.dart';
 import 'package:flymap/ui/screens/onboarding/widgets/onboarding_step_scaffold.dart';
 import 'package:flymap/ui/screens/onboarding/widgets/profile/interests_selector.dart';
 
@@ -14,8 +14,8 @@ class OnboardingInterestsStep extends StatelessWidget {
 
   final String title;
   final String subtitle;
-  final List<OnboardingInterest> selectedInterests;
-  final ValueChanged<OnboardingInterest> onToggleInterest;
+  final List<UsersInterests> selectedInterests;
+  final ValueChanged<UsersInterests> onToggleInterest;
 
   @override
   Widget build(BuildContext context) {
