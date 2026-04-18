@@ -92,13 +92,15 @@ class _PoiChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Image.asset(_iconAssetPathForType(item.type), width: 16, height: 16),
-          const SizedBox(width: 6),
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: maxWidth),
-            child: Text(
-              item.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: Text(
+                item.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
         ],
