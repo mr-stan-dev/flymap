@@ -32,4 +32,24 @@ void main() {
 
     expect(request.containsKey('user_preferences'), isFalse);
   });
+
+  test(
+    'buildFlightInfoFunctionRequest rounds waypoint coordinates to 2 decimals',
+    () {
+      final request = buildFlightInfoFunctionRequest(
+        airportDeparture: 'LHR',
+        airportArrival: 'SFO',
+        waypoints: const [
+          LatLng(51.470022, -0.454295),
+          LatLng(37.621313, -122.378955),
+        ],
+        promptVersion: 3,
+      );
+
+      expect(request['waypoints'], [
+        [51.47, -0.45],
+        [37.62, -122.38],
+      ]);
+    },
+  );
 }

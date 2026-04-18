@@ -8,6 +8,8 @@ import 'package:flymap/entity/wiki_article_candidate.dart';
 import 'package:flymap/logger.dart';
 import 'package:latlong2/latlong.dart';
 
+const _waypointFractionDigits = 2;
+
 Map<String, dynamic> buildFlightInfoFunctionRequest({
   required String airportDeparture,
   required String airportArrival,
@@ -16,7 +18,20 @@ Map<String, dynamic> buildFlightInfoFunctionRequest({
   List<UsersInterests>? interests,
 }) {
   final request = <String, dynamic>{
-    'waypoints': waypoints.map((c) => [c.latitude, c.longitude]).toList(),
+    'waypoints': waypoints
+        .map(
+          (c) => [
+            _roundCoordinate(
+              c.latitude,
+              fractionDigits: _waypointFractionDigits,
+            ),
+            _roundCoordinate(
+              c.longitude,
+              fractionDigits: _waypointFractionDigits,
+            ),
+          ],
+        )
+        .toList(),
     'airport_departure': airportDeparture,
     'airport_arrival': airportArrival,
     'prompt_version': promptVersion.toString(),
@@ -32,11 +47,14 @@ Map<String, dynamic> buildFlightInfoFunctionRequest({
   return request;
 }
 
+double _roundCoordinate(double value, {required int fractionDigits}) =>
+    double.parse(value.toStringAsFixed(fractionDigits));
+
 class FlightInfoApi {
   final functions = FirebaseFunctions.instance;
   static const _overviewPromptVersion = 3;
   static const _getOverviewFunction = 'get_flight_overview';
-  static const _wikiArticlesPromptVersion = 2;
+  static const _wikiArticlesPromptVersion = 4;
   static const _getWikiArticlesFunction = 'get_flight_wiki_articles';
   final _logger = Logger('FlightInfoApi');
 
