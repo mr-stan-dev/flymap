@@ -86,14 +86,15 @@ class _AirportSelectionScreenState extends State<AirportSelectionScreen> {
                     recentCodes.add(code);
                     return true;
                   }).toList();
-              final popular =
-                  _filterAirportsForCurrentStep(state.popularAirports, state)
-                      .where(
-                        (airport) =>
-                            !favoriteCodes.contains(_airportCode(airport)) &&
-                            !recentCodes.contains(_airportCode(airport)),
-                      )
-                      .toList();
+              final popular = recent.isNotEmpty
+                  ? const <Airport>[]
+                  : _filterAirportsForCurrentStep(state.popularAirports, state)
+                        .where(
+                          (airport) =>
+                              !favoriteCodes.contains(_airportCode(airport)) &&
+                              !recentCodes.contains(_airportCode(airport)),
+                        )
+                        .toList();
               final results = _filterAirportsForCurrentStep(
                 state.searchResults,
                 state,
