@@ -32,6 +32,7 @@ void main() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     await GetIt.I.reset();
     GetIt.I.registerSingleton<OnboardingRepository>(OnboardingRepository());
+    GetIt.I.registerSingleton<AppAnalytics>(const _FakeAppAnalytics());
     GetIt.I.registerSingleton<AirportsDatabase>(
       AirportsDatabase.test(seedAirports: _seedAirports),
     );

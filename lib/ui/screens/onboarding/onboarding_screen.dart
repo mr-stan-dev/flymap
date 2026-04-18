@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/airports_database.dart';
@@ -47,8 +50,17 @@ class _OnboardingFlowView extends StatefulWidget {
 }
 
 class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
+  static const String _flowVersion = 'v2_profile';
+  static const String _entrySource = 'app_launch';
+
+  final AppAnalytics _analytics = GetIt.I<AppAnalytics>();
+  final DateTime _startedAt = DateTime.now();
+
   int _stepIndex = 0;
   bool _isFinishing = false;
+  int _stepsSkippedCount = 0;
+  String? _lastTrackedStepId;
+  int? _lastTrackedStepIndex;
 
   List<OnboardingStepDefinition> _steps(SubscriptionState subscriptionState) =>
       [
@@ -132,6 +144,19 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
       ];
 
   @override
+  void initState() {
+    super.initState();
+    unawaited(
+      _analytics.log(
+        const OnboardingStartedEvent(
+          flowVersion: _flowVersion,
+          entrySource: _entrySource,
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final subscriptionState = context.watch<SubscriptionCubit>().state;
     final steps = _steps(subscriptionState);
@@ -142,6 +167,7 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
         final currentStep = steps[_stepIndex];
         final canContinue =
             !_isFinishing && !state.isLoading && currentStep.canContinue(state);
+        _trackStepViewed(stepId: currentStep.id, isSkippable: !isLastStep);
 
         return Scaffold(
           body: SafeArea(
@@ -186,7 +212,9 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
                                   label: context.t.onboarding.skip,
                                   onPressed: _isFinishing
                                       ? null
-                                      : _skipCurrentStep,
+                                      : () => _skipCurrentStep(
+                                          currentStepId: currentStep.id,
+                                        ),
                                   expand: false,
                                 )
                               : const SizedBox(width: 44, height: 44),
@@ -226,6 +254,8 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
                             context.read(),
                             currentStepId: currentStep.id,
                             isLastStep: isLastStep,
+                            state: state,
+                            stepsTotal: steps.length,
                           )
                         : null,
                   ),
@@ -242,9 +272,12 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
     OnboardingProfileFormCubit cubit, {
     required OnboardingStepId currentStepId,
     required bool isLastStep,
+    required OnboardingProfileFormState state,
+    required int stepsTotal,
   }) async {
+    _trackStepCompleted(currentStepId, state);
     if (isLastStep) {
-      await _finish(cubit);
+      await _finish(cubit, stepsTotal: stepsTotal);
       return;
     }
     if (currentStepId == OnboardingStepId.homeAirport) {
@@ -255,17 +288,42 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
     });
   }
 
-  Future<void> _finish(OnboardingProfileFormCubit cubit) async {
+  Future<void> _finish(
+    OnboardingProfileFormCubit cubit, {
+    required int stepsTotal,
+  }) async {
     setState(() {
       _isFinishing = true;
     });
     await cubit.completeOnboarding();
+    final durationSec = DateTime.now().difference(_startedAt).inSeconds;
+    unawaited(
+      _analytics.log(
+        OnboardingCompletedEvent(
+          flowVersion: _flowVersion,
+          stepsTotal: stepsTotal,
+          stepsSkippedCount: _stepsSkippedCount,
+          durationSec: durationSec,
+        ),
+      ),
+    );
     if (!mounted) return;
     AppRouter.goToFlightSearch(context);
   }
 
-  Future<void> _skipCurrentStep() async {
+  Future<void> _skipCurrentStep({
+    required OnboardingStepId currentStepId,
+  }) async {
     if (_isFinishing) return;
+    _stepsSkippedCount += 1;
+    unawaited(
+      _analytics.log(
+        OnboardingStepSkippedEvent(
+          stepId: currentStepId.name,
+          stepIndex: _currentStepOrdinal,
+        ),
+      ),
+    );
     setState(() {
       _stepIndex += 1;
     });
@@ -301,5 +359,62 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
         );
         return;
     }
+  }
+
+  void _trackStepViewed({
+    required OnboardingStepId stepId,
+    required bool isSkippable,
+  }) {
+    if (_lastTrackedStepId == stepId.name &&
+        _lastTrackedStepIndex == _currentStepOrdinal) {
+      return;
+    }
+    _lastTrackedStepId = stepId.name;
+    _lastTrackedStepIndex = _currentStepOrdinal;
+    unawaited(
+      _analytics.log(
+        OnboardingStepViewedEvent(
+          stepId: stepId.name,
+          stepIndex: _currentStepOrdinal,
+          isSkippable: isSkippable,
+        ),
+      ),
+    );
+  }
+
+  void _trackStepCompleted(
+    OnboardingStepId stepId,
+    OnboardingProfileFormState state,
+  ) {
+    unawaited(
+      _analytics.log(
+        OnboardingStepCompletedEvent(
+          stepId: stepId.name,
+          stepIndex: _currentStepOrdinal,
+          inputState: _inputStateForStep(stepId, state),
+        ),
+      ),
+    );
+  }
+
+  int get _currentStepOrdinal => _stepIndex + 1;
+
+  String _inputStateForStep(
+    OnboardingStepId stepId,
+    OnboardingProfileFormState state,
+  ) {
+    return switch (stepId) {
+      OnboardingStepId.welcome => 'none',
+      OnboardingStepId.frequency =>
+        state.profile.flyingFrequency == null ? 'empty' : 'selected',
+      OnboardingStepId.homeAirport =>
+        state.homeAirport == null ? 'empty' : 'selected',
+      OnboardingStepId.interests =>
+        'selected_${state.profile.interests.length}',
+      OnboardingStepId.name =>
+        state.profile.displayName.trim().isEmpty ? 'empty' : 'filled',
+      OnboardingStepId.pro =>
+        context.read<SubscriptionCubit>().state.isPro ? 'is_pro' : 'free',
+    };
   }
 }
