@@ -88,7 +88,7 @@ class _TranslationsHomeFr extends TranslationsHomeEn {
 	@override String get aboutTooltip => 'À propos';
 	@override String get settingsTooltip => 'Réglages';
 	@override String get tabFlights => 'Vols';
-	@override String get tabLearn => 'Découvrir';
+	@override String get tabLearn => 'Apprendre et jouer';
 	@override String get loadingFlights => 'Chargement des vols...';
 	@override String get failedToLoadFlights => 'Échec du chargement des vols';
 	@override String get newFlight => 'Nouveau vol';
@@ -149,6 +149,9 @@ class _TranslationsLearnFr extends TranslationsLearnEn {
 	@override String get upgradeRequiresInternet => 'Le contenu premium est disponible avec Pro. Connectez-vous à Internet pour mettre à niveau.';
 	@override String get proListPreviewHint => 'Vous pouvez déjà parcourir ces titres. Débloquez la lecture avec Flymap Pro.';
 	@override String get failedToLoadArticle => 'Impossible d’ouvrir cet article pour le moment.';
+	@override String get quizzesTitle => 'Quiz';
+	@override String get articlesTitle => 'Articles';
+	@override late final _TranslationsLearnGeoQuizFr geoQuiz = _TranslationsLearnGeoQuizFr._(_root);
 }
 
 // Path: settings
@@ -727,6 +730,45 @@ class _TranslationsHomeSortFr extends TranslationsHomeSortEn {
 	@override String get alphabetical => 'A-Z';
 }
 
+// Path: learn.geoQuiz
+class _TranslationsLearnGeoQuizFr extends TranslationsLearnGeoQuizEn {
+	_TranslationsLearnGeoQuizFr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Geo Quiz';
+	@override String get countriesTitle => 'Pays sur la carte';
+	@override String get subtitle => 'Devinez le pays d’après sa silhouette';
+	@override String get loading => 'Chargement de Geo Quiz...';
+	@override String get failedToLoad => 'Échec du chargement des quiz';
+	@override String get failedToLoadQuiz => 'Échec du chargement du quiz';
+	@override String get emptyTitle => 'Aucun quiz pour l’instant';
+	@override String get emptySubtitle => 'Les geo quiz apparaîtront bientôt ici.';
+	@override String get countryHint => 'Nom du pays...';
+	@override String progressCount({required Object solved, required Object total}) => '${solved} / ${total}';
+	@override String nextCount({required Object next, required Object total}) => '${next} sur ${total}';
+	@override String correctCount({required Object count}) => '${count} corrects';
+	@override String get reset => 'Réinitialiser la progression';
+	@override String get mapPlaceholder => 'Les données de carte seront ajoutées ensuite';
+	@override String get newBadge => 'NOUVEAU';
+	@override String get correct => 'Correct';
+	@override String get wrong => 'Incorrect';
+	@override String get next => 'Suivant';
+	@override String get pause => 'Pause';
+	@override String get resume => 'Reprendre';
+	@override String get finish => 'Terminer';
+	@override String get completeTitle => 'Quiz terminé';
+	@override String completeMessage({required Object total, required Object quiz}) => 'Vous avez trouvé les ${total} pays de ${quiz}.';
+	@override String get backToQuizzes => 'Retour aux quiz';
+	@override String get playAgain => 'Rejouer';
+	@override String get progressReady => 'Prêt à jouer';
+	@override String progressFinished({required Object count}) => '${count} terminés';
+	@override String progressInProgress({required Object count}) => '${count} en cours';
+	@override String get progressAllCompleted => 'Tous terminés';
+	@override String get descriptionUnavailable => 'La description n’est pas encore disponible.';
+}
+
 // Path: createFlight.steps
 class _TranslationsCreateFlightStepsFr extends TranslationsCreateFlightStepsEn {
 	_TranslationsCreateFlightStepsFr._(TranslationsFr root) : this._root = root, super.internal(root);
@@ -1303,7 +1345,7 @@ extension on TranslationsFr {
 			'home.aboutTooltip' => 'À propos',
 			'home.settingsTooltip' => 'Réglages',
 			'home.tabFlights' => 'Vols',
-			'home.tabLearn' => 'Découvrir',
+			'home.tabLearn' => 'Apprendre et jouer',
 			'home.loadingFlights' => 'Chargement des vols...',
 			'home.failedToLoadFlights' => 'Échec du chargement des vols',
 			'home.newFlight' => 'Nouveau vol',
@@ -1357,6 +1399,38 @@ extension on TranslationsFr {
 			'learn.upgradeRequiresInternet' => 'Le contenu premium est disponible avec Pro. Connectez-vous à Internet pour mettre à niveau.',
 			'learn.proListPreviewHint' => 'Vous pouvez déjà parcourir ces titres. Débloquez la lecture avec Flymap Pro.',
 			'learn.failedToLoadArticle' => 'Impossible d’ouvrir cet article pour le moment.',
+			'learn.quizzesTitle' => 'Quiz',
+			'learn.articlesTitle' => 'Articles',
+			'learn.geoQuiz.title' => 'Geo Quiz',
+			'learn.geoQuiz.countriesTitle' => 'Pays sur la carte',
+			'learn.geoQuiz.subtitle' => 'Devinez le pays d’après sa silhouette',
+			'learn.geoQuiz.loading' => 'Chargement de Geo Quiz...',
+			'learn.geoQuiz.failedToLoad' => 'Échec du chargement des quiz',
+			'learn.geoQuiz.failedToLoadQuiz' => 'Échec du chargement du quiz',
+			'learn.geoQuiz.emptyTitle' => 'Aucun quiz pour l’instant',
+			'learn.geoQuiz.emptySubtitle' => 'Les geo quiz apparaîtront bientôt ici.',
+			'learn.geoQuiz.countryHint' => 'Nom du pays...',
+			'learn.geoQuiz.progressCount' => ({required Object solved, required Object total}) => '${solved} / ${total}',
+			'learn.geoQuiz.nextCount' => ({required Object next, required Object total}) => '${next} sur ${total}',
+			'learn.geoQuiz.correctCount' => ({required Object count}) => '${count} corrects',
+			'learn.geoQuiz.reset' => 'Réinitialiser la progression',
+			'learn.geoQuiz.mapPlaceholder' => 'Les données de carte seront ajoutées ensuite',
+			'learn.geoQuiz.newBadge' => 'NOUVEAU',
+			'learn.geoQuiz.correct' => 'Correct',
+			'learn.geoQuiz.wrong' => 'Incorrect',
+			'learn.geoQuiz.next' => 'Suivant',
+			'learn.geoQuiz.pause' => 'Pause',
+			'learn.geoQuiz.resume' => 'Reprendre',
+			'learn.geoQuiz.finish' => 'Terminer',
+			'learn.geoQuiz.completeTitle' => 'Quiz terminé',
+			'learn.geoQuiz.completeMessage' => ({required Object total, required Object quiz}) => 'Vous avez trouvé les ${total} pays de ${quiz}.',
+			'learn.geoQuiz.backToQuizzes' => 'Retour aux quiz',
+			'learn.geoQuiz.playAgain' => 'Rejouer',
+			'learn.geoQuiz.progressReady' => 'Prêt à jouer',
+			'learn.geoQuiz.progressFinished' => ({required Object count}) => '${count} terminés',
+			'learn.geoQuiz.progressInProgress' => ({required Object count}) => '${count} en cours',
+			'learn.geoQuiz.progressAllCompleted' => 'Tous terminés',
+			'learn.geoQuiz.descriptionUnavailable' => 'La description n’est pas encore disponible.',
 			'settings.title' => 'Réglages',
 			'settings.loading' => 'Chargement des réglages...',
 			'settings.profile' => 'Profil',
@@ -1765,6 +1839,8 @@ extension on TranslationsFr {
 			'flight.dashboard.accuracyPoor' => 'Faible',
 			'flight.dashboard.gpsOff' => 'GPS désactivé',
 			'flight.dashboard.gpsOffHint' => 'Activez les services de localisation pour commencer le suivi.',
+			_ => null,
+		} ?? switch (path) {
 			'flight.dashboard.gpsPermissionRequired' => 'Autorisation GPS requise',
 			'flight.dashboard.gpsPermissionHint' => 'Accordez l’autorisation pour accéder à la télémétrie du vol en direct.',
 			'flight.dashboard.gpsSearching' => 'Recherche du GPS',
@@ -1797,8 +1873,6 @@ extension on TranslationsFr {
 			'flight.dashboard.gpsSearchingLabel' => 'Recherche GPS',
 			'flight.dashboard.gpsPermissionNeededLabel' => 'Autorisation GPS nécessaire',
 			'flight.dashboard.gpsOffLabel' => 'GPS désactivé',
-			_ => null,
-		} ?? switch (path) {
 			'flight.dashboard.aircraftHeading' => 'Cap de l’avion',
 			'flight.dashboard.headingShort' => ({required Object heading}) => 'CAP ${heading}°',
 			'flight.dashboard.liveInstruments' => 'Instruments en direct',

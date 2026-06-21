@@ -70,6 +70,8 @@ flutter:
     - assets/data/airports.csv # source: https://ourairports.com/data/ filtered by large and medium size in chatgpt
     - assets/data/learn/
     - assets/data/learn/articles/
+    - assets/data/geo_quiz/
+    - assets/data/geo_quiz/countries/
     - assets/data/ne_50m_land.geojson
     - assets/styles/openfreemap_offline_style.json
     - assets/styles/openfreemap_offline_fiord_style.json
@@ -83,6 +85,7 @@ flutter:
     - assets/images/icons/
     - assets/images/learn/
     - assets/images/learn/categories/
+    - assets/images/quiz/
     - assets/images/poi/
     - assets/images/regions/
 

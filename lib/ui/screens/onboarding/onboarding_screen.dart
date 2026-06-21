@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
+import 'package:flymap/repository/feature_announcement_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/router/app_router.dart';
@@ -36,6 +37,10 @@ class OnboardingScreen extends StatelessWidget {
         airportsDb: GetIt.I<AirportsDatabase>(),
         favoritesRepository: GetIt.I<FavoriteAirportsRepository>(),
         recentAirportsRepository: GetIt.I<RecentAirportsRepository>(),
+        featureAnnouncementRepository:
+            GetIt.I.isRegistered<FeatureAnnouncementRepository>()
+            ? GetIt.I<FeatureAnnouncementRepository>()
+            : null,
       ),
       child: const _OnboardingFlowView(),
     );

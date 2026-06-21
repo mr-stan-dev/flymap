@@ -41,10 +41,13 @@ import 'package:flymap/rating/rate_prompt_repository.dart';
 import 'package:flymap/rating/rate_review_launcher.dart';
 import 'package:flymap/rating/rate_store_launcher.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
+import 'package:flymap/repository/feature_announcement_repository.dart';
 import 'package:flymap/repository/flight_unlock_repository.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/learn_article_progress_repository.dart';
 import 'package:flymap/repository/learn_repository.dart';
+import 'package:flymap/repository/geo_quiz_progress_repository.dart';
+import 'package:flymap/repository/geo_quiz_repository.dart';
 import 'package:flymap/repository/metric_units_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/poi_wiki_preview_repository.dart';
@@ -302,6 +305,9 @@ class DiModule {
     i.registerLazySingleton<OnboardingRepository>(
       () => OnboardingRepository(prefsStorage: i.get()),
     );
+    i.registerLazySingleton<FeatureAnnouncementRepository>(
+      () => FeatureAnnouncementRepository(onboarding: i.get()),
+    );
 
     i.registerLazySingleton<LearnPackLocalDb>(() => LearnPackLocalDb());
     i.registerLazySingleton<LearnRepository>(
@@ -309,6 +315,10 @@ class DiModule {
     );
     i.registerLazySingleton<LearnArticleProgressRepository>(
       () => SharedPrefsLearnArticleProgressRepository(),
+    );
+    i.registerLazySingleton<GeoQuizRepository>(() => AssetGeoQuizRepository());
+    i.registerLazySingleton<GeoQuizProgressRepository>(
+      () => SharedPrefsGeoQuizProgressRepository(),
     );
     i.registerLazySingleton<GetLearnCategoriesUseCase>(
       () => GetLearnCategoriesUseCase(repository: i.get()),

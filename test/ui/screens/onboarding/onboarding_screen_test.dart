@@ -10,6 +10,7 @@ import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/flight_unlock_repository.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
+import 'package:flymap/repository/feature_announcement_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
@@ -39,6 +40,11 @@ void main() {
     await GetIt.I.reset();
     GetIt.I.registerSingleton<OnboardingRepository>(
       OnboardingRepository(prefsStorage: UserFlightPrefsStorage()),
+    );
+    GetIt.I.registerSingleton<FeatureAnnouncementRepository>(
+      FeatureAnnouncementRepository(
+        onboarding: GetIt.I.get<OnboardingRepository>(),
+      ),
     );
     GetIt.I.registerSingleton<AppAnalytics>(const _FakeAppAnalytics());
     GetIt.I.registerSingleton<AirportsDatabase>(
@@ -115,7 +121,10 @@ void main() {
       await _pumpUntilVisible(tester, find.text('New flight'));
 
       expect(find.text('New flight'), findsOneWidget);
-      expect(tester.state<NavigatorState>(find.byType(Navigator)).canPop(), isFalse);
+      expect(
+        tester.state<NavigatorState>(find.byType(Navigator)).canPop(),
+        isFalse,
+      );
 
       await tester.tap(find.byIcon(Icons.arrow_back));
       await _pumpUntilVisible(tester, find.text('Home screen'));
@@ -124,6 +133,14 @@ void main() {
 
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getBool('onboarding.seen'), isTrue);
+      expect(
+        prefs.getBool(
+          FeatureAnnouncementRepository.seenKey(
+            FeatureAnnouncement.geoQuizLearn,
+          ),
+        ),
+        isTrue,
+      );
     },
   );
 }

@@ -127,8 +127,8 @@ class TranslationsHomeEn {
 	/// en: 'Flights'
 	String get tabFlights => 'Flights';
 
-	/// en: 'Learn'
-	String get tabLearn => 'Learn';
+	/// en: 'Learn & Play'
+	String get tabLearn => 'Learn & Play';
 
 	/// en: 'Loading flights...'
 	String get loadingFlights => 'Loading flights...';
@@ -290,6 +290,14 @@ class TranslationsLearnEn {
 
 	/// en: 'Could not open this article right now.'
 	String get failedToLoadArticle => 'Could not open this article right now.';
+
+	/// en: 'Quizzes'
+	String get quizzesTitle => 'Quizzes';
+
+	/// en: 'Articles'
+	String get articlesTitle => 'Articles';
+
+	late final TranslationsLearnGeoQuizEn geoQuiz = TranslationsLearnGeoQuizEn.internal(_root);
 }
 
 // Path: settings
@@ -1789,6 +1797,105 @@ class TranslationsHomeSortEn {
 	String get alphabetical => 'A-Z';
 }
 
+// Path: learn.geoQuiz
+class TranslationsLearnGeoQuizEn {
+	TranslationsLearnGeoQuizEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Geo Quiz'
+	String get title => 'Geo Quiz';
+
+	/// en: 'Countries on map'
+	String get countriesTitle => 'Countries on map';
+
+	/// en: 'Guess the country from its outline'
+	String get subtitle => 'Guess the country from its outline';
+
+	/// en: 'Loading Geo Quiz...'
+	String get loading => 'Loading Geo Quiz...';
+
+	/// en: 'Failed to load quizzes'
+	String get failedToLoad => 'Failed to load quizzes';
+
+	/// en: 'Failed to load quiz'
+	String get failedToLoadQuiz => 'Failed to load quiz';
+
+	/// en: 'No quizzes yet'
+	String get emptyTitle => 'No quizzes yet';
+
+	/// en: 'Geo quizzes will appear here soon.'
+	String get emptySubtitle => 'Geo quizzes will appear here soon.';
+
+	/// en: 'Country name...'
+	String get countryHint => 'Country name...';
+
+	/// en: '$solved / $total'
+	String progressCount({required Object solved, required Object total}) => '${solved} / ${total}';
+
+	/// en: '$next of $total'
+	String nextCount({required Object next, required Object total}) => '${next} of ${total}';
+
+	/// en: '$count correct'
+	String correctCount({required Object count}) => '${count} correct';
+
+	/// en: 'Reset progress'
+	String get reset => 'Reset progress';
+
+	/// en: 'Map data will be added next'
+	String get mapPlaceholder => 'Map data will be added next';
+
+	/// en: 'NEW'
+	String get newBadge => 'NEW';
+
+	/// en: 'Correct'
+	String get correct => 'Correct';
+
+	/// en: 'Wrong'
+	String get wrong => 'Wrong';
+
+	/// en: 'Next'
+	String get next => 'Next';
+
+	/// en: 'Pause'
+	String get pause => 'Pause';
+
+	/// en: 'Resume'
+	String get resume => 'Resume';
+
+	/// en: 'Finish'
+	String get finish => 'Finish';
+
+	/// en: 'Quiz complete'
+	String get completeTitle => 'Quiz complete';
+
+	/// en: 'You found all $total countries in $quiz.'
+	String completeMessage({required Object total, required Object quiz}) => 'You found all ${total} countries in ${quiz}.';
+
+	/// en: 'Back to quizzes'
+	String get backToQuizzes => 'Back to quizzes';
+
+	/// en: 'Play again'
+	String get playAgain => 'Play again';
+
+	/// en: 'Ready to play'
+	String get progressReady => 'Ready to play';
+
+	/// en: '$count finished'
+	String progressFinished({required Object count}) => '${count} finished';
+
+	/// en: '$count in progress'
+	String progressInProgress({required Object count}) => '${count} in progress';
+
+	/// en: 'All completed'
+	String get progressAllCompleted => 'All completed';
+
+	/// en: 'Description is not available yet.'
+	String get descriptionUnavailable => 'Description is not available yet.';
+}
+
 // Path: createFlight.steps
 class TranslationsCreateFlightStepsEn {
 	TranslationsCreateFlightStepsEn.internal(this._root);
@@ -3081,7 +3188,7 @@ extension on Translations {
 			'home.aboutTooltip' => 'About',
 			'home.settingsTooltip' => 'Settings',
 			'home.tabFlights' => 'Flights',
-			'home.tabLearn' => 'Learn',
+			'home.tabLearn' => 'Learn & Play',
 			'home.loadingFlights' => 'Loading flights...',
 			'home.failedToLoadFlights' => 'Failed to load flights',
 			'home.newFlight' => 'New flight',
@@ -3135,6 +3242,38 @@ extension on Translations {
 			'learn.upgradeRequiresInternet' => 'Premium content is available with Pro. Connect to the internet to upgrade.',
 			'learn.proListPreviewHint' => 'You can browse these article titles now. Unlock reading with Flymap Pro.',
 			'learn.failedToLoadArticle' => 'Could not open this article right now.',
+			'learn.quizzesTitle' => 'Quizzes',
+			'learn.articlesTitle' => 'Articles',
+			'learn.geoQuiz.title' => 'Geo Quiz',
+			'learn.geoQuiz.countriesTitle' => 'Countries on map',
+			'learn.geoQuiz.subtitle' => 'Guess the country from its outline',
+			'learn.geoQuiz.loading' => 'Loading Geo Quiz...',
+			'learn.geoQuiz.failedToLoad' => 'Failed to load quizzes',
+			'learn.geoQuiz.failedToLoadQuiz' => 'Failed to load quiz',
+			'learn.geoQuiz.emptyTitle' => 'No quizzes yet',
+			'learn.geoQuiz.emptySubtitle' => 'Geo quizzes will appear here soon.',
+			'learn.geoQuiz.countryHint' => 'Country name...',
+			'learn.geoQuiz.progressCount' => ({required Object solved, required Object total}) => '${solved} / ${total}',
+			'learn.geoQuiz.nextCount' => ({required Object next, required Object total}) => '${next} of ${total}',
+			'learn.geoQuiz.correctCount' => ({required Object count}) => '${count} correct',
+			'learn.geoQuiz.reset' => 'Reset progress',
+			'learn.geoQuiz.mapPlaceholder' => 'Map data will be added next',
+			'learn.geoQuiz.newBadge' => 'NEW',
+			'learn.geoQuiz.correct' => 'Correct',
+			'learn.geoQuiz.wrong' => 'Wrong',
+			'learn.geoQuiz.next' => 'Next',
+			'learn.geoQuiz.pause' => 'Pause',
+			'learn.geoQuiz.resume' => 'Resume',
+			'learn.geoQuiz.finish' => 'Finish',
+			'learn.geoQuiz.completeTitle' => 'Quiz complete',
+			'learn.geoQuiz.completeMessage' => ({required Object total, required Object quiz}) => 'You found all ${total} countries in ${quiz}.',
+			'learn.geoQuiz.backToQuizzes' => 'Back to quizzes',
+			'learn.geoQuiz.playAgain' => 'Play again',
+			'learn.geoQuiz.progressReady' => 'Ready to play',
+			'learn.geoQuiz.progressFinished' => ({required Object count}) => '${count} finished',
+			'learn.geoQuiz.progressInProgress' => ({required Object count}) => '${count} in progress',
+			'learn.geoQuiz.progressAllCompleted' => 'All completed',
+			'learn.geoQuiz.descriptionUnavailable' => 'Description is not available yet.',
 			'settings.title' => 'Settings',
 			'settings.loading' => 'Loading settings...',
 			'settings.profile' => 'Profile',
@@ -3543,6 +3682,8 @@ extension on Translations {
 			'flight.dashboard.accuracyPoor' => 'Poor',
 			'flight.dashboard.gpsOff' => 'GPS off',
 			'flight.dashboard.gpsOffHint' => 'Enable location services to start tracking.',
+			_ => null,
+		} ?? switch (path) {
 			'flight.dashboard.gpsPermissionRequired' => 'Location permission required',
 			'flight.dashboard.gpsPermissionHint' => 'Grant permission to access live flight telemetry.',
 			'flight.dashboard.gpsSearching' => 'Searching for GPS',
@@ -3575,8 +3716,6 @@ extension on Translations {
 			'flight.dashboard.gpsSearchingLabel' => 'GPS searching',
 			'flight.dashboard.gpsPermissionNeededLabel' => 'GPS permission needed',
 			'flight.dashboard.gpsOffLabel' => 'GPS off',
-			_ => null,
-		} ?? switch (path) {
 			'flight.dashboard.aircraftHeading' => 'Aircraft heading',
 			'flight.dashboard.headingShort' => ({required Object heading}) => 'HDG ${heading}°',
 			'flight.dashboard.liveInstruments' => 'Live instruments',

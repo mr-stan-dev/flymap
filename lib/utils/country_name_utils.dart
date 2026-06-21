@@ -199,6 +199,8 @@ class CountryNameUtils {
   };
   static final Map<String, Map<String, String>> _localizedNameToCodeCache = {};
 
+  static List<String> get countryCodes => _countryCodes;
+
   static String? toCode(String name, {String? languageCode}) {
     final normalized = _normalizeCountryName(name);
     if (normalized.isEmpty) return null;

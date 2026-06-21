@@ -4,6 +4,7 @@ import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/user_profile.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
+import 'package:flymap/repository/feature_announcement_repository.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
@@ -16,11 +17,13 @@ class OnboardingProfileFormCubit extends Cubit<OnboardingProfileFormState> {
     required AirportsDatabase airportsDb,
     required FavoriteAirportsRepository favoritesRepository,
     required RecentAirportsRepository recentAirportsRepository,
+    FeatureAnnouncementRepository? featureAnnouncementRepository,
     bool autoLoad = true,
   }) : _repository = repository,
        _airportsDb = airportsDb,
        _favoritesRepository = favoritesRepository,
        _recentAirportsRepository = recentAirportsRepository,
+       _featureAnnouncementRepository = featureAnnouncementRepository,
        super(const OnboardingProfileFormState.initial()) {
     if (autoLoad) {
       load();
@@ -31,6 +34,7 @@ class OnboardingProfileFormCubit extends Cubit<OnboardingProfileFormState> {
   final AirportsDatabase _airportsDb;
   final FavoriteAirportsRepository _favoritesRepository;
   final RecentAirportsRepository _recentAirportsRepository;
+  final FeatureAnnouncementRepository? _featureAnnouncementRepository;
   final _logger = Logger('OnboardingProfileFormCubit');
 
   Future<void> load() async {
@@ -167,6 +171,7 @@ class OnboardingProfileFormCubit extends Cubit<OnboardingProfileFormState> {
   }
 
   Future<void> completeOnboarding() async {
+    await _featureAnnouncementRepository?.markCurrentOnboardingFeaturesSeen();
     await _repository.markSeen();
   }
 

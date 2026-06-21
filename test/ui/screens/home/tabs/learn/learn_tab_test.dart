@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flymap/data/network/connectivity_checker.dart';
+import 'package:flymap/domain/entity/geo_quiz.dart';
 import 'package:flymap/domain/entity/learn_access.dart';
 import 'package:flymap/domain/entity/learn_article_content.dart';
 import 'package:flymap/domain/entity/learn_article_meta.dart';
@@ -12,6 +14,8 @@ import 'package:flymap/domain/entity/learn_article_progress.dart';
 import 'package:flymap/domain/entity/learn_category.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/flight_unlock_repository.dart';
+import 'package:flymap/repository/geo_quiz_progress_repository.dart';
+import 'package:flymap/repository/geo_quiz_repository.dart';
 import 'package:flymap/repository/learn_article_progress_repository.dart';
 import 'package:flymap/repository/learn_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
@@ -21,11 +25,14 @@ import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/subscription/subscription_status.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
+import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/geo_quiz_entry_card.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/learn_article_screen.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/learn_tab.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/viewmodel/learn_cubit.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/theme/app_theme.dart';
+import 'package:flymap/ui/widgets/pro_widgets.dart';
 import 'package:flymap/domain/usecase/can_open_learn_article_use_case.dart';
 import 'package:flymap/domain/usecase/get_learn_article_content_use_case.dart';
 import 'package:flymap/domain/usecase/get_learn_article_progress_use_case.dart';
@@ -33,11 +40,36 @@ import 'package:flymap/domain/usecase/get_learn_categories_use_case.dart';
 import 'package:flymap/domain/usecase/get_learn_category_articles_use_case.dart';
 import 'package:flymap/domain/usecase/mark_learn_article_seen_use_case.dart';
 import 'package:flymap/domain/usecase/toggle_learn_article_favorite_use_case.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   setUpAll(() {
     LocaleSettings.setLocaleSync(AppLocale.en);
+  });
+
+  setUp(() {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final getIt = GetIt.I;
+    if (getIt.isRegistered<GeoQuizRepository>()) {
+      getIt.unregister<GeoQuizRepository>();
+    }
+    getIt.registerLazySingleton<GeoQuizRepository>(
+      () => _FakeGeoQuizRepository(),
+    );
+    if (getIt.isRegistered<GeoQuizProgressRepository>()) {
+      getIt.unregister<GeoQuizProgressRepository>();
+    }
+    getIt.registerLazySingleton<GeoQuizProgressRepository>(
+      () => SharedPrefsGeoQuizProgressRepository(),
+    );
+    if (getIt.isRegistered<ConnectivityChecker>()) {
+      getIt.unregister<ConnectivityChecker>();
+    }
+    getIt.registerSingleton<ConnectivityChecker>(
+      const _FakeConnectivityChecker(hasInternet: true),
+    );
   });
 
   testWidgets('does not show PRO badge on category cards', (tester) async {
@@ -59,6 +91,261 @@ void main() {
     expect(find.text('Pro Cat'), findsOneWidget);
     expect(find.byType(LearnTab), findsOneWidget);
     expect(find.text('PRO'), findsNothing);
+  });
+
+  testWidgets('shows Countries on map in Quizzes before learn categories', (
+    tester,
+  ) async {
+    final learnRepository = _FakeLearnRepository();
+    final learnCubit = _buildLearnCubit(learnRepository);
+
+    await tester.pumpWidget(
+      _testApp(isProUser: false, child: LearnTab(cubit: learnCubit)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Quizzes'), findsOneWidget);
+    expect(find.text('Countries on map'), findsOneWidget);
+    expect(find.text('Start practicing'), findsNothing);
+    expect(find.text('Free Cat'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('Countries on map')).dy,
+      lessThan(tester.getTopLeft(find.text('Free Cat')).dy),
+    );
+    expect(
+      tester.getTopLeft(find.byKey(GeoQuizEntryCard.imageKey)).dx,
+      lessThan(tester.getTopLeft(find.text('Countries on map')).dx),
+    );
+  });
+
+  testWidgets('can show NEW badge on Geo Quiz card', (tester) async {
+    final learnRepository = _FakeLearnRepository();
+    final learnCubit = _buildLearnCubit(learnRepository);
+
+    await tester.pumpWidget(
+      _testApp(
+        isProUser: false,
+        child: LearnTab(cubit: learnCubit, showGeoQuizNewBadge: true),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('learn.geo_quiz.new_badge')), findsOneWidget);
+    expect(find.text('NEW'), findsOneWidget);
+  });
+
+  testWidgets('shows quiz progress and section titles', (tester) async {
+    await GetIt.I<GeoQuizProgressRepository>().markSolved(
+      quizId: 'countries_africa',
+      regionId: 'AO',
+    );
+    await GetIt.I<GeoQuizProgressRepository>().markSolved(
+      quizId: 'countries_europe',
+      regionId: 'FR',
+    );
+    final learnRepository = _FakeLearnRepository();
+    final learnCubit = _buildLearnCubit(learnRepository);
+
+    await tester.pumpWidget(
+      _testApp(isProUser: false, child: LearnTab(cubit: learnCubit)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(GeoQuizEntryCard.finishedMetricKey), findsOneWidget);
+    expect(find.byKey(GeoQuizEntryCard.inProgressMetricKey), findsOneWidget);
+    expect(find.text('1 finished'), findsOneWidget);
+    expect(find.text('1 in progress'), findsOneWidget);
+    expect(find.text('Quizzes'), findsOneWidget);
+    expect(find.text('Articles'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('Articles')).dy,
+      lessThan(tester.getTopLeft(find.text('Free Cat')).dy),
+    );
+  });
+
+  testWidgets('shows all completed when every quiz is finished', (
+    tester,
+  ) async {
+    final progressRepository = GetIt.I<GeoQuizProgressRepository>();
+    for (final regionId in const ['AO']) {
+      await progressRepository.markSolved(
+        quizId: 'countries_africa',
+        regionId: regionId,
+      );
+    }
+    for (final regionId in const ['FR', 'DE']) {
+      await progressRepository.markSolved(
+        quizId: 'countries_europe',
+        regionId: regionId,
+      );
+    }
+    for (final regionId in const ['AO', 'FR', 'DE']) {
+      await progressRepository.markSolved(
+        quizId: 'countries_world',
+        regionId: regionId,
+      );
+    }
+
+    final learnCubit = _buildLearnCubit(_FakeLearnRepository());
+    await tester.pumpWidget(
+      _testApp(isProUser: false, child: LearnTab(cubit: learnCubit)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(GeoQuizEntryCard.allCompletedMetricKey), findsOneWidget);
+    expect(find.text('All completed'), findsOneWidget);
+    expect(find.byKey(GeoQuizEntryCard.inProgressMetricKey), findsNothing);
+  });
+
+  testWidgets('hides NEW badge on Geo Quiz card by default', (tester) async {
+    final learnRepository = _FakeLearnRepository();
+    final learnCubit = _buildLearnCubit(learnRepository);
+
+    await tester.pumpWidget(
+      _testApp(isProUser: false, child: LearnTab(cubit: learnCubit)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('learn.geo_quiz.new_badge')), findsNothing);
+  });
+
+  testWidgets('opens Geo Quiz list and quiz screen from Learn tab', (
+    tester,
+  ) async {
+    final learnRepository = _FakeLearnRepository();
+    final learnCubit = _buildLearnCubit(learnRepository);
+
+    await tester.pumpWidget(
+      _testApp(isProUser: false, child: LearnTab(cubit: learnCubit)),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Countries on map'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Countries on map'), findsOneWidget);
+    expect(find.byKey(const Key('geoQuizGrid')), findsOneWidget);
+    expect(find.text('Countries'), findsNothing);
+    expect(find.text('Africa'), findsOneWidget);
+    expect(find.byType(ProBadge), findsNWidgets(2));
+    expect(
+      tester
+          .widgetList<Icon>(find.byIcon(Icons.lock_outline_rounded))
+          .every((icon) => icon.color == DsBrandColors.proAmber),
+      isTrue,
+    );
+
+    await tester.tap(find.text('Europe'));
+    await tester.pump();
+    for (var i = 0; i < 30 && find.byType(TextField).evaluate().isEmpty; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('1 of 2'), findsOneWidget);
+  });
+
+  testWidgets('locked quiz shows offline upgrade message', (tester) async {
+    GetIt.I.unregister<ConnectivityChecker>();
+    GetIt.I.registerSingleton<ConnectivityChecker>(
+      const _FakeConnectivityChecker(hasInternet: false),
+    );
+    final learnCubit = _buildLearnCubit(_FakeLearnRepository());
+
+    await tester.pumpWidget(
+      _testApp(isProUser: false, child: LearnTab(cubit: learnCubit)),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Countries on map'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('World'));
+    await tester.pumpAndSettle();
+
+    expect(find.text(t.learn.upgradeRequiresInternet), findsOneWidget);
+    expect(find.byType(TextField), findsNothing);
+  });
+
+  testWidgets('Pro user can open locked quiz', (tester) async {
+    final learnCubit = _buildLearnCubit(_FakeLearnRepository());
+
+    await tester.pumpWidget(
+      _testApp(isProUser: true, child: LearnTab(cubit: learnCubit)),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Countries on map'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ProBadge), findsNothing);
+    await tester.tap(find.text('World'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TextField), findsOneWidget);
+  });
+
+  testWidgets('correct answer countdown can be paused and resumed', (
+    tester,
+  ) async {
+    final learnRepository = _FakeLearnRepository();
+    final learnCubit = _buildLearnCubit(learnRepository);
+
+    await tester.pumpWidget(
+      _testApp(isProUser: false, child: LearnTab(cubit: learnCubit)),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Countries on map'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Europe'));
+    await tester.pumpAndSettle();
+
+    final answer = find.text('France').evaluate().isNotEmpty
+        ? 'France'
+        : 'Germany';
+    await tester.enterText(find.byType(TextField), answer.substring(0, 2));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(ActionChip, answer));
+    await tester.pump();
+
+    expect(find.byKey(const Key('geoQuizCorrectOverlay')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('geoQuizCorrectCountdownToggle')));
+    await tester.pump();
+    expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 6));
+    expect(find.byKey(const Key('geoQuizCorrectOverlay')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('geoQuizCorrectCountdownToggle')));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 6));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.byKey(const Key('geoQuizCorrectOverlay')), findsNothing);
+  });
+
+  testWidgets('final correct answer waits for Finish', (tester) async {
+    final learnRepository = _FakeLearnRepository();
+    final learnCubit = _buildLearnCubit(learnRepository);
+
+    await tester.pumpWidget(
+      _testApp(isProUser: true, child: LearnTab(cubit: learnCubit)),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Countries on map'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Africa'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), 'An');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(ActionChip, 'Angola'));
+    await tester.pump();
+
+    expect(find.byKey(const Key('geoQuizCorrectOverlay')), findsOneWidget);
+    expect(find.text('Finish'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 6));
+    expect(find.byKey(const Key('geoQuizCorrectOverlay')), findsOneWidget);
+
+    await tester.tap(find.text('Finish'));
+    await tester.pumpAndSettle();
+    expect(find.text('Quiz complete'), findsOneWidget);
   });
 
   testWidgets('free user can browse premium category article titles', (
@@ -124,6 +411,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.ensureVisible(find.text('Free Cat'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Free Cat'));
     await tester.pumpAndSettle();
 
@@ -150,6 +439,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.ensureVisible(find.text('Free Cat'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Free Cat'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Free One'));
@@ -432,6 +723,71 @@ class _FakeFlightUnlockRepository implements FlightUnlockRepository {
 
   @override
   Future<int> restoreUnlock() async => 0;
+}
+
+class _FakeGeoQuizRepository implements GeoQuizRepository {
+  static const _africaSummary = GeoQuizSummary(
+    id: 'countries_africa',
+    title: 'Africa',
+    subtitle: 'Countries',
+    totalCount: 1,
+    access: LearnAccess.pro,
+  );
+  static const _europeSummary = GeoQuizSummary(
+    id: 'countries_europe',
+    title: 'Europe',
+    subtitle: 'Countries',
+    totalCount: 2,
+  );
+  static const _worldSummary = GeoQuizSummary(
+    id: 'countries_world',
+    title: 'World',
+    subtitle: 'Countries',
+    totalCount: 3,
+    access: LearnAccess.pro,
+  );
+
+  @override
+  Future<List<GeoQuizSummary>> getQuizzes() async {
+    return const [_africaSummary, _europeSummary, _worldSummary];
+  }
+
+  @override
+  Future<List<GeoQuizRegion>> getRegions({required String quizId}) async {
+    return switch (quizId) {
+      'countries_europe' => const [
+        GeoQuizRegion(id: 'FR', countryCode: 'FR', names: {'en': 'France'}),
+        GeoQuizRegion(id: 'DE', countryCode: 'DE', names: {'en': 'Germany'}),
+      ],
+      'countries_world' => const [
+        GeoQuizRegion(id: 'AO', countryCode: 'AO', names: {'en': 'Angola'}),
+        GeoQuizRegion(id: 'FR', countryCode: 'FR', names: {'en': 'France'}),
+        GeoQuizRegion(id: 'DE', countryCode: 'DE', names: {'en': 'Germany'}),
+      ],
+      _ => const [
+        GeoQuizRegion(id: 'AO', countryCode: 'AO', names: {'en': 'Angola'}),
+      ],
+    };
+  }
+
+  @override
+  Future<String?> getRegionDescription({
+    required String regionId,
+    required String languageCode,
+  }) async {
+    return null;
+  }
+}
+
+class _FakeConnectivityChecker extends ConnectivityChecker {
+  const _FakeConnectivityChecker({required this.hasInternet});
+
+  final bool hasInternet;
+
+  @override
+  Future<bool> hasInternetConnectivity({
+    Duration timeout = const Duration(seconds: 2),
+  }) async => hasInternet;
 }
 
 class _FakeAppAnalytics implements AppAnalytics {

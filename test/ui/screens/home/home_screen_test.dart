@@ -15,6 +15,7 @@ import 'package:flymap/domain/entity/flight_route_metrics.dart';
 import 'package:flymap/domain/entity/flight_status.dart';
 import 'package:flymap/domain/entity/flight_timestamp.dart';
 import 'package:flymap/domain/entity/flight_waypoint.dart';
+import 'package:flymap/domain/entity/geo_quiz.dart';
 import 'package:flymap/domain/entity/learn_access.dart';
 import 'package:flymap/domain/entity/learn_article_content.dart';
 import 'package:flymap/domain/entity/learn_article_meta.dart';
@@ -23,6 +24,9 @@ import 'package:flymap/domain/entity/learn_category.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/flight_unlock_repository.dart';
+import 'package:flymap/repository/feature_announcement_repository.dart';
+import 'package:flymap/repository/geo_quiz_progress_repository.dart';
+import 'package:flymap/repository/geo_quiz_repository.dart';
 import 'package:flymap/repository/learn_article_progress_repository.dart';
 import 'package:flymap/repository/learn_repository.dart';
 import 'package:flymap/repository/metric_units_repository.dart';
@@ -77,6 +81,11 @@ void main() {
     GetIt.I.registerSingleton<OnboardingRepository>(
       OnboardingRepository(prefsStorage: UserFlightPrefsStorage()),
     );
+    GetIt.I.registerSingleton<FeatureAnnouncementRepository>(
+      FeatureAnnouncementRepository(
+        onboarding: GetIt.I.get<OnboardingRepository>(),
+      ),
+    );
     final learnRepository = _FakeLearnRepository();
     GetIt.I.registerSingleton<GetLearnCategoriesUseCase>(
       GetLearnCategoriesUseCase(repository: learnRepository),
@@ -100,6 +109,12 @@ void main() {
     GetIt.I.registerSingleton<CanOpenLearnArticleUseCase>(
       CanOpenLearnArticleUseCase(repository: learnRepository),
     );
+    GetIt.I.registerSingleton<GeoQuizRepository>(
+      const _FakeGeoQuizRepository(),
+    );
+    GetIt.I.registerSingleton<GeoQuizProgressRepository>(
+      SharedPrefsGeoQuizProgressRepository(),
+    );
   });
 
   tearDown(() async {
@@ -122,14 +137,16 @@ void main() {
     );
   });
 
-  testWidgets('switches to Learn tab and keeps app stable', (tester) async {
+  testWidgets('switches to Learn & Play tab and keeps app stable', (
+    tester,
+  ) async {
     await tester.pumpWidget(_testApp());
     await _pumpForInitialLoad(tester);
 
-    await tester.tap(find.text('Learn'));
+    await tester.tap(find.text('Learn & Play'));
     await tester.pump(const Duration(milliseconds: 200));
 
-    expect(_findAppBarTitle('Learn'), findsOneWidget);
+    expect(_findAppBarTitle('Learn & Play'), findsOneWidget);
     expect(
       tester
           .widget<BottomNavigationBar>(find.byType(BottomNavigationBar))
@@ -137,6 +154,40 @@ void main() {
       1,
     );
   });
+
+  testWidgets(
+    'shows Learn new feature dot for existing users and clears it on open',
+    (tester) async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('onboarding.seen', true);
+
+      await tester.pumpWidget(_testApp());
+      await _pumpForInitialLoad(tester);
+
+      expect(
+        find.byKey(const Key('home.learn.geo_quiz_new_dot')),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Learn & Play'));
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pump(const Duration(milliseconds: 200));
+
+      expect(
+        find.byKey(const Key('home.learn.geo_quiz_new_dot')),
+        findsNothing,
+      );
+      expect(find.byKey(const Key('learn.geo_quiz.new_badge')), findsOneWidget);
+      expect(
+        prefs.getBool(
+          FeatureAnnouncementRepository.seenKey(
+            FeatureAnnouncement.geoQuizLearn,
+          ),
+        ),
+        isTrue,
+      );
+    },
+  );
 
   testWidgets('switches to Settings tab and renders settings content', (
     tester,
@@ -539,6 +590,37 @@ class _FakeLearnRepository implements LearnRepository {
   @override
   Future<List<LearnCategory>> getCategories() async {
     return _categories;
+  }
+}
+
+class _FakeGeoQuizRepository implements GeoQuizRepository {
+  const _FakeGeoQuizRepository();
+
+  @override
+  Future<List<GeoQuizSummary>> getQuizzes() async {
+    return const [
+      GeoQuizSummary(
+        id: 'countries_africa',
+        title: 'Africa',
+        subtitle: 'Countries',
+        totalCount: 1,
+      ),
+    ];
+  }
+
+  @override
+  Future<List<GeoQuizRegion>> getRegions({required String quizId}) async {
+    return const [
+      GeoQuizRegion(id: 'AO', countryCode: 'AO', names: {'en': 'Angola'}),
+    ];
+  }
+
+  @override
+  Future<String?> getRegionDescription({
+    required String regionId,
+    required String languageCode,
+  }) async {
+    return null;
   }
 }
 
