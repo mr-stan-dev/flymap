@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flymap/domain/entity/gps_data.dart';
 import 'package:flymap/repository/metric_units_repository.dart';
 import 'package:geolocator/geolocator.dart';
@@ -38,10 +39,7 @@ class GpsDataProvider {
 
     onUpdate(GpsStatus.searching);
 
-    const settings = LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 0,
-    );
+    final settings = _locationSettings();
 
     final speedUnit = await _unitsRepository.getSpeedUnit();
     final altitudeUnit = await _unitsRepository.getAltitudeUnit();
@@ -61,6 +59,9 @@ class GpsDataProvider {
                 ? pos.altitude
                 : pos.altitude * 3.28084; // -> m or ft
             final altitude = AltitudeValue(altitudeValue, isMeter ? 'm' : 'ft');
+            final altitudeAccuracy = pos.altitudeAccuracy > 0
+                ? pos.altitudeAccuracy
+                : null;
 
             final gps = GpsData(
               latitude: pos.latitude,
@@ -69,8 +70,11 @@ class GpsDataProvider {
               speed: speed,
               course: pos.heading, // degrees
               accuracy: pos.accuracy, // meters
+              altitudeAccuracy: altitudeAccuracy, // meters
             );
-            final status = pos.accuracy <= 40
+            final status =
+                pos.accuracy <= 40 &&
+                    (altitudeAccuracy == null || altitudeAccuracy <= 1000)
                 ? GpsStatus.gpsActive
                 : GpsStatus.weakSignal;
             onUpdate(status, data: gps);
@@ -79,6 +83,33 @@ class GpsDataProvider {
             onUpdate(GpsStatus.searching);
           },
         );
+  }
+
+  LocationSettings _locationSettings() {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return AndroidSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          distanceFilter: 0,
+          intervalDuration: const Duration(seconds: 1),
+          useMSLAltitude: true,
+        );
+      case TargetPlatform.iOS:
+        return AppleSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          activityType: ActivityType.airborne,
+          distanceFilter: 0,
+          pauseLocationUpdatesAutomatically: false,
+        );
+      case TargetPlatform.macOS:
+      case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+      case TargetPlatform.windows:
+        return const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          distanceFilter: 0,
+        );
+    }
   }
 
   Future<void> stop() async {
