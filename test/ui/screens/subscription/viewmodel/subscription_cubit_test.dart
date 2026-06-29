@@ -253,6 +253,21 @@ void main() {
       expect(event.result, SubscriptionPaywallResult.cancelled);
     });
 
+    test('logs Geo Quiz paywall source', () async {
+      repository.paywallResult = SubscriptionPaywallResult.purchased;
+
+      final result = await cubit.presentPaywallFromGeoQuiz();
+
+      expect(result, SubscriptionPaywallResult.purchased);
+      final presented = analytics.events
+          .whereType<PaywallPresentedEvent>()
+          .single;
+      expect(presented.source, PaywallSource.geoQuizLockedContent);
+      final completed = analytics.events.whereType<PaywallResultEvent>().single;
+      expect(completed.source, PaywallSource.geoQuizLockedContent);
+      expect(completed.result, SubscriptionPaywallResult.purchased);
+    });
+
     test('logs real route gate paywall source', () async {
       repository.paywallResult = SubscriptionPaywallResult.cancelled;
 

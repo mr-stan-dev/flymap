@@ -20,6 +20,9 @@ enum PaywallSource {
   /// User attempted to open locked Learn content.
   learnLockedContent,
 
+  /// User attempted to open a locked Geo Quiz.
+  geoQuizLockedContent,
+
   /// User opened paywall from onboarding soft Pro step.
   onboarding,
 
@@ -46,6 +49,7 @@ extension PaywallSourceAnalyticsValue on PaywallSource {
       PaywallSource.settingsBanner => 'settings_banner',
       PaywallSource.subscriptionManagement => 'subscription_management',
       PaywallSource.learnLockedContent => 'learn_locked_content',
+      PaywallSource.geoQuizLockedContent => 'geo_quiz_locked_content',
       PaywallSource.onboarding => 'onboarding',
       PaywallSource.routeOverviewGate => 'route_overview_gate',
       PaywallSource.routeTimelineGate => 'route_timeline_gate',

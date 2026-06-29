@@ -1,38 +1,45 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/domain/entity/geo_quiz.dart';
-import 'package:flymap/i18n/app_localization.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/geo_quiz_progress_repository.dart';
 import 'package:flymap/repository/geo_quiz_repository.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_state.dart';
 import 'package:flymap/utils/country_name_utils.dart';
-import 'package:get_it/get_it.dart';
 
 typedef GeoQuizLanguageCodeProvider = String Function();
+typedef GeoQuizNowProvider = DateTime Function();
 
 class GeoQuizCubit extends Cubit<GeoQuizState> {
   GeoQuizCubit({
     required GeoQuizSummary summary,
-    GeoQuizRepository? repository,
-    GeoQuizProgressRepository? progressRepository,
-    GeoQuizLanguageCodeProvider? languageCodeProvider,
-    bool randomizeRegionOrder = true,
+    required GeoQuizRepository repository,
+    required GeoQuizProgressRepository progressRepository,
+    required GeoQuizLanguageCodeProvider languageCodeProvider,
+    required AppAnalytics analytics,
+    required bool isProUser,
+    required GeoQuizNowProvider nowProvider,
   }) : _summary = summary,
-       _repository = repository ?? GetIt.I<GeoQuizRepository>(),
-       _progressRepository =
-           progressRepository ?? GetIt.I<GeoQuizProgressRepository>(),
-       _languageCodeProvider =
-           languageCodeProvider ?? (() => AppLocalization.currentLanguageCode),
-       _randomizeRegionOrder = randomizeRegionOrder,
+       _repository = repository,
+       _progressRepository = progressRepository,
+       _languageCodeProvider = languageCodeProvider,
+       _analytics = analytics,
+       _isProUser = isProUser,
+       _nowProvider = nowProvider,
        super(const GeoQuizLoading());
 
   final GeoQuizSummary _summary;
   final GeoQuizRepository _repository;
   final GeoQuizProgressRepository _progressRepository;
   final GeoQuizLanguageCodeProvider _languageCodeProvider;
-  final bool _randomizeRegionOrder;
+  final AppAnalytics _analytics;
+  final bool _isProUser;
+  final GeoQuizNowProvider _nowProvider;
+  DateTime? _startedAt;
+  bool _completionLogged = false;
 
   Future<void> load() async {
     emit(const GeoQuizLoading());
@@ -41,20 +48,24 @@ class GeoQuizCubit extends Cubit<GeoQuizState> {
         await _repository.getRegions(quizId: _summary.id),
       );
       final progress = await _progressRepository.getProgress(_summary.id);
-      emit(
-        GeoQuizLoaded(
-          summary: _summary,
-          regions: regions,
-          progress: _filterProgress(progress, regions),
-        ),
+      final loaded = GeoQuizLoaded(
+        summary: _summary,
+        regions: regions,
+        progress: _filterProgress(progress, regions),
       );
+      _startedAt = _nowProvider();
+      _completionLogged = loaded.isComplete;
+      emit(loaded);
+      if (!loaded.isComplete) {
+        _logStarted(loaded);
+      }
     } catch (_) {
       emit(GeoQuizError(message: t.learn.geoQuiz.failedToLoadQuiz));
     }
   }
 
   List<GeoQuizRegion> _orderedRegions(List<GeoQuizRegion> regions) {
-    if (!_randomizeRegionOrder || regions.length < 2) return regions;
+    if (regions.length < 3) return regions;
     return List<GeoQuizRegion>.of(regions)..shuffle(Random());
   }
 
@@ -104,17 +115,14 @@ class GeoQuizCubit extends Cubit<GeoQuizState> {
       quizId: current.summary.id,
       regionId: suggestion.regionId,
     );
-    emit(
-      current.copyWith(
-        progress: _filterProgress(updated, current.regions),
-        query: '',
-        suggestions: const [],
-        feedback: GeoQuizAnswerFeedback(
-          isCorrect: true,
-          label: suggestion.label,
-        ),
-      ),
+    final next = current.copyWith(
+      progress: _filterProgress(updated, current.regions),
+      query: '',
+      suggestions: const [],
+      feedback: GeoQuizAnswerFeedback(isCorrect: true, label: suggestion.label),
     );
+    emit(next);
+    _logCompletedIfNeeded(previous: current, current: next);
   }
 
   Future<void> submitQuery() async {
@@ -151,15 +159,20 @@ class GeoQuizCubit extends Cubit<GeoQuizState> {
   Future<void> reset() async {
     final current = state;
     if (current is! GeoQuizLoaded) return;
+    final shouldLogStarted = current.isComplete;
     final resetProgress = await _progressRepository.reset(current.summary.id);
-    emit(
-      current.copyWith(
-        progress: resetProgress,
-        query: '',
-        suggestions: const [],
-        clearFeedback: true,
-      ),
+    final reset = current.copyWith(
+      progress: resetProgress,
+      query: '',
+      suggestions: const [],
+      clearFeedback: true,
     );
+    _startedAt = _nowProvider();
+    _completionLogged = false;
+    emit(reset);
+    if (shouldLogStarted) {
+      _logStarted(reset);
+    }
   }
 
   void clearFeedback() {
@@ -177,6 +190,43 @@ class GeoQuizCubit extends Cubit<GeoQuizState> {
 
   String regionLabel(GeoQuizRegion region) {
     return region.labelForLanguage(_languageCodeProvider());
+  }
+
+  void _logStarted(GeoQuizLoaded state) {
+    unawaited(
+      _analytics.log(
+        GeoQuizStartedEvent(
+          quizId: state.summary.id,
+          access: state.summary.access,
+          isProUser: _isProUser,
+          solvedCount: state.solvedCount,
+          totalCount: state.totalCount,
+          isResume: state.solvedCount > 0,
+        ),
+      ),
+    );
+  }
+
+  void _logCompletedIfNeeded({
+    required GeoQuizLoaded previous,
+    required GeoQuizLoaded current,
+  }) {
+    if (_completionLogged || previous.isComplete || !current.isComplete) return;
+    _completionLogged = true;
+    final startedAt = _startedAt;
+    final duration = startedAt == null
+        ? 0
+        : _nowProvider().difference(startedAt).inSeconds.clamp(0, 1 << 31);
+    unawaited(
+      _analytics.log(
+        GeoQuizCompletedEvent(
+          quizId: current.summary.id,
+          totalCount: current.totalCount,
+          durationSeconds: duration,
+          isProUser: _isProUser,
+        ),
+      ),
+    );
   }
 
   void skipCurrentRegion() {

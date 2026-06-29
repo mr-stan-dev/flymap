@@ -18,16 +18,16 @@ enum FlightNumberLookupResult {
   final String analyticsValue;
 }
 
-class FlightNumberLookupResultEvent extends AnalyticsEvent {
+class FlightNumberLookupResultEvent extends FirebaseAnalyticsEvent {
   const FlightNumberLookupResultEvent({required this.result});
 
   final FlightNumberLookupResult result;
 
   @override
-  String get name => 'flight_number_lookup_result';
+  String get firebaseEventName => 'flight_number_lookup_result';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'result': result.analyticsValue,
   };
 }

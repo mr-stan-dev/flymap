@@ -1,7 +1,7 @@
 import 'package:flymap/analytics/events/analytics_event.dart';
 import 'package:flymap/subscription/paywall_source.dart';
 
-class FlightUnlockSheetOpenedEvent extends AnalyticsEvent {
+class FlightUnlockSheetOpenedEvent extends FirebaseAnalyticsEvent {
   const FlightUnlockSheetOpenedEvent({
     required this.source,
     required this.unusedUnlockCount,
@@ -13,10 +13,10 @@ class FlightUnlockSheetOpenedEvent extends AnalyticsEvent {
   final bool hasCachedProduct;
 
   @override
-  String get name => 'flight_unlock_sheet_opened';
+  String get firebaseEventName => 'flight_unlock_sheet_opened';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'source': source.analyticsValue,
     'unused_unlock_count': unusedUnlockCount,
     'has_cached_product': hasCachedProduct ? 1 : 0,

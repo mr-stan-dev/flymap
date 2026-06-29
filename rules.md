@@ -37,6 +37,9 @@ A concise, repeatable blueprint to build new Flutter apps with the same architec
   - Lazy singletons for shared services (e.g., DB, repositories, connectivity, use cases).
   - Factories for lightweight mappers and providers.
 - Centralize registrations in di/di_module.dart; no ad-hoc GetIt.register in feature code.
+- Constructor dependencies for Cubits/ViewModels must be `required` and non-nullable.
+- Do not use nullable/default constructor params that silently fall back to `GetIt` inside feature classes.
+- Resolve production dependencies in `di/di_module.dart` and pass them explicitly via GetIt factories or factory params.
 
 ## Routing
 - Use go_router with a single `AppRouter.createRouter()` that declares all routes.

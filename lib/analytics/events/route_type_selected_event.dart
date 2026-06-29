@@ -10,7 +10,8 @@ enum SelectedRouteType {
   final String analyticsValue;
 }
 
-class RouteTypeSelectedEvent extends AnalyticsEvent {
+class RouteTypeSelectedEvent extends AnalyticsEvent
+    implements FirebaseAnalyticsEvent, PostHogAnalyticsEvent {
   const RouteTypeSelectedEvent({
     required this.routeType,
     required this.isProUser,
@@ -22,12 +23,18 @@ class RouteTypeSelectedEvent extends AnalyticsEvent {
   final bool hasPendingFlightUnlock;
 
   @override
-  String get name => 'route_type_selected';
+  String get firebaseEventName => 'route_type_selected';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'route_type': routeType.analyticsValue,
     'is_pro_user': isProUser,
     'has_pending_flight_unlock': hasPendingFlightUnlock,
   };
+
+  @override
+  String get postHogEventName => firebaseEventName;
+
+  @override
+  Map<String, Object> get postHogParameters => firebaseParameters;
 }

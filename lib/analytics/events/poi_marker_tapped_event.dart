@@ -11,17 +11,17 @@ extension PoiMarkerTapSourceAnalyticsValue on PoiMarkerTapSource {
   }
 }
 
-class PoiMarkerTappedEvent extends AnalyticsEvent {
+class PoiMarkerTappedEvent extends FirebaseAnalyticsEvent {
   const PoiMarkerTappedEvent({required this.source, required this.poiType});
 
   final PoiMarkerTapSource source;
   final String poiType;
 
   @override
-  String get name => 'poi_marker_tapped';
+  String get firebaseEventName => 'poi_marker_tapped';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'source': source.analyticsValue,
     'poi_type': poiType.isEmpty ? 'unknown' : poiType,
   };

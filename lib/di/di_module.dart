@@ -2,11 +2,9 @@ import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/analytics/app_analytics_context.dart';
 import 'package:flymap/analytics/app_analytics_initializer.dart';
 import 'package:flymap/analytics/composite_app_analytics.dart';
-import 'package:flymap/analytics/filtering_app_analytics.dart';
 import 'package:flymap/analytics/posthog_app_analytics.dart';
 import 'package:flymap/analytics/posthog_client.dart';
 import 'package:flymap/analytics/posthog_env_config.dart';
-import 'package:flymap/analytics/posthog_event_filter.dart';
 import 'package:flymap/auth/app_auth_repository.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics_initializer.dart';
@@ -88,6 +86,10 @@ import 'package:flymap/domain/usecase/mark_learn_article_seen_use_case.dart';
 import 'package:flymap/domain/usecase/start_flight_use_case.dart';
 import 'package:flymap/domain/usecase/submit_feedback_use_case.dart';
 import 'package:flymap/domain/usecase/toggle_learn_article_favorite_use_case.dart';
+import 'package:flymap/domain/entity/geo_quiz.dart';
+import 'package:flymap/i18n/app_localization.dart';
+import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_cubit.dart';
+import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_list_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:in_app_review/in_app_review.dart';
@@ -107,12 +109,9 @@ class DiModule {
       () => CompositeAppAnalytics(
         sinks: <AppAnalytics>[
           FirebaseAppAnalytics(),
-          FilteringAppAnalytics(
-            delegate: PostHogAppAnalytics(
-              config: i.get<PostHogEnvConfig>(),
-              client: i.get<PostHogAnalyticsClient>(),
-            ),
-            eventFilter: const PostHogFunnelEventFilter(),
+          PostHogAppAnalytics(
+            config: i.get<PostHogEnvConfig>(),
+            client: i.get<PostHogAnalyticsClient>(),
           ),
         ],
       ),
@@ -319,6 +318,24 @@ class DiModule {
     i.registerLazySingleton<GeoQuizRepository>(() => AssetGeoQuizRepository());
     i.registerLazySingleton<GeoQuizProgressRepository>(
       () => SharedPrefsGeoQuizProgressRepository(),
+    );
+    i.registerFactory<GeoQuizListCubit>(
+      () => GeoQuizListCubit(
+        repository: i.get(),
+        progressRepository: i.get(),
+        analytics: i.get(),
+      ),
+    );
+    i.registerFactoryParam<GeoQuizCubit, GeoQuizSummary, bool>(
+      (summary, isProUser) => GeoQuizCubit(
+        summary: summary,
+        repository: i.get(),
+        progressRepository: i.get(),
+        languageCodeProvider: () => AppLocalization.currentLanguageCode,
+        analytics: i.get(),
+        isProUser: isProUser,
+        nowProvider: DateTime.now,
+      ),
     );
     i.registerLazySingleton<GetLearnCategoriesUseCase>(
       () => GetLearnCategoriesUseCase(repository: i.get()),

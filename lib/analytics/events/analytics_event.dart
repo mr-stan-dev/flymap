@@ -1,6 +1,17 @@
 abstract class AnalyticsEvent {
   const AnalyticsEvent();
+}
 
-  String get name;
-  Map<String, Object> get parameters;
+abstract class FirebaseAnalyticsEvent extends AnalyticsEvent {
+  const FirebaseAnalyticsEvent();
+
+  String get firebaseEventName;
+  Map<String, Object> get firebaseParameters;
+}
+
+abstract class PostHogAnalyticsEvent extends AnalyticsEvent {
+  const PostHogAnalyticsEvent();
+
+  String get postHogEventName;
+  Map<String, Object> get postHogParameters;
 }

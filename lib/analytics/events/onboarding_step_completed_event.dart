@@ -1,6 +1,6 @@
 import 'package:flymap/analytics/events/analytics_event.dart';
 
-class OnboardingStepCompletedEvent extends AnalyticsEvent {
+class OnboardingStepCompletedEvent extends FirebaseAnalyticsEvent {
   const OnboardingStepCompletedEvent({
     required this.stepId,
     required this.stepIndex,
@@ -12,10 +12,10 @@ class OnboardingStepCompletedEvent extends AnalyticsEvent {
   final String inputState;
 
   @override
-  String get name => 'onboarding_step_completed';
+  String get firebaseEventName => 'onboarding_step_completed';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'step_id': stepId,
     'step_index': stepIndex,
     'input_state': inputState,

@@ -91,12 +91,13 @@ class PostHogAppAnalytics
 
   @override
   Future<void> log(AnalyticsEvent event) async {
+    if (event is! PostHogAnalyticsEvent) return;
     if (!_isReady) return;
     await _client.capture(
-      eventName: event.name,
+      eventName: event.postHogEventName,
       properties: <String, Object>{
         ..._globalContext.toAnalyticsProperties(),
-        ...event.parameters,
+        ...event.postHogParameters,
       },
     );
   }

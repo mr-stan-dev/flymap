@@ -1,7 +1,7 @@
 import 'package:flymap/analytics/events/analytics_event.dart';
 import 'package:flymap/domain/entity/flight_route_source.dart';
 
-class RouteOverviewCompletedEvent extends AnalyticsEvent {
+class RouteOverviewCompletedEvent extends FirebaseAnalyticsEvent {
   const RouteOverviewCompletedEvent({
     required this.isSkipped,
     required this.isProUser,
@@ -13,10 +13,10 @@ class RouteOverviewCompletedEvent extends AnalyticsEvent {
   final FlightRouteSource routeSource;
 
   @override
-  String get name => 'route_overview_completed';
+  String get firebaseEventName => 'route_overview_completed';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'is_skipped': isSkipped,
     'is_pro_user': isProUser,
     'route_source': routeSource.rawValue,

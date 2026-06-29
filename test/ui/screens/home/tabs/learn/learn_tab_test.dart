@@ -29,6 +29,8 @@ import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/geo_quiz_entry_card.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/learn_article_screen.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/learn_tab.dart';
+import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_cubit.dart';
+import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_list_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/viewmodel/learn_cubit.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/theme/app_theme.dart';
@@ -69,6 +71,34 @@ void main() {
     }
     getIt.registerSingleton<ConnectivityChecker>(
       const _FakeConnectivityChecker(hasInternet: true),
+    );
+    if (getIt.isRegistered<AppAnalytics>()) {
+      getIt.unregister<AppAnalytics>();
+    }
+    getIt.registerSingleton<AppAnalytics>(_FakeAppAnalytics());
+    if (getIt.isRegistered<GeoQuizListCubit>()) {
+      getIt.unregister<GeoQuizListCubit>();
+    }
+    getIt.registerFactory<GeoQuizListCubit>(
+      () => GeoQuizListCubit(
+        repository: getIt.get(),
+        progressRepository: getIt.get(),
+        analytics: getIt.get(),
+      ),
+    );
+    if (getIt.isRegistered<GeoQuizCubit>()) {
+      getIt.unregister<GeoQuizCubit>();
+    }
+    getIt.registerFactoryParam<GeoQuizCubit, GeoQuizSummary, bool>(
+      (summary, isProUser) => GeoQuizCubit(
+        summary: summary,
+        repository: getIt.get(),
+        progressRepository: getIt.get(),
+        languageCodeProvider: () => 'en',
+        analytics: getIt.get(),
+        isProUser: isProUser,
+        nowProvider: DateTime.now,
+      ),
     );
   });
 
@@ -212,6 +242,9 @@ void main() {
   testWidgets('opens Geo Quiz list and quiz screen from Learn tab', (
     tester,
   ) async {
+    final analytics = _FakeAppAnalytics();
+    GetIt.I.unregister<AppAnalytics>();
+    GetIt.I.registerSingleton<AppAnalytics>(analytics);
     final learnRepository = _FakeLearnRepository();
     final learnCubit = _buildLearnCubit(learnRepository);
 
@@ -228,6 +261,11 @@ void main() {
     expect(find.text('Countries'), findsNothing);
     expect(find.text('Africa'), findsOneWidget);
     expect(find.byType(ProBadge), findsNWidgets(2));
+    final listOpened = analytics.logged
+        .whereType<GeoQuizListOpenedEvent>()
+        .single;
+    expect(listOpened.quizCount, 3);
+    expect(listOpened.isProUser, isFalse);
     expect(
       tester
           .widgetList<Icon>(find.byIcon(Icons.lock_outline_rounded))
@@ -447,19 +485,27 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      analytics.logged.map((event) => event.name),
+      analytics.logged.whereType<FirebaseAnalyticsEvent>().map(
+        (event) => event.firebaseEventName,
+      ),
       containsAll(<String>['learn_category_opened', 'learn_article_opened']),
     );
     expect(
       analytics.logged
-          .firstWhere((event) => event.name == 'learn_category_opened')
-          .parameters,
+          .whereType<FirebaseAnalyticsEvent>()
+          .firstWhere(
+            (event) => event.firebaseEventName == 'learn_category_opened',
+          )
+          .firebaseParameters,
       <String, Object>{'category_id': 'free_cat', 'article_count': 1},
     );
     expect(
       analytics.logged
-          .firstWhere((event) => event.name == 'learn_article_opened')
-          .parameters,
+          .whereType<FirebaseAnalyticsEvent>()
+          .firstWhere(
+            (event) => event.firebaseEventName == 'learn_article_opened',
+          )
+          .firebaseParameters,
       <String, Object>{
         'article_id': 'f1',
         'category_id': 'free_cat',

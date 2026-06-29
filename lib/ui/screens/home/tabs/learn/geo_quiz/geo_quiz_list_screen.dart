@@ -13,14 +13,15 @@ import 'package:flymap/ui/widgets/pro_widgets.dart';
 import 'package:get_it/get_it.dart';
 
 class GeoQuizListScreen extends StatelessWidget {
-  const GeoQuizListScreen({super.key, this.cubit});
-
-  final GeoQuizListCubit? cubit;
+  const GeoQuizListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<GeoQuizListCubit>(
-      create: (_) => (cubit ?? GeoQuizListCubit())..load(),
+      create: (providerContext) => GetIt.I<GeoQuizListCubit>()
+        ..open(
+          isProUser: providerContext.read<SubscriptionCubit>().state.isPro,
+        ),
       child: Scaffold(
         appBar: AppBar(title: Text(context.t.learn.geoQuiz.countriesTitle)),
         body: const SafeArea(child: _GeoQuizListBody()),
@@ -47,7 +48,8 @@ class _GeoQuizListBody extends StatelessWidget {
               title: context.t.learn.geoQuiz.failedToLoad,
               message: message,
               retryLabel: context.t.common.retry,
-              onRetry: () => context.read<GeoQuizListCubit>().load(),
+              onRetry: () =>
+                  context.read<GeoQuizListCubit>().open(isProUser: isProUser),
             );
           case GeoQuizListLoaded(:final quizzes):
             if (quizzes.isEmpty) {
@@ -140,7 +142,7 @@ class _GeoQuizListBody extends StatelessWidget {
 
     final result = await context
         .read<SubscriptionCubit>()
-        .presentPaywallFromLearn();
+        .presentPaywallFromGeoQuiz();
     if (!context.mounted) return false;
     return switch (result) {
       SubscriptionPaywallResult.purchased ||

@@ -10,6 +10,7 @@ import 'package:flymap/ui/screens/home/tabs/learn/learn_category_card.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/learn_category_screen.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/viewmodel/learn_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/viewmodel/learn_state.dart';
+import 'package:get_it/get_it.dart';
 
 class LearnTab extends StatelessWidget {
   const LearnTab({super.key, this.cubit, this.showGeoQuizNewBadge = false});
@@ -25,7 +26,7 @@ class LearnTab extends StatelessWidget {
           create: (_) => (cubit ?? LearnCubit())..load(),
         ),
         BlocProvider<GeoQuizListCubit>(
-          create: (_) => GeoQuizListCubit()..load(),
+          create: (_) => GetIt.I<GeoQuizListCubit>()..load(),
         ),
       ],
       child: _LearnCategoriesView(showGeoQuizNewBadge: showGeoQuizNewBadge),

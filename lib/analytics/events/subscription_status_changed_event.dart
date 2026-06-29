@@ -1,6 +1,7 @@
 import 'package:flymap/analytics/events/analytics_event.dart';
 
-class SubscriptionStatusChangedEvent extends AnalyticsEvent {
+class SubscriptionStatusChangedEvent extends AnalyticsEvent
+    implements FirebaseAnalyticsEvent, PostHogAnalyticsEvent {
   const SubscriptionStatusChangedEvent({
     required this.fromStatus,
     required this.toStatus,
@@ -12,12 +13,18 @@ class SubscriptionStatusChangedEvent extends AnalyticsEvent {
   final String source;
 
   @override
-  String get name => 'subscription_status_changed';
+  String get firebaseEventName => 'subscription_status_changed';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'from_status': fromStatus,
     'to_status': toStatus,
     'source': source,
   };
+
+  @override
+  String get postHogEventName => firebaseEventName;
+
+  @override
+  Map<String, Object> get postHogParameters => firebaseParameters;
 }

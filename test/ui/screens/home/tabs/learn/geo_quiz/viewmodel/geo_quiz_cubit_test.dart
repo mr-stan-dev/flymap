@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/domain/entity/geo_quiz.dart';
 import 'package:flymap/domain/entity/learn_access.dart';
 import 'package:flymap/i18n/strings.g.dart';
@@ -20,7 +21,7 @@ void main() {
   });
 
   test('loads geo quiz summaries', () async {
-    final cubit = GeoQuizListCubit(
+    final cubit = _buildListCubit(
       repository: AssetGeoQuizRepository(),
       progressRepository: _InMemoryGeoQuizProgressRepository(),
     );
@@ -44,6 +45,26 @@ void main() {
       state.quizzes.skip(2).every((quiz) => quiz.access == LearnAccess.pro),
       isTrue,
     );
+  });
+
+  test('logs list opened only for explicit open action', () async {
+    final analytics = _RecordingAnalytics();
+    final cubit = _buildListCubit(
+      repository: AssetGeoQuizRepository(),
+      progressRepository: _InMemoryGeoQuizProgressRepository(),
+      analytics: analytics,
+    );
+    addTearDown(cubit.close);
+
+    await cubit.load();
+    expect(analytics.events.whereType<GeoQuizListOpenedEvent>(), isEmpty);
+
+    await cubit.open(isProUser: false);
+    await cubit.open(isProUser: false);
+
+    final opened = analytics.events.whereType<GeoQuizListOpenedEvent>().single;
+    expect(opened.quizCount, 7);
+    expect(opened.isProUser, isFalse);
   });
 
   test('loads generated country regions from bundled GeoJSON assets', () async {
@@ -113,7 +134,7 @@ void main() {
 
   test('filters suggestions from query and marks answer solved', () async {
     final progressRepository = _InMemoryGeoQuizProgressRepository();
-    final cubit = GeoQuizCubit(
+    final cubit = _buildGeoQuizCubit(
       summary: const GeoQuizSummary(
         id: 'countries_africa',
         title: 'Africa',
@@ -122,8 +143,6 @@ void main() {
       ),
       repository: _StaticGeoQuizRepository(),
       progressRepository: progressRepository,
-      languageCodeProvider: () => 'en',
-      randomizeRegionOrder: false,
     );
     addTearDown(cubit.close);
 
@@ -180,7 +199,7 @@ void main() {
   });
 
   test('accepting duplicate solved answer leaves progress unchanged', () async {
-    final cubit = GeoQuizCubit(
+    final cubit = _buildGeoQuizCubit(
       summary: const GeoQuizSummary(
         id: 'countries_africa',
         title: 'Africa',
@@ -189,8 +208,6 @@ void main() {
       ),
       repository: _StaticGeoQuizRepository(),
       progressRepository: _InMemoryGeoQuizProgressRepository(),
-      languageCodeProvider: () => 'en',
-      randomizeRegionOrder: false,
     );
     addTearDown(cubit.close);
 
@@ -212,7 +229,7 @@ void main() {
       quizId: 'countries_africa',
       regionId: 'ao',
     );
-    final cubit = GeoQuizCubit(
+    final cubit = _buildGeoQuizCubit(
       summary: const GeoQuizSummary(
         id: 'countries_africa',
         title: 'Africa',
@@ -221,8 +238,6 @@ void main() {
       ),
       repository: _StaticGeoQuizRepository(),
       progressRepository: progressRepository,
-      languageCodeProvider: () => 'en',
-      randomizeRegionOrder: false,
     );
     addTearDown(cubit.close);
 
@@ -235,7 +250,7 @@ void main() {
   });
 
   test('skip moves current region to the end without marking solved', () async {
-    final cubit = GeoQuizCubit(
+    final cubit = _buildGeoQuizCubit(
       summary: const GeoQuizSummary(
         id: 'countries_africa',
         title: 'Africa',
@@ -244,8 +259,6 @@ void main() {
       ),
       repository: _StaticGeoQuizRepository(),
       progressRepository: _InMemoryGeoQuizProgressRepository(),
-      languageCodeProvider: () => 'en',
-      randomizeRegionOrder: false,
     );
     addTearDown(cubit.close);
 
@@ -262,7 +275,7 @@ void main() {
   });
 
   test('reset clears solved ids for quiz', () async {
-    final cubit = GeoQuizCubit(
+    final cubit = _buildGeoQuizCubit(
       summary: const GeoQuizSummary(
         id: 'countries_africa',
         title: 'Africa',
@@ -271,8 +284,6 @@ void main() {
       ),
       repository: _StaticGeoQuizRepository(),
       progressRepository: _InMemoryGeoQuizProgressRepository(),
-      languageCodeProvider: () => 'en',
-      randomizeRegionOrder: false,
     );
     addTearDown(cubit.close);
 
@@ -285,6 +296,171 @@ void main() {
     final state = cubit.state as GeoQuizLoaded;
     expect(state.solvedCount, 0);
   });
+
+  test('logs quiz start and completion once with session details', () async {
+    final analytics = _RecordingAnalytics();
+    var now = DateTime(2026, 1, 1, 12);
+    final cubit = _buildGeoQuizCubit(
+      summary: const GeoQuizSummary(
+        id: 'countries_africa',
+        title: 'Africa',
+        subtitle: 'Countries',
+        totalCount: 2,
+        access: LearnAccess.pro,
+      ),
+      repository: _StaticGeoQuizRepository(),
+      progressRepository: _InMemoryGeoQuizProgressRepository(),
+      analytics: analytics,
+      isProUser: true,
+      nowProvider: () => now,
+    );
+    addTearDown(cubit.close);
+
+    await cubit.load();
+    now = now.add(const Duration(seconds: 15));
+    await cubit.acceptSuggestion(
+      const GeoQuizAnswerSuggestion(regionId: 'ao', label: 'Angola'),
+    );
+    await cubit.acceptSuggestion(
+      const GeoQuizAnswerSuggestion(regionId: 'eg', label: 'Egypt'),
+    );
+    await cubit.acceptSuggestion(
+      const GeoQuizAnswerSuggestion(regionId: 'eg', label: 'Egypt'),
+    );
+
+    final started = analytics.events.whereType<GeoQuizStartedEvent>().single;
+    final completed = analytics.events
+        .whereType<GeoQuizCompletedEvent>()
+        .single;
+    expect(started.postHogParameters, <String, Object>{
+      'quiz_id': 'countries_africa',
+      'access': 'pro',
+      'is_pro_user': true,
+      'solved_count': 0,
+      'total_count': 2,
+      'is_resume': false,
+    });
+    expect(completed.postHogParameters['duration_seconds'], 15);
+  });
+
+  test('does not log started when reopening a completed quiz', () async {
+    final analytics = _RecordingAnalytics();
+    final progressRepository = _InMemoryGeoQuizProgressRepository();
+    await progressRepository.markSolved(
+      quizId: 'countries_africa',
+      regionId: 'ao',
+    );
+    await progressRepository.markSolved(
+      quizId: 'countries_africa',
+      regionId: 'eg',
+    );
+    final cubit = _buildGeoQuizCubit(
+      summary: const GeoQuizSummary(
+        id: 'countries_africa',
+        title: 'Africa',
+        subtitle: 'Countries',
+        totalCount: 2,
+      ),
+      repository: _StaticGeoQuizRepository(),
+      progressRepository: progressRepository,
+      analytics: analytics,
+    );
+    addTearDown(cubit.close);
+
+    await cubit.load();
+
+    expect(analytics.events.whereType<GeoQuizStartedEvent>(), isEmpty);
+    expect(analytics.events.whereType<GeoQuizCompletedEvent>(), isEmpty);
+  });
+
+  test('logs started when resetting a completed quiz for replay', () async {
+    final analytics = _RecordingAnalytics();
+    final progressRepository = _InMemoryGeoQuizProgressRepository();
+    await progressRepository.markSolved(
+      quizId: 'countries_africa',
+      regionId: 'ao',
+    );
+    await progressRepository.markSolved(
+      quizId: 'countries_africa',
+      regionId: 'eg',
+    );
+    final cubit = _buildGeoQuizCubit(
+      summary: const GeoQuizSummary(
+        id: 'countries_africa',
+        title: 'Africa',
+        subtitle: 'Countries',
+        totalCount: 2,
+      ),
+      repository: _StaticGeoQuizRepository(),
+      progressRepository: progressRepository,
+      analytics: analytics,
+    );
+    addTearDown(cubit.close);
+
+    await cubit.load();
+    await cubit.reset();
+
+    final started = analytics.events.whereType<GeoQuizStartedEvent>().single;
+    expect(started.postHogParameters, <String, Object>{
+      'quiz_id': 'countries_africa',
+      'access': 'free',
+      'is_pro_user': false,
+      'solved_count': 0,
+      'total_count': 2,
+      'is_resume': false,
+    });
+  });
+}
+
+GeoQuizListCubit _buildListCubit({
+  required GeoQuizRepository repository,
+  required GeoQuizProgressRepository progressRepository,
+  AppAnalytics? analytics,
+}) {
+  return GeoQuizListCubit(
+    repository: repository,
+    progressRepository: progressRepository,
+    analytics: analytics ?? _RecordingAnalytics(),
+  );
+}
+
+GeoQuizCubit _buildGeoQuizCubit({
+  required GeoQuizSummary summary,
+  required GeoQuizRepository repository,
+  required GeoQuizProgressRepository progressRepository,
+  AppAnalytics? analytics,
+  bool isProUser = false,
+  GeoQuizNowProvider? nowProvider,
+}) {
+  return GeoQuizCubit(
+    summary: summary,
+    repository: repository,
+    progressRepository: progressRepository,
+    languageCodeProvider: () => 'en',
+    analytics: analytics ?? _RecordingAnalytics(),
+    isProUser: isProUser,
+    nowProvider: nowProvider ?? DateTime.now,
+  );
+}
+
+class _RecordingAnalytics implements AppAnalytics {
+  final List<AnalyticsEvent> events = <AnalyticsEvent>[];
+
+  @override
+  Future<void> log(AnalyticsEvent event) async {
+    events.add(event);
+  }
+
+  @override
+  Future<void> setGlobalContext({
+    required String appVersion,
+    required String buildNumber,
+    required String platform,
+    required String appEnv,
+  }) async {}
+
+  @override
+  Future<void> setSubscriptionContext({required bool isPro}) async {}
 }
 
 class _InMemoryGeoQuizProgressRepository implements GeoQuizProgressRepository {

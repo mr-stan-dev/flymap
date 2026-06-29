@@ -12,6 +12,9 @@ export 'package:flymap/analytics/events/flight_opened_event.dart';
 export 'package:flymap/analytics/events/flight_unlock_action_event.dart';
 export 'package:flymap/analytics/events/flight_unlock_purchase_result_event.dart';
 export 'package:flymap/analytics/events/flight_unlock_sheet_opened_event.dart';
+export 'package:flymap/analytics/events/geo_quiz_completed_event.dart';
+export 'package:flymap/analytics/events/geo_quiz_list_opened_event.dart';
+export 'package:flymap/analytics/events/geo_quiz_started_event.dart';
 export 'package:flymap/analytics/events/learn_article_opened_event.dart';
 export 'package:flymap/analytics/events/learn_category_opened_event.dart';
 export 'package:flymap/analytics/events/onboarding_completed_event.dart';
@@ -100,10 +103,11 @@ class FirebaseAppAnalytics
 
   @override
   Future<void> log(AnalyticsEvent event) async {
+    if (event is! FirebaseAnalyticsEvent) return;
     try {
       await _analytics.logEvent(
-        name: event.name,
-        parameters: _firebaseParameters(event.parameters),
+        name: event.firebaseEventName,
+        parameters: _firebaseParameters(event.firebaseParameters),
       );
     } catch (_) {
       // Keep analytics non-blocking for user flows.

@@ -12,7 +12,8 @@ enum FlightOpenedAccessTier {
   final String analyticsValue;
 }
 
-class FlightOpenedEvent extends AnalyticsEvent {
+class FlightOpenedEvent extends AnalyticsEvent
+    implements FirebaseAnalyticsEvent, PostHogAnalyticsEvent {
   const FlightOpenedEvent({
     required this.routeSource,
     required this.routeLength,
@@ -24,14 +25,20 @@ class FlightOpenedEvent extends AnalyticsEvent {
   final FlightOpenedAccessTier accessTier;
 
   @override
-  String get name => 'flight_opened';
+  String get firebaseEventName => 'flight_opened';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'route_source': routeSource.rawValue,
     'route_length_bucket': _routeBucket(routeLength),
     'access_tier': accessTier.analyticsValue,
   };
+
+  @override
+  String get postHogEventName => firebaseEventName;
+
+  @override
+  Map<String, Object> get postHogParameters => firebaseParameters;
 }
 
 String _routeBucket(RouteLength routeLength) {

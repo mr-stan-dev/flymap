@@ -10,16 +10,23 @@ enum RestorePurchasesAnalyticsResult {
   final String analyticsValue;
 }
 
-class RestorePurchasesResultEvent extends AnalyticsEvent {
+class RestorePurchasesResultEvent extends AnalyticsEvent
+    implements FirebaseAnalyticsEvent, PostHogAnalyticsEvent {
   const RestorePurchasesResultEvent({required this.result});
 
   final RestorePurchasesAnalyticsResult result;
 
   @override
-  String get name => 'restore_purchases_result';
+  String get firebaseEventName => 'restore_purchases_result';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'result': result.analyticsValue,
   };
+
+  @override
+  String get postHogEventName => firebaseEventName;
+
+  @override
+  Map<String, Object> get postHogParameters => firebaseParameters;
 }

@@ -3,7 +3,7 @@ import 'package:flymap/subscription/paywall_source.dart';
 
 enum FlightUnlockActionType { useExisting, buyUnlock, viewProPlans }
 
-class FlightUnlockActionEvent extends AnalyticsEvent {
+class FlightUnlockActionEvent extends FirebaseAnalyticsEvent {
   const FlightUnlockActionEvent({
     required this.source,
     required this.action,
@@ -15,10 +15,10 @@ class FlightUnlockActionEvent extends AnalyticsEvent {
   final int unusedUnlockCount;
 
   @override
-  String get name => 'flight_unlock_action';
+  String get firebaseEventName => 'flight_unlock_action';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'source': source.analyticsValue,
     'action': switch (action) {
       FlightUnlockActionType.useExisting => 'use_existing',

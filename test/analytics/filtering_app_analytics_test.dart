@@ -3,7 +3,6 @@ import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/analytics/app_analytics_context.dart';
 import 'package:flymap/analytics/app_analytics_identity.dart';
 import 'package:flymap/analytics/filtering_app_analytics.dart';
-import 'package:flymap/analytics/posthog_event_filter.dart';
 import 'package:flymap/domain/entity/learn_access.dart';
 import 'package:flymap/subscription/paywall_source.dart';
 
@@ -32,9 +31,12 @@ void main() {
         ),
       );
 
-      expect(delegate.events.map((event) => event.name), <String>[
-        'paywall_presented',
-      ]);
+      expect(
+        delegate.events.whereType<FirebaseAnalyticsEvent>().map(
+          (event) => event.firebaseEventName,
+        ),
+        <String>['paywall_presented'],
+      );
     });
 
     test('still forwards sink setup identity and context calls', () async {
@@ -66,44 +68,6 @@ void main() {
       expect(delegate.globalContext?['app_env'], 'release');
       expect(delegate.isPro, isTrue);
       expect(delegate.userId, 'firebase-uid');
-    });
-  });
-
-  group('PostHogFunnelEventFilter', () {
-    test('allows only funnel and monetization events', () {
-      const filter = PostHogFunnelEventFilter();
-
-      expect(
-        filter.allows(
-          const PaywallPresentedEvent(
-            source: PaywallSource.settingsBanner,
-            isProUser: false,
-            hasProducts: true,
-          ),
-        ),
-        isTrue,
-      );
-      expect(
-        filter.allows(
-          const OnboardingStepViewedEvent(
-            stepId: 'profile',
-            stepIndex: 1,
-            isSkippable: true,
-          ),
-        ),
-        isFalse,
-      );
-      expect(
-        filter.allows(
-          const LearnArticleOpenedEvent(
-            articleId: 'why_planes_turn',
-            categoryId: 'flight_basics',
-            access: LearnAccess.free,
-            isProUser: false,
-          ),
-        ),
-        isFalse,
-      );
     });
   });
 }

@@ -1,6 +1,7 @@
 import 'package:flymap/analytics/events/analytics_event.dart';
 
-class SearchRouteNotSupportedEvent extends AnalyticsEvent {
+class SearchRouteNotSupportedEvent extends AnalyticsEvent
+    implements FirebaseAnalyticsEvent, PostHogAnalyticsEvent {
   const SearchRouteNotSupportedEvent({
     required this.reason,
     required this.routeLengthKm,
@@ -10,11 +11,17 @@ class SearchRouteNotSupportedEvent extends AnalyticsEvent {
   final double routeLengthKm;
 
   @override
-  String get name => 'search_route_not_supported';
+  String get firebaseEventName => 'search_route_not_supported';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'reason': reason,
     'route_length_km': routeLengthKm.round(),
   };
+
+  @override
+  String get postHogEventName => firebaseEventName;
+
+  @override
+  Map<String, Object> get postHogParameters => firebaseParameters;
 }

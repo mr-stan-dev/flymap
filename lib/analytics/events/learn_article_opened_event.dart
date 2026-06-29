@@ -1,7 +1,7 @@
 import 'package:flymap/analytics/events/analytics_event.dart';
 import 'package:flymap/domain/entity/learn_access.dart';
 
-class LearnArticleOpenedEvent extends AnalyticsEvent {
+class LearnArticleOpenedEvent extends FirebaseAnalyticsEvent {
   const LearnArticleOpenedEvent({
     required this.articleId,
     required this.categoryId,
@@ -15,10 +15,10 @@ class LearnArticleOpenedEvent extends AnalyticsEvent {
   final bool isProUser;
 
   @override
-  String get name => 'learn_article_opened';
+  String get firebaseEventName => 'learn_article_opened';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'article_id': articleId,
     'category_id': categoryId,
     'access': access.name,

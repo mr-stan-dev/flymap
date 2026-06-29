@@ -1,6 +1,6 @@
 import 'package:flymap/analytics/events/analytics_event.dart';
 
-class OnboardingStepViewedEvent extends AnalyticsEvent {
+class OnboardingStepViewedEvent extends FirebaseAnalyticsEvent {
   const OnboardingStepViewedEvent({
     required this.stepId,
     required this.stepIndex,
@@ -12,10 +12,10 @@ class OnboardingStepViewedEvent extends AnalyticsEvent {
   final bool isSkippable;
 
   @override
-  String get name => 'onboarding_step_viewed';
+  String get firebaseEventName => 'onboarding_step_viewed';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'step_id': stepId,
     'step_index': stepIndex,
     'is_skippable': isSkippable ? 1 : 0,

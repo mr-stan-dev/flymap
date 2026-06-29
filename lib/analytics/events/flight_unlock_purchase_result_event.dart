@@ -2,7 +2,7 @@ import 'package:flymap/analytics/events/analytics_event.dart';
 import 'package:flymap/subscription/paywall_source.dart';
 import 'package:flymap/subscription/flight_unlock_purchase_result.dart';
 
-class FlightUnlockPurchaseResultEvent extends AnalyticsEvent {
+class FlightUnlockPurchaseResultEvent extends FirebaseAnalyticsEvent {
   const FlightUnlockPurchaseResultEvent({
     required this.source,
     required this.result,
@@ -16,10 +16,10 @@ class FlightUnlockPurchaseResultEvent extends AnalyticsEvent {
   final int balanceAfter;
 
   @override
-  String get name => 'flight_unlock_purchase_result';
+  String get firebaseEventName => 'flight_unlock_purchase_result';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'source': source.analyticsValue,
     'result': result.name,
     'product_id': productId,

@@ -55,10 +55,9 @@ void main() {
         (state as FlightNumberSearchError).message,
         'We couldn\'t find that flight number. Make sure it is the same as on your tickets and try again, or find by airports.',
       );
-      expect(analytics.logged.single.name, 'flight_number_lookup_result');
-      expect(analytics.logged.single.parameters, <String, Object>{
-        'result': 'not_found',
-      });
+      final event = analytics.logged.single as FirebaseAnalyticsEvent;
+      expect(event.firebaseEventName, 'flight_number_lookup_result');
+      expect(event.firebaseParameters, <String, Object>{'result': 'not_found'});
       expect(crashlytics.lastFlightNumber, 'BA117');
     });
 
@@ -90,9 +89,11 @@ void main() {
           (state as FlightNumberSearchError).message,
           'Flight data is temporarily unavailable. Please try again in a moment, or find by airports.',
         );
-        expect(analytics.logged.single.parameters, <String, Object>{
-          'result': 'provider_invalid_response',
-        });
+        expect(
+          (analytics.logged.single as FirebaseAnalyticsEvent)
+              .firebaseParameters,
+          <String, Object>{'result': 'provider_invalid_response'},
+        );
       },
     );
 
@@ -111,9 +112,10 @@ void main() {
         (state as FlightNumberSearchError).message,
         'Something went wrong while looking up this flight. Please try again, or find by airports.',
       );
-      expect(analytics.logged.single.parameters, <String, Object>{
-        'result': 'internal',
-      });
+      expect(
+        (analytics.logged.single as FirebaseAnalyticsEvent).firebaseParameters,
+        <String, Object>{'result': 'internal'},
+      );
     });
 
     test('maps invalid-argument failures to validation copy', () async {
@@ -131,9 +133,10 @@ void main() {
         (state as FlightNumberSearchError).message,
         'Enter a valid flight number like BA117.',
       );
-      expect(analytics.logged.single.parameters, <String, Object>{
-        'result': 'invalid_argument',
-      });
+      expect(
+        (analytics.logged.single as FirebaseAnalyticsEvent).firebaseParameters,
+        <String, Object>{'result': 'invalid_argument'},
+      );
     });
 
     test('maps resource-exhausted failures to retry-later copy', () async {
@@ -151,9 +154,10 @@ void main() {
         (state as FlightNumberSearchError).message,
         'Too many flight lookups right now. Please try again in a moment, or find by airports.',
       );
-      expect(analytics.logged.single.parameters, <String, Object>{
-        'result': 'resource_exhausted',
-      });
+      expect(
+        (analytics.logged.single as FirebaseAnalyticsEvent).firebaseParameters,
+        <String, Object>{'result': 'resource_exhausted'},
+      );
     });
   });
 }

@@ -1,7 +1,8 @@
 import 'package:flymap/analytics/events/analytics_event.dart';
 import 'package:flymap/domain/entity/flight_route_source.dart';
 
-class DownloadCompletedEvent extends AnalyticsEvent {
+class DownloadCompletedEvent extends AnalyticsEvent
+    implements FirebaseAnalyticsEvent, PostHogAnalyticsEvent {
   const DownloadCompletedEvent({
     required this.routeLengthKm,
     required this.articlesDownloadedCount,
@@ -17,10 +18,10 @@ class DownloadCompletedEvent extends AnalyticsEvent {
   final FlightRouteSource routeSource;
 
   @override
-  String get name => 'download_completed';
+  String get firebaseEventName => 'download_completed';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'route_length_km': routeLengthKm.round(),
     'articles_downloaded_count': articlesDownloadedCount,
     'map_size_mb': double.parse(
@@ -29,4 +30,10 @@ class DownloadCompletedEvent extends AnalyticsEvent {
     'access_mode': accessMode,
     'route_source': routeSource.rawValue,
   };
+
+  @override
+  String get postHogEventName => firebaseEventName;
+
+  @override
+  Map<String, Object> get postHogParameters => firebaseParameters;
 }

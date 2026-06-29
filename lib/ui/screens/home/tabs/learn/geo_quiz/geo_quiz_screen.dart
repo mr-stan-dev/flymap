@@ -12,18 +12,22 @@ import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_state.dart';
+import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
+import 'package:get_it/get_it.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 class GeoQuizScreen extends StatelessWidget {
-  const GeoQuizScreen({required this.summary, super.key, this.cubit});
+  const GeoQuizScreen({required this.summary, super.key});
 
   final GeoQuizSummary summary;
-  final GeoQuizCubit? cubit;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<GeoQuizCubit>(
-      create: (_) => (cubit ?? GeoQuizCubit(summary: summary))..load(),
+      create: (_) => GetIt.I<GeoQuizCubit>(
+        param1: summary,
+        param2: context.read<SubscriptionCubit>().state.isPro,
+      )..load(),
       child: _GeoQuizScaffold(summary: summary),
     );
   }

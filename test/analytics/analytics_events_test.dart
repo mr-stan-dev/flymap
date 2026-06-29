@@ -14,8 +14,8 @@ void main() {
         hasPendingFlightUnlock: true,
       );
 
-      expect(event.name, 'route_type_selected');
-      expect(event.parameters, <String, Object>{
+      expect(event.firebaseEventName, 'route_type_selected');
+      expect(event.firebaseParameters, <String, Object>{
         'route_type': 'real_route',
         'is_pro_user': false,
         'has_pending_flight_unlock': true,
@@ -29,8 +29,8 @@ void main() {
         accessTier: FlightOpenedAccessTier.flightUnlock,
       );
 
-      expect(event.name, 'flight_opened');
-      expect(event.parameters, <String, Object>{
+      expect(event.firebaseEventName, 'flight_opened');
+      expect(event.firebaseParameters, <String, Object>{
         'route_source': 'fr24_historical',
         'route_length_bucket': 'long',
         'access_tier': 'flight_unlock',
@@ -52,13 +52,13 @@ void main() {
         source: 'purchase',
       );
 
-      expect(paywall.name, 'paywall_presented');
-      expect(paywall.parameters['source'], 'settings_banner');
-      expect(paywall.parameters['has_products'], isTrue);
-      expect(restore.name, 'restore_purchases_result');
-      expect(restore.parameters['result'], 'no_subscription');
-      expect(statusChanged.name, 'subscription_status_changed');
-      expect(statusChanged.parameters['to_status'], 'pro');
+      expect(paywall.firebaseEventName, 'paywall_presented');
+      expect(paywall.firebaseParameters['source'], 'settings_banner');
+      expect(paywall.firebaseParameters['has_products'], isTrue);
+      expect(restore.firebaseEventName, 'restore_purchases_result');
+      expect(restore.firebaseParameters['result'], 'no_subscription');
+      expect(statusChanged.firebaseEventName, 'subscription_status_changed');
+      expect(statusChanged.firebaseParameters['to_status'], 'pro');
     });
 
     test('learn events have stable privacy-safe properties', () {
@@ -73,18 +73,52 @@ void main() {
         isProUser: false,
       );
 
-      expect(category.name, 'learn_category_opened');
-      expect(category.parameters, <String, Object>{
+      expect(category.firebaseEventName, 'learn_category_opened');
+      expect(category.firebaseParameters, <String, Object>{
         'category_id': 'flight_basics',
         'article_count': 12,
       });
-      expect(article.name, 'learn_article_opened');
-      expect(article.parameters, <String, Object>{
+      expect(article.firebaseEventName, 'learn_article_opened');
+      expect(article.firebaseParameters, <String, Object>{
         'article_id': 'why_planes_turn',
         'category_id': 'flight_basics',
         'access': 'free',
         'is_pro_user': false,
       });
+    });
+
+    test('Geo Quiz events have stable provider-specific properties', () {
+      const started = GeoQuizStartedEvent(
+        quizId: 'countries_europe',
+        access: LearnAccess.free,
+        isProUser: false,
+        solvedCount: 5,
+        totalCount: 45,
+        isResume: true,
+      );
+      const completed = GeoQuizCompletedEvent(
+        quizId: 'countries_europe',
+        totalCount: 45,
+        durationSeconds: 90,
+        isProUser: false,
+      );
+
+      expect(started.postHogEventName, 'geo_quiz_started');
+      expect(started.postHogParameters['is_resume'], isTrue);
+      expect(started.postHogParameters['solved_count'], 5);
+      expect(completed.postHogEventName, 'geo_quiz_completed');
+      expect(completed.postHogParameters['duration_seconds'], 90);
+    });
+
+    test('Geo Quiz paywall source remains distinct from articles', () {
+      expect(
+        PaywallSource.geoQuizLockedContent.analyticsValue,
+        'geo_quiz_locked_content',
+      );
+      expect(
+        PaywallSource.learnLockedContent.analyticsValue,
+        'learn_locked_content',
+      );
     });
   });
 }

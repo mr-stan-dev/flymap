@@ -43,6 +43,8 @@ import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/subscription/subscription_status.dart';
 import 'package:flymap/ui/screens/home/home_screen.dart';
+import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_cubit.dart';
+import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_list_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/home/widgets/flights_list/home_flight_card.dart';
 import 'package:flymap/ui/screens/settings/viewmodel/settings_cubit.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
@@ -114,6 +116,25 @@ void main() {
     );
     GetIt.I.registerSingleton<GeoQuizProgressRepository>(
       SharedPrefsGeoQuizProgressRepository(),
+    );
+    GetIt.I.registerSingleton<AppAnalytics>(const _FakeAppAnalytics());
+    GetIt.I.registerFactory<GeoQuizListCubit>(
+      () => GeoQuizListCubit(
+        repository: GetIt.I.get(),
+        progressRepository: GetIt.I.get(),
+        analytics: GetIt.I.get(),
+      ),
+    );
+    GetIt.I.registerFactoryParam<GeoQuizCubit, GeoQuizSummary, bool>(
+      (summary, isProUser) => GeoQuizCubit(
+        summary: summary,
+        repository: GetIt.I.get(),
+        progressRepository: GetIt.I.get(),
+        languageCodeProvider: () => 'en',
+        analytics: GetIt.I.get(),
+        isProUser: isProUser,
+        nowProvider: DateTime.now,
+      ),
     );
   });
 

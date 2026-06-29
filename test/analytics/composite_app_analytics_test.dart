@@ -38,8 +38,14 @@ void main() {
       expect(second.globalContext?['platform'], 'ios');
       expect(first.isPro, isTrue);
       expect(second.userId, 'firebase-uid');
-      expect(first.events.single.name, 'onboarding_started');
-      expect(second.events.single.name, 'onboarding_started');
+      expect(
+        (first.events.single as FirebaseAnalyticsEvent).firebaseEventName,
+        'onboarding_started',
+      );
+      expect(
+        (second.events.single as PostHogAnalyticsEvent).postHogEventName,
+        'onboarding_started',
+      );
     });
 
     test('swallows sink errors and still forwards to healthy sinks', () async {
@@ -55,7 +61,10 @@ void main() {
 
       expect(healthy.initialized, isTrue);
       expect(healthy.isPro, isFalse);
-      expect(healthy.events.single.name, 'onboarding_started');
+      expect(
+        (healthy.events.single as FirebaseAnalyticsEvent).firebaseEventName,
+        'onboarding_started',
+      );
     });
   });
 }

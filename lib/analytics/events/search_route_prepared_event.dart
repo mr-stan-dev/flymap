@@ -3,7 +3,8 @@ import 'package:flymap/domain/entity/flight_route_source.dart';
 import 'package:flymap/domain/entity/map_detail_level.dart';
 import 'package:flymap/map_download_config.dart';
 
-class SearchRoutePreparedEvent extends AnalyticsEvent {
+class SearchRoutePreparedEvent extends AnalyticsEvent
+    implements FirebaseAnalyticsEvent, PostHogAnalyticsEvent {
   const SearchRoutePreparedEvent({
     required this.routeLengthKm,
     required this.routeLength,
@@ -17,15 +18,21 @@ class SearchRoutePreparedEvent extends AnalyticsEvent {
   final FlightRouteSource routeSource;
 
   @override
-  String get name => 'search_route_prepared';
+  String get firebaseEventName => 'search_route_prepared';
 
   @override
-  Map<String, Object> get parameters => <String, Object>{
+  Map<String, Object> get firebaseParameters => <String, Object>{
     'route_length_km': routeLengthKm.round(),
     'route_length_bucket': _routeBucket(routeLength),
     'map_detail': mapDetail.name,
     'route_source': routeSource.rawValue,
   };
+
+  @override
+  String get postHogEventName => firebaseEventName;
+
+  @override
+  Map<String, Object> get postHogParameters => firebaseParameters;
 }
 
 String _routeBucket(RouteLength routeLength) {
