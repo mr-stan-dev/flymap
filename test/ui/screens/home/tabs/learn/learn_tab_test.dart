@@ -150,7 +150,7 @@ void main() {
       lessThan(tester.getTopLeft(find.text('Free Cat')).dy),
     );
     expect(
-      tester.getTopLeft(find.byKey(CountriesQuizEntryCard.imageKey)).dx,
+      tester.getTopLeft(find.byKey(GeoQuizEntryCard.countriesImageKey)).dx,
       lessThan(tester.getTopLeft(find.text('Countries on map')).dx),
     );
   });
@@ -188,14 +188,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(CountriesQuizEntryCard.finishedMetricKey),
-      findsOneWidget,
-    );
-    expect(
-      find.byKey(CountriesQuizEntryCard.inProgressMetricKey),
-      findsOneWidget,
-    );
+    expect(find.byKey(GeoQuizEntryCard.finishedMetricKey), findsOneWidget);
+    expect(find.byKey(GeoQuizEntryCard.inProgressMetricKey), findsOneWidget);
     expect(find.text('1 finished'), findsOneWidget);
     expect(find.text('1 in progress'), findsOneWidget);
     expect(find.text('Quizzes'), findsOneWidget);
@@ -235,15 +229,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(CountriesQuizEntryCard.allCompletedMetricKey),
-      findsOneWidget,
-    );
+    expect(find.byKey(GeoQuizEntryCard.allCompletedMetricKey), findsOneWidget);
     expect(find.text('All completed'), findsOneWidget);
-    expect(
-      find.byKey(CountriesQuizEntryCard.inProgressMetricKey),
-      findsNothing,
-    );
+    expect(find.byKey(GeoQuizEntryCard.inProgressMetricKey), findsNothing);
   });
 
   testWidgets('hides NEW badge on Geo Quiz card by default', (tester) async {

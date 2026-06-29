@@ -249,16 +249,6 @@ class _GeoQuizGridTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Text(
-                localizedSubtitle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 12),
               ClipRRect(
                 borderRadius: BorderRadius.circular(999),
                 child: LinearProgressIndicator(

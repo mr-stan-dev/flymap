@@ -89,7 +89,12 @@ class _LearnCategoriesView extends StatelessWidget {
                     collectionId: 'countries',
                     screenTitle: context.t.learn.geoQuiz.countriesTitle,
                     builder: (context, progress, openScreen) {
-                      return CountriesQuizEntryCard(
+                      return GeoQuizEntryCard(
+                        title: context.t.learn.geoQuiz.countriesTitle,
+                        subtitle: context.t.learn.geoQuiz.subtitle,
+                        imageAssetPath:
+                            'assets/images/quiz/countries_quiz.webp',
+                        imageKey: GeoQuizEntryCard.countriesImageKey,
                         finishedCount: progress.finished,
                         inProgressCount: progress.inProgress,
                         totalCount: progress.total,
@@ -104,7 +109,12 @@ class _LearnCategoriesView extends StatelessWidget {
                     collectionId: 'geography',
                     screenTitle: context.t.learn.geoQuiz.geographyTitle,
                     builder: (context, progress, openScreen) {
-                      return GeographyQuizEntryCard(
+                      return GeoQuizEntryCard(
+                        title: context.t.learn.geoQuiz.geographyTitle,
+                        subtitle: context.t.learn.geoQuiz.geographySubtitle,
+                        imageAssetPath:
+                            'assets/images/quiz/geography_quiz.webp',
+                        imageKey: GeoQuizEntryCard.geographyImageKey,
                         finishedCount: progress.finished,
                         inProgressCount: progress.inProgress,
                         totalCount: progress.total,
