@@ -1,0 +1,2086 @@
+{
+  "regions": {
+    "Q4918": {
+      "names": {
+        "en": "Mediterranean Sea",
+        "de": "Mittelmeer",
+        "es": "Mediterráneo",
+        "fr": "mer Méditerranée"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q1247": {
+      "names": {
+        "en": "Caribbean Sea",
+        "de": "Karibisches Meer",
+        "es": "mar Caribe",
+        "fr": "mer des Caraïbes"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q23406": {
+      "names": {
+        "en": "Red Sea",
+        "de": "Rotes Meer",
+        "es": "mar Rojo",
+        "fr": "mer Rouge"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q166": {
+      "names": {
+        "en": "Black Sea",
+        "de": "Schwarzes Meer",
+        "es": "mar Negro",
+        "fr": "mer Noire"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q1693": {
+      "names": {
+        "en": "North Sea",
+        "de": "Nordsee",
+        "es": "mar del Norte",
+        "fr": "mer du Nord"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q545": {
+      "names": {
+        "en": "Baltic Sea",
+        "de": "Ostsee",
+        "es": "Mar Báltico",
+        "fr": "mer Baltique"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q58705": {
+      "names": {
+        "en": "Arabian Sea",
+        "de": "Arabisches Meer",
+        "es": "mar Arábigo",
+        "fr": "mer d'Arabie"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q37660": {
+      "names": {
+        "en": "South China Sea",
+        "de": "Südchinesisches Meer",
+        "es": "mar de China Meridional",
+        "fr": "mer de Chine méridionale"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q27092": {
+      "names": {
+        "en": "Sea of Japan",
+        "de": "Japanisches Meer",
+        "es": "mar del Japón",
+        "fr": "mer du Japon"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q44725": {
+      "names": {
+        "en": "Bering Sea",
+        "de": "Beringmeer",
+        "es": "mar de Bering",
+        "fr": "mer de Béring"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q82931": {
+      "names": {
+        "en": "Coral Sea",
+        "de": "Korallenmeer",
+        "es": "mar del Coral",
+        "fr": "mer de Corail"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q33254": {
+      "names": {
+        "en": "Tasman Sea",
+        "de": "Tasmansee",
+        "es": "mar de Tasmania",
+        "fr": "mer de Tasman"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q47545": {
+      "names": {
+        "en": "Norwegian Sea",
+        "de": "Europäisches Nordmeer",
+        "es": "mar de Noruega",
+        "fr": "mer de Norvège"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q45823": {
+      "names": {
+        "en": "Barents Sea",
+        "de": "Barentssee",
+        "es": "Mar de Barents",
+        "fr": "mer de Barents"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q132868": {
+      "names": {
+        "en": "Greenland Sea",
+        "de": "Grönlandsee",
+        "es": "mar de Groenlandia",
+        "fr": "mer du Groenland"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q184189": {
+      "names": {
+        "en": "Labrador Sea",
+        "de": "Labradorsee",
+        "es": "mar de Labrador",
+        "fr": "mer du Labrador"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q13924": {
+      "names": {
+        "en": "Adriatic Sea",
+        "de": "Adriatisches Meer",
+        "es": "mar Adriático",
+        "fr": "mer Adriatique"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q34575": {
+      "names": {
+        "en": "Aegean Sea",
+        "de": "Ägäisches Meer",
+        "es": "mar Egeo",
+        "fr": "mer Égée"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q38882": {
+      "names": {
+        "en": "Tyrrhenian Sea",
+        "de": "Tyrrhenisches Meer",
+        "es": "mar Tirreno",
+        "fr": "mer Tyrrhénienne"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q47632": {
+      "names": {
+        "en": "Andaman Sea",
+        "de": "Andamanensee",
+        "es": "mar de Andamán",
+        "fr": "mer d'Andaman"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q45341": {
+      "names": {
+        "en": "East China Sea",
+        "de": "Ostchinesisches Meer",
+        "es": "mar de China Oriental",
+        "fr": "mer de Chine orientale"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q37960": {
+      "names": {
+        "en": "Yellow Sea",
+        "de": "Gelbes Meer",
+        "es": "mar Amarillo",
+        "fr": "mer Jaune"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q5484": {
+      "names": {
+        "en": "Caspian Sea",
+        "de": "Kaspisches Meer",
+        "es": "mar Caspio",
+        "fr": "mer Caspienne"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q41602": {
+      "names": {
+        "en": "Sea of Okhotsk",
+        "de": "Ochotskisches Meer",
+        "es": "mar de Ojotsk",
+        "fr": "mer d'Okhotsk"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q159183": {
+      "names": {
+        "en": "Philippine Sea",
+        "de": "Philippinensee",
+        "es": "mar de Filipinas",
+        "fr": "mer des Philippines"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q44133": {
+      "names": {
+        "en": "White Sea",
+        "de": "Weißes Meer",
+        "es": "mar Blanco",
+        "fr": "mer Blanche"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q35000": {
+      "names": {
+        "en": "Sea of Azov",
+        "de": "Asowsches Meer",
+        "es": "mar de Azov",
+        "fr": "mer d'Azov"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q35367": {
+      "names": {
+        "en": "Sea of Marmara",
+        "de": "Marmarameer",
+        "es": "mar de Mármara",
+        "fr": "mer de Marmara"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q181969": {
+      "names": {
+        "en": "Bohai Sea",
+        "de": "Golf von Bohai",
+        "es": "mar de Bohai",
+        "fr": "mer de Bohai"
+      },
+      "aliases": [
+        "Bo Hai"
+      ],
+      "regionType": "sea"
+    },
+    "Q42820": {
+      "names": {
+        "en": "Ligurian Sea",
+        "de": "Ligurisches Meer",
+        "es": "mar de Liguria",
+        "fr": "mer Ligure"
+      },
+      "aliases": [],
+      "regionType": "sea"
+    },
+    "Q5456": {
+      "names": {
+        "en": "Andes",
+        "de": "Anden",
+        "es": "Cordillera de Los Andes",
+        "fr": "cordillère des Andes"
+      },
+      "aliases": [
+        "Andes"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q5463": {
+      "names": {
+        "en": "Rocky Mountains",
+        "de": "Rocky Mountains",
+        "es": "Montañas Rocosas",
+        "fr": "montagnes Rocheuses"
+      },
+      "aliases": [
+        "Rocky Mountains"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q93332": {
+      "names": {
+        "en": "Appalachian Mountains",
+        "de": "Appalachen",
+        "es": "Apalaches",
+        "fr": "Appalaches"
+      },
+      "aliases": [
+        "Appalachian Mts."
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q192583": {
+      "names": {
+        "en": "Great Dividing Range",
+        "de": "Great Dividing Range",
+        "es": "Gran Cordillera Divisoria",
+        "fr": "Cordillère australienne"
+      },
+      "aliases": [
+        "Great Dividing Range"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q130135": {
+      "names": {
+        "en": "Atlas Mountains",
+        "de": "Atlas",
+        "es": "Atlas",
+        "fr": "Atlas"
+      },
+      "aliases": [
+        "Atlas Mountains"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q5451": {
+      "names": {
+        "en": "Himalayas",
+        "de": "Himalaya",
+        "es": "Himalaya",
+        "fr": "Himalaya"
+      },
+      "aliases": [
+        "Himalayas"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q5955": {
+      "names": {
+        "en": "Altai Mountains",
+        "de": "Altai",
+        "es": "macizo de Altái",
+        "fr": "Altaï"
+      },
+      "aliases": [
+        "Altay Mountains"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q5474": {
+      "names": {
+        "en": "Tian Shan",
+        "de": "Tian Shan",
+        "es": "Tian Shan",
+        "fr": "Tian Shan"
+      },
+      "aliases": [
+        "Tian Shan"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q183295": {
+      "names": {
+        "en": "Drakensberg",
+        "de": "Drakensberge",
+        "es": "Drakensberg",
+        "fr": "Drakensberg"
+      },
+      "aliases": [
+        "Drakensberg"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q5472": {
+      "names": {
+        "en": "Hindu Kush",
+        "de": "Hindukusch",
+        "es": "Hindú Kush",
+        "fr": "Hindou Kouch"
+      },
+      "aliases": [
+        "Hindu Kush"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q1288": {
+      "names": {
+        "en": "Carpathian Mountains",
+        "de": "Karpaten",
+        "es": "montes Cárpatos",
+        "fr": "Carpates"
+      },
+      "aliases": [
+        "Carpathian Mountains"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q186547": {
+      "names": {
+        "en": "Scandinavian Mountains",
+        "de": "Skandinavisches Gebirge",
+        "es": "Alpes escandinavos",
+        "fr": "Alpes scandinaves"
+      },
+      "aliases": [
+        "Kjølen Mountains"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q35600": {
+      "names": {
+        "en": "Ural Mountains",
+        "de": "Ural",
+        "es": "Montes Urales",
+        "fr": "Oural"
+      },
+      "aliases": [
+        "Ural Mountains"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q5477": {
+      "names": {
+        "en": "Caucasus Mountains",
+        "de": "Kaukasus",
+        "es": "Cáucaso",
+        "fr": "Caucase"
+      },
+      "aliases": [
+        "Caucasus Mts."
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q1286": {
+      "names": {
+        "en": "Alps",
+        "de": "Alpen",
+        "es": "Alpes",
+        "fr": "Alpes"
+      },
+      "aliases": [
+        "Alps"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q4558": {
+      "names": {
+        "en": "Cascade Range",
+        "de": "Kaskadenkette",
+        "es": "Cordillera de las Cascadas",
+        "fr": "chaîne des Cascades"
+      },
+      "aliases": [
+        "Cascade Range"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q4527": {
+      "names": {
+        "en": "Western Ghats",
+        "de": "Westghats",
+        "es": "Ghats occidentales",
+        "fr": "Ghâts occidentaux"
+      },
+      "aliases": [
+        "Western Ghats"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q465055": {
+      "names": {
+        "en": "Eastern Ghats",
+        "de": "Ostghats",
+        "es": "Ghats orientales",
+        "fr": "Ghâts orientaux"
+      },
+      "aliases": [
+        "Eastern Ghats"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q167021": {
+      "names": {
+        "en": "Zagros Mountains",
+        "de": "Zāgros-Gebirge",
+        "es": "Zagros",
+        "fr": "Zagros"
+      },
+      "aliases": [
+        "Zagros Mountains"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q1124584": {
+      "names": {
+        "en": "Sierra Madre Occidental",
+        "de": "Sierra Madre Occidental",
+        "es": "Sierra Madre Occidental",
+        "fr": "Sierra Madre occidentale"
+      },
+      "aliases": [
+        "Sierra Madre Occidental"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q144040": {
+      "names": {
+        "en": "Sierra Madre Oriental",
+        "de": "Sierra Madre Oriental",
+        "es": "Sierra Madre Oriental",
+        "fr": "Sierra Madre orientale"
+      },
+      "aliases": [
+        "Sierra Madre Oriental"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q189915": {
+      "names": {
+        "en": "Dinaric Alps",
+        "de": "Dinarisches Gebirge",
+        "es": "Alpes Dináricos",
+        "fr": "Alpes dinariques"
+      },
+      "aliases": [],
+      "regionType": "mountain_range"
+    },
+    "Q187871": {
+      "names": {
+        "en": "Kunlun Mountains",
+        "de": "Kunlun",
+        "es": "Kunlun",
+        "fr": "Cordillère du Kunlun"
+      },
+      "aliases": [
+        "Kunlun Mountains"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q12431": {
+      "names": {
+        "en": "Pyrenees",
+        "de": "Pyrenäen",
+        "es": "Pirineos",
+        "fr": "Pyrénées"
+      },
+      "aliases": [
+        "Pyrenees"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q5469": {
+      "names": {
+        "en": "Karakoram",
+        "de": "Karakorum",
+        "es": "Cordillera del Karakórum",
+        "fr": "Karakoram"
+      },
+      "aliases": [
+        "Karakoram Ra."
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q156684": {
+      "names": {
+        "en": "Alaska Range",
+        "de": "Alaskakette",
+        "es": "Cordillera de Alaska",
+        "fr": "chaîne d'Alaska"
+      },
+      "aliases": [
+        "Alaska Range"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q166755": {
+      "names": {
+        "en": "Blue Ridge Mountains",
+        "de": "Blue Ridge Mountains",
+        "es": "Cordillera Azul",
+        "fr": "montagnes Blue Ridge"
+      },
+      "aliases": [
+        "Blue Ridge"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q216593": {
+      "names": {
+        "en": "Lesser Caucasus",
+        "de": "Kleiner Kaukasus",
+        "es": "Cáucaso Menor",
+        "fr": "Petit Caucase"
+      },
+      "aliases": [],
+      "regionType": "mountain_range"
+    },
+    "Q161750": {
+      "names": {
+        "en": "Pamir mountains",
+        "de": "Pamir",
+        "es": "Cordillera del Pamir",
+        "fr": "Pamir"
+      },
+      "aliases": [
+        "Pamirs"
+      ],
+      "regionType": "mountain_range"
+    },
+    "Q1066": {
+      "names": {
+        "en": "Lake Superior",
+        "de": "Oberer",
+        "es": "Superior",
+        "fr": "Supérieur"
+      },
+      "aliases": [
+        "Superior"
+      ],
+      "regionType": "lake"
+    },
+    "Q5505": {
+      "names": {
+        "en": "Lake Victoria",
+        "de": "Victoriasee",
+        "es": "Victoria",
+        "fr": "Victoria"
+      },
+      "aliases": [
+        "Nyanza",
+        "Victoria"
+      ],
+      "regionType": "lake"
+    },
+    "Q1383": {
+      "names": {
+        "en": "Lake Huron",
+        "de": "Huronsee",
+        "es": "Hurón",
+        "fr": "Huron"
+      },
+      "aliases": [
+        "Huron"
+      ],
+      "regionType": "lake"
+    },
+    "Q1169": {
+      "names": {
+        "en": "Lake Michigan",
+        "de": "Michigansee",
+        "es": "Míchigan",
+        "fr": "Michigan"
+      },
+      "aliases": [
+        "Michigan"
+      ],
+      "regionType": "lake"
+    },
+    "Q5511": {
+      "names": {
+        "en": "Lake Tanganyika",
+        "de": "Tanganjikasee",
+        "es": "Tanganica",
+        "fr": "Tanganyika"
+      },
+      "aliases": [
+        "Tanganyika"
+      ],
+      "regionType": "lake"
+    },
+    "Q5513": {
+      "names": {
+        "en": "Lake Baikal",
+        "de": "Baikalsee",
+        "es": "Baikal",
+        "fr": "Baïkal"
+      },
+      "aliases": [
+        "Baikal"
+      ],
+      "regionType": "lake"
+    },
+    "Q5525": {
+      "names": {
+        "en": "Great Bear Lake",
+        "de": "Großer Bärensee",
+        "es": "Gran Oso",
+        "fr": "grand l'Ours"
+      },
+      "aliases": [
+        "Great Bear"
+      ],
+      "regionType": "lake"
+    },
+    "Q5532": {
+      "names": {
+        "en": "Lake Malawi",
+        "de": "Malawisee",
+        "es": "Malaui",
+        "fr": "Malawi"
+      },
+      "aliases": [
+        "Malawi"
+      ],
+      "regionType": "lake"
+    },
+    "Q5539": {
+      "names": {
+        "en": "Great Slave Lake",
+        "de": "Großer Sklavensee",
+        "es": "Gran Esclavo",
+        "fr": "Grand Esclaves"
+      },
+      "aliases": [
+        "Great Slave"
+      ],
+      "regionType": "lake"
+    },
+    "Q5492": {
+      "names": {
+        "en": "Lake Erie",
+        "de": "Eriesee",
+        "es": "Erie",
+        "fr": "Érié"
+      },
+      "aliases": [
+        "Erie"
+      ],
+      "regionType": "lake"
+    },
+    "Q3272": {
+      "names": {
+        "en": "Lake Winnipeg",
+        "de": "Winnipegsee",
+        "es": "Winnipeg",
+        "fr": "Winnipeg"
+      },
+      "aliases": [
+        "Winnipeg"
+      ],
+      "regionType": "lake"
+    },
+    "Q1062": {
+      "names": {
+        "en": "Lake Ontario",
+        "de": "Ontariosee",
+        "es": "Ontario",
+        "fr": "Ontario"
+      },
+      "aliases": [
+        "Ontario"
+      ],
+      "regionType": "lake"
+    },
+    "Q15288": {
+      "names": {
+        "en": "Lake Ladoga",
+        "de": "Ladogasee",
+        "es": "Ládoga",
+        "fr": "Ladoga"
+      },
+      "aliases": [
+        "Ladoga"
+      ],
+      "regionType": "lake"
+    },
+    "Q134485": {
+      "names": {
+        "en": "Lake Balkhash",
+        "de": "Balchaschsee",
+        "es": "Baljash",
+        "fr": "Balkhach"
+      },
+      "aliases": [
+        "Balkhash"
+      ],
+      "regionType": "lake"
+    },
+    "Q166162": {
+      "names": {
+        "en": "Lake Onega",
+        "de": "Onegasee",
+        "es": "Onega",
+        "fr": "Onega"
+      },
+      "aliases": [
+        "Onega"
+      ],
+      "regionType": "lake"
+    },
+    "Q35342": {
+      "names": {
+        "en": "Titicaca",
+        "de": "Titicacasee",
+        "es": "Titicaca",
+        "fr": "Titicaca"
+      },
+      "aliases": [
+        "Lago Titicaca"
+      ],
+      "regionType": "lake"
+    },
+    "Q173862": {
+      "names": {
+        "en": "Nicaragua",
+        "de": "Nicaraguasee",
+        "es": "Cocibolca",
+        "fr": "Nicaragua"
+      },
+      "aliases": [
+        "Lago de Nicaragua"
+      ],
+      "regionType": "lake"
+    },
+    "Q173596": {
+      "names": {
+        "en": "Vänern",
+        "de": "Vänern",
+        "es": "Vänern",
+        "fr": "Vänern"
+      },
+      "aliases": [],
+      "regionType": "lake"
+    },
+    "Q125888": {
+      "names": {
+        "en": "Lake Albert",
+        "de": "Albertsee",
+        "es": "Alberto",
+        "fr": "Albert"
+      },
+      "aliases": [
+        "Albert"
+      ],
+      "regionType": "lake"
+    },
+    "Q116685": {
+      "names": {
+        "en": "Lake Tana",
+        "de": "Tanasee",
+        "es": "Tana",
+        "fr": "Tana"
+      },
+      "aliases": [
+        "Tana"
+      ],
+      "regionType": "lake"
+    },
+    "Q181932": {
+      "names": {
+        "en": "Lake Sevan",
+        "de": "Sewansee",
+        "es": "Sevan",
+        "fr": "Sevan"
+      },
+      "aliases": [
+        "Sevan"
+      ],
+      "regionType": "lake"
+    },
+    "Q125309": {
+      "names": {
+        "en": "Lake Chad",
+        "de": "Tschadsee",
+        "es": "Chad",
+        "fr": "Tchad"
+      },
+      "aliases": [
+        "Chad"
+      ],
+      "regionType": "lake"
+    },
+    "Q125912": {
+      "names": {
+        "en": "Lake Kivu",
+        "de": "Kiwusee",
+        "es": "Kivu",
+        "fr": "Kivu"
+      },
+      "aliases": [
+        "Kivu"
+      ],
+      "regionType": "lake"
+    },
+    "Q202905": {
+      "names": {
+        "en": "Lake Okeechobee",
+        "de": "Okeechobeesee",
+        "es": "Okeechobee",
+        "fr": "Okeechobee"
+      },
+      "aliases": [
+        "Okeechobee"
+      ],
+      "regionType": "lake"
+    },
+    "Q192770": {
+      "names": {
+        "en": "Lake Saimaa",
+        "de": "Saimaa",
+        "es": "Saimaa",
+        "fr": "Saimaa"
+      },
+      "aliases": [
+        "Saimaa"
+      ],
+      "regionType": "lake"
+    },
+    "Q272463": {
+      "names": {
+        "en": "Lake Athabasca",
+        "de": "Athabascasee",
+        "es": "Athabasca",
+        "fr": "Athabasca"
+      },
+      "aliases": [
+        "Athabasca"
+      ],
+      "regionType": "lake"
+    },
+    "Q192215": {
+      "names": {
+        "en": "Khövsgöl Nuur",
+        "de": "Chöwsgöl Nuur",
+        "es": "Ubsugul",
+        "fr": "Khövsgöl"
+      },
+      "aliases": [],
+      "regionType": "lake"
+    },
+    "Q19253": {
+      "names": {
+        "en": "Lake Peipus",
+        "de": "Peipussee",
+        "es": "Peipus",
+        "fr": "Peïpous"
+      },
+      "aliases": [
+        "Peipus"
+      ],
+      "regionType": "lake"
+    },
+    "Q199938": {
+      "names": {
+        "en": "Tonlé Sap",
+        "de": "Tonle Sap",
+        "es": "Tonlé Sap",
+        "fr": "Tonlé Sap"
+      },
+      "aliases": [],
+      "regionType": "lake"
+    },
+    "Q223#island": {
+      "names": {
+        "en": "Greenland",
+        "de": "Grönland",
+        "es": "Groenlandia",
+        "fr": "Groenland"
+      },
+      "aliases": [
+        "Greenland"
+      ],
+      "regionType": "island"
+    },
+    "Q40285": {
+      "names": {
+        "en": "New Guinea",
+        "de": "Neuguinea",
+        "es": "Nueva Guinea",
+        "fr": "Nouvelle-Guinée"
+      },
+      "aliases": [
+        "New Guinea"
+      ],
+      "regionType": "island"
+    },
+    "Q36117": {
+      "names": {
+        "en": "Borneo",
+        "de": "Borneo",
+        "es": "Isla de Borneo",
+        "fr": "Bornéo"
+      },
+      "aliases": [
+        "Borneo"
+      ],
+      "regionType": "island"
+    },
+    "Q7463928": {
+      "names": {
+        "en": "Madagascar",
+        "de": "Madagaskar",
+        "es": "MADAGASCAR",
+        "fr": "Madagascar"
+      },
+      "aliases": [
+        "Madagascar"
+      ],
+      "regionType": "island"
+    },
+    "Q3492": {
+      "names": {
+        "en": "Sumatra",
+        "de": "Sumatra",
+        "es": "Sumatra",
+        "fr": "Sumatra"
+      },
+      "aliases": [
+        "Sumatra"
+      ],
+      "regionType": "island"
+    },
+    "Q13989": {
+      "names": {
+        "en": "Honshu",
+        "de": "Honshū",
+        "es": "Honshū",
+        "fr": "Honshū"
+      },
+      "aliases": [
+        "Honshü"
+      ],
+      "regionType": "island"
+    },
+    "Q23666": {
+      "names": {
+        "en": "Great Britain",
+        "de": "Großbritannien",
+        "es": "Gran Bretaña",
+        "fr": "Grande-Bretagne"
+      },
+      "aliases": [
+        "Great Britain"
+      ],
+      "regionType": "island"
+    },
+    "Q3812": {
+      "names": {
+        "en": "Sulawesi",
+        "de": "Sulawesi",
+        "es": "Célebes",
+        "fr": "Célèbes"
+      },
+      "aliases": [
+        "Sulawesi"
+      ],
+      "regionType": "island"
+    },
+    "Q120755": {
+      "names": {
+        "en": "South Island",
+        "de": "Südinsel",
+        "es": "Isla Sur",
+        "fr": "île du Sud"
+      },
+      "aliases": [
+        "South Island"
+      ],
+      "regionType": "island"
+    },
+    "Q3757": {
+      "names": {
+        "en": "Java",
+        "de": "Java",
+        "es": "Java",
+        "fr": "Java"
+      },
+      "aliases": [
+        "Java"
+      ],
+      "regionType": "island"
+    },
+    "Q118863": {
+      "names": {
+        "en": "North Island",
+        "de": "Nordinsel",
+        "es": "Isla Norte",
+        "fr": "île du Nord"
+      },
+      "aliases": [
+        "North Island"
+      ],
+      "regionType": "island"
+    },
+    "Q48335": {
+      "names": {
+        "en": "Newfoundland",
+        "de": "Neufundland",
+        "es": "Isla de Terranova",
+        "fr": "Terre-Neuve"
+      },
+      "aliases": [
+        "Island Of Newfoundland"
+      ],
+      "regionType": "island"
+    },
+    "Q586657": {
+      "names": {
+        "en": "Cuba",
+        "de": "Kuba",
+        "es": "Cuba",
+        "fr": "Cuba"
+      },
+      "aliases": [
+        "Cuba"
+      ],
+      "regionType": "island"
+    },
+    "Q125384": {
+      "names": {
+        "en": "Luzon",
+        "de": "Luzon",
+        "es": "Luzón",
+        "fr": "Luçon"
+      },
+      "aliases": [
+        "Luzon"
+      ],
+      "regionType": "island"
+    },
+    "Q3740828": {
+      "names": {
+        "en": "Iceland",
+        "de": "Island",
+        "es": "ISLANDIA",
+        "fr": "Islande"
+      },
+      "aliases": [
+        "Iceland"
+      ],
+      "regionType": "island"
+    },
+    "Q124873": {
+      "names": {
+        "en": "Mindanao",
+        "de": "Mindanao",
+        "es": "Mindanao",
+        "fr": "Mindanao"
+      },
+      "aliases": [
+        "Mindanao"
+      ],
+      "regionType": "island"
+    },
+    "Q22890": {
+      "names": {
+        "en": "Ireland",
+        "de": "Irland",
+        "es": "Irlanda",
+        "fr": "Irlande"
+      },
+      "aliases": [
+        "Ireland"
+      ],
+      "regionType": "island"
+    },
+    "Q35581#island": {
+      "names": {
+        "en": "Hokkaidō",
+        "de": "Hokkaidō",
+        "es": "Hokkaidō",
+        "fr": "Hokkaidō"
+      },
+      "aliases": [
+        "Hokkaidö"
+      ],
+      "regionType": "island"
+    },
+    "Q4526612": {
+      "names": {
+        "en": "Sri Lanka",
+        "de": "SRI LANKA",
+        "es": "SRI LANKA",
+        "fr": "Sri Lanka"
+      },
+      "aliases": [
+        "Sri Lanka"
+      ],
+      "regionType": "island"
+    },
+    "Q22502": {
+      "names": {
+        "en": "Taiwan",
+        "de": "Taiwan",
+        "es": "Taiwán",
+        "fr": "île de Taïwan"
+      },
+      "aliases": [
+        "Taiwan"
+      ],
+      "regionType": "island"
+    },
+    "Q170479": {
+      "names": {
+        "en": "Vancouver Island",
+        "de": "Vancouver Island",
+        "es": "Isla de Vancouver",
+        "fr": "île de Vancouver"
+      },
+      "aliases": [],
+      "regionType": "island"
+    },
+    "Q4951156": {
+      "names": {
+        "en": "Sicily",
+        "de": "Sizilien",
+        "es": "Sicilia",
+        "fr": "Sicile"
+      },
+      "aliases": [
+        "Sicilia"
+      ],
+      "regionType": "island"
+    },
+    "Q1462": {
+      "names": {
+        "en": "Sardinia",
+        "de": "Sardinien",
+        "es": "Cerdeña",
+        "fr": "Sardaigne"
+      },
+      "aliases": [
+        "Sardegna"
+      ],
+      "regionType": "island"
+    },
+    "Q25277": {
+      "names": {
+        "en": "Hispaniola",
+        "de": "Hispaniola",
+        "es": "La Española",
+        "fr": "Hispaniola"
+      },
+      "aliases": [
+        "Hispaniola"
+      ],
+      "regionType": "island"
+    },
+    "Q644636": {
+      "names": {
+        "en": "Cyprus",
+        "de": "Zypern",
+        "es": "Chipre",
+        "fr": "Chypre"
+      },
+      "aliases": [],
+      "regionType": "island"
+    },
+    "Q27508031": {
+      "names": {
+        "en": "Jamaica",
+        "de": "Jamaika",
+        "es": "Jamaica",
+        "fr": "Jamaïque"
+      },
+      "aliases": [],
+      "regionType": "island"
+    },
+    "Q14112": {
+      "names": {
+        "en": "Corsica",
+        "de": "Korsika",
+        "es": "Córcega",
+        "fr": "Corse"
+      },
+      "aliases": [
+        "Corse"
+      ],
+      "regionType": "island"
+    },
+    "Q34374#island": {
+      "names": {
+        "en": "Crete",
+        "de": "Kreta",
+        "es": "Creta",
+        "fr": "Crète"
+      },
+      "aliases": [],
+      "regionType": "island"
+    },
+    "Q8828": {
+      "names": {
+        "en": "Mallorca",
+        "de": "Mallorca",
+        "es": "Mallorca",
+        "fr": "Majorque"
+      },
+      "aliases": [],
+      "regionType": "island"
+    },
+    "Q3593416": {
+      "names": {
+        "en": "Tasmania",
+        "de": "TASMANIEN",
+        "es": "TASMANIA",
+        "fr": "île de Tasmanie"
+      },
+      "aliases": [
+        "Mainland Tasmania",
+        "Tasmania"
+      ],
+      "regionType": "island"
+    },
+    "Q81178": {
+      "names": {
+        "en": "Baffin Island",
+        "de": "Baffininsel",
+        "es": "isla de Baffin",
+        "fr": "île de Baffin"
+      },
+      "aliases": [
+        "Baffin Island"
+      ],
+      "regionType": "island"
+    },
+    "Q158129": {
+      "names": {
+        "en": "Victoria Island",
+        "de": "Victoria-Insel",
+        "es": "Isla Victoria",
+        "fr": "île Victoria"
+      },
+      "aliases": [
+        "Victoria Island"
+      ],
+      "regionType": "island"
+    },
+    "Q146841": {
+      "names": {
+        "en": "Ellesmere Island",
+        "de": "Ellesmere Island",
+        "es": "Isla de Ellesmere",
+        "fr": "île d'Ellesmere"
+      },
+      "aliases": [
+        "Ellesmere Island"
+      ],
+      "regionType": "island"
+    },
+    "Q7792": {
+      "names": {
+        "en": "Sakhalin",
+        "de": "Sachalin",
+        "es": "Sajalín",
+        "fr": "Sakhaline"
+      },
+      "aliases": [
+        "Sakhalin"
+      ],
+      "regionType": "island"
+    },
+    "Q82601": {
+      "names": {
+        "en": "Tierra del Fuego",
+        "de": "Feuerland",
+        "es": "Archipiélago de Tierra del Fuego",
+        "fr": "Terre de Feu"
+      },
+      "aliases": [
+        "Tierra Del Fuego"
+      ],
+      "regionType": "island"
+    },
+    "Q21162": {
+      "names": {
+        "en": "Spitsbergen",
+        "de": "Spitzbergen",
+        "es": "Spitsbergen",
+        "fr": "Spitzberg"
+      },
+      "aliases": [],
+      "regionType": "island"
+    },
+    "Q13987": {
+      "names": {
+        "en": "Kyushu",
+        "de": "Kyūshū",
+        "es": "Kyūshū",
+        "fr": "Kyūshū"
+      },
+      "aliases": [
+        "Kyüshü"
+      ],
+      "regionType": "island"
+    },
+    "Q1081204": {
+      "names": {
+        "en": "Hainan Island",
+        "de": "Insel Hainan",
+        "es": "Hainan",
+        "fr": "Hainan"
+      },
+      "aliases": [
+        "Hainan"
+      ],
+      "regionType": "island"
+    },
+    "Q83067": {
+      "names": {
+        "en": "Timor",
+        "de": "Timor",
+        "es": "Timor",
+        "fr": "Timor"
+      },
+      "aliases": [
+        "Timor"
+      ],
+      "regionType": "island"
+    },
+    "Q2076337": {
+      "names": {
+        "en": "Puerto Rico",
+        "de": "Puerto Rico",
+        "es": "Puerto Rico",
+        "fr": "Porto Rico"
+      },
+      "aliases": [],
+      "regionType": "island"
+    },
+    "Q4648": {
+      "names": {
+        "en": "Bali",
+        "de": "Bali",
+        "es": "Bali",
+        "fr": "Bali"
+      },
+      "aliases": [],
+      "regionType": "island"
+    },
+    "Q40846": {
+      "names": {
+        "en": "Tenerife",
+        "de": "Teneriffa",
+        "es": "Tenerife",
+        "fr": "Ténérife"
+      },
+      "aliases": [],
+      "regionType": "island"
+    },
+    "Q82859": {
+      "names": {
+        "en": "Socotra",
+        "de": "Sokotra",
+        "es": "Socotra",
+        "fr": "Socotra"
+      },
+      "aliases": [],
+      "regionType": "island"
+    },
+    "Q205022": {
+      "names": {
+        "en": "Bioko",
+        "de": "Bioko",
+        "es": "Bioko",
+        "fr": "Bioko"
+      },
+      "aliases": [],
+      "regionType": "island"
+    },
+    "Q514070": {
+      "names": {
+        "en": "Andros",
+        "de": "Andros",
+        "es": "Andros",
+        "fr": "Andros"
+      },
+      "aliases": [],
+      "regionType": "island"
+    },
+    "Q38684": {
+      "names": {
+        "en": "Bay of Bengal",
+        "de": "Golf von Bengalen",
+        "es": "Bahía de Bengala",
+        "fr": "golfe du Bengale"
+      },
+      "aliases": [],
+      "regionType": "bay"
+    },
+    "Q3040": {
+      "names": {
+        "en": "Hudson Bay",
+        "de": "Hudson Bay",
+        "es": "Bahía de Hudson",
+        "fr": "baie d'Hudson"
+      },
+      "aliases": [],
+      "regionType": "bay"
+    },
+    "Q41573": {
+      "names": {
+        "en": "Bay of Biscay",
+        "de": "Biskaya",
+        "es": "Golfo de Vizcaya",
+        "fr": "golfe de Gascogne"
+      },
+      "aliases": [],
+      "regionType": "bay"
+    },
+    "Q216868": {
+      "names": {
+        "en": "Chesapeake Bay",
+        "de": "Chesapeake Bay",
+        "es": "bahía de Chesapeake",
+        "fr": "baie de Chesapeake"
+      },
+      "aliases": [],
+      "regionType": "bay"
+    },
+    "Q181857": {
+      "names": {
+        "en": "Bay of Fundy",
+        "de": "Bay of Fundy",
+        "es": "Bahía de Fundy",
+        "fr": "baie de Fundy"
+      },
+      "aliases": [],
+      "regionType": "bay"
+    },
+    "Q232264": {
+      "names": {
+        "en": "San Francisco Bay",
+        "de": "Bucht von San Francisco",
+        "es": "Bahía de San Francisco",
+        "fr": "baie de San Francisco"
+      },
+      "aliases": [],
+      "regionType": "bay"
+    },
+    "Q223810": {
+      "names": {
+        "en": "James Bay",
+        "de": "James Bay",
+        "es": "Bahía James",
+        "fr": "baie James"
+      },
+      "aliases": [],
+      "regionType": "bay"
+    },
+    "Q140290": {
+      "names": {
+        "en": "Bay of Plenty",
+        "de": "Bay of Plenty",
+        "es": "Bay of Plenty",
+        "fr": "baie de l'Abondance"
+      },
+      "aliases": [],
+      "regionType": "bay"
+    },
+    "Q189262": {
+      "names": {
+        "en": "Davis Strait",
+        "de": "Davisstraße",
+        "es": "Estrecho de Davis",
+        "fr": "détroit de Davis"
+      },
+      "aliases": [],
+      "regionType": "strait"
+    },
+    "Q48359": {
+      "names": {
+        "en": "Strait of Malacca",
+        "de": "Straße von Malakka",
+        "es": "Estrecho de Malaca",
+        "fr": "détroit de Malacca"
+      },
+      "aliases": [],
+      "regionType": "strait"
+    },
+    "Q171846": {
+      "names": {
+        "en": "Bass Strait",
+        "de": "Bass-Straße",
+        "es": "Estrecho de Bass",
+        "fr": "détroit de Bass"
+      },
+      "aliases": [],
+      "regionType": "strait"
+    },
+    "Q232912": {
+      "names": {
+        "en": "Florida Strait",
+        "de": "Floridastraße",
+        "es": "Estrecho de Florida",
+        "fr": "détroit de Floride"
+      },
+      "aliases": [
+        "Straits of Florida"
+      ],
+      "regionType": "strait"
+    },
+    "Q127031": {
+      "names": {
+        "en": "Taiwan Strait",
+        "de": "Formosastraße",
+        "es": "Estrecho de Taiwán",
+        "fr": "détroit de Taïwan"
+      },
+      "aliases": [],
+      "regionType": "strait"
+    },
+    "Q48365": {
+      "names": {
+        "en": "Strait of Magellan",
+        "de": "Magellanstraße",
+        "es": "Estrecho de Magallanes",
+        "fr": "détroit de Magellan"
+      },
+      "aliases": [
+        "Estrecho de Magellanes"
+      ],
+      "regionType": "strait"
+    },
+    "Q5023": {
+      "names": {
+        "en": "Cook Strait",
+        "de": "Cookstraße",
+        "es": "Estrecho de Cook",
+        "fr": "détroit de Cook"
+      },
+      "aliases": [],
+      "regionType": "strait"
+    },
+    "Q35958": {
+      "names": {
+        "en": "Bosporus",
+        "de": "Bosporus",
+        "es": "Bósforo",
+        "fr": "Bosphore"
+      },
+      "aliases": [],
+      "regionType": "strait"
+    },
+    "Q52052": {
+      "names": {
+        "en": "Korea Strait",
+        "de": "Koreastraße",
+        "es": "Estrecho de Corea",
+        "fr": "détroit de Corée"
+      },
+      "aliases": [],
+      "regionType": "strait"
+    },
+    "Q271521": {
+      "names": {
+        "en": "Tsugaru Strait",
+        "de": "Tsugaru-Straße",
+        "es": "Estrecho de Tsugaru",
+        "fr": "détroit de Tsugaru"
+      },
+      "aliases": [],
+      "regionType": "strait"
+    },
+    "Q12630": {
+      "names": {
+        "en": "Gulf of Mexico",
+        "de": "Golf von Mexiko",
+        "es": "Golfo de México",
+        "fr": "golfe du Mexique"
+      },
+      "aliases": [],
+      "regionType": "gulf"
+    },
+    "Q41430": {
+      "names": {
+        "en": "Gulf of Guinea",
+        "de": "Golf von Guinea",
+        "es": "Golfo de Guinea",
+        "fr": "golfe de Guinée"
+      },
+      "aliases": [],
+      "regionType": "gulf"
+    },
+    "Q180531": {
+      "names": {
+        "en": "Gulf of Alaska",
+        "de": "Golf von Alaska",
+        "es": "Golfo de Alaska",
+        "fr": "Golfe d'Alaska"
+      },
+      "aliases": [],
+      "regionType": "gulf"
+    },
+    "Q34675": {
+      "names": {
+        "en": "Persian Gulf",
+        "de": "Persischer Golf",
+        "es": "golfo Pérsico",
+        "fr": "golfe Persique"
+      },
+      "aliases": [],
+      "regionType": "gulf"
+    },
+    "Q41837": {
+      "names": {
+        "en": "Gulf of Aden",
+        "de": "Golf von Aden",
+        "es": "Golfo de Adén",
+        "fr": "golfe d'Aden"
+      },
+      "aliases": [],
+      "regionType": "gulf"
+    },
+    "Q132811": {
+      "names": {
+        "en": "Gulf of California",
+        "de": "Golf von Kalifornien",
+        "es": "Golfo de California",
+        "fr": "golfe de Californie"
+      },
+      "aliases": [
+        "Golfo de California"
+      ],
+      "regionType": "gulf"
+    },
+    "Q131217": {
+      "names": {
+        "en": "Gulf of Thailand",
+        "de": "Golf von Thailand",
+        "es": "Golfo de Tailandia",
+        "fr": "Golfe de Thaïlande"
+      },
+      "aliases": [],
+      "regionType": "gulf"
+    },
+    "Q169523": {
+      "names": {
+        "en": "Gulf of Saint Lawrence",
+        "de": "Sankt-Lorenz-Golf",
+        "es": "Golfo de San Lorenzo",
+        "fr": "golfe du Saint-Laurent"
+      },
+      "aliases": [],
+      "regionType": "gulf"
+    },
+    "Q14686": {
+      "names": {
+        "en": "Gulf of Finland",
+        "de": "Finnischer Meerbusen",
+        "es": "Golfo de Finlandia",
+        "fr": "golfe de Finlande"
+      },
+      "aliases": [],
+      "regionType": "gulf"
+    },
+    "Q192626": {
+      "names": {
+        "en": "Hawaiian Islands",
+        "de": "Hawaii-Inseln",
+        "es": "Archipiélago de Hawái",
+        "fr": "archipel d'Hawaï"
+      },
+      "aliases": [
+        "Hawaiian Islands"
+      ],
+      "regionType": "archipelago"
+    },
+    "Q38272": {
+      "names": {
+        "en": "British Isles",
+        "de": "Britische Inseln",
+        "es": "Islas británicas",
+        "fr": "îles Britanniques"
+      },
+      "aliases": [
+        "British Isles"
+      ],
+      "regionType": "archipelago"
+    },
+    "Q128011": {
+      "names": {
+        "en": "Greater Antilles",
+        "de": "Große Antillen",
+        "es": "Antillas Mayores",
+        "fr": "Grandes Antilles"
+      },
+      "aliases": [
+        "Greater Antilles"
+      ],
+      "regionType": "archipelago"
+    },
+    "Q21713615": {
+      "names": {
+        "en": "Bahama Islands",
+        "de": "Bahamas",
+        "es": "Islas Bahamas",
+        "fr": "Îles des Bahamas"
+      },
+      "aliases": [
+        "Bahama Islands"
+      ],
+      "regionType": "archipelago"
+    },
+    "Q5813": {
+      "names": {
+        "en": "Canary Islands",
+        "de": "Kanarische Inseln",
+        "es": "Canarias",
+        "fr": "Îles Canaries"
+      },
+      "aliases": [
+        "Islas Canarias"
+      ],
+      "regionType": "archipelago"
+    },
+    "Q38095": {
+      "names": {
+        "en": "Galapagos Islands",
+        "de": "Galapagosinseln",
+        "es": "Islas Galápagos",
+        "fr": "îles Galápagos"
+      },
+      "aliases": [
+        "Archipiélago De Colón"
+      ],
+      "regionType": "archipelago"
+    },
+    "Q25263#archipelago": {
+      "names": {
+        "en": "Azores",
+        "de": "Azoren",
+        "es": "Azores",
+        "fr": "Açores"
+      },
+      "aliases": [
+        "Açores"
+      ],
+      "regionType": "archipelago"
+    },
+    "Q31945": {
+      "names": {
+        "en": "Arabian Peninsula",
+        "de": "Arabische Halbinsel",
+        "es": "Arabia",
+        "fr": "Arabie"
+      },
+      "aliases": [
+        "Arabian Peninsula"
+      ],
+      "regionType": "peninsula"
+    },
+    "Q21195": {
+      "names": {
+        "en": "Scandinavia",
+        "de": "Skandinavien",
+        "es": "Escandinavia",
+        "fr": "Scandinavie"
+      },
+      "aliases": [
+        "Scandinavia"
+      ],
+      "regionType": "peninsula"
+    },
+    "Q23522": {
+      "names": {
+        "en": "Balkans",
+        "de": "Balkanhalbinsel",
+        "es": "península balcánica",
+        "fr": "Balkans"
+      },
+      "aliases": [
+        "Balkan Pen."
+      ],
+      "regionType": "peninsula"
+    },
+    "Q483134": {
+      "names": {
+        "en": "Korean Peninsula",
+        "de": "Koreanische Halbinsel",
+        "es": "Península de Corea",
+        "fr": "Péninsule de Corée"
+      },
+      "aliases": [
+        "Korea"
+      ],
+      "regionType": "peninsula"
+    },
+    "Q130978": {
+      "names": {
+        "en": "Yucatan Peninsula",
+        "de": "Yucatán",
+        "es": "península de Yucatán",
+        "fr": "Péninsule du Yucatán"
+      },
+      "aliases": [
+        "Pen. De Yucatán"
+      ],
+      "regionType": "peninsula"
+    },
+    "Q178543": {
+      "names": {
+        "en": "Baja California Peninsula",
+        "de": "Niederkalifornien",
+        "es": "Península de California",
+        "fr": "Basse-Californie"
+      },
+      "aliases": [
+        "Baja California"
+      ],
+      "regionType": "peninsula"
+    },
+    "Q6583": {
+      "names": {
+        "en": "Sahara",
+        "de": "Sahara",
+        "es": "Sahara",
+        "fr": "Sahara"
+      },
+      "aliases": [
+        "Sahara"
+      ],
+      "regionType": "desert"
+    },
+    "Q42070": {
+      "names": {
+        "en": "Gobi Desert",
+        "de": "Gobi",
+        "es": "Desierto de Gobi",
+        "fr": "désert de Gobi"
+      },
+      "aliases": [
+        "Gobi Desert"
+      ],
+      "regionType": "desert"
+    },
+    "Q47700": {
+      "names": {
+        "en": "Kalahari Desert",
+        "de": "Kalahari",
+        "es": "Kalahari",
+        "fr": "désert du Kalahari"
+      },
+      "aliases": [
+        "Kalahari Desert"
+      ],
+      "regionType": "desert"
+    },
+    "Q229269": {
+      "names": {
+        "en": "Rub' al Khali",
+        "de": "Rub al-Chali",
+        "es": "Desierto de Rub al-Jali",
+        "fr": "Rub al-Khali"
+      },
+      "aliases": [
+        "Rub’ Al Khali"
+      ],
+      "regionType": "desert"
+    },
+    "Q47141": {
+      "names": {
+        "en": "Atacama Desert",
+        "de": "Atacamawüste",
+        "es": "Desierto de Atacama",
+        "fr": "désert d'Atacama"
+      },
+      "aliases": [
+        "Desierto De Atacama"
+      ],
+      "regionType": "desert"
+    },
+    "Q131377": {
+      "names": {
+        "en": "Namib",
+        "de": "Namib",
+        "es": "Namib",
+        "fr": "désert du Namib"
+      },
+      "aliases": [
+        "Namib Desert"
+      ],
+      "regionType": "desert"
+    },
+    "Q172691": {
+      "names": {
+        "en": "Thar Desert",
+        "de": "Thar",
+        "es": "Desierto de Thar",
+        "fr": "désert du Thar"
+      },
+      "aliases": [
+        "Thar Desert"
+      ],
+      "regionType": "desert"
+    },
+    "Q189429": {
+      "names": {
+        "en": "Sonoran Desert",
+        "de": "Sonora-Wüste",
+        "es": "Desierto de Sonora",
+        "fr": "désert de Sonora"
+      },
+      "aliases": [
+        "Sonoran Desert"
+      ],
+      "regionType": "desert"
+    },
+    "Q179842": {
+      "names": {
+        "en": "Tibetan Plateau",
+        "de": "Hochland von Tibet",
+        "es": "Meseta Tibetana",
+        "fr": "Plateau tibétain"
+      },
+      "aliases": [
+        "Plateau Of Tibet"
+      ],
+      "regionType": "plateau"
+    },
+    "Q169966": {
+      "names": {
+        "en": "Deccan Plateau",
+        "de": "Dekkan",
+        "es": "Decán",
+        "fr": "Deccan"
+      },
+      "aliases": [
+        "Deccan Plateau"
+      ],
+      "regionType": "plateau"
+    },
+    "Q925906": {
+      "names": {
+        "en": "Colorado Plateau",
+        "de": "Colorado-Plateau",
+        "es": "Meseta del Colorado",
+        "fr": "plateau du Colorado"
+      },
+      "aliases": [
+        "Colorado Plateau"
+      ],
+      "regionType": "plateau"
+    },
+    "Q118574": {
+      "names": {
+        "en": "Altiplano",
+        "de": "Altiplano",
+        "es": "Altiplano",
+        "fr": "altiplano"
+      },
+      "aliases": [
+        "Altiplano"
+      ],
+      "regionType": "plateau"
+    }
+  }
+}

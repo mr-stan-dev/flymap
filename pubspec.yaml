@@ -72,6 +72,7 @@ flutter:
     - assets/data/learn/articles/
     - assets/data/geo_quiz/
     - assets/data/geo_quiz/countries/
+    - assets/data/geo_quiz/geography/
     - assets/data/ne_50m_land.geojson
     - assets/styles/openfreemap_offline_style.json
     - assets/styles/openfreemap_offline_fiord_style.json

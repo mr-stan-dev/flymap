@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:country_flags/country_flags.dart' as country_flags;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -8,6 +9,7 @@ import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/domain/entity/geo_quiz.dart';
 import 'package:flymap/domain/entity/learn_access.dart';
+import 'package:flymap/domain/entity/route_region_type.dart';
 import 'package:flymap/domain/entity/learn_article_content.dart';
 import 'package:flymap/domain/entity/learn_article_meta.dart';
 import 'package:flymap/domain/entity/learn_article_progress.dart';
@@ -25,7 +27,6 @@ import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/subscription/subscription_status.dart';
 import 'package:flymap/router/app_router.dart';
-import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/geo_quiz_entry_card.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/learn_article_screen.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/learn_tab.dart';
@@ -79,8 +80,9 @@ void main() {
     if (getIt.isRegistered<GeoQuizListCubit>()) {
       getIt.unregister<GeoQuizListCubit>();
     }
-    getIt.registerFactory<GeoQuizListCubit>(
-      () => GeoQuizListCubit(
+    getIt.registerFactoryParam<GeoQuizListCubit, String, Object?>(
+      (collectionId, _) => GeoQuizListCubit(
+        collectionId: collectionId,
         repository: getIt.get(),
         progressRepository: getIt.get(),
         analytics: getIt.get(),
@@ -135,15 +137,20 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Quizzes'), findsOneWidget);
+    expect(find.text('Geography'), findsOneWidget);
     expect(find.text('Countries on map'), findsOneWidget);
     expect(find.text('Start practicing'), findsNothing);
     expect(find.text('Free Cat'), findsOneWidget);
     expect(
       tester.getTopLeft(find.text('Countries on map')).dy,
+      lessThan(tester.getTopLeft(find.text('Geography')).dy),
+    );
+    expect(
+      tester.getTopLeft(find.text('Geography')).dy,
       lessThan(tester.getTopLeft(find.text('Free Cat')).dy),
     );
     expect(
-      tester.getTopLeft(find.byKey(GeoQuizEntryCard.imageKey)).dx,
+      tester.getTopLeft(find.byKey(CountriesQuizEntryCard.imageKey)).dx,
       lessThan(tester.getTopLeft(find.text('Countries on map')).dx),
     );
   });
@@ -181,8 +188,14 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byKey(GeoQuizEntryCard.finishedMetricKey), findsOneWidget);
-    expect(find.byKey(GeoQuizEntryCard.inProgressMetricKey), findsOneWidget);
+    expect(
+      find.byKey(CountriesQuizEntryCard.finishedMetricKey),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(CountriesQuizEntryCard.inProgressMetricKey),
+      findsOneWidget,
+    );
     expect(find.text('1 finished'), findsOneWidget);
     expect(find.text('1 in progress'), findsOneWidget);
     expect(find.text('Quizzes'), findsOneWidget);
@@ -222,9 +235,15 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byKey(GeoQuizEntryCard.allCompletedMetricKey), findsOneWidget);
+    expect(
+      find.byKey(CountriesQuizEntryCard.allCompletedMetricKey),
+      findsOneWidget,
+    );
     expect(find.text('All completed'), findsOneWidget);
-    expect(find.byKey(GeoQuizEntryCard.inProgressMetricKey), findsNothing);
+    expect(
+      find.byKey(CountriesQuizEntryCard.inProgressMetricKey),
+      findsNothing,
+    );
   });
 
   testWidgets('hides NEW badge on Geo Quiz card by default', (tester) async {
@@ -253,25 +272,73 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text('Geography'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Geography'), findsOneWidget);
+    expect(find.byKey(const Key('geoQuizGrid')), findsOneWidget);
+    final seasTile = find.byKey(const ValueKey('geoQuizTile.geography_seas'));
+    final mountainTile = find.byKey(
+      const ValueKey('geoQuizTile.geography_mountain_ranges'),
+    );
+    final lakesTile = find.byKey(const ValueKey('geoQuizTile.geography_lakes'));
+    final islandsTile = find.byKey(
+      const ValueKey('geoQuizTile.geography_islands'),
+    );
+    final otherTile = find.byKey(const ValueKey('geoQuizTile.geography_other'));
+    expect(seasTile, findsOneWidget);
+    expect(mountainTile, findsOneWidget);
+    expect(lakesTile, findsOneWidget);
+    expect(islandsTile, findsOneWidget);
+    expect(otherTile, findsOneWidget);
+    expect(find.byType(ProBadge), findsNWidgets(3));
+
+    final seasOffset = tester.getTopLeft(seasTile);
+    final mountainOffset = tester.getTopLeft(mountainTile);
+    final lakesOffset = tester.getTopLeft(lakesTile);
+    final islandsOffset = tester.getTopLeft(islandsTile);
+    final otherOffset = tester.getTopLeft(otherTile);
+    expect(seasOffset.dy, lessThanOrEqualTo(mountainOffset.dy));
+    expect(mountainOffset.dy, lessThanOrEqualTo(lakesOffset.dy));
+    expect(lakesOffset.dy, lessThanOrEqualTo(islandsOffset.dy));
+    expect(islandsOffset.dy, lessThanOrEqualTo(otherOffset.dy));
+    if (seasOffset.dy == mountainOffset.dy) {
+      expect(seasOffset.dx, lessThan(mountainOffset.dx));
+    }
+    if (mountainOffset.dy == lakesOffset.dy) {
+      expect(mountainOffset.dx, lessThan(lakesOffset.dx));
+    }
+    if (lakesOffset.dy == islandsOffset.dy) {
+      expect(lakesOffset.dx, lessThan(islandsOffset.dx));
+    }
+    if (islandsOffset.dy == otherOffset.dy) {
+      expect(islandsOffset.dx, lessThan(otherOffset.dx));
+    }
+
+    await tester.tap(seasTile);
+    await tester.pumpAndSettle();
+    expect(find.text('Seas'), findsOneWidget);
+    expect(find.byType(TextField), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
     await tester.tap(find.text('Countries on map'));
     await tester.pumpAndSettle();
 
     expect(find.text('Countries on map'), findsOneWidget);
     expect(find.byKey(const Key('geoQuizGrid')), findsOneWidget);
-    expect(find.text('Countries'), findsNothing);
     expect(find.text('Africa'), findsOneWidget);
     expect(find.byType(ProBadge), findsNWidgets(2));
-    final listOpened = analytics.logged
+    final listOpenedEvents = analytics.logged
         .whereType<GeoQuizListOpenedEvent>()
-        .single;
+        .toList();
+    expect(listOpenedEvents, hasLength(2));
+    final listOpened = listOpenedEvents.last;
     expect(listOpened.quizCount, 3);
     expect(listOpened.isProUser, isFalse);
-    expect(
-      tester
-          .widgetList<Icon>(find.byIcon(Icons.lock_outline_rounded))
-          .every((icon) => icon.color == DsBrandColors.proAmber),
-      isTrue,
-    );
 
     await tester.tap(find.text('Europe'));
     await tester.pump();
@@ -384,6 +451,75 @@ void main() {
     await tester.tap(find.text('Finish'));
     await tester.pumpAndSettle();
     expect(find.text('Quiz complete'), findsOneWidget);
+  });
+
+  testWidgets('country suggestions show flags and hint dialog opens', (
+    tester,
+  ) async {
+    final learnCubit = _buildLearnCubit(_FakeLearnRepository());
+
+    await tester.pumpWidget(
+      _testApp(isProUser: false, child: LearnTab(cubit: learnCubit)),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Countries on map'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Europe'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), 'fr');
+    await tester.pump();
+
+    final franceChip = find.widgetWithText(ActionChip, 'France');
+    expect(franceChip, findsOneWidget);
+    expect(
+      find.descendant(
+        of: franceChip,
+        matching: find.byWidgetPredicate(
+          (widget) => widget is country_flags.CountryFlag,
+        ),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const Key('geoQuizHintButton')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('geoQuizHintDialog')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('geoQuizHintTile.0')).first);
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.byKey(const Key('geoQuizHintDialog')), findsOneWidget);
+  });
+
+  testWidgets('geography suggestions show region icons', (tester) async {
+    final learnCubit = _buildLearnCubit(_FakeLearnRepository());
+
+    await tester.pumpWidget(
+      _testApp(isProUser: true, child: LearnTab(cubit: learnCubit)),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Geography'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('geoQuizTile.geography_seas')));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), 'med');
+    await tester.pump();
+
+    final seaChip = find.widgetWithText(ActionChip, 'Mediterranean Sea');
+    expect(seaChip, findsOneWidget);
+    expect(
+      find.descendant(
+        of: seaChip,
+        matching: find.byWidgetPredicate((widget) {
+          if (widget is! Image) return false;
+          final provider = widget.image;
+          return provider is AssetImage &&
+              provider.assetName == RouteRegionType.sea.assetImagePath;
+        }),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('free user can browse premium category article titles', (
@@ -774,6 +910,7 @@ class _FakeFlightUnlockRepository implements FlightUnlockRepository {
 class _FakeGeoQuizRepository implements GeoQuizRepository {
   static const _africaSummary = GeoQuizSummary(
     id: 'countries_africa',
+    collectionId: 'countries',
     title: 'Africa',
     subtitle: 'Countries',
     totalCount: 1,
@@ -781,21 +918,78 @@ class _FakeGeoQuizRepository implements GeoQuizRepository {
   );
   static const _europeSummary = GeoQuizSummary(
     id: 'countries_europe',
+    collectionId: 'countries',
     title: 'Europe',
     subtitle: 'Countries',
     totalCount: 2,
   );
   static const _worldSummary = GeoQuizSummary(
     id: 'countries_world',
+    collectionId: 'countries',
     title: 'World',
     subtitle: 'Countries',
     totalCount: 3,
     access: LearnAccess.pro,
   );
+  static const _seasSummary = GeoQuizSummary(
+    id: 'geography_seas',
+    collectionId: 'geography',
+    title: 'Seas',
+    subtitle: 'Seas',
+    totalCount: 1,
+    iconName: 'waves',
+  );
+  static const _mountainRangesSummary = GeoQuizSummary(
+    id: 'geography_mountain_ranges',
+    collectionId: 'geography',
+    title: 'Mountain ranges',
+    subtitle: 'Mountain ranges',
+    totalCount: 1,
+    iconName: 'terrain',
+  );
+  static const _lakesSummary = GeoQuizSummary(
+    id: 'geography_lakes',
+    collectionId: 'geography',
+    title: 'Lakes',
+    subtitle: 'Lakes',
+    totalCount: 1,
+    iconName: 'water',
+    access: LearnAccess.pro,
+  );
+  static const _islandsSummary = GeoQuizSummary(
+    id: 'geography_islands',
+    collectionId: 'geography',
+    title: 'Islands',
+    subtitle: 'Islands',
+    totalCount: 1,
+    iconName: 'landscape',
+    access: LearnAccess.pro,
+  );
+  static const _otherSummary = GeoQuizSummary(
+    id: 'geography_other',
+    collectionId: 'geography',
+    title: 'Other',
+    subtitle: 'Bays, straits, gulfs, deserts, and more',
+    totalCount: 1,
+    iconName: 'explore',
+    access: LearnAccess.pro,
+  );
 
   @override
-  Future<List<GeoQuizSummary>> getQuizzes() async {
-    return const [_africaSummary, _europeSummary, _worldSummary];
+  Future<List<GeoQuizSummary>> getQuizzes({
+    required String collectionId,
+  }) async {
+    return switch (collectionId) {
+      'countries' => const [_africaSummary, _europeSummary, _worldSummary],
+      'geography' => const [
+        _seasSummary,
+        _mountainRangesSummary,
+        _lakesSummary,
+        _islandsSummary,
+        _otherSummary,
+      ],
+      _ => const [],
+    };
   }
 
   @override
@@ -810,6 +1004,29 @@ class _FakeGeoQuizRepository implements GeoQuizRepository {
         GeoQuizRegion(id: 'FR', countryCode: 'FR', names: {'en': 'France'}),
         GeoQuizRegion(id: 'DE', countryCode: 'DE', names: {'en': 'Germany'}),
       ],
+      'geography_seas' => const [
+        GeoQuizRegion(
+          id: 'sea:med',
+          names: {'en': 'Mediterranean Sea'},
+          regionType: 'sea',
+        ),
+      ],
+      'geography_mountain_ranges' => const [
+        GeoQuizRegion(id: 'range:alps', names: {'en': 'Alps'}),
+      ],
+      'geography_lakes' => const [
+        GeoQuizRegion(id: 'lake:baikal', names: {'en': 'Lake Baikal'}),
+      ],
+      'geography_islands' => const [
+        GeoQuizRegion(id: 'island:madagascar', names: {'en': 'Madagascar'}),
+      ],
+      'geography_other' => const [
+        GeoQuizRegion(
+          id: 'bay:bengal',
+          names: {'en': 'Bay of Bengal'},
+          regionType: 'bay',
+        ),
+      ],
       _ => const [
         GeoQuizRegion(id: 'AO', countryCode: 'AO', names: {'en': 'Angola'}),
       ],
@@ -818,6 +1035,7 @@ class _FakeGeoQuizRepository implements GeoQuizRepository {
 
   @override
   Future<String?> getRegionDescription({
+    required String quizId,
     required String regionId,
     required String languageCode,
   }) async {

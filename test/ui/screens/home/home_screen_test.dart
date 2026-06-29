@@ -118,8 +118,9 @@ void main() {
       SharedPrefsGeoQuizProgressRepository(),
     );
     GetIt.I.registerSingleton<AppAnalytics>(const _FakeAppAnalytics());
-    GetIt.I.registerFactory<GeoQuizListCubit>(
-      () => GeoQuizListCubit(
+    GetIt.I.registerFactoryParam<GeoQuizListCubit, String, Object?>(
+      (collectionId, _) => GeoQuizListCubit(
+        collectionId: collectionId,
         repository: GetIt.I.get(),
         progressRepository: GetIt.I.get(),
         analytics: GetIt.I.get(),
@@ -618,15 +619,31 @@ class _FakeGeoQuizRepository implements GeoQuizRepository {
   const _FakeGeoQuizRepository();
 
   @override
-  Future<List<GeoQuizSummary>> getQuizzes() async {
-    return const [
-      GeoQuizSummary(
-        id: 'countries_africa',
-        title: 'Africa',
-        subtitle: 'Countries',
-        totalCount: 1,
-      ),
-    ];
+  Future<List<GeoQuizSummary>> getQuizzes({
+    required String collectionId,
+  }) async {
+    return switch (collectionId) {
+      'countries' => const [
+        GeoQuizSummary(
+          id: 'countries_africa',
+          collectionId: 'countries',
+          title: 'Africa',
+          subtitle: 'Countries',
+          totalCount: 1,
+        ),
+      ],
+      'geography' => const [
+        GeoQuizSummary(
+          id: 'geography_seas',
+          collectionId: 'geography',
+          title: 'Seas',
+          subtitle: 'Seas',
+          totalCount: 0,
+          iconName: 'waves',
+        ),
+      ],
+      _ => const [],
+    };
   }
 
   @override
@@ -638,6 +655,7 @@ class _FakeGeoQuizRepository implements GeoQuizRepository {
 
   @override
   Future<String?> getRegionDescription({
+    required String quizId,
     required String regionId,
     required String languageCode,
   }) async {

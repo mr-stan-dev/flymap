@@ -319,8 +319,9 @@ class DiModule {
     i.registerLazySingleton<GeoQuizProgressRepository>(
       () => SharedPrefsGeoQuizProgressRepository(),
     );
-    i.registerFactory<GeoQuizListCubit>(
-      () => GeoQuizListCubit(
+    i.registerFactoryParam<GeoQuizListCubit, String, Object?>(
+      (collectionId, _) => GeoQuizListCubit(
+        collectionId: collectionId,
         repository: i.get(),
         progressRepository: i.get(),
         analytics: i.get(),

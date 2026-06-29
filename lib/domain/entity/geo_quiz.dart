@@ -4,6 +4,7 @@ import 'package:flymap/domain/entity/learn_access.dart';
 class GeoQuizSummary extends Equatable {
   const GeoQuizSummary({
     required this.id,
+    required this.collectionId,
     required this.title,
     required this.subtitle,
     required this.totalCount,
@@ -13,6 +14,7 @@ class GeoQuizSummary extends Equatable {
   });
 
   final String id;
+  final String collectionId;
   final String title;
   final String subtitle;
   final int totalCount;
@@ -25,6 +27,7 @@ class GeoQuizSummary extends Equatable {
   @override
   List<Object?> get props => [
     id,
+    collectionId,
     title,
     subtitle,
     totalCount,
@@ -40,12 +43,14 @@ class GeoQuizRegion extends Equatable {
     required this.names,
     this.aliases = const <String>[],
     this.countryCode,
+    this.regionType,
   });
 
   final String id;
   final Map<String, String> names;
   final List<String> aliases;
   final String? countryCode;
+  final String? regionType;
 
   String labelForLanguage(String languageCode) {
     final localized = names[languageCode]?.trim();
@@ -69,7 +74,7 @@ class GeoQuizRegion extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, names, aliases, countryCode];
+  List<Object?> get props => [id, names, aliases, countryCode, regionType];
 }
 
 class GeoQuizProgress extends Equatable {
@@ -99,14 +104,16 @@ class GeoQuizAnswerSuggestion extends Equatable {
     required this.regionId,
     required this.label,
     this.countryCode,
+    this.regionType,
   });
 
   final String regionId;
   final String label;
   final String? countryCode;
+  final String? regionType;
 
   @override
-  List<Object?> get props => [regionId, label, countryCode];
+  List<Object?> get props => [regionId, label, countryCode, regionType];
 }
 
 class GeoQuizAnswerFeedback extends Equatable {

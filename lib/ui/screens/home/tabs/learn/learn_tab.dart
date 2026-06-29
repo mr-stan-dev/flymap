@@ -12,6 +12,35 @@ import 'package:flymap/ui/screens/home/tabs/learn/viewmodel/learn_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/viewmodel/learn_state.dart';
 import 'package:get_it/get_it.dart';
 
+({int finished, int inProgress, int total}) _geoQuizProgress(
+  GeoQuizListState state,
+) {
+  if (state is! GeoQuizListLoaded) {
+    return (finished: 0, inProgress: 0, total: 0);
+  }
+
+  var finished = 0;
+  var inProgress = 0;
+  for (final quiz in state.quizzes) {
+    final solved = state
+        .progressFor(quiz.id)
+        .solvedCount
+        .clamp(0, quiz.totalCount)
+        .toInt();
+    if (quiz.totalCount > 0 && solved >= quiz.totalCount) {
+      finished += 1;
+    } else if (solved > 0) {
+      inProgress += 1;
+    }
+  }
+
+  return (
+    finished: finished,
+    inProgress: inProgress,
+    total: state.quizzes.length,
+  );
+}
+
 class LearnTab extends StatelessWidget {
   const LearnTab({super.key, this.cubit, this.showGeoQuizNewBadge = false});
 
@@ -20,15 +49,8 @@ class LearnTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<LearnCubit>(
-          create: (_) => (cubit ?? LearnCubit())..load(),
-        ),
-        BlocProvider<GeoQuizListCubit>(
-          create: (_) => GetIt.I<GeoQuizListCubit>()..load(),
-        ),
-      ],
+    return BlocProvider<LearnCubit>(
+      create: (_) => (cubit ?? LearnCubit())..load(),
       child: _LearnCategoriesView(showGeoQuizNewBadge: showGeoQuizNewBadge),
     );
   }
@@ -63,30 +85,35 @@ class _LearnCategoriesView extends StatelessWidget {
                   );
                 }
                 if (index == 1) {
-                  return BlocBuilder<GeoQuizListCubit, GeoQuizListState>(
-                    builder: (context, geoQuizState) {
-                      final progress = _geoQuizProgress(geoQuizState);
-                      return GeoQuizEntryCard(
+                  return _GeoQuizCollectionCardLoader(
+                    collectionId: 'countries',
+                    screenTitle: context.t.learn.geoQuiz.countriesTitle,
+                    builder: (context, progress, openScreen) {
+                      return CountriesQuizEntryCard(
                         finishedCount: progress.finished,
                         inProgressCount: progress.inProgress,
                         totalCount: progress.total,
                         showNewBadge: showGeoQuizNewBadge,
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => const GeoQuizListScreen(),
-                            ),
-                          );
-                          if (!context.mounted) return;
-                          await context
-                              .read<GeoQuizListCubit>()
-                              .refreshProgress();
-                        },
+                        onTap: openScreen,
                       );
                     },
                   );
                 }
                 if (index == 2) {
+                  return _GeoQuizCollectionCardLoader(
+                    collectionId: 'geography',
+                    screenTitle: context.t.learn.geoQuiz.geographyTitle,
+                    builder: (context, progress, openScreen) {
+                      return GeographyQuizEntryCard(
+                        finishedCount: progress.finished,
+                        inProgressCount: progress.inProgress,
+                        totalCount: progress.total,
+                        onTap: openScreen,
+                      );
+                    },
+                  );
+                }
+                if (index == 3) {
                   return _LearnSectionTitle(
                     title: context.t.learn.articlesTitle,
                   );
@@ -98,7 +125,7 @@ class _LearnCategoriesView extends StatelessWidget {
                     icon: Icons.menu_book_outlined,
                   );
                 }
-                final category = categories[index - 3];
+                final category = categories[index - 4];
                 return LearnCategoryCard(
                   category: category,
                   onTap: () {
@@ -115,39 +142,53 @@ class _LearnCategoriesView extends StatelessWidget {
                 );
               },
               separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemCount: categories.isEmpty ? 4 : categories.length + 3,
+              itemCount: categories.isEmpty ? 5 : categories.length + 4,
             );
         }
       },
     );
   }
+}
 
-  ({int finished, int inProgress, int total}) _geoQuizProgress(
-    GeoQuizListState state,
-  ) {
-    if (state is! GeoQuizListLoaded) {
-      return (finished: 0, inProgress: 0, total: 0);
-    }
+typedef _GeoQuizCollectionCardBuilder =
+    Widget Function(
+      BuildContext context,
+      ({int finished, int inProgress, int total}) progress,
+      Future<void> Function() openScreen,
+    );
 
-    var finished = 0;
-    var inProgress = 0;
-    for (final quiz in state.quizzes) {
-      final solved = state
-          .progressFor(quiz.id)
-          .solvedCount
-          .clamp(0, quiz.totalCount)
-          .toInt();
-      if (quiz.totalCount > 0 && solved >= quiz.totalCount) {
-        finished += 1;
-      } else if (solved > 0) {
-        inProgress += 1;
-      }
-    }
+class _GeoQuizCollectionCardLoader extends StatelessWidget {
+  const _GeoQuizCollectionCardLoader({
+    required this.collectionId,
+    required this.screenTitle,
+    required this.builder,
+  });
 
-    return (
-      finished: finished,
-      inProgress: inProgress,
-      total: state.quizzes.length,
+  final String collectionId;
+  final String screenTitle;
+  final _GeoQuizCollectionCardBuilder builder;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<GeoQuizListCubit>(
+      create: (_) => GetIt.I<GeoQuizListCubit>(param1: collectionId)..load(),
+      child: BlocBuilder<GeoQuizListCubit, GeoQuizListState>(
+        builder: (context, state) {
+          final progress = _geoQuizProgress(state);
+          return builder(context, progress, () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => GeoQuizListScreen(
+                  collectionId: collectionId,
+                  title: screenTitle,
+                ),
+              ),
+            );
+            if (!context.mounted) return;
+            await context.read<GeoQuizListCubit>().refreshProgress();
+          });
+        },
+      ),
     );
   }
 }

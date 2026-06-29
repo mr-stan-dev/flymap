@@ -115,14 +115,17 @@ void main() {
     final repository = AssetGeoQuizRepository();
 
     final french = await repository.getRegionDescription(
+      quizId: 'countries_europe',
       regionId: 'FR',
       languageCode: 'fr',
     );
     final fallback = await repository.getRegionDescription(
+      quizId: 'countries_europe',
       regionId: 'FR',
       languageCode: 'it',
     );
     final missing = await repository.getRegionDescription(
+      quizId: 'countries_north_america',
       regionId: 'AG',
       languageCode: 'en',
     );
@@ -132,11 +135,48 @@ void main() {
     expect(missing, isNull);
   });
 
+  test('loads geography quizzes and generated region assets', () async {
+    final repository = AssetGeoQuizRepository();
+
+    final quizzes = await repository.getQuizzes(collectionId: 'geography');
+    final seas = await repository.getRegions(quizId: 'geography_seas');
+    final mountains = await repository.getRegions(
+      quizId: 'geography_mountain_ranges',
+    );
+
+    expect(quizzes.map((quiz) => quiz.title), [
+      'Seas',
+      'Mountain ranges',
+      'Lakes',
+      'Islands',
+      'Other',
+    ]);
+    expect(quizzes.take(2).every((quiz) => !quiz.isProOnly), isTrue);
+    expect(quizzes.skip(2).every((quiz) => quiz.isProOnly), isTrue);
+    expect(quizzes.first.totalCount, 30);
+    expect(quizzes[3].totalCount, 45);
+    expect(quizzes.last.totalCount, 52);
+    expect(
+      seas.map((region) => region.labelForLanguage('en')),
+      contains('Mediterranean Sea'),
+    );
+    expect(
+      mountains.map((region) => region.labelForLanguage('en')),
+      contains('Alps'),
+    );
+    expect(
+      seas.firstWhere((region) => region.id == 'Q4918').names,
+      containsPair('fr', 'mer Méditerranée'),
+    );
+    expect(seas.firstWhere((region) => region.id == 'Q4918').regionType, 'sea');
+  });
+
   test('filters suggestions from query and marks answer solved', () async {
     final progressRepository = _InMemoryGeoQuizProgressRepository();
     final cubit = _buildGeoQuizCubit(
       summary: const GeoQuizSummary(
         id: 'countries_africa',
+        collectionId: 'countries',
         title: 'Africa',
         subtitle: 'Countries',
         totalCount: 54,
@@ -156,9 +196,12 @@ void main() {
 
     cubit.updateQuery('eg');
     state = cubit.state as GeoQuizLoaded;
-    expect(state.suggestions.map((item) => item.label), ['Egypt']);
+    expect(state.suggestions.map((item) => item.label), contains('Egypt'));
+    expect(state.suggestions.first.label, 'Egypt');
 
-    await cubit.acceptSuggestion(state.suggestions.single);
+    await cubit.acceptSuggestion(
+      state.suggestions.firstWhere((item) => item.label == 'Egypt'),
+    );
     state = cubit.state as GeoQuizLoaded;
     expect(state.solvedCount, 0);
     expect(state.feedback?.isCorrect, isFalse);
@@ -166,9 +209,12 @@ void main() {
 
     cubit.updateQuery('can');
     state = cubit.state as GeoQuizLoaded;
-    expect(state.suggestions.map((item) => item.label), ['Canada']);
+    expect(state.suggestions.map((item) => item.label), contains('Canada'));
+    expect(state.suggestions.first.label, 'Canada');
 
-    await cubit.acceptSuggestion(state.suggestions.single);
+    await cubit.acceptSuggestion(
+      state.suggestions.firstWhere((item) => item.label == 'Canada'),
+    );
     state = cubit.state as GeoQuizLoaded;
     expect(state.solvedCount, 0);
     expect(state.feedback?.isCorrect, isFalse);
@@ -198,10 +244,36 @@ void main() {
     expect(state.suggestions.map((item) => item.label), ['Egypt']);
   });
 
+  test('geography suggestions only include quiz regions', () async {
+    final cubit = _buildGeoQuizCubit(
+      summary: const GeoQuizSummary(
+        id: 'geography_seas',
+        collectionId: 'geography',
+        title: 'Seas',
+        subtitle: 'Seas',
+        totalCount: 1,
+      ),
+      repository: _StaticGeoQuizRepository(),
+      progressRepository: _InMemoryGeoQuizProgressRepository(),
+    );
+    addTearDown(cubit.close);
+
+    await cubit.load();
+
+    cubit.updateQuery('fr');
+    var state = cubit.state as GeoQuizLoaded;
+    expect(state.suggestions, isEmpty);
+
+    cubit.updateQuery('dit');
+    state = cubit.state as GeoQuizLoaded;
+    expect(state.suggestions.map((item) => item.label), ['Mediterranean Sea']);
+  });
+
   test('accepting duplicate solved answer leaves progress unchanged', () async {
     final cubit = _buildGeoQuizCubit(
       summary: const GeoQuizSummary(
         id: 'countries_africa',
+        collectionId: 'countries',
         title: 'Africa',
         subtitle: 'Countries',
         totalCount: 54,
@@ -232,6 +304,7 @@ void main() {
     final cubit = _buildGeoQuizCubit(
       summary: const GeoQuizSummary(
         id: 'countries_africa',
+        collectionId: 'countries',
         title: 'Africa',
         subtitle: 'Countries',
         totalCount: 2,
@@ -253,6 +326,7 @@ void main() {
     final cubit = _buildGeoQuizCubit(
       summary: const GeoQuizSummary(
         id: 'countries_africa',
+        collectionId: 'countries',
         title: 'Africa',
         subtitle: 'Countries',
         totalCount: 54,
@@ -278,6 +352,7 @@ void main() {
     final cubit = _buildGeoQuizCubit(
       summary: const GeoQuizSummary(
         id: 'countries_africa',
+        collectionId: 'countries',
         title: 'Africa',
         subtitle: 'Countries',
         totalCount: 54,
@@ -303,6 +378,7 @@ void main() {
     final cubit = _buildGeoQuizCubit(
       summary: const GeoQuizSummary(
         id: 'countries_africa',
+        collectionId: 'countries',
         title: 'Africa',
         subtitle: 'Countries',
         totalCount: 2,
@@ -357,6 +433,7 @@ void main() {
     final cubit = _buildGeoQuizCubit(
       summary: const GeoQuizSummary(
         id: 'countries_africa',
+        collectionId: 'countries',
         title: 'Africa',
         subtitle: 'Countries',
         totalCount: 2,
@@ -387,6 +464,7 @@ void main() {
     final cubit = _buildGeoQuizCubit(
       summary: const GeoQuizSummary(
         id: 'countries_africa',
+        collectionId: 'countries',
         title: 'Africa',
         subtitle: 'Countries',
         totalCount: 2,
@@ -418,6 +496,7 @@ GeoQuizListCubit _buildListCubit({
   AppAnalytics? analytics,
 }) {
   return GeoQuizListCubit(
+    collectionId: 'countries',
     repository: repository,
     progressRepository: progressRepository,
     analytics: analytics ?? _RecordingAnalytics(),
@@ -503,6 +582,7 @@ class _InMemoryGeoQuizProgressRepository implements GeoQuizProgressRepository {
 class _StaticGeoQuizRepository implements GeoQuizRepository {
   static const _summary = GeoQuizSummary(
     id: 'countries_africa',
+    collectionId: 'countries',
     title: 'Africa',
     subtitle: 'Countries',
     totalCount: 2,
@@ -521,16 +601,36 @@ class _StaticGeoQuizRepository implements GeoQuizRepository {
     ),
   ];
 
+  static const _geographyRegions = <GeoQuizRegion>[
+    GeoQuizRegion(
+      id: 'Q4918',
+      names: {
+        'en': 'Mediterranean Sea',
+        'fr': 'mer Mediterranee',
+        'de': 'Mittelmeer',
+        'es': 'mar Mediterraneo',
+      },
+      regionType: 'sea',
+    ),
+  ];
+
   @override
-  Future<List<GeoQuizSummary>> getQuizzes() async => const [_summary];
+  Future<List<GeoQuizSummary>> getQuizzes({
+    required String collectionId,
+  }) async => collectionId == 'countries' ? const [_summary] : const [];
 
   @override
   Future<List<GeoQuizRegion>> getRegions({required String quizId}) async {
-    return quizId == _summary.id ? _regions : const <GeoQuizRegion>[];
+    return switch (quizId) {
+      'countries_africa' => _regions,
+      'geography_seas' => _geographyRegions,
+      _ => const <GeoQuizRegion>[],
+    };
   }
 
   @override
   Future<String?> getRegionDescription({
+    required String quizId,
     required String regionId,
     required String languageCode,
   }) async {

@@ -183,6 +183,7 @@ class GeoQuizCubit extends Cubit<GeoQuizState> {
 
   Future<String?> loadRegionDescription(String regionId) {
     return _repository.getRegionDescription(
+      quizId: _summary.id,
       regionId: regionId,
       languageCode: _languageCodeProvider(),
     );
@@ -312,44 +313,55 @@ class GeoQuizCubit extends Cubit<GeoQuizState> {
       }
     }
 
-    for (final countryCode in CountryNameUtils.countryCodes) {
-      final label = CountryNameUtils.fromCode(
-        countryCode,
-        languageCode: languageCode,
-      );
-      if (!_normalizeAnswer(label).startsWith(normalizedQuery)) continue;
+    if (state.summary.collectionId == 'countries') {
+      for (final countryCode in CountryNameUtils.countryCodes) {
+        final label = CountryNameUtils.fromCode(
+          countryCode,
+          languageCode: languageCode,
+        );
+        if (!_normalizeAnswer(label).contains(normalizedQuery)) continue;
 
-      final quizRegion = quizRegionByCountryCode[countryCode];
-      if (quizRegion != null &&
-          state.progress.solvedRegionIds.contains(quizRegion.id)) {
-        continue;
+        final quizRegion = quizRegionByCountryCode[countryCode];
+        if (quizRegion != null &&
+            state.progress.solvedRegionIds.contains(quizRegion.id)) {
+          continue;
+        }
+        addSuggestion(
+          GeoQuizAnswerSuggestion(
+            regionId: quizRegion?.id ?? 'country:$countryCode',
+            label: label,
+            countryCode: countryCode,
+            regionType: quizRegion?.regionType ?? 'country',
+          ),
+        );
       }
-      addSuggestion(
-        GeoQuizAnswerSuggestion(
-          regionId: quizRegion?.id ?? 'country:$countryCode',
-          label: label,
-          countryCode: countryCode,
-        ),
-      );
     }
 
     for (final region in state.regions) {
       if (state.progress.solvedRegionIds.contains(region.id)) continue;
       final labels = region.answerLabelsForLanguage(languageCode);
       for (final label in labels) {
-        if (!_normalizeAnswer(label).startsWith(normalizedQuery)) continue;
+        if (!_normalizeAnswer(label).contains(normalizedQuery)) continue;
         addSuggestion(
           GeoQuizAnswerSuggestion(
             regionId: region.id,
             label: label,
             countryCode: region.countryCode,
+            regionType: region.regionType,
           ),
         );
         break;
       }
     }
 
-    suggestions.sort((a, b) => a.label.compareTo(b.label));
+    suggestions.sort((a, b) {
+      final aIndex = _normalizeAnswer(a.label).indexOf(normalizedQuery);
+      final bIndex = _normalizeAnswer(b.label).indexOf(normalizedQuery);
+      if (aIndex != bIndex) return aIndex.compareTo(bIndex);
+      final lengthCompare = a.label.length.compareTo(b.label.length);
+      if (lengthCompare != 0) return lengthCompare;
+      return a.label.compareTo(b.label);
+    });
     return suggestions.take(6).toList(growable: false);
   }
 

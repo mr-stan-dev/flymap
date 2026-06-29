@@ -6,6 +6,7 @@ import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/geo_quiz_screen.dart';
+import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/geo_quiz_summary_localization.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_list_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_list_state.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
@@ -13,17 +14,23 @@ import 'package:flymap/ui/widgets/pro_widgets.dart';
 import 'package:get_it/get_it.dart';
 
 class GeoQuizListScreen extends StatelessWidget {
-  const GeoQuizListScreen({super.key});
+  const GeoQuizListScreen({
+    required this.collectionId,
+    required this.title,
+    super.key,
+  });
+
+  final String collectionId;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<GeoQuizListCubit>(
-      create: (providerContext) => GetIt.I<GeoQuizListCubit>()
-        ..open(
-          isProUser: providerContext.read<SubscriptionCubit>().state.isPro,
-        ),
+      create: (providerContext) => GetIt.I<GeoQuizListCubit>(
+        param1: collectionId,
+      )..open(isProUser: providerContext.read<SubscriptionCubit>().state.isPro),
       child: Scaffold(
-        appBar: AppBar(title: Text(context.t.learn.geoQuiz.countriesTitle)),
+        appBar: AppBar(title: Text(title)),
         body: const SafeArea(child: _GeoQuizListBody()),
       ),
     );
@@ -89,6 +96,7 @@ class _GeoQuizListBody extends StatelessWidget {
                         SizedBox(
                           width: tileWidth,
                           child: _GeoQuizGridTile(
+                            key: ValueKey('geoQuizTile.${quiz.id}'),
                             quiz: quiz,
                             progress: state.progressFor(quiz.id),
                             locked: !isProUser && quiz.isProOnly,
@@ -173,6 +181,7 @@ class _GeoQuizGridTile extends StatelessWidget {
     required this.progress,
     required this.locked,
     required this.onTap,
+    super.key,
   });
 
   final GeoQuizSummary quiz;
@@ -187,6 +196,8 @@ class _GeoQuizGridTile extends StatelessWidget {
     final solved = progress.solvedCount.clamp(0, quiz.totalCount).toInt();
     final fraction = quiz.totalCount <= 0 ? 0.0 : solved / quiz.totalCount;
     final isComplete = quiz.totalCount > 0 && solved >= quiz.totalCount;
+    final localizedTitle = localizedGeoQuizTitle(context.t, quiz);
+    final localizedSubtitle = localizedGeoQuizSubtitle(context.t, quiz);
     return Card(
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
@@ -201,11 +212,7 @@ class _GeoQuizGridTile extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                    locked
-                        ? Icons.lock_outline_rounded
-                        : isComplete
-                        ? Icons.check_circle
-                        : Icons.public,
+                    locked ? Icons.lock_outline_rounded : Icons.public,
                     color: locked
                         ? DsBrandColors.proAmber
                         : isComplete
@@ -234,11 +241,21 @@ class _GeoQuizGridTile extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                quiz.title,
+                localizedTitle,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                localizedSubtitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 12),

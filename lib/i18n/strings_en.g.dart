@@ -1808,6 +1808,12 @@ class TranslationsLearnGeoQuizEn {
 	/// en: 'Geo Quiz'
 	String get title => 'Geo Quiz';
 
+	/// en: 'Geography'
+	String get geographyTitle => 'Geography';
+
+	/// en: 'Seas, mountain ranges, lakes, islands, and more'
+	String get geographySubtitle => 'Seas, mountain ranges, lakes, islands, and more';
+
 	/// en: 'Countries on map'
 	String get countriesTitle => 'Countries on map';
 
@@ -1829,8 +1835,8 @@ class TranslationsLearnGeoQuizEn {
 	/// en: 'Geo quizzes will appear here soon.'
 	String get emptySubtitle => 'Geo quizzes will appear here soon.';
 
-	/// en: 'Country name...'
-	String get countryHint => 'Country name...';
+	/// en: 'Region name...'
+	String get countryHint => 'Region name...';
 
 	/// en: '$solved / $total'
 	String progressCount({required Object solved, required Object total}) => '${solved} / ${total}';
@@ -1855,6 +1861,12 @@ class TranslationsLearnGeoQuizEn {
 
 	/// en: 'Wrong'
 	String get wrong => 'Wrong';
+
+	/// en: 'Hint'
+	String get hintTitle => 'Hint';
+
+	/// en: 'Tap on a letter to reveal'
+	String get hintSubtitle => 'Tap on a letter to reveal';
 
 	/// en: 'Next'
 	String get next => 'Next';
@@ -1891,6 +1903,51 @@ class TranslationsLearnGeoQuizEn {
 
 	/// en: 'All completed'
 	String get progressAllCompleted => 'All completed';
+
+	/// en: 'Africa'
+	String get quizCountriesAfricaTitle => 'Africa';
+
+	/// en: 'Europe'
+	String get quizCountriesEuropeTitle => 'Europe';
+
+	/// en: 'Asia'
+	String get quizCountriesAsiaTitle => 'Asia';
+
+	/// en: 'North America'
+	String get quizCountriesNorthAmericaTitle => 'North America';
+
+	/// en: 'South America'
+	String get quizCountriesSouthAmericaTitle => 'South America';
+
+	/// en: 'Oceania'
+	String get quizCountriesOceaniaTitle => 'Oceania';
+
+	/// en: 'All Countries'
+	String get quizCountriesAllTitle => 'All Countries';
+
+	/// en: 'Countries'
+	String get quizCountriesSubtitle => 'Countries';
+
+	/// en: 'World'
+	String get quizCountriesAllSubtitle => 'World';
+
+	/// en: 'Seas'
+	String get quizGeographySeasTitle => 'Seas';
+
+	/// en: 'Mountain ranges'
+	String get quizGeographyMountainRangesTitle => 'Mountain ranges';
+
+	/// en: 'Lakes'
+	String get quizGeographyLakesTitle => 'Lakes';
+
+	/// en: 'Islands'
+	String get quizGeographyIslandsTitle => 'Islands';
+
+	/// en: 'Other'
+	String get quizGeographyOtherTitle => 'Other';
+
+	/// en: 'Bays, straits, gulfs, deserts, and more'
+	String get quizGeographyOtherSubtitle => 'Bays, straits, gulfs, deserts, and more';
 
 	/// en: 'Description is not available yet.'
 	String get descriptionUnavailable => 'Description is not available yet.';
@@ -3245,6 +3302,8 @@ extension on Translations {
 			'learn.quizzesTitle' => 'Quizzes',
 			'learn.articlesTitle' => 'Articles',
 			'learn.geoQuiz.title' => 'Geo Quiz',
+			'learn.geoQuiz.geographyTitle' => 'Geography',
+			'learn.geoQuiz.geographySubtitle' => 'Seas, mountain ranges, lakes, islands, and more',
 			'learn.geoQuiz.countriesTitle' => 'Countries on map',
 			'learn.geoQuiz.subtitle' => 'Guess the country from its outline',
 			'learn.geoQuiz.loading' => 'Loading Geo Quiz...',
@@ -3252,7 +3311,7 @@ extension on Translations {
 			'learn.geoQuiz.failedToLoadQuiz' => 'Failed to load quiz',
 			'learn.geoQuiz.emptyTitle' => 'No quizzes yet',
 			'learn.geoQuiz.emptySubtitle' => 'Geo quizzes will appear here soon.',
-			'learn.geoQuiz.countryHint' => 'Country name...',
+			'learn.geoQuiz.countryHint' => 'Region name...',
 			'learn.geoQuiz.progressCount' => ({required Object solved, required Object total}) => '${solved} / ${total}',
 			'learn.geoQuiz.nextCount' => ({required Object next, required Object total}) => '${next} of ${total}',
 			'learn.geoQuiz.correctCount' => ({required Object count}) => '${count} correct',
@@ -3261,6 +3320,8 @@ extension on Translations {
 			'learn.geoQuiz.newBadge' => 'NEW',
 			'learn.geoQuiz.correct' => 'Correct',
 			'learn.geoQuiz.wrong' => 'Wrong',
+			'learn.geoQuiz.hintTitle' => 'Hint',
+			'learn.geoQuiz.hintSubtitle' => 'Tap on a letter to reveal',
 			'learn.geoQuiz.next' => 'Next',
 			'learn.geoQuiz.pause' => 'Pause',
 			'learn.geoQuiz.resume' => 'Resume',
@@ -3273,6 +3334,21 @@ extension on Translations {
 			'learn.geoQuiz.progressFinished' => ({required Object count}) => '${count} finished',
 			'learn.geoQuiz.progressInProgress' => ({required Object count}) => '${count} in progress',
 			'learn.geoQuiz.progressAllCompleted' => 'All completed',
+			'learn.geoQuiz.quizCountriesAfricaTitle' => 'Africa',
+			'learn.geoQuiz.quizCountriesEuropeTitle' => 'Europe',
+			'learn.geoQuiz.quizCountriesAsiaTitle' => 'Asia',
+			'learn.geoQuiz.quizCountriesNorthAmericaTitle' => 'North America',
+			'learn.geoQuiz.quizCountriesSouthAmericaTitle' => 'South America',
+			'learn.geoQuiz.quizCountriesOceaniaTitle' => 'Oceania',
+			'learn.geoQuiz.quizCountriesAllTitle' => 'All Countries',
+			'learn.geoQuiz.quizCountriesSubtitle' => 'Countries',
+			'learn.geoQuiz.quizCountriesAllSubtitle' => 'World',
+			'learn.geoQuiz.quizGeographySeasTitle' => 'Seas',
+			'learn.geoQuiz.quizGeographyMountainRangesTitle' => 'Mountain ranges',
+			'learn.geoQuiz.quizGeographyLakesTitle' => 'Lakes',
+			'learn.geoQuiz.quizGeographyIslandsTitle' => 'Islands',
+			'learn.geoQuiz.quizGeographyOtherTitle' => 'Other',
+			'learn.geoQuiz.quizGeographyOtherSubtitle' => 'Bays, straits, gulfs, deserts, and more',
 			'learn.geoQuiz.descriptionUnavailable' => 'Description is not available yet.',
 			'settings.title' => 'Settings',
 			'settings.loading' => 'Loading settings...',
@@ -3663,6 +3739,8 @@ extension on Translations {
 			'flight.map.validationFailed' => 'Offline map validation failed. Please re-download this route.',
 			'flight.map.loadStyleFailed' => 'Could not load offline map style.',
 			'flight.map.sunriseInMinutes' => ({required Object minutes}) => 'Sunrise in ${minutes} min',
+			_ => null,
+		} ?? switch (path) {
 			'flight.map.sunsetInMinutes' => ({required Object minutes}) => 'Sunset in ${minutes} min',
 			'flight.map.switchTo2D' => 'Switch to 2D',
 			'flight.map.switchTo3D' => 'Switch to 3D',
@@ -3682,8 +3760,6 @@ extension on Translations {
 			'flight.dashboard.accuracyPoor' => 'Poor',
 			'flight.dashboard.gpsOff' => 'GPS off',
 			'flight.dashboard.gpsOffHint' => 'Enable location services to start tracking.',
-			_ => null,
-		} ?? switch (path) {
 			'flight.dashboard.gpsPermissionRequired' => 'Location permission required',
 			'flight.dashboard.gpsPermissionHint' => 'Grant permission to access live flight telemetry.',
 			'flight.dashboard.gpsSearching' => 'Searching for GPS',

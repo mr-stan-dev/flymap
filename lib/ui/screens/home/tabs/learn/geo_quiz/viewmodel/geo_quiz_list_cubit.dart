@@ -9,14 +9,17 @@ import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_li
 
 class GeoQuizListCubit extends Cubit<GeoQuizListState> {
   GeoQuizListCubit({
+    required String collectionId,
     required GeoQuizRepository repository,
     required GeoQuizProgressRepository progressRepository,
     required AppAnalytics analytics,
-  }) : _repository = repository,
+  }) : _collectionId = collectionId,
+       _repository = repository,
        _progressRepository = progressRepository,
        _analytics = analytics,
        super(const GeoQuizListLoading());
 
+  final String _collectionId;
   final GeoQuizRepository _repository;
   final GeoQuizProgressRepository _progressRepository;
   final AppAnalytics _analytics;
@@ -42,7 +45,7 @@ class GeoQuizListCubit extends Cubit<GeoQuizListState> {
   Future<void> load() async {
     emit(const GeoQuizListLoading());
     try {
-      final quizzes = await _repository.getQuizzes();
+      final quizzes = await _repository.getQuizzes(collectionId: _collectionId);
       final progressByQuizId = await _progressRepository.getByQuizIds(
         quizzes.map((quiz) => quiz.id),
       );

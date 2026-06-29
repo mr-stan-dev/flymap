@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 
-class GeoQuizEntryCard extends StatelessWidget {
-  const GeoQuizEntryCard({
+class CountriesQuizEntryCard extends StatelessWidget {
+  const CountriesQuizEntryCard({
     required this.onTap,
     required this.finishedCount,
     required this.inProgressCount,
@@ -40,7 +40,11 @@ class GeoQuizEntryCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const _GeoQuizIllustration(size: 72),
+                  const _GeoQuizIllustration(
+                    size: 72,
+                    assetPath: 'assets/images/quiz/countries_quiz.webp',
+                    imageKey: CountriesQuizEntryCard.imageKey,
+                  ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
@@ -80,6 +84,80 @@ class GeoQuizEntryCard extends StatelessWidget {
             if (showNewBadge)
               const Positioned(top: 12, right: 12, child: _NewBadge()),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class GeographyQuizEntryCard extends StatelessWidget {
+  const GeographyQuizEntryCard({
+    required this.onTap,
+    required this.finishedCount,
+    required this.inProgressCount,
+    required this.totalCount,
+    super.key,
+  });
+
+  static const imageKey = Key('learn.geo_quiz.geography_image');
+
+  final VoidCallback onTap;
+  final int finishedCount;
+  final int inProgressCount;
+  final int totalCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _GeoQuizIllustration(
+                size: 72,
+                assetPath: 'assets/images/quiz/geography_quiz.webp',
+                imageKey: imageKey,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      context.t.learn.geoQuiz.geographyTitle,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      context.t.learn.geoQuiz.geographySubtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                        height: 1.25,
+                      ),
+                    ),
+                    const SizedBox(height: 9),
+                    _CompactProgress(
+                      finishedCount: finishedCount,
+                      inProgressCount: inProgressCount,
+                      totalCount: totalCount,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -128,7 +206,7 @@ class _CompactProgress extends StatelessWidget {
 
     if (totalCount > 0 && finishedCount >= totalCount) {
       return _ProgressMetric(
-        key: GeoQuizEntryCard.allCompletedMetricKey,
+        key: CountriesQuizEntryCard.allCompletedMetricKey,
         icon: Icons.check_circle_rounded,
         label: context.t.learn.geoQuiz.progressAllCompleted,
         color: success,
@@ -141,7 +219,7 @@ class _CompactProgress extends StatelessWidget {
       children: [
         if (inProgressCount > 0)
           _ProgressMetric(
-            key: GeoQuizEntryCard.inProgressMetricKey,
+            key: CountriesQuizEntryCard.inProgressMetricKey,
             icon: Icons.donut_small_rounded,
             label: context.t.learn.geoQuiz.progressInProgress(
               count: inProgressCount,
@@ -150,7 +228,7 @@ class _CompactProgress extends StatelessWidget {
           ),
         if (finishedCount > 0)
           _ProgressMetric(
-            key: GeoQuizEntryCard.finishedMetricKey,
+            key: CountriesQuizEntryCard.finishedMetricKey,
             icon: Icons.check_circle_rounded,
             label: context.t.learn.geoQuiz.progressFinished(
               count: finishedCount,
@@ -197,9 +275,15 @@ class _ProgressMetric extends StatelessWidget {
 }
 
 class _GeoQuizIllustration extends StatelessWidget {
-  const _GeoQuizIllustration({required this.size});
+  const _GeoQuizIllustration({
+    required this.size,
+    required this.assetPath,
+    this.imageKey,
+  });
 
   final double size;
+  final String assetPath;
+  final Key? imageKey;
 
   @override
   Widget build(BuildContext context) {
@@ -218,8 +302,8 @@ class _GeoQuizIllustration extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Image.asset(
-            'assets/images/quiz/countries_quiz.webp',
-            key: GeoQuizEntryCard.imageKey,
+            assetPath,
+            key: imageKey,
             fit: BoxFit.cover,
             excludeFromSemantics: true,
           ),
@@ -236,7 +320,7 @@ class _NewBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return DecoratedBox(
-      key: GeoQuizEntryCard.newBadgeKey,
+      key: CountriesQuizEntryCard.newBadgeKey,
       decoration: BoxDecoration(
         color: scheme.error,
         borderRadius: BorderRadius.circular(999),

@@ -2,14 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:country_flags/country_flags.dart' as country_flags;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:country_flags/country_flags.dart' as country_flags;
 import 'package:flymap/domain/entity/geo_quiz.dart';
+import 'package:flymap/domain/entity/route_region_type.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
+import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/geo_quiz_summary_localization.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_state.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
@@ -44,7 +46,7 @@ class _GeoQuizScaffold extends StatelessWidget {
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text(summary.title),
+        title: Text(localizedGeoQuizTitle(context.t, summary)),
         backgroundColor: Theme.of(
           context,
         ).colorScheme.surface.withValues(alpha: 0.92),
@@ -1050,14 +1052,13 @@ class _GeoQuizVectorMapState extends State<_GeoQuizVectorMap> {
 
     var minLat = points.first.latitude;
     var maxLat = points.first.latitude;
-    var minLon = points.first.longitude;
-    var maxLon = points.first.longitude;
+    final rawLongitudes = <double>[];
     for (final point in points) {
       if (point.latitude < minLat) minLat = point.latitude;
       if (point.latitude > maxLat) maxLat = point.latitude;
-      if (point.longitude < minLon) minLon = point.longitude;
-      if (point.longitude > maxLon) maxLon = point.longitude;
+      rawLongitudes.add(point.longitude);
     }
+    var (:minLon, :maxLon) = _minimalLongitudeWindow(rawLongitudes);
 
     const minSpan = 2.4;
     final latSpan = (maxLat - minLat).abs();
@@ -1139,6 +1140,48 @@ class _GeoQuizVectorMapState extends State<_GeoQuizVectorMap> {
     if (maxSpan >= 25) return 1.35;
     if (maxSpan >= 10) return 1.65;
     return 2.25;
+  }
+
+  ({double minLon, double maxLon}) _minimalLongitudeWindow(
+    List<double> rawLongitudes,
+  ) {
+    if (rawLongitudes.isEmpty) {
+      return (minLon: -180.0, maxLon: 180.0);
+    }
+    final normalized =
+        rawLongitudes.map((value) => value < 0 ? value + 360.0 : value).toList()
+          ..sort();
+    if (normalized.length == 1) {
+      final longitude = normalized.single > 180
+          ? normalized.single - 360
+          : normalized.single;
+      return (minLon: longitude, maxLon: longitude);
+    }
+
+    var largestGap = -1.0;
+    var cutIndex = 0;
+    for (var index = 0; index < normalized.length; index++) {
+      final current = normalized[index];
+      final next = index == normalized.length - 1
+          ? normalized.first + 360.0
+          : normalized[index + 1];
+      final gap = next - current;
+      if (gap > largestGap) {
+        largestGap = gap;
+        cutIndex = index;
+      }
+    }
+
+    var minLon = normalized[(cutIndex + 1) % normalized.length];
+    var maxLon = normalized[cutIndex];
+    if (minLon > maxLon) {
+      maxLon += 360.0;
+    }
+    while (minLon > 180.0) {
+      minLon -= 360.0;
+      maxLon -= 360.0;
+    }
+    return (minLon: minLon, maxLon: maxLon);
   }
 
   void _collectGeoJsonPositions(dynamic node, List<LatLng> points) {
@@ -1576,7 +1619,7 @@ class _GeoQuizCompletionOverlay extends StatelessWidget {
                   Text(
                     context.t.learn.geoQuiz.completeMessage(
                       total: state.totalCount,
-                      quiz: state.summary.title,
+                      quiz: localizedGeoQuizTitle(context.t, state.summary),
                     ),
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -1658,7 +1701,7 @@ class _GeoQuizCountryHeader extends StatelessWidget {
         SizedBox(
           width: 42,
           height: 42,
-          child: _SuggestionFlag(countryCode: countryCode, size: 42),
+          child: _CountryCodeFlag(countryCode: countryCode, size: 42),
         ),
         const SizedBox(width: 14),
         Expanded(
@@ -1672,6 +1715,32 @@ class _GeoQuizCountryHeader extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _CountryCodeFlag extends StatelessWidget {
+  const _CountryCodeFlag({required this.countryCode, required this.size});
+
+  final String? countryCode;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final normalizedCode = countryCode?.trim();
+    if (normalizedCode != null && normalizedCode.length == 2) {
+      return SizedBox(
+        width: size,
+        height: size,
+        child: country_flags.CountryFlag.fromCountryCode(
+          normalizedCode,
+          width: size,
+          height: size,
+          shape: country_flags.Circle(),
+        ),
+      );
+    }
+    final theme = Theme.of(context);
+    return Icon(Icons.public, size: size, color: theme.colorScheme.primary);
   }
 }
 
@@ -1731,6 +1800,16 @@ class _GeoQuizAnswerPanelState extends State<_GeoQuizAnswerPanel> {
   late final TextEditingController _controller = TextEditingController(
     text: widget.state.query,
   );
+
+  Future<void> _openHintDialog() async {
+    final region = widget.state.currentRegion;
+    if (region == null) return;
+    final answer = context.read<GeoQuizCubit>().regionLabel(region);
+    await showDialog<void>(
+      context: context,
+      builder: (context) => _GeoQuizHintDialog(answer: answer),
+    );
+  }
 
   @override
   void didUpdateWidget(covariant _GeoQuizAnswerPanel oldWidget) {
@@ -1819,13 +1898,21 @@ class _GeoQuizAnswerPanelState extends State<_GeoQuizAnswerPanel> {
                     ),
                   ),
                   const Spacer(),
-                  IconButton.filledTonal(
-                    visualDensity: VisualDensity.compact,
+                  _GeoQuizPanelActionButton(
+                    key: const Key('geoQuizHintButton'),
+                    icon: Icons.lightbulb_outline,
+                    tooltip: context.t.learn.geoQuiz.hintTitle,
+                    onPressed: widget.state.currentRegion == null
+                        ? null
+                        : _openHintDialog,
+                  ),
+                  const SizedBox(width: 8),
+                  _GeoQuizPanelActionButton(
+                    icon: Icons.skip_next,
                     tooltip: context.t.learn.geoQuiz.next,
                     onPressed: widget.state.currentRegionId == null
                         ? null
                         : context.read<GeoQuizCubit>().skipCurrentRegion,
-                    icon: const Icon(Icons.skip_next),
                   ),
                 ],
               ),
@@ -1852,6 +1939,347 @@ class _GeoQuizAnswerPanelState extends State<_GeoQuizAnswerPanel> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+}
+
+class _GeoQuizPanelActionButton extends StatelessWidget {
+  const _GeoQuizPanelActionButton({
+    super.key,
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Tooltip(
+      message: tooltip,
+      child: SizedBox(
+        height: 40,
+        child: OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(40, 40),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.compact,
+            backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.72),
+            side: BorderSide(
+              color: theme.colorScheme.outline.withValues(alpha: 0.18),
+            ),
+            shape: const StadiumBorder(),
+          ),
+          onPressed: onPressed,
+          child: Icon(icon, size: 20),
+        ),
+      ),
+    );
+  }
+}
+
+class _GeoQuizHintDialog extends StatefulWidget {
+  const _GeoQuizHintDialog({required this.answer});
+
+  final String answer;
+
+  @override
+  State<_GeoQuizHintDialog> createState() => _GeoQuizHintDialogState();
+}
+
+class _GeoQuizHintDialogState extends State<_GeoQuizHintDialog> {
+  static const _revealDuration = Duration(seconds: 3);
+  static const _hintTileWidth = 34.0;
+  static const _hintTileHeight = 44.0;
+
+  final Set<int> _revealedIndices = <int>{};
+  int? _revealingIndex;
+
+  bool _isRevealableCharacter(String character) {
+    final codeUnit = character.codeUnitAt(0);
+    final isUppercaseLatin = codeUnit >= 65 && codeUnit <= 90;
+    final isLowercaseLatin = codeUnit >= 97 && codeUnit <= 122;
+    final isDigit = codeUnit >= 48 && codeUnit <= 57;
+    return isUppercaseLatin || isLowercaseLatin || isDigit;
+  }
+
+  void _startReveal(int index) {
+    if (_revealingIndex != null || _revealedIndices.contains(index)) return;
+    setState(() {
+      _revealingIndex = index;
+    });
+  }
+
+  void _finishReveal(int index) {
+    if (!mounted || _revealingIndex != index) return;
+    setState(() {
+      _revealingIndex = null;
+      _revealedIndices.add(index);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final characters = widget.answer.characters.toList(growable: false);
+    return AlertDialog(
+      key: const Key('geoQuizHintDialog'),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      titlePadding: const EdgeInsets.fromLTRB(24, 22, 24, 0),
+      contentPadding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
+      actionsPadding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+      title: Text(
+        context.t.learn.geoQuiz.hintTitle,
+        style: theme.textTheme.titleLarge?.copyWith(
+          color: theme.colorScheme.onSurface,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+      content: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 360),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              context.t.learn.geoQuiz.hintSubtitle,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Wrap(
+              spacing: 8,
+              runSpacing: 10,
+              children: [
+                for (var index = 0; index < characters.length; index++)
+                  _buildHintCharacterTile(
+                    context,
+                    character: characters[index],
+                    index: index,
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        SecondaryButton(
+          label: context.t.common.ok,
+          compact: true,
+          expand: false,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHintCharacterTile(
+    BuildContext context, {
+    required String character,
+    required int index,
+  }) {
+    final theme = Theme.of(context);
+    if (character == ' ') {
+      return const SizedBox(width: 10, height: 44);
+    }
+    final shouldReveal = _isRevealableCharacter(character);
+    if (!shouldReveal) {
+      return SizedBox(
+        height: 44,
+        child: Center(
+          child: Text(
+            character,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+      );
+    }
+
+    final isRevealed = _revealedIndices.contains(index);
+    final isRevealing = _revealingIndex == index;
+    final isEnabled = !isRevealed && !isRevealing && _revealingIndex == null;
+    final borderColor = isRevealed || isRevealing
+        ? theme.colorScheme.primary
+        : theme.colorScheme.outline.withValues(alpha: 0.28);
+    final baseColor = isRevealed
+        ? theme.colorScheme.primaryContainer
+        : theme.colorScheme.surfaceContainerHighest;
+    final placeholderColor = theme.colorScheme.onSurfaceVariant.withValues(
+      alpha: isRevealing ? 0.3 : 0.45,
+    );
+
+    return SizedBox(
+      key: ValueKey('geoQuizHintTile.$index'),
+      width: _hintTileWidth,
+      height: _hintTileHeight,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: isEnabled ? () => _startReveal(index) : null,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: baseColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: borderColor),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(11),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  if (isRevealing)
+                    TweenAnimationBuilder<double>(
+                      key: ValueKey('hintReveal.$index'),
+                      duration: _revealDuration,
+                      tween: Tween(begin: 0, end: 1),
+                      onEnd: () => _finishReveal(index),
+                      builder: (context, value, child) {
+                        final fillHeight = _hintTileHeight * value;
+                        final scannerAlignment = Alignment(0, -1 + (2 * value));
+                        return Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primary.withValues(
+                                  alpha: 0.08,
+                                ),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: FractionallySizedBox(
+                                heightFactor: value,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary.withValues(
+                                      alpha: 0.18,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              height: fillHeight,
+                              child: ClipRect(
+                                child: OverflowBox(
+                                  minWidth: _hintTileWidth,
+                                  maxWidth: _hintTileWidth,
+                                  minHeight: _hintTileHeight,
+                                  maxHeight: _hintTileHeight,
+                                  alignment: Alignment.topCenter,
+                                  child: SizedBox(
+                                    width: _hintTileWidth,
+                                    height: _hintTileHeight,
+                                    child: Center(
+                                      child: Text(
+                                        character.toUpperCase(),
+                                        style: theme.textTheme.titleMedium
+                                            ?.copyWith(
+                                              color: theme
+                                                  .colorScheme
+                                                  .onPrimaryContainer,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned.fill(
+                              child: Align(
+                                alignment: scannerAlignment,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        theme.colorScheme.primary.withValues(
+                                          alpha: 0,
+                                        ),
+                                        theme.colorScheme.primary.withValues(
+                                          alpha: 0.55,
+                                        ),
+                                        theme.colorScheme.primary.withValues(
+                                          alpha: 0.9,
+                                        ),
+                                        theme.colorScheme.primary.withValues(
+                                          alpha: 0.2,
+                                        ),
+                                      ],
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: theme.colorScheme.primary
+                                            .withValues(alpha: 0.28),
+                                        blurRadius: 6,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
+                                  ),
+                                  child: const SizedBox(
+                                    height: 6,
+                                    width: double.infinity,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  if (!isRevealed)
+                    Center(
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 180),
+                        opacity: isRevealing ? 0 : 1,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: placeholderColor,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: const SizedBox(width: 14, height: 4),
+                        ),
+                      ),
+                    ),
+                  Center(
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 180),
+                      opacity: isRevealed
+                          ? 1
+                          : isRevealing
+                          ? 0
+                          : 0,
+                      child: Text(
+                        character.toUpperCase(),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -1933,7 +2361,7 @@ class _SuggestionsList extends StatelessWidget {
             visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             padding: const EdgeInsets.symmetric(horizontal: 6),
-            avatar: _SuggestionFlag(countryCode: suggestion.countryCode),
+            avatar: _SuggestionLeadingIcon(suggestion: suggestion),
             label: Text(
               suggestion.label,
               maxLines: 1,
@@ -1960,33 +2388,47 @@ class _SuggestionsList extends StatelessWidget {
   }
 }
 
-class _SuggestionFlag extends StatelessWidget {
-  const _SuggestionFlag({required this.countryCode, this.size = 18});
+class _SuggestionLeadingIcon extends StatelessWidget {
+  const _SuggestionLeadingIcon({required this.suggestion});
 
-  final String? countryCode;
-  final double size;
+  final GeoQuizAnswerSuggestion suggestion;
 
   @override
   Widget build(BuildContext context) {
-    final normalizedCode = countryCode?.trim();
-    if (normalizedCode != null && normalizedCode.length == 2) {
+    final countryCode = suggestion.countryCode?.trim().toUpperCase();
+    if (countryCode != null && countryCode.isNotEmpty) {
       return SizedBox(
-        width: size,
-        height: size,
-        child: country_flags.CountryFlag.fromCountryCode(
-          normalizedCode,
-          width: size,
-          height: size,
-          shape: country_flags.Circle(),
+        width: 18,
+        height: 18,
+        child: _CountryCodeFlag(countryCode: countryCode, size: 18),
+      );
+    }
+    final regionType = RouteRegionType.fromApiValue(
+      suggestion.regionType ?? 'unknown',
+    );
+    final assetPath = regionType.assetImagePath;
+    final theme = Theme.of(context);
+    if (assetPath != null) {
+      return ClipOval(
+        child: SizedBox(
+          width: 18,
+          height: 18,
+          child: Image.asset(
+            assetPath,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => Icon(
+              Icons.public,
+              size: 18,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
         ),
       );
     }
-
-    final theme = Theme.of(context);
     return Icon(
-      Icons.flag_outlined,
+      Icons.public,
+      size: 18,
       color: theme.colorScheme.onSurfaceVariant,
-      size: size,
     );
   }
 }

@@ -738,6 +738,8 @@ class _TranslationsLearnGeoQuizEs extends TranslationsLearnGeoQuizEn {
 
 	// Translations
 	@override String get title => 'Geo Quiz';
+	@override String get geographyTitle => 'Geografía';
+	@override String get geographySubtitle => 'Mares, cordilleras, lagos, islas y más';
 	@override String get countriesTitle => 'Países en el mapa';
 	@override String get subtitle => 'Adivina el país por su contorno';
 	@override String get loading => 'Cargando Geo Quiz...';
@@ -745,7 +747,7 @@ class _TranslationsLearnGeoQuizEs extends TranslationsLearnGeoQuizEn {
 	@override String get failedToLoadQuiz => 'No se pudo cargar el cuestionario';
 	@override String get emptyTitle => 'Aún no hay cuestionarios';
 	@override String get emptySubtitle => 'Los geo quizzes aparecerán aquí pronto.';
-	@override String get countryHint => 'Nombre del país...';
+	@override String get countryHint => 'Nombre de la región...';
 	@override String progressCount({required Object solved, required Object total}) => '${solved} / ${total}';
 	@override String nextCount({required Object next, required Object total}) => '${next} de ${total}';
 	@override String correctCount({required Object count}) => '${count} correctos';
@@ -754,6 +756,8 @@ class _TranslationsLearnGeoQuizEs extends TranslationsLearnGeoQuizEn {
 	@override String get newBadge => 'NUEVO';
 	@override String get correct => 'Correcto';
 	@override String get wrong => 'Incorrecto';
+	@override String get hintTitle => 'Pista';
+	@override String get hintSubtitle => 'Toca una letra para revelarla';
 	@override String get next => 'Siguiente';
 	@override String get pause => 'Pausar';
 	@override String get resume => 'Reanudar';
@@ -766,6 +770,21 @@ class _TranslationsLearnGeoQuizEs extends TranslationsLearnGeoQuizEn {
 	@override String progressFinished({required Object count}) => '${count} terminados';
 	@override String progressInProgress({required Object count}) => '${count} en curso';
 	@override String get progressAllCompleted => 'Todos completados';
+	@override String get quizCountriesAfricaTitle => 'África';
+	@override String get quizCountriesEuropeTitle => 'Europa';
+	@override String get quizCountriesAsiaTitle => 'Asia';
+	@override String get quizCountriesNorthAmericaTitle => 'Norteamérica';
+	@override String get quizCountriesSouthAmericaTitle => 'Sudamérica';
+	@override String get quizCountriesOceaniaTitle => 'Oceanía';
+	@override String get quizCountriesAllTitle => 'Todos los países';
+	@override String get quizCountriesSubtitle => 'Países';
+	@override String get quizCountriesAllSubtitle => 'Mundo';
+	@override String get quizGeographySeasTitle => 'Mares';
+	@override String get quizGeographyMountainRangesTitle => 'Cordilleras';
+	@override String get quizGeographyLakesTitle => 'Lagos';
+	@override String get quizGeographyIslandsTitle => 'Islas';
+	@override String get quizGeographyOtherTitle => 'Otros';
+	@override String get quizGeographyOtherSubtitle => 'Bahías, estrechos, golfos, desiertos y más';
 	@override String get descriptionUnavailable => 'La descripción aún no está disponible.';
 }
 
@@ -1402,6 +1421,8 @@ extension on TranslationsEs {
 			'learn.quizzesTitle' => 'Cuestionarios',
 			'learn.articlesTitle' => 'Artículos',
 			'learn.geoQuiz.title' => 'Geo Quiz',
+			'learn.geoQuiz.geographyTitle' => 'Geografía',
+			'learn.geoQuiz.geographySubtitle' => 'Mares, cordilleras, lagos, islas y más',
 			'learn.geoQuiz.countriesTitle' => 'Países en el mapa',
 			'learn.geoQuiz.subtitle' => 'Adivina el país por su contorno',
 			'learn.geoQuiz.loading' => 'Cargando Geo Quiz...',
@@ -1409,7 +1430,7 @@ extension on TranslationsEs {
 			'learn.geoQuiz.failedToLoadQuiz' => 'No se pudo cargar el cuestionario',
 			'learn.geoQuiz.emptyTitle' => 'Aún no hay cuestionarios',
 			'learn.geoQuiz.emptySubtitle' => 'Los geo quizzes aparecerán aquí pronto.',
-			'learn.geoQuiz.countryHint' => 'Nombre del país...',
+			'learn.geoQuiz.countryHint' => 'Nombre de la región...',
 			'learn.geoQuiz.progressCount' => ({required Object solved, required Object total}) => '${solved} / ${total}',
 			'learn.geoQuiz.nextCount' => ({required Object next, required Object total}) => '${next} de ${total}',
 			'learn.geoQuiz.correctCount' => ({required Object count}) => '${count} correctos',
@@ -1418,6 +1439,8 @@ extension on TranslationsEs {
 			'learn.geoQuiz.newBadge' => 'NUEVO',
 			'learn.geoQuiz.correct' => 'Correcto',
 			'learn.geoQuiz.wrong' => 'Incorrecto',
+			'learn.geoQuiz.hintTitle' => 'Pista',
+			'learn.geoQuiz.hintSubtitle' => 'Toca una letra para revelarla',
 			'learn.geoQuiz.next' => 'Siguiente',
 			'learn.geoQuiz.pause' => 'Pausar',
 			'learn.geoQuiz.resume' => 'Reanudar',
@@ -1430,6 +1453,21 @@ extension on TranslationsEs {
 			'learn.geoQuiz.progressFinished' => ({required Object count}) => '${count} terminados',
 			'learn.geoQuiz.progressInProgress' => ({required Object count}) => '${count} en curso',
 			'learn.geoQuiz.progressAllCompleted' => 'Todos completados',
+			'learn.geoQuiz.quizCountriesAfricaTitle' => 'África',
+			'learn.geoQuiz.quizCountriesEuropeTitle' => 'Europa',
+			'learn.geoQuiz.quizCountriesAsiaTitle' => 'Asia',
+			'learn.geoQuiz.quizCountriesNorthAmericaTitle' => 'Norteamérica',
+			'learn.geoQuiz.quizCountriesSouthAmericaTitle' => 'Sudamérica',
+			'learn.geoQuiz.quizCountriesOceaniaTitle' => 'Oceanía',
+			'learn.geoQuiz.quizCountriesAllTitle' => 'Todos los países',
+			'learn.geoQuiz.quizCountriesSubtitle' => 'Países',
+			'learn.geoQuiz.quizCountriesAllSubtitle' => 'Mundo',
+			'learn.geoQuiz.quizGeographySeasTitle' => 'Mares',
+			'learn.geoQuiz.quizGeographyMountainRangesTitle' => 'Cordilleras',
+			'learn.geoQuiz.quizGeographyLakesTitle' => 'Lagos',
+			'learn.geoQuiz.quizGeographyIslandsTitle' => 'Islas',
+			'learn.geoQuiz.quizGeographyOtherTitle' => 'Otros',
+			'learn.geoQuiz.quizGeographyOtherSubtitle' => 'Bahías, estrechos, golfos, desiertos y más',
 			'learn.geoQuiz.descriptionUnavailable' => 'La descripción aún no está disponible.',
 			'settings.title' => 'Ajustes',
 			'settings.loading' => 'Cargando ajustes...',
@@ -1820,6 +1858,8 @@ extension on TranslationsEs {
 			'flight.map.validationFailed' => 'La validación del mapa offline falló. Vuelve a descargar esta ruta.',
 			'flight.map.loadStyleFailed' => 'No se pudo cargar el estilo del mapa offline.',
 			'flight.map.sunriseInMinutes' => ({required Object minutes}) => 'Amanecer en ${minutes} min',
+			_ => null,
+		} ?? switch (path) {
 			'flight.map.sunsetInMinutes' => ({required Object minutes}) => 'Atardecer en ${minutes} min',
 			'flight.map.switchTo2D' => 'Cambiar a 2D',
 			'flight.map.switchTo3D' => 'Cambiar a 3D',
@@ -1839,8 +1879,6 @@ extension on TranslationsEs {
 			'flight.dashboard.accuracyPoor' => 'Baja',
 			'flight.dashboard.gpsOff' => 'GPS apagado',
 			'flight.dashboard.gpsOffHint' => 'Activa los servicios de ubicación para empezar el seguimiento.',
-			_ => null,
-		} ?? switch (path) {
 			'flight.dashboard.gpsPermissionRequired' => 'Permiso de GPS requerido',
 			'flight.dashboard.gpsPermissionHint' => 'Concede permiso para acceder a la telemetría en vivo del vuelo.',
 			'flight.dashboard.gpsSearching' => 'Buscando GPS',
