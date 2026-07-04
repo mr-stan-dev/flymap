@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sky_camera/src/domain/models/sky_camera_overlay_snapshot.dart';
-import 'package:sky_camera/src/presentation/formatters/sky_camera_flag_emoji.dart';
+import 'package:sky_camera/src/presentation/formatters/sky_camera_route_presentation.dart';
 import 'package:sky_camera/src/presentation/formatters/sky_camera_telemetry_formatter.dart';
 import 'package:sky_camera/src/presentation/sky_camera_metrics_position.dart';
 import 'package:sky_camera/src/presentation/sky_camera_strings.dart';
@@ -34,8 +34,11 @@ class SkyCameraOverlayView extends StatelessWidget {
       strings: strings,
     );
     final showsMetrics = formatter.visibleMetricDisplays.isNotEmpty;
-    final shouldShowRouteHeader = _shouldShowRouteHeader();
-    final routeSubtitle = _routeSubtitle();
+    final route = SkyCameraRoutePresentation.fromSnapshot(snapshot);
+    final shouldShowRouteHeader =
+        route.originDisplay.isNotEmpty ||
+        route.destinationDisplay.isNotEmpty ||
+        route.subtitle != null;
     return FittedBox(
       fit: BoxFit.fill,
       child: SizedBox(
@@ -91,12 +94,9 @@ class SkyCameraOverlayView extends StatelessWidget {
                               const SizedBox(height: 18),
                             if (shouldShowRouteHeader)
                               _SkyCameraRouteHeader(
-                                originCode: snapshot.originCode,
-                                destinationCode: snapshot.destinationCode,
-                                originCountryCode: snapshot.originCountryCode,
-                                destinationCountryCode:
-                                    snapshot.destinationCountryCode,
-                                subtitle: routeSubtitle,
+                                originDisplay: route.originDisplay,
+                                destinationDisplay: route.destinationDisplay,
+                                subtitle: route.subtitle,
                               ),
                             const Spacer(),
                           ],
@@ -123,56 +123,28 @@ class SkyCameraOverlayView extends StatelessWidget {
       ),
     );
   }
-
-  String? _routeSubtitle() {
-    final subtitle = snapshot.routeLabel.trim();
-    if (subtitle.isEmpty) return null;
-    final normalized = subtitle
-        .replaceAll('->', '→')
-        .replaceAll(RegExp(r'\s+'), '')
-        .toUpperCase();
-    final currentRoute = '${snapshot.originCode}→${snapshot.destinationCode}'
-        .toUpperCase();
-    if (normalized == currentRoute) {
-      return null;
-    }
-    return subtitle;
-  }
-
-  bool _shouldShowRouteHeader() {
-    return snapshot.originCode.trim().isNotEmpty ||
-        snapshot.destinationCode.trim().isNotEmpty ||
-        _routeSubtitle() != null;
-  }
 }
 
 class _SkyCameraRouteHeader extends StatelessWidget {
   const _SkyCameraRouteHeader({
-    required this.originCode,
-    required this.destinationCode,
-    required this.originCountryCode,
-    required this.destinationCountryCode,
+    required this.originDisplay,
+    required this.destinationDisplay,
     required this.subtitle,
   });
 
-  final String originCode;
-  final String destinationCode;
-  final String originCountryCode;
-  final String destinationCountryCode;
+  final String originDisplay;
+  final String destinationDisplay;
   final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
-    final originFlag = skyCameraFlagEmoji(originCountryCode);
-    final destinationFlag = skyCameraFlagEmoji(destinationCountryCode);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text.rich(
           TextSpan(
             children: [
-              if (originFlag.isNotEmpty) TextSpan(text: '$originFlag '),
-              TextSpan(text: originCode),
+              TextSpan(text: originDisplay),
               const WidgetSpan(
                 alignment: PlaceholderAlignment.middle,
                 child: Padding(
@@ -184,9 +156,7 @@ class _SkyCameraRouteHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              if (destinationFlag.isNotEmpty)
-                TextSpan(text: '$destinationFlag '),
-              TextSpan(text: destinationCode),
+              TextSpan(text: destinationDisplay),
             ],
           ),
           style: const TextStyle(

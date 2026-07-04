@@ -35,6 +35,12 @@ class SkyCameraOverlaySnapshot {
   final double? horizontalAccuracyMeters;
   final double? outsideTemperatureCelsius;
 
+  bool get isDomestic {
+    final origin = originCountryCode.trim().toUpperCase();
+    final destination = destinationCountryCode.trim().toUpperCase();
+    return origin.isNotEmpty && origin == destination;
+  }
+
   Map<String, Object?> toJson() {
     return <String, Object?>{
       'timestamp': timestamp.toIso8601String(),

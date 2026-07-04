@@ -141,6 +141,39 @@ void main() {
     expect(find.byKey(const Key('sky_camera.brand_logo')), findsOneWidget);
   });
 
+  testWidgets('domestic route keeps flags and omits country codes', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SkyCameraScreen(
+          driver: _FakeSkyCameraDriver(),
+          snapshotSource: _FakeSnapshotSource(
+            snapshot: _testSnapshot(
+              routeLabel: 'London, GB → Manchester, GB',
+              originCode: 'LHR',
+              destinationCode: 'MAN',
+              originCountryCode: 'GB',
+              destinationCountryCode: 'GB',
+            ),
+          ),
+          exportService: _FakeExportService(),
+          observer: const _FakeObserver(),
+          photoCropper: const _FakePhotoCropper(),
+          openCapturePreview: _openFakeCapturePreview,
+          overlayComposer: const SkyCameraOverlayComposer(),
+          strings: _strings,
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('London → Manchester'), findsOneWidget);
+    expect(find.textContaining('🇬🇧'), findsOneWidget);
+    expect(find.textContaining(', GB'), findsNothing);
+  });
+
   testWidgets('captures and saves an overlay photo', (tester) async {
     final exportService = _FakeExportService();
     final driver = _FakeSkyCameraDriver();

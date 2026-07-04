@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flymap/domain/entity/route_region.dart';
 import 'package:flymap/domain/entity/route_region_type.dart';
+import 'package:flymap/domain/policy/domestic_route_policy.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/utils/country_name_utils.dart';
 
@@ -89,9 +90,10 @@ class ShareFlightCardPolicy {
       departureCountryCode,
     );
     final normalizedArrivalCountry = _normalizeCountryCode(arrivalCountryCode);
-    final isDomesticFlight =
-        normalizedDepartureCountry.isNotEmpty &&
-        normalizedDepartureCountry == normalizedArrivalCountry;
+    final isDomesticFlight = DomesticRoutePolicy.isDomestic(
+      originCountryCode: normalizedDepartureCountry,
+      destinationCountryCode: normalizedArrivalCountry,
+    );
 
     final departureChip = isDomesticFlight
         ? _airportCityChip(

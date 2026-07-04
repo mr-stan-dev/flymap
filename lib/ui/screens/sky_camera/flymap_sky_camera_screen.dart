@@ -158,8 +158,10 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
           ? arrival.city.trim()
           : arrival.nameShort;
       return FlymapSkyCameraPlaceholderCopy(
-        routeLabel:
-            '$departureCity, ${departure.countryCode} → $arrivalCity, ${arrival.countryCode}',
+        routeLabel: flight.route.isDomestic
+            ? '$departureCity → $arrivalCity'
+            : '$departureCity, ${departure.countryCode} → '
+                  '$arrivalCity, ${arrival.countryCode}',
         originCode: departure.displayCode,
         destinationCode: arrival.displayCode,
         originCountryCode: departure.countryCode,

@@ -3,6 +3,7 @@ import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight_route_metrics.dart';
 import 'package:flymap/domain/entity/flight_route_source.dart';
 import 'package:flymap/domain/policy/flight_duration_estimate_policy.dart';
+import 'package:flymap/domain/policy/domestic_route_policy.dart';
 import 'package:flymap/domain/entity/flight_waypoint.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -31,6 +32,11 @@ class FlightRoute extends Equatable {
   }) : legacyDistanceInKm = distanceInKm;
 
   String get routeCode => '${departure.primaryCode}_${arrival.primaryCode}';
+
+  bool get isDomestic => DomesticRoutePolicy.isDomestic(
+    originCountryCode: departure.countryCode,
+    destinationCountryCode: arrival.countryCode,
+  );
 
   double get primaryDistanceKm {
     if (isHistoricalTrack) {

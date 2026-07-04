@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sky_camera/src/domain/models/sky_camera_overlay_snapshot.dart';
-import 'package:sky_camera/src/presentation/formatters/sky_camera_flag_emoji.dart';
+import 'package:sky_camera/src/presentation/formatters/sky_camera_route_presentation.dart';
 import 'package:sky_camera/src/presentation/formatters/sky_camera_telemetry_formatter.dart';
 import 'package:sky_camera/src/presentation/sky_camera_metrics_position.dart';
 import 'package:sky_camera/src/presentation/sky_camera_signal_bar_metrics.dart';
@@ -43,7 +43,7 @@ class SkyCameraOverlayComposer {
       strings: strings,
     );
     final visibleMetrics = formatter.visibleMetricDisplays;
-    final routeSubtitle = _routeSubtitle(snapshot);
+    final route = SkyCameraRoutePresentation.fromSnapshot(snapshot);
 
     canvas.drawRect(
       rect,
@@ -82,8 +82,7 @@ class SkyCameraOverlayComposer {
     }
     _drawRouteHeader(
       canvas,
-      snapshot: snapshot,
-      subtitle: routeSubtitle,
+      route: route,
       theme: theme,
       top: routeTop + techStripHeight,
     );
@@ -147,12 +146,13 @@ class SkyCameraOverlayComposer {
 
   void _drawRouteHeader(
     Canvas canvas, {
-    required SkyCameraOverlaySnapshot snapshot,
-    required String? subtitle,
+    required SkyCameraRoutePresentation route,
     required _OverlayTheme theme,
     required double top,
   }) {
-    if (!_shouldShowRouteHeader(snapshot, subtitle)) {
+    if (route.originDisplay.isEmpty &&
+        route.destinationDisplay.isEmpty &&
+        route.subtitle == null) {
       return;
     }
     final codeStyle = TextStyle(
@@ -166,17 +166,12 @@ class SkyCameraOverlayComposer {
     );
     final arrowStyle = codeStyle.copyWith(fontSize: theme.arrowFontSize);
 
-    final originDisplay = _flaggedCode(
-      skyCameraFlagEmoji(snapshot.originCountryCode),
-      snapshot.originCode,
-    );
-    final destinationDisplay = _flaggedCode(
-      skyCameraFlagEmoji(snapshot.destinationCountryCode),
-      snapshot.destinationCode,
-    );
-    final originPainter = _textPainter(originDisplay, codeStyle);
+    final originPainter = _textPainter(route.originDisplay, codeStyle);
     final arrowPainter = _textPainter('→', arrowStyle);
-    final destinationPainter = _textPainter(destinationDisplay, codeStyle);
+    final destinationPainter = _textPainter(
+      route.destinationDisplay,
+      codeStyle,
+    );
 
     final baseLeft = theme.margin;
     originPainter.paint(canvas, Offset(baseLeft, top));
@@ -189,21 +184,16 @@ class SkyCameraOverlayComposer {
         arrowLeft + arrowPainter.width + theme.routeInlineGap;
     destinationPainter.paint(canvas, Offset(destinationLeft, top));
 
-    if (subtitle == null) return;
+    if (route.subtitle == null) return;
     _drawText(
       canvas,
-      text: subtitle,
+      text: route.subtitle!,
       offset: Offset(baseLeft, top + theme.routeSubtitleTopOffset),
       fontSize: theme.routeSubtitleFontSize,
       fontWeight: FontWeight.w500,
       color: Colors.white.withValues(alpha: 0.94),
       maxWidth: theme.width - (theme.margin * 2),
     );
-  }
-
-  String _flaggedCode(String flag, String code) {
-    if (flag.isEmpty) return code;
-    return '$flag $code';
   }
 
   void _drawTechStrip(
@@ -464,30 +454,6 @@ class SkyCameraOverlayComposer {
       maxWidth: maxWidth,
     );
     painter.paint(canvas, offset);
-  }
-
-  String? _routeSubtitle(SkyCameraOverlaySnapshot snapshot) {
-    final subtitle = snapshot.routeLabel.trim();
-    if (subtitle.isEmpty) return null;
-    final normalized = subtitle
-        .replaceAll('->', '→')
-        .replaceAll(RegExp(r'\s+'), '')
-        .toUpperCase();
-    final currentRoute = '${snapshot.originCode}→${snapshot.destinationCode}'
-        .toUpperCase();
-    if (normalized == currentRoute) {
-      return null;
-    }
-    return subtitle;
-  }
-
-  bool _shouldShowRouteHeader(
-    SkyCameraOverlaySnapshot snapshot,
-    String? subtitle,
-  ) {
-    return snapshot.originCode.trim().isNotEmpty ||
-        snapshot.destinationCode.trim().isNotEmpty ||
-        (subtitle?.trim().isNotEmpty ?? false);
   }
 }
 

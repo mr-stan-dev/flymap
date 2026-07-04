@@ -18,7 +18,7 @@ class RouteUtils {
     final languageCode = Localizations.localeOf(context).languageCode;
     final depCode = route.departure.countryCode;
     final arrCode = route.arrival.countryCode;
-    if (depCode == arrCode) {
+    if (route.isDomestic) {
       return CountryNameUtils.fromCode(depCode, languageCode: languageCode);
     }
     return '${CountryNameUtils.fromCode(depCode, languageCode: languageCode)} • ${CountryNameUtils.fromCode(arrCode, languageCode: languageCode)}';
