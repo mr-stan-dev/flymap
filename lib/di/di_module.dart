@@ -345,7 +345,7 @@ class DiModule {
       ),
     );
     i.registerLazySingleton<FlymapSkyCameraShareService>(
-      FlymapSkyCameraShareService.new,
+      () => FlymapSkyCameraShareService(analytics: i.get()),
     );
     i.registerLazySingleton<FlymapSkyCameraSessionFactory>(
       () => FlymapSkyCameraSessionFactory(

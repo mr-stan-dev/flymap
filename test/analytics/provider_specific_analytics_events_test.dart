@@ -77,36 +77,18 @@ void main() {
       hasActiveFlightContext: false,
       hasLiveLocation: false,
     );
-    const captured = SkyCameraPhotoCapturedEvent(
+    const captured = SkyPhotoCaptureEvent(
       hasActiveFlightContext: true,
       hasLiveLocation: true,
     );
-    const saved = SkyCameraPhotoSavedEvent(
-      hasActiveFlightContext: true,
-      hasLiveLocation: true,
-      saveCleanCopy: true,
-      saveOverlayCopy: true,
-    );
-    const shared = SkyCameraShareTappedEvent(
-      hasActiveFlightContext: true,
-      hasLiveLocation: false,
-    );
+    const shared = SkyPhotoShareEvent();
 
     expect(opened.firebaseParameters, isEmpty);
+    expect(captured.firebaseEventName, 'sky_photo_captured');
     expect(captured.firebaseParameters, <String, Object>{
       'overlay_mode': 'placeholder_v1',
     });
-    expect(saved.postHogParameters, <String, Object>{
-      'has_active_flight_context': true,
-      'has_live_location': true,
-      'overlay_mode': 'placeholder_v1',
-      'save_clean_copy': true,
-      'save_overlay_copy': true,
-    });
-    expect(shared.postHogParameters, <String, Object>{
-      'has_active_flight_context': true,
-      'has_live_location': false,
-      'overlay_mode': 'placeholder_v1',
-    });
+    expect(shared.firebaseEventName, 'sky_photo_share');
+    expect(shared.postHogParameters, isEmpty);
   });
 }

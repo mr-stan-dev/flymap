@@ -34,9 +34,8 @@ export 'package:flymap/analytics/events/search_route_prepared_event.dart';
 export 'package:flymap/analytics/events/share_card_generated_event.dart';
 export 'package:flymap/analytics/events/share_card_shared_event.dart';
 export 'package:flymap/analytics/events/sky_camera_opened_event.dart';
-export 'package:flymap/analytics/events/sky_camera_photo_captured_event.dart';
-export 'package:flymap/analytics/events/sky_camera_photo_saved_event.dart';
-export 'package:flymap/analytics/events/sky_camera_share_tapped_event.dart';
+export 'package:flymap/analytics/events/sky_photo_capture_event.dart';
+export 'package:flymap/analytics/events/sky_photo_share_event.dart';
 export 'package:flymap/analytics/events/subscription_status_changed_event.dart';
 
 abstract class AppAnalytics {

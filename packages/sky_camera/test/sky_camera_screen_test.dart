@@ -969,18 +969,6 @@ class _FakeObserver implements SkyCameraObserver {
   Future<void> onPhotoCaptured({
     required SkyCameraOverlaySnapshot snapshot,
   }) async {}
-
-  @override
-  Future<void> onPhotoSaved({
-    required SkyCameraOverlaySnapshot snapshot,
-    required bool saveCleanCopy,
-    required bool saveOverlayCopy,
-  }) async {}
-
-  @override
-  Future<void> onShareTapped({
-    required SkyCameraOverlaySnapshot snapshot,
-  }) async {}
 }
 
 SkyCameraOverlaySnapshot _testSnapshot({

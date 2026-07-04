@@ -864,7 +864,9 @@ class _FakeFlymapSkyCameraSessionFactory extends FlymapSkyCameraSessionFactory {
            flightRepository: flightRepository,
            mediaRepository: mediaRepository,
          ),
-         shareService: FlymapSkyCameraShareService(),
+         shareService: FlymapSkyCameraShareService(
+           analytics: const _FakeAppAnalytics(),
+         ),
          analytics: const _FakeAppAnalytics(),
          locationService: AppLocationService(
            client: const _FakeAppLocationClient(),
@@ -1053,18 +1055,6 @@ class _NoopSkyCameraObserver implements SkyCameraObserver {
 
   @override
   Future<void> onPhotoCaptured({
-    required SkyCameraOverlaySnapshot snapshot,
-  }) async {}
-
-  @override
-  Future<void> onPhotoSaved({
-    required SkyCameraOverlaySnapshot snapshot,
-    required bool saveCleanCopy,
-    required bool saveOverlayCopy,
-  }) async {}
-
-  @override
-  Future<void> onShareTapped({
     required SkyCameraOverlaySnapshot snapshot,
   }) async {}
 }

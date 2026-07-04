@@ -43,11 +43,6 @@ class SkyCameraCaptureCoordinator {
       snapshot: snapshot,
       overlayBytes: overlayBytes,
     );
-    await observer.onPhotoSaved(
-      snapshot: snapshot,
-      saveCleanCopy: true,
-      saveOverlayCopy: true,
-    );
     return saved;
   }
 }

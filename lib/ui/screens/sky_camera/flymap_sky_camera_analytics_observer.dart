@@ -29,35 +29,7 @@ class FlymapSkyCameraAnalyticsObserver implements SkyCameraObserver {
     required SkyCameraOverlaySnapshot snapshot,
   }) async {
     await analytics.log(
-      SkyCameraPhotoCapturedEvent(
-        hasActiveFlightContext: await _hasActiveFlightContext,
-        hasLiveLocation: snapshot.hasLiveLocation,
-      ),
-    );
-  }
-
-  @override
-  Future<void> onPhotoSaved({
-    required SkyCameraOverlaySnapshot snapshot,
-    required bool saveCleanCopy,
-    required bool saveOverlayCopy,
-  }) async {
-    await analytics.log(
-      SkyCameraPhotoSavedEvent(
-        hasActiveFlightContext: await _hasActiveFlightContext,
-        hasLiveLocation: snapshot.hasLiveLocation,
-        saveCleanCopy: saveCleanCopy,
-        saveOverlayCopy: saveOverlayCopy,
-      ),
-    );
-  }
-
-  @override
-  Future<void> onShareTapped({
-    required SkyCameraOverlaySnapshot snapshot,
-  }) async {
-    await analytics.log(
-      SkyCameraShareTappedEvent(
+      SkyPhotoCaptureEvent(
         hasActiveFlightContext: await _hasActiveFlightContext,
         hasLiveLocation: snapshot.hasLiveLocation,
       ),
