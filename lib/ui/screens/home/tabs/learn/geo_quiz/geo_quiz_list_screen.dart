@@ -197,7 +197,6 @@ class _GeoQuizGridTile extends StatelessWidget {
     final fraction = quiz.totalCount <= 0 ? 0.0 : solved / quiz.totalCount;
     final isComplete = quiz.totalCount > 0 && solved >= quiz.totalCount;
     final localizedTitle = localizedGeoQuizTitle(context.t, quiz);
-    final localizedSubtitle = localizedGeoQuizSubtitle(context.t, quiz);
     return Card(
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,

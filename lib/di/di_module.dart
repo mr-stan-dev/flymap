@@ -18,12 +18,16 @@ import 'package:flymap/data/api/flight_route_search_api.dart';
 import 'package:flymap/data/api/mapbox_static_image_api.dart';
 import 'package:flymap/data/api/route_overview_api.dart';
 import 'package:flymap/data/api/flight_info_api_mapper.dart';
+import 'package:flymap/data/gps_data_provider.dart';
 import 'package:flymap/data/map_asset_cache_service.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/local/airlines_database.dart';
 import 'package:flymap/data/local/app_database.dart';
 import 'package:flymap/data/local/flights_db_service.dart';
 import 'package:flymap/data/local/learn_pack_local_db.dart';
+import 'package:flymap/data/location/app_location_client.dart';
+import 'package:flymap/data/location/app_location_service.dart';
+import 'package:flymap/data/location/geolocator_app_location_client.dart';
 import 'package:flymap/data/local/learn_repository_impl.dart';
 import 'package:flymap/data/local/migrations/flights_db_migration.dart';
 import 'package:flymap/data/local/migrations/flights_db_migration_runner.dart';
@@ -52,6 +56,7 @@ import 'package:flymap/repository/poi_wiki_preview_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/repository/route_overview_repository.dart';
 import 'package:flymap/repository/settings_repository.dart';
+import 'package:flymap/repository/sky_camera_media_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
 import 'package:flymap/repository/user_flight_prefs_repository.dart';
 import 'package:flymap/repository/flight_search_repository.dart';
@@ -90,6 +95,9 @@ import 'package:flymap/domain/entity/geo_quiz.dart';
 import 'package:flymap/i18n/app_localization.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_list_cubit.dart';
+import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_export_service.dart';
+import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_session_factory.dart';
+import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_share_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:in_app_review/in_app_review.dart';
@@ -212,6 +220,15 @@ class DiModule {
     i.registerLazySingleton<ConnectivityChecker>(
       () => const ConnectivityChecker(),
     );
+    i.registerLazySingleton<AppLocationClient>(
+      () => GeolocatorAppLocationClient(),
+    );
+    i.registerLazySingleton<AppLocationService>(
+      () => AppLocationService(client: i.get()),
+    );
+    i.registerFactory<GpsDataProvider>(
+      () => GpsDataProvider(locationService: i.get(), unitsRepository: i.get()),
+    );
     i.registerLazySingleton<MapAssetCacheService>(() => MapAssetCacheService());
 
     i.registerLazySingleton<DownloadMapUseCase>(
@@ -318,6 +335,27 @@ class DiModule {
     i.registerLazySingleton<GeoQuizRepository>(() => AssetGeoQuizRepository());
     i.registerLazySingleton<GeoQuizProgressRepository>(
       () => SharedPrefsGeoQuizProgressRepository(),
+    );
+    i.registerLazySingleton<SkyCameraMediaRepository>(
+      () => SkyCameraMediaRepository(database: i.get()),
+    );
+    i.registerLazySingleton<FlymapSkyCameraExportService>(
+      () => FlymapSkyCameraExportService(
+        flightRepository: i.get(),
+        mediaRepository: i.get(),
+      ),
+    );
+    i.registerLazySingleton<FlymapSkyCameraShareService>(
+      FlymapSkyCameraShareService.new,
+    );
+    i.registerLazySingleton<FlymapSkyCameraSessionFactory>(
+      () => FlymapSkyCameraSessionFactory(
+        exportService: i.get(),
+        shareService: i.get(),
+        analytics: i.get(),
+        flightRepository: i.get(),
+        locationService: i.get(),
+      ),
     );
     i.registerFactoryParam<GeoQuizListCubit, String, Object?>(
       (collectionId, _) => GeoQuizListCubit(

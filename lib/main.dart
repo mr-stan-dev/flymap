@@ -11,6 +11,7 @@ import 'package:flymap/app/flymap_app.dart';
 import 'package:flymap/crashlytics/app_crashlytics_initializer.dart';
 import 'package:flymap/cubit_state_observer.dart';
 import 'package:flymap/data/map_asset_cache_service.dart';
+import 'package:flymap/data/location/app_location_service.dart';
 import 'package:flymap/data/local/app_database.dart';
 import 'package:flymap/data/local/migrations/flights_db_migration_runner.dart';
 import 'package:flymap/domain/usecase/auto_complete_stale_in_progress_flights_use_case.dart';
@@ -64,6 +65,7 @@ void main() async {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         GetIt.I<MapAssetCacheService>().ensureReadyInBackground();
+        unawaited(GetIt.I<AppLocationService>().initializeForegroundWarmup());
       });
     },
     (error, stack) async {

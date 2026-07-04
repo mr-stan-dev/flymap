@@ -4,17 +4,22 @@ import 'package:sembast/sembast_io.dart';
 
 class AppDatabase {
   static AppDatabase? _instance;
-  static Database? _database;
-  static StoreRef<String, Map<String, dynamic>>? _flightsStore;
-  static StoreRef<String, Map<String, dynamic>>? _flightAssetsStore;
-  static StoreRef<String, Map<String, dynamic>>? _migrationsStore;
+  Database? _database;
+  StoreRef<String, Map<String, dynamic>>? _flightsStore;
+  StoreRef<String, Map<String, dynamic>>? _flightAssetsStore;
+  StoreRef<String, Map<String, dynamic>>? _skyCameraMediaStore;
+  StoreRef<String, Map<String, dynamic>>? _migrationsStore;
   static const _dbName = 'flymap.db';
   static const _flightsStoreName = 'flights';
   static const _flightAssetsStoreName = 'flight_assets';
+  static const _skyCameraMediaStoreName = 'sky_camera_media';
   static const _migrationsStoreName = 'migrations';
   static const int schemaVersion = 2;
 
   AppDatabase._();
+  AppDatabase.test({required Database database}) : _database = database {
+    _initializeStores();
+  }
 
   static AppDatabase get instance {
     _instance ??= AppDatabase._();
@@ -22,15 +27,11 @@ class AppDatabase {
   }
 
   Future<void> initialize() async {
-    if (_database == null) {
-      final appDocDir = await getApplicationDocumentsDirectory();
-      final dbPath = join(appDocDir.path, _dbName);
-      _database = await databaseFactoryIo.openDatabase(dbPath);
-
-      _flightsStore = stringMapStoreFactory.store(_flightsStoreName);
-      _flightAssetsStore = stringMapStoreFactory.store(_flightAssetsStoreName);
-      _migrationsStore = stringMapStoreFactory.store(_migrationsStoreName);
-    }
+    if (_database != null) return;
+    final appDocDir = await getApplicationDocumentsDirectory();
+    final dbPath = join(appDocDir.path, _dbName);
+    _database = await databaseFactoryIo.openDatabase(dbPath);
+    _initializeStores();
   }
 
   Database get database {
@@ -54,6 +55,13 @@ class AppDatabase {
     return _flightAssetsStore!;
   }
 
+  StoreRef<String, Map<String, dynamic>> get skyCameraMediaStore {
+    if (_skyCameraMediaStore == null) {
+      throw StateError('Database not initialized. Call initialize() first.');
+    }
+    return _skyCameraMediaStore!;
+  }
+
   StoreRef<String, Map<String, dynamic>> get migrationsStore {
     if (_migrationsStore == null) {
       throw StateError('Database not initialized. Call initialize() first.');
@@ -66,6 +74,16 @@ class AppDatabase {
     _database = null;
     _flightsStore = null;
     _flightAssetsStore = null;
+    _skyCameraMediaStore = null;
     _migrationsStore = null;
+  }
+
+  void _initializeStores() {
+    _flightsStore = stringMapStoreFactory.store(_flightsStoreName);
+    _flightAssetsStore = stringMapStoreFactory.store(_flightAssetsStoreName);
+    _skyCameraMediaStore = stringMapStoreFactory.store(
+      _skyCameraMediaStoreName,
+    );
+    _migrationsStore = stringMapStoreFactory.store(_migrationsStoreName);
   }
 }

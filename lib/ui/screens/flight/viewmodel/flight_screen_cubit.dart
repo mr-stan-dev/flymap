@@ -49,7 +49,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
        _deleteFlightUseCase = deleteFlightUseCase ?? GetIt.I.get(),
        _completeFlightUseCase = completeFlightUseCase ?? GetIt.I.get(),
        _startFlightUseCase = startFlightUseCase ?? GetIt.I.get(),
-       _gpsProvider = gpsProvider ?? GpsDataProvider(),
+       _gpsProvider = gpsProvider ?? GetIt.I.get(),
        _geoAwarenessEngine = geoAwarenessEngine ?? const GeoAwarenessEngine(),
        _nowProvider = nowProvider ?? DateTime.now,
        _gpsStaleThresholdOverride = gpsStaleThreshold,

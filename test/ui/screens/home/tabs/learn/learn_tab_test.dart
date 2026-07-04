@@ -351,7 +351,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Countries on map'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('World'));
+    await tester.tap(find.byKey(const ValueKey('geoQuizTile.countries_world')));
     await tester.pumpAndSettle();
 
     expect(find.text(t.learn.upgradeRequiresInternet), findsOneWidget);
@@ -369,7 +369,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ProBadge), findsNothing);
-    await tester.tap(find.text('World'));
+    await tester.tap(find.byKey(const ValueKey('geoQuizTile.countries_world')));
     await tester.pumpAndSettle();
 
     expect(find.byType(TextField), findsOneWidget);

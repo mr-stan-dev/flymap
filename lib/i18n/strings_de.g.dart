@@ -42,6 +42,8 @@ class TranslationsDe extends Translations with BaseTranslations<AppLocale, Trans
 	@override String get appName => 'Flymap';
 	@override late final _TranslationsCommonDe common = _TranslationsCommonDe._(_root);
 	@override late final _TranslationsHomeDe home = _TranslationsHomeDe._(_root);
+	@override late final _TranslationsSkyCameraDe skyCamera = _TranslationsSkyCameraDe._(_root);
+	@override late final _TranslationsMediaDe media = _TranslationsMediaDe._(_root);
 	@override late final _TranslationsLearnDe learn = _TranslationsLearnDe._(_root);
 	@override late final _TranslationsSettingsDe settings = _TranslationsSettingsDe._(_root);
 	@override late final _TranslationsSubscriptionDe subscription = _TranslationsSubscriptionDe._(_root);
@@ -88,7 +90,9 @@ class _TranslationsHomeDe extends TranslationsHomeEn {
 	@override String get aboutTooltip => 'Info';
 	@override String get settingsTooltip => 'Einstellungen';
 	@override String get tabFlights => 'Flüge';
-	@override String get tabLearn => 'Lernen & Spielen';
+	@override String get tabLearn => 'Lernen';
+	@override String get tabMedia => 'Medien';
+	@override String get openSkyCamera => 'Sky Camera öffnen';
 	@override String get loadingFlights => 'Flüge werden geladen...';
 	@override String get failedToLoadFlights => 'Flüge konnten nicht geladen werden';
 	@override String get newFlight => 'Neuer Flug';
@@ -128,6 +132,73 @@ class _TranslationsHomeDe extends TranslationsHomeEn {
 	@override String hoursAgo({required Object hours}) => 'vor ${hours} Std';
 	@override String minutesAgo({required Object minutes}) => 'vor ${minutes} Min';
 	@override late final _TranslationsHomeSortDe sort = _TranslationsHomeSortDe._(_root);
+}
+
+// Path: skyCamera
+class _TranslationsSkyCameraDe extends TranslationsSkyCameraEn {
+	_TranslationsSkyCameraDe._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get loading => 'Kamera wird geladen...';
+	@override String get loadingGpsData => 'GPS-Daten werden geladen';
+	@override String get zoom => 'Zoom';
+	@override String get flash => 'Blitz';
+	@override String get cameraUnavailable => 'Die Kamera ist gerade nicht verfügbar.';
+	@override String get cameraPermissionDenied => 'Für Fotos wird Kamerazugriff benötigt.';
+	@override String get captureFailed => 'Das Foto konnte gerade nicht aufgenommen werden.';
+	@override String get savedMessage => 'Foto gespeichert';
+	@override String get share => 'Teilen';
+	@override String get noActiveFlightTitle => 'Kein aktiver Flug';
+	@override String get noActiveFlightMessage => 'Sky Camera funktioniert auch ohne Flug, aber Routendetails erscheinen nur während eines aktiven Flugs.';
+	@override String get telemetrySpeed => 'Geschwindigkeit';
+	@override String get telemetryAltitude => 'Höhe';
+	@override String get telemetryHeading => 'Kurs';
+	@override String get telemetryTime => 'Zeit';
+	@override String get contextCaption => 'Kontext';
+	@override String get mapCaption => 'Karte';
+	@override String get coordinatesCaption => 'Koordinaten';
+	@override String get noValuePlaceholder => '--';
+	@override String get placeholderRoute => 'LHR -> BCN';
+	@override String get placeholderOriginCode => 'LHR';
+	@override String get placeholderDestinationCode => 'BCN';
+	@override String get placeholderContext => 'Mittelmeer';
+	@override String get placeholderMap => 'Routenvorschau';
+}
+
+// Path: media
+class _TranslationsMediaDe extends TranslationsMediaEn {
+	_TranslationsMediaDe._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Medien vom Fensterplatz';
+	@override String get loading => 'Medien werden geladen...';
+	@override String get failedToLoad => 'Medien konnten nicht geladen werden';
+	@override String get filesTab => 'Dateien';
+	@override String get flightsTab => 'Flüge';
+	@override String get emptyTitle => 'Willkommen bei deiner Sky Camera am Fensterplatz';
+	@override String get emptySubtitle => 'Halte wunderschöne Ausblicke von deinem Fensterplatz fest und teile sie mit Flug- und GPS-Daten-Overlays.';
+	@override String get emptyFlightsTitle => 'Noch keine Flugordner';
+	@override String get emptyFlightsSubtitle => 'Mit gespeicherten Flügen verknüpfte Aufnahmen erscheinen hier.';
+	@override String get deleteAction => 'Löschen';
+	@override String get share => 'Teilen';
+	@override String selectedCount({required Object count}) => '${count} ausgewählt';
+	@override String get groupNoFlight => 'Kein Flugkontext';
+	@override String get groupNoFlightSubtitle => 'Aufnahmen außerhalb eines aktiven Flugs';
+	@override String get groupUnknownFlight => 'Flugaufnahme';
+	@override String get previewTitle => 'Aufnahme';
+	@override String captureCount({required Object count}) => '${count} Aufnahmen';
+	@override String get deleteFolder => 'Ordner löschen';
+	@override String deleteFolders({required Object count}) => '${count} Ordner löschen';
+	@override String get deleteFile => 'Datei löschen';
+	@override String deleteFiles({required Object count}) => '${count} Dateien löschen';
+	@override String deleteFolderConfirm({required Object count}) => 'Diesen Ordner und alle ${count} Dateien löschen?';
+	@override String deleteFoldersConfirm({required Object count}) => '${count} Ordner und alle enthaltenen Dateien löschen?';
+	@override String get deleteFileConfirm => 'Diese Datei löschen?';
+	@override String deleteFilesConfirm({required Object count}) => '${count} Dateien löschen?';
 }
 
 // Path: learn
@@ -1364,7 +1435,9 @@ extension on TranslationsDe {
 			'home.aboutTooltip' => 'Info',
 			'home.settingsTooltip' => 'Einstellungen',
 			'home.tabFlights' => 'Flüge',
-			'home.tabLearn' => 'Lernen & Spielen',
+			'home.tabLearn' => 'Lernen',
+			'home.tabMedia' => 'Medien',
+			'home.openSkyCamera' => 'Sky Camera öffnen',
 			'home.loadingFlights' => 'Flüge werden geladen...',
 			'home.failedToLoadFlights' => 'Flüge konnten nicht geladen werden',
 			'home.newFlight' => 'Neuer Flug',
@@ -1406,6 +1479,55 @@ extension on TranslationsDe {
 			'home.sort.mostRecent' => 'Neueste',
 			'home.sort.longest' => 'Längste',
 			'home.sort.alphabetical' => 'A-Z',
+			'skyCamera.loading' => 'Kamera wird geladen...',
+			'skyCamera.loadingGpsData' => 'GPS-Daten werden geladen',
+			'skyCamera.zoom' => 'Zoom',
+			'skyCamera.flash' => 'Blitz',
+			'skyCamera.cameraUnavailable' => 'Die Kamera ist gerade nicht verfügbar.',
+			'skyCamera.cameraPermissionDenied' => 'Für Fotos wird Kamerazugriff benötigt.',
+			'skyCamera.captureFailed' => 'Das Foto konnte gerade nicht aufgenommen werden.',
+			'skyCamera.savedMessage' => 'Foto gespeichert',
+			'skyCamera.share' => 'Teilen',
+			'skyCamera.noActiveFlightTitle' => 'Kein aktiver Flug',
+			'skyCamera.noActiveFlightMessage' => 'Sky Camera funktioniert auch ohne Flug, aber Routendetails erscheinen nur während eines aktiven Flugs.',
+			'skyCamera.telemetrySpeed' => 'Geschwindigkeit',
+			'skyCamera.telemetryAltitude' => 'Höhe',
+			'skyCamera.telemetryHeading' => 'Kurs',
+			'skyCamera.telemetryTime' => 'Zeit',
+			'skyCamera.contextCaption' => 'Kontext',
+			'skyCamera.mapCaption' => 'Karte',
+			'skyCamera.coordinatesCaption' => 'Koordinaten',
+			'skyCamera.noValuePlaceholder' => '--',
+			'skyCamera.placeholderRoute' => 'LHR -> BCN',
+			'skyCamera.placeholderOriginCode' => 'LHR',
+			'skyCamera.placeholderDestinationCode' => 'BCN',
+			'skyCamera.placeholderContext' => 'Mittelmeer',
+			'skyCamera.placeholderMap' => 'Routenvorschau',
+			'media.title' => 'Medien vom Fensterplatz',
+			'media.loading' => 'Medien werden geladen...',
+			'media.failedToLoad' => 'Medien konnten nicht geladen werden',
+			'media.filesTab' => 'Dateien',
+			'media.flightsTab' => 'Flüge',
+			'media.emptyTitle' => 'Willkommen bei deiner Sky Camera am Fensterplatz',
+			'media.emptySubtitle' => 'Halte wunderschöne Ausblicke von deinem Fensterplatz fest und teile sie mit Flug- und GPS-Daten-Overlays.',
+			'media.emptyFlightsTitle' => 'Noch keine Flugordner',
+			'media.emptyFlightsSubtitle' => 'Mit gespeicherten Flügen verknüpfte Aufnahmen erscheinen hier.',
+			'media.deleteAction' => 'Löschen',
+			'media.share' => 'Teilen',
+			'media.selectedCount' => ({required Object count}) => '${count} ausgewählt',
+			'media.groupNoFlight' => 'Kein Flugkontext',
+			'media.groupNoFlightSubtitle' => 'Aufnahmen außerhalb eines aktiven Flugs',
+			'media.groupUnknownFlight' => 'Flugaufnahme',
+			'media.previewTitle' => 'Aufnahme',
+			'media.captureCount' => ({required Object count}) => '${count} Aufnahmen',
+			'media.deleteFolder' => 'Ordner löschen',
+			'media.deleteFolders' => ({required Object count}) => '${count} Ordner löschen',
+			'media.deleteFile' => 'Datei löschen',
+			'media.deleteFiles' => ({required Object count}) => '${count} Dateien löschen',
+			'media.deleteFolderConfirm' => ({required Object count}) => 'Diesen Ordner und alle ${count} Dateien löschen?',
+			'media.deleteFoldersConfirm' => ({required Object count}) => '${count} Ordner und alle enthaltenen Dateien löschen?',
+			'media.deleteFileConfirm' => 'Diese Datei löschen?',
+			'media.deleteFilesConfirm' => ({required Object count}) => '${count} Dateien löschen?',
 			'learn.loadingCategories' => 'Lernkategorien werden geladen...',
 			'learn.failedToLoadCategories' => 'Kategorien konnten nicht geladen werden',
 			'learn.emptyCategoriesTitle' => 'Noch keine Kategorien',
@@ -1807,6 +1929,8 @@ extension on TranslationsDe {
 			'createFlight.downloading.downloaded' => ({required Object size}) => 'Heruntergeladen: ${size}',
 			'createFlight.downloading.finalizing' => 'Kartenpaket wird finalisiert...',
 			'createFlight.downloading.verifying' => 'Kartenpaket wird überprüft...',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.errors.failedLoadAirports' => 'Flughäfen konnten nicht geladen werden. Bitte versuche es erneut.',
 			'createFlight.errors.airportSearchFailed' => 'Flughafensuche fehlgeschlagen. Versuche eine andere Anfrage.',
 			'createFlight.errors.someArticlesFailed' => 'Einige Artikel sind fehlgeschlagen. Kartendownload wird fortgesetzt.',
@@ -1858,8 +1982,6 @@ extension on TranslationsDe {
 			'flight.map.validationFailed' => 'Validierung der Offline-Karte fehlgeschlagen. Bitte lade diese Route erneut herunter.',
 			'flight.map.loadStyleFailed' => 'Offline-Kartenstil konnte nicht geladen werden.',
 			'flight.map.sunriseInMinutes' => ({required Object minutes}) => 'Sonnenaufgang in ${minutes} Min',
-			_ => null,
-		} ?? switch (path) {
 			'flight.map.sunsetInMinutes' => ({required Object minutes}) => 'Sonnenuntergang in ${minutes} Min',
 			'flight.map.switchTo2D' => 'Zu 2D wechseln',
 			'flight.map.switchTo3D' => 'Zu 3D wechseln',

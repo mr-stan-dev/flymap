@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flymap/data/location/app_location_client.dart';
+import 'package:flymap/data/location/app_location_service.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/domain/entity/airport.dart';
@@ -21,6 +24,7 @@ import 'package:flymap/domain/entity/learn_article_content.dart';
 import 'package:flymap/domain/entity/learn_article_meta.dart';
 import 'package:flymap/domain/entity/learn_article_progress.dart';
 import 'package:flymap/domain/entity/learn_category.dart';
+import 'package:flymap/domain/entity/sky_camera_media_item.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/flight_unlock_repository.dart';
@@ -34,6 +38,7 @@ import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/rating/rate_prompt_policy_service.dart';
 import 'package:flymap/rating/rate_prompt_trigger.dart';
 import 'package:flymap/rating/rate_review_launcher.dart';
+import 'package:flymap/repository/sky_camera_media_repository.dart';
 import 'package:flymap/repository/settings_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
 import 'package:flymap/repository/user_flight_prefs_storage.dart';
@@ -43,9 +48,13 @@ import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/subscription/subscription_status.dart';
 import 'package:flymap/ui/screens/home/home_screen.dart';
+import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_session_factory.dart';
+import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_export_service.dart';
+import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_share_service.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_list_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/home/widgets/flights_list/home_flight_card.dart';
+import 'package:sky_camera/sky_camera.dart';
 import 'package:flymap/ui/screens/settings/viewmodel/settings_cubit.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/theme/app_theme.dart';
@@ -58,10 +67,13 @@ import 'package:flymap/domain/usecase/get_learn_category_articles_use_case.dart'
 import 'package:flymap/domain/usecase/mark_learn_article_seen_use_case.dart';
 import 'package:flymap/domain/usecase/toggle_learn_article_favorite_use_case.dart';
 import 'package:get_it/get_it.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  late _FakeSkyCameraMediaRepository mediaRepository;
+
   setUpAll(() {
     LocaleSettings.setLocaleSync(AppLocale.en);
   });
@@ -69,6 +81,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await GetIt.I.reset();
+    mediaRepository = _FakeSkyCameraMediaRepository();
     GetIt.I.registerSingleton<FlightRepository>(const _FakeFlightRepository());
     GetIt.I.registerSingleton<DeleteFlightUseCase>(_FakeDeleteFlightUseCase());
     GetIt.I.registerSingleton<ConnectivityChecker>(
@@ -117,7 +130,12 @@ void main() {
     GetIt.I.registerSingleton<GeoQuizProgressRepository>(
       SharedPrefsGeoQuizProgressRepository(),
     );
+    GetIt.I.registerSingleton<SkyCameraMediaRepository>(mediaRepository);
     GetIt.I.registerSingleton<AppAnalytics>(const _FakeAppAnalytics());
+    GetIt.I.registerSingleton<MetricUnitsRepository>(MetricUnitsRepository());
+    GetIt.I.registerSingleton<FlymapSkyCameraSessionFactory>(
+      _FakeFlymapSkyCameraSessionFactory(mediaRepository: mediaRepository),
+    );
     GetIt.I.registerFactoryParam<GeoQuizListCubit, String, Object?>(
       (collectionId, _) => GeoQuizListCubit(
         collectionId: collectionId,
@@ -141,6 +159,7 @@ void main() {
 
   tearDown(() async {
     await GetIt.I.reset();
+    await mediaRepository.dispose();
   });
 
   testWidgets('defaults to Flights tab with dynamic app bar title', (
@@ -151,30 +170,78 @@ void main() {
 
     expect(_findAppBarTitle('Flights'), findsOneWidget);
     expect(find.text('New flight'), findsOneWidget);
-    expect(
-      tester
-          .widget<BottomNavigationBar>(find.byType(BottomNavigationBar))
-          .currentIndex,
-      0,
-    );
+    expect(find.byKey(homeFlightsTabKey), findsOneWidget);
+    expect(find.byKey(homeLearnTabKey), findsOneWidget);
+    expect(find.byKey(homeMediaTabKey), findsOneWidget);
+    expect(find.byKey(homeSettingsTabKey), findsOneWidget);
   });
 
-  testWidgets('switches to Learn & Play tab and keeps app stable', (
-    tester,
-  ) async {
+  testWidgets('switches to Learn tab and keeps app stable', (tester) async {
     await tester.pumpWidget(_testApp());
     await _pumpForInitialLoad(tester);
 
-    await tester.tap(find.text('Learn & Play'));
+    await tester.tap(find.byKey(homeLearnTabKey));
     await tester.pump(const Duration(milliseconds: 200));
 
-    expect(_findAppBarTitle('Learn & Play'), findsOneWidget);
-    expect(
-      tester
-          .widget<BottomNavigationBar>(find.byType(BottomNavigationBar))
-          .currentIndex,
-      1,
+    expect(_findAppBarTitle('Learn'), findsOneWidget);
+  });
+
+  testWidgets(
+    'shows camera FAB in Media tab and opens camera with no flights',
+    (tester) async {
+      await tester.pumpWidget(_testApp());
+      await _pumpForInitialLoad(tester);
+
+      expect(find.byKey(homeSkyCameraButtonKey), findsNothing);
+
+      await tester.tap(find.byKey(homeMediaTabKey));
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pump(const Duration(milliseconds: 200));
+
+      expect(find.byKey(homeSkyCameraButtonKey), findsOneWidget);
+      await tester.ensureVisible(find.byKey(homeSkyCameraButtonKey));
+
+      await tester.tap(find.byKey(homeSkyCameraButtonKey), warnIfMissed: false);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.byKey(const Key('test.sky_camera.preview')), findsOneWidget);
+      expect(find.textContaining('LHR'), findsNothing);
+      expect(find.textContaining('BCN'), findsNothing);
+    },
+  );
+
+  testWidgets('camera startup can finish after its route is closed', (
+    tester,
+  ) async {
+    final flightsCompleter = Completer<List<Flight>>();
+    final flightRepository = _DelayedFlightRepository(flightsCompleter);
+    await GetIt.I.unregister<FlymapSkyCameraSessionFactory>();
+    GetIt.I.registerSingleton<FlymapSkyCameraSessionFactory>(
+      _FakeFlymapSkyCameraSessionFactory(
+        mediaRepository: mediaRepository,
+        flightRepository: flightRepository,
+      ),
     );
+
+    await tester.pumpWidget(_testApp());
+    await _pumpForInitialLoad(tester);
+    await tester.tap(find.byKey(homeMediaTabKey));
+    await tester.pump(const Duration(milliseconds: 200));
+    await tester.pump(const Duration(milliseconds: 200));
+    await tester.ensureVisible(find.byKey(homeSkyCameraButtonKey));
+    await tester.tap(find.byKey(homeSkyCameraButtonKey), warnIfMissed: false);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    Navigator.of(tester.element(find.byType(CircularProgressIndicator))).pop();
+    await tester.pump();
+    flightsCompleter.complete(const <Flight>[]);
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets(
@@ -186,19 +253,13 @@ void main() {
       await tester.pumpWidget(_testApp());
       await _pumpForInitialLoad(tester);
 
-      expect(
-        find.byKey(const Key('home.learn.geo_quiz_new_dot')),
-        findsOneWidget,
-      );
+      expect(find.byKey(homeLearnGeoQuizDotKey), findsOneWidget);
 
-      await tester.tap(find.text('Learn & Play'));
+      await tester.tap(find.byKey(homeLearnTabKey));
       await tester.pump(const Duration(milliseconds: 200));
       await tester.pump(const Duration(milliseconds: 200));
 
-      expect(
-        find.byKey(const Key('home.learn.geo_quiz_new_dot')),
-        findsNothing,
-      );
+      expect(find.byKey(homeLearnGeoQuizDotKey), findsNothing);
       expect(find.byKey(const Key('learn.geo_quiz.new_badge')), findsOneWidget);
       expect(
         prefs.getBool(
@@ -217,18 +278,180 @@ void main() {
     await tester.pumpWidget(_testApp());
     await _pumpForInitialLoad(tester);
 
-    await tester.tap(find.text('Settings'));
+    await tester.tap(find.byKey(homeSettingsTabKey));
     await tester.pump(const Duration(milliseconds: 200));
 
     expect(_findAppBarTitle('Settings'), findsOneWidget);
     expect(find.text('Appearance'), findsOneWidget);
+  });
+
+  testWidgets('switches to Media tab and renders empty media state', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_testApp());
+    await _pumpForInitialLoad(tester);
+
+    await tester.tap(find.byKey(homeMediaTabKey));
+    await tester.pump(const Duration(milliseconds: 200));
+    await tester.pump(const Duration(milliseconds: 200));
+
+    expect(_findAppBarTitle('Window Seat Media'), findsOneWidget);
+    expect(find.text('Welcome to your window-seat Sky Camera'), findsOneWidget);
     expect(
-      tester
-          .widget<BottomNavigationBar>(find.byType(BottomNavigationBar))
-          .currentIndex,
-      2,
+      find.text(
+        'Capture and share beautiful views from your window seat with flight and GPS data overlays.',
+      ),
+      findsOneWidget,
     );
   });
+
+  testWidgets(
+    'Media tab shows no-flight captures in the top horizontal section',
+    (tester) async {
+      await GetIt.I.unregister<SkyCameraMediaRepository>();
+      mediaRepository = _FakeSkyCameraMediaRepository(
+        captures: [
+          _buildMediaItem(
+            id: 'capture-no-flight',
+            capturedAt: DateTime(2026, 7, 2, 12, 0),
+          ),
+        ],
+      );
+      GetIt.I.registerSingleton<SkyCameraMediaRepository>(mediaRepository);
+
+      await tester.pumpWidget(_testApp());
+      await _pumpForInitialLoad(tester);
+
+      await tester.tap(find.byKey(homeMediaTabKey));
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pump(const Duration(milliseconds: 200));
+
+      expect(find.text('No flight context'), findsOneWidget);
+      expect(
+        find.text('Captures taken outside an active flight'),
+        findsOneWidget,
+      );
+      expect(find.byType(Card), findsWidgets);
+      final thumbnailSize = tester.getSize(
+        find.byKey(const Key('media.strip_thumbnail_capture-no-flight')),
+      );
+      expect(thumbnailSize.width, thumbnailSize.height);
+      expect(find.text('View all'), findsNothing);
+    },
+  );
+
+  testWidgets('deletes the last pager item after Media refresh', (
+    tester,
+  ) async {
+    await GetIt.I.unregister<SkyCameraMediaRepository>();
+    mediaRepository = _FakeSkyCameraMediaRepository(
+      captures: [
+        _buildMediaItem(
+          id: 'capture-only',
+          capturedAt: DateTime(2026, 7, 2, 12, 0),
+        ),
+      ],
+    );
+    GetIt.I.registerSingleton<SkyCameraMediaRepository>(mediaRepository);
+
+    await tester.pumpWidget(_testApp());
+    await _pumpForInitialLoad(tester);
+    await tester.tap(find.byKey(homeMediaTabKey));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(
+      find.byKey(const Key('media.strip_thumbnail_capture-only')),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('media.capture_preview_menu')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete file'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(TextButton, 'Delete'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Welcome to your window-seat Sky Camera'), findsOneWidget);
+  });
+
+  testWidgets(
+    'Media tab hides view all for flight groups with 10 or fewer files',
+    (tester) async {
+      await GetIt.I.unregister<FlightRepository>();
+      GetIt.I.registerSingleton<FlightRepository>(
+        _FakeFlightRepository(
+          flights: [
+            _buildFlight(id: 'flight-1', status: FlightStatus.completed),
+          ],
+        ),
+      );
+      await GetIt.I.unregister<SkyCameraMediaRepository>();
+      mediaRepository = _FakeSkyCameraMediaRepository(
+        captures: [
+          _buildMediaItem(
+            id: 'capture-flight-1',
+            capturedAt: DateTime(2026, 7, 2, 12, 0),
+            flightId: 'flight-1',
+          ),
+        ],
+      );
+      GetIt.I.registerSingleton<SkyCameraMediaRepository>(mediaRepository);
+
+      await tester.pumpWidget(_testApp());
+      await _pumpForInitialLoad(tester);
+
+      await tester.tap(find.byKey(homeMediaTabKey));
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pump(const Duration(milliseconds: 200));
+
+      expect(find.text('LHR - MUC'), findsOneWidget);
+      expect(find.text('London - Munich'), findsOneWidget);
+      expect(find.text('View all'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'Media tab shows view all for no-flight and flight groups with more than 10 files',
+    (tester) async {
+      await GetIt.I.unregister<FlightRepository>();
+      GetIt.I.registerSingleton<FlightRepository>(
+        _FakeFlightRepository(
+          flights: [
+            _buildFlight(id: 'flight-1', status: FlightStatus.completed),
+          ],
+        ),
+      );
+      await GetIt.I.unregister<SkyCameraMediaRepository>();
+      mediaRepository = _FakeSkyCameraMediaRepository(
+        captures: [
+          for (var i = 0; i < 11; i++)
+            _buildMediaItem(
+              id: 'capture-no-flight-$i',
+              capturedAt: DateTime(2026, 7, 2, 12, i),
+            ),
+          for (var i = 0; i < 11; i++)
+            _buildMediaItem(
+              id: 'capture-flight-$i',
+              capturedAt: DateTime(2026, 7, 1, 12, i),
+              flightId: 'flight-1',
+            ),
+        ],
+      );
+      GetIt.I.registerSingleton<SkyCameraMediaRepository>(mediaRepository);
+
+      await tester.pumpWidget(_testApp());
+      await _pumpForInitialLoad(tester);
+
+      await tester.tap(find.byKey(homeMediaTabKey));
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pump(const Duration(milliseconds: 200));
+
+      expect(find.text('No flight context'), findsOneWidget);
+      expect(find.text('LHR - MUC'), findsOneWidget);
+      expect(find.text('View all'), findsNWidgets(2));
+    },
+  );
 
   testWidgets('supports preselecting Settings tab from constructor', (
     tester,
@@ -237,12 +460,6 @@ void main() {
     await _pumpForInitialLoad(tester);
 
     expect(_findAppBarTitle('Settings'), findsOneWidget);
-    expect(
-      tester
-          .widget<BottomNavigationBar>(find.byType(BottomNavigationBar))
-          .currentIndex,
-      2,
-    );
   });
 
   testWidgets(
@@ -361,6 +578,15 @@ class _FakeFlightRepository implements FlightRepository {
     required FlightStatus status,
     DateTime? completedAt,
   }) async => true;
+}
+
+class _DelayedFlightRepository extends _FakeFlightRepository {
+  const _DelayedFlightRepository(this.flightsCompleter);
+
+  final Completer<List<Flight>> flightsCompleter;
+
+  @override
+  Future<List<Flight>> getAllFlights() => flightsCompleter.future;
 }
 
 class _FakeConnectivityChecker extends ConnectivityChecker {
@@ -513,6 +739,281 @@ class _FakeAppAnalytics implements AppAnalytics {
 
   @override
   Future<void> setSubscriptionContext({required bool isPro}) async {}
+}
+
+class _FakeSkyCameraMediaRepository extends SkyCameraMediaRepository {
+  _FakeSkyCameraMediaRepository({
+    List<SkyCameraMediaItem> captures = const <SkyCameraMediaItem>[],
+  }) : _captures = List<SkyCameraMediaItem>.of(captures),
+       super.forTest();
+
+  final List<SkyCameraMediaItem> _captures;
+  final StreamController<void> _changes = StreamController<void>.broadcast();
+
+  @override
+  Stream<void> watch() => _changes.stream;
+
+  @override
+  Future<List<SkyCameraMediaItem>> getCaptures() async =>
+      List<SkyCameraMediaItem>.of(_captures);
+
+  @override
+  Future<void> addCapture(SkyCameraMediaItem capture) async {
+    _captures.removeWhere((item) => item.id == capture.id);
+    _captures.insert(0, capture);
+    _changes.add(null);
+  }
+
+  @override
+  Future<void> deleteCaptureIds(Iterable<String> captureIds) async {
+    final ids = captureIds.toSet();
+    _captures.removeWhere((item) => ids.contains(item.id));
+    _changes.add(null);
+  }
+
+  Future<void> dispose() => _changes.close();
+}
+
+SkyCameraMediaItem _buildMediaItem({
+  required String id,
+  required DateTime capturedAt,
+  String? flightId,
+  String routeLabel = 'Placeholder',
+  String originCode = '',
+  String destinationCode = '',
+}) {
+  return SkyCameraMediaItem(
+    id: id,
+    capturedAt: capturedAt,
+    mediaType: SkyCameraMediaType.photo,
+    sourcePath: '/tmp/$id.jpg',
+    flightId: flightId,
+    snapshot: SkyCameraOverlaySnapshot(
+      timestamp: capturedAt,
+      routeLabel: routeLabel,
+      originCode: originCode,
+      destinationCode: destinationCode,
+      originCountryCode: 'GB',
+      destinationCountryCode: 'ES',
+      contextLabel: 'Context',
+      mapStatePlaceholder: 'Map',
+      hasLiveLocation: false,
+      latitude: null,
+      longitude: null,
+      headingDegrees: null,
+      altitudeMeters: null,
+      speedMetersPerSecond: null,
+    ),
+    renditions: [
+      SkyCameraMediaRendition(
+        id: 'default',
+        skinId: 'flymap_default_v1',
+        mediaType: SkyCameraMediaType.photo,
+        path: '/tmp/$id-overlay.png',
+        previewImagePath: '/tmp/$id-overlay.png',
+      ),
+    ],
+    trackPoints: const [],
+    previewImagePath: '/tmp/$id-overlay.png',
+    selectedRenditionId: 'default',
+  );
+}
+
+class _FakeFlymapSkyCameraSessionFactory extends FlymapSkyCameraSessionFactory {
+  _FakeFlymapSkyCameraSessionFactory({
+    required SkyCameraMediaRepository mediaRepository,
+    super.flightRepository = const _FakeFlightRepository(),
+  }) : super(
+         exportService: FlymapSkyCameraExportService(
+           flightRepository: flightRepository,
+           mediaRepository: mediaRepository,
+         ),
+         shareService: FlymapSkyCameraShareService(),
+         analytics: const _FakeAppAnalytics(),
+         locationService: AppLocationService(
+           client: const _FakeAppLocationClient(),
+         ),
+       );
+
+  @override
+  FlymapSkyCameraSession create({
+    required FlymapSkyCameraPlaceholderCopy placeholderCopy,
+  }) {
+    return FlymapSkyCameraSession(
+      driver: _FakeSkyCameraDriver(),
+      snapshotSource: _FakeSkyCameraSnapshotSource(
+        placeholderCopy: placeholderCopy,
+      ),
+      exportService: _NoopSkyCameraExportService(),
+      shareService: _NoopSkyCameraShareService(),
+      observer: const _NoopSkyCameraObserver(),
+    );
+  }
+}
+
+class _FakeSkyCameraDriver implements SkyCameraDriver {
+  bool _isInitialized = false;
+
+  @override
+  SkyCameraFlashState get flashState => SkyCameraFlashState.off;
+
+  @override
+  bool get isInitialized => _isInitialized;
+
+  @override
+  Widget buildPreview() {
+    return const ColoredBox(
+      key: Key('test.sky_camera.preview'),
+      color: Colors.black,
+      child: SizedBox.expand(),
+    );
+  }
+
+  @override
+  Future<SkyCameraCapturedPhoto> capturePhoto() async {
+    return SkyCameraCapturedPhoto(
+      bytes: Uint8List(0),
+      fileExtension: 'jpg',
+      capturedAt: DateTime(2026, 1, 1),
+    );
+  }
+
+  @override
+  Future<void> dispose() async {}
+
+  @override
+  Future<void> initialize() async {
+    _isInitialized = true;
+  }
+
+  @override
+  Future<void> onAppLifecycleStateChanged(AppLifecycleState state) async {}
+
+  @override
+  Future<void> setFocusPoint(Offset normalizedPoint) async {}
+
+  @override
+  Future<SkyCameraZoomBounds> getZoomBounds() async {
+    return const SkyCameraZoomBounds(min: 1.0, max: 4.0);
+  }
+
+  @override
+  Future<void> setZoomLevel(double zoomLevel) async {}
+
+  @override
+  Future<void> toggleFlash() async {}
+}
+
+class _FakeAppLocationClient implements AppLocationClient {
+  const _FakeAppLocationClient();
+
+  @override
+  Future<LocationPermission> checkPermission() async {
+    return LocationPermission.denied;
+  }
+
+  @override
+  Stream<Position> getPositionStream({
+    required LocationSettings locationSettings,
+  }) {
+    return const Stream<Position>.empty();
+  }
+
+  @override
+  Future<Position> getCurrentPosition({
+    required LocationAccuracy accuracy,
+  }) async {
+    throw UnsupportedError('No test location');
+  }
+
+  @override
+  Future<bool> isLocationServiceEnabled() async => false;
+
+  @override
+  Future<LocationPermission> requestPermission() async {
+    return LocationPermission.denied;
+  }
+}
+
+class _FakeSkyCameraSnapshotSource implements SkyCameraOverlaySnapshotSource {
+  const _FakeSkyCameraSnapshotSource({required this.placeholderCopy});
+
+  final FlymapSkyCameraPlaceholderCopy placeholderCopy;
+
+  @override
+  Future<void> dispose() async {}
+
+  @override
+  Future<void> start() async {}
+
+  @override
+  Stream<SkyCameraOverlaySnapshot> watch() {
+    return Stream<SkyCameraOverlaySnapshot>.value(
+      SkyCameraOverlaySnapshot(
+        timestamp: DateTime(2026, 1, 1, 12, 0),
+        routeLabel: placeholderCopy.routeLabel,
+        originCode: placeholderCopy.originCode,
+        destinationCode: placeholderCopy.destinationCode,
+        originCountryCode: placeholderCopy.originCountryCode,
+        destinationCountryCode: placeholderCopy.destinationCountryCode,
+        contextLabel: placeholderCopy.contextLabel,
+        mapStatePlaceholder: placeholderCopy.mapPlaceholder,
+        hasLiveLocation: false,
+        latitude: null,
+        longitude: null,
+        headingDegrees: null,
+        altitudeMeters: null,
+        speedMetersPerSecond: null,
+      ),
+    );
+  }
+}
+
+class _NoopSkyCameraExportService implements SkyCameraExportService {
+  @override
+  Future<SkyCameraSavedCapture> saveCapture({
+    required SkyCameraCapturedPhoto originalPhoto,
+    required SkyCameraOverlaySnapshot snapshot,
+    required List<int> overlayBytes,
+  }) async {
+    return const SkyCameraSavedCapture(
+      id: 'capture-1',
+      originalPath: '/tmp/original.jpg',
+      overlayPath: '/tmp/overlay.png',
+    );
+  }
+}
+
+class _NoopSkyCameraShareService implements SkyCameraShareService {
+  @override
+  Future<void> shareCapture({
+    required SkyCameraSavedCapture capture,
+    required Rect sharePositionOrigin,
+  }) async {}
+}
+
+class _NoopSkyCameraObserver implements SkyCameraObserver {
+  const _NoopSkyCameraObserver();
+
+  @override
+  Future<void> onOpened({required SkyCameraOverlaySnapshot snapshot}) async {}
+
+  @override
+  Future<void> onPhotoCaptured({
+    required SkyCameraOverlaySnapshot snapshot,
+  }) async {}
+
+  @override
+  Future<void> onPhotoSaved({
+    required SkyCameraOverlaySnapshot snapshot,
+    required bool saveCleanCopy,
+    required bool saveOverlayCopy,
+  }) async {}
+
+  @override
+  Future<void> onShareTapped({
+    required SkyCameraOverlaySnapshot snapshot,
+  }) async {}
 }
 
 class _FakeRatePromptPolicyService implements RatePromptPolicyService {

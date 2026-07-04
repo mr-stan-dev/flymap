@@ -59,4 +59,42 @@ void main() {
     expect(event, isNot(isA<PostHogAnalyticsEvent>()));
     expect(event.firebaseEventName, 'learn_category_opened');
   });
+
+  test('Sky Camera events keep Firebase minimal and PostHog rich', () {
+    const opened = SkyCameraOpenedEvent(
+      hasActiveFlightContext: false,
+      hasLiveLocation: false,
+    );
+    const captured = SkyCameraPhotoCapturedEvent(
+      hasActiveFlightContext: true,
+      hasLiveLocation: true,
+    );
+    const saved = SkyCameraPhotoSavedEvent(
+      hasActiveFlightContext: true,
+      hasLiveLocation: true,
+      saveCleanCopy: true,
+      saveOverlayCopy: true,
+    );
+    const shared = SkyCameraShareTappedEvent(
+      hasActiveFlightContext: true,
+      hasLiveLocation: false,
+    );
+
+    expect(opened.firebaseParameters, isEmpty);
+    expect(captured.firebaseParameters, <String, Object>{
+      'overlay_mode': 'placeholder_v1',
+    });
+    expect(saved.postHogParameters, <String, Object>{
+      'has_active_flight_context': true,
+      'has_live_location': true,
+      'overlay_mode': 'placeholder_v1',
+      'save_clean_copy': true,
+      'save_overlay_copy': true,
+    });
+    expect(shared.postHogParameters, <String, Object>{
+      'has_active_flight_context': true,
+      'has_live_location': false,
+      'overlay_mode': 'placeholder_v1',
+    });
+  });
 }

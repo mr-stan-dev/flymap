@@ -46,6 +46,8 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	late final TranslationsCommonEn common = TranslationsCommonEn.internal(_root);
 	late final TranslationsHomeEn home = TranslationsHomeEn.internal(_root);
+	late final TranslationsSkyCameraEn skyCamera = TranslationsSkyCameraEn.internal(_root);
+	late final TranslationsMediaEn media = TranslationsMediaEn.internal(_root);
 	late final TranslationsLearnEn learn = TranslationsLearnEn.internal(_root);
 	late final TranslationsSettingsEn settings = TranslationsSettingsEn.internal(_root);
 	late final TranslationsSubscriptionEn subscription = TranslationsSubscriptionEn.internal(_root);
@@ -127,8 +129,14 @@ class TranslationsHomeEn {
 	/// en: 'Flights'
 	String get tabFlights => 'Flights';
 
-	/// en: 'Learn & Play'
-	String get tabLearn => 'Learn & Play';
+	/// en: 'Learn'
+	String get tabLearn => 'Learn';
+
+	/// en: 'Media'
+	String get tabMedia => 'Media';
+
+	/// en: 'Open Sky Camera'
+	String get openSkyCamera => 'Open Sky Camera';
 
 	/// en: 'Loading flights...'
 	String get loadingFlights => 'Loading flights...';
@@ -245,6 +253,171 @@ class TranslationsHomeEn {
 	String minutesAgo({required Object minutes}) => '${minutes} m ago';
 
 	late final TranslationsHomeSortEn sort = TranslationsHomeSortEn.internal(_root);
+}
+
+// Path: skyCamera
+class TranslationsSkyCameraEn {
+	TranslationsSkyCameraEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Loading camera...'
+	String get loading => 'Loading camera...';
+
+	/// en: 'Loading GPS data'
+	String get loadingGpsData => 'Loading GPS data';
+
+	/// en: 'Zoom'
+	String get zoom => 'Zoom';
+
+	/// en: 'Flash'
+	String get flash => 'Flash';
+
+	/// en: 'Camera is unavailable right now.'
+	String get cameraUnavailable => 'Camera is unavailable right now.';
+
+	/// en: 'Camera permission is required to take photos.'
+	String get cameraPermissionDenied => 'Camera permission is required to take photos.';
+
+	/// en: 'Could not capture photo right now.'
+	String get captureFailed => 'Could not capture photo right now.';
+
+	/// en: 'Photo saved'
+	String get savedMessage => 'Photo saved';
+
+	/// en: 'Share'
+	String get share => 'Share';
+
+	/// en: 'No active flight'
+	String get noActiveFlightTitle => 'No active flight';
+
+	/// en: 'Sky Camera works without a flight, but route details appear only during an active flight.'
+	String get noActiveFlightMessage => 'Sky Camera works without a flight, but route details appear only during an active flight.';
+
+	/// en: 'Speed'
+	String get telemetrySpeed => 'Speed';
+
+	/// en: 'Altitude'
+	String get telemetryAltitude => 'Altitude';
+
+	/// en: 'Heading'
+	String get telemetryHeading => 'Heading';
+
+	/// en: 'Time'
+	String get telemetryTime => 'Time';
+
+	/// en: 'Context'
+	String get contextCaption => 'Context';
+
+	/// en: 'Map'
+	String get mapCaption => 'Map';
+
+	/// en: 'Coordinates'
+	String get coordinatesCaption => 'Coordinates';
+
+	/// en: '--'
+	String get noValuePlaceholder => '--';
+
+	/// en: 'LHR -> BCN'
+	String get placeholderRoute => 'LHR -> BCN';
+
+	/// en: 'LHR'
+	String get placeholderOriginCode => 'LHR';
+
+	/// en: 'BCN'
+	String get placeholderDestinationCode => 'BCN';
+
+	/// en: 'Mediterranean Sea'
+	String get placeholderContext => 'Mediterranean Sea';
+
+	/// en: 'Route preview'
+	String get placeholderMap => 'Route preview';
+}
+
+// Path: media
+class TranslationsMediaEn {
+	TranslationsMediaEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Window Seat Media'
+	String get title => 'Window Seat Media';
+
+	/// en: 'Loading media...'
+	String get loading => 'Loading media...';
+
+	/// en: 'Failed to load media'
+	String get failedToLoad => 'Failed to load media';
+
+	/// en: 'Files'
+	String get filesTab => 'Files';
+
+	/// en: 'Flights'
+	String get flightsTab => 'Flights';
+
+	/// en: 'Welcome to your window-seat Sky Camera'
+	String get emptyTitle => 'Welcome to your window-seat Sky Camera';
+
+	/// en: 'Capture and share beautiful views from your window seat with flight and GPS data overlays.'
+	String get emptySubtitle => 'Capture and share beautiful views from your window seat with flight and GPS data overlays.';
+
+	/// en: 'No flight folders yet'
+	String get emptyFlightsTitle => 'No flight folders yet';
+
+	/// en: 'Captures linked to saved flights will appear here.'
+	String get emptyFlightsSubtitle => 'Captures linked to saved flights will appear here.';
+
+	/// en: 'Delete'
+	String get deleteAction => 'Delete';
+
+	/// en: 'Share'
+	String get share => 'Share';
+
+	/// en: '$count selected'
+	String selectedCount({required Object count}) => '${count} selected';
+
+	/// en: 'No flight context'
+	String get groupNoFlight => 'No flight context';
+
+	/// en: 'Captures taken outside an active flight'
+	String get groupNoFlightSubtitle => 'Captures taken outside an active flight';
+
+	/// en: 'Flight capture'
+	String get groupUnknownFlight => 'Flight capture';
+
+	/// en: 'Capture'
+	String get previewTitle => 'Capture';
+
+	/// en: '$count captures'
+	String captureCount({required Object count}) => '${count} captures';
+
+	/// en: 'Delete folder'
+	String get deleteFolder => 'Delete folder';
+
+	/// en: 'Delete $count folders'
+	String deleteFolders({required Object count}) => 'Delete ${count} folders';
+
+	/// en: 'Delete file'
+	String get deleteFile => 'Delete file';
+
+	/// en: 'Delete $count files'
+	String deleteFiles({required Object count}) => 'Delete ${count} files';
+
+	/// en: 'Delete this folder and all $count files?'
+	String deleteFolderConfirm({required Object count}) => 'Delete this folder and all ${count} files?';
+
+	/// en: 'Delete $count folders and all files inside them?'
+	String deleteFoldersConfirm({required Object count}) => 'Delete ${count} folders and all files inside them?';
+
+	/// en: 'Delete this file?'
+	String get deleteFileConfirm => 'Delete this file?';
+
+	/// en: 'Delete $count files?'
+	String deleteFilesConfirm({required Object count}) => 'Delete ${count} files?';
 }
 
 // Path: learn
@@ -3245,7 +3418,9 @@ extension on Translations {
 			'home.aboutTooltip' => 'About',
 			'home.settingsTooltip' => 'Settings',
 			'home.tabFlights' => 'Flights',
-			'home.tabLearn' => 'Learn & Play',
+			'home.tabLearn' => 'Learn',
+			'home.tabMedia' => 'Media',
+			'home.openSkyCamera' => 'Open Sky Camera',
 			'home.loadingFlights' => 'Loading flights...',
 			'home.failedToLoadFlights' => 'Failed to load flights',
 			'home.newFlight' => 'New flight',
@@ -3287,6 +3462,55 @@ extension on Translations {
 			'home.sort.mostRecent' => 'Most recent',
 			'home.sort.longest' => 'Longest',
 			'home.sort.alphabetical' => 'A-Z',
+			'skyCamera.loading' => 'Loading camera...',
+			'skyCamera.loadingGpsData' => 'Loading GPS data',
+			'skyCamera.zoom' => 'Zoom',
+			'skyCamera.flash' => 'Flash',
+			'skyCamera.cameraUnavailable' => 'Camera is unavailable right now.',
+			'skyCamera.cameraPermissionDenied' => 'Camera permission is required to take photos.',
+			'skyCamera.captureFailed' => 'Could not capture photo right now.',
+			'skyCamera.savedMessage' => 'Photo saved',
+			'skyCamera.share' => 'Share',
+			'skyCamera.noActiveFlightTitle' => 'No active flight',
+			'skyCamera.noActiveFlightMessage' => 'Sky Camera works without a flight, but route details appear only during an active flight.',
+			'skyCamera.telemetrySpeed' => 'Speed',
+			'skyCamera.telemetryAltitude' => 'Altitude',
+			'skyCamera.telemetryHeading' => 'Heading',
+			'skyCamera.telemetryTime' => 'Time',
+			'skyCamera.contextCaption' => 'Context',
+			'skyCamera.mapCaption' => 'Map',
+			'skyCamera.coordinatesCaption' => 'Coordinates',
+			'skyCamera.noValuePlaceholder' => '--',
+			'skyCamera.placeholderRoute' => 'LHR -> BCN',
+			'skyCamera.placeholderOriginCode' => 'LHR',
+			'skyCamera.placeholderDestinationCode' => 'BCN',
+			'skyCamera.placeholderContext' => 'Mediterranean Sea',
+			'skyCamera.placeholderMap' => 'Route preview',
+			'media.title' => 'Window Seat Media',
+			'media.loading' => 'Loading media...',
+			'media.failedToLoad' => 'Failed to load media',
+			'media.filesTab' => 'Files',
+			'media.flightsTab' => 'Flights',
+			'media.emptyTitle' => 'Welcome to your window-seat Sky Camera',
+			'media.emptySubtitle' => 'Capture and share beautiful views from your window seat with flight and GPS data overlays.',
+			'media.emptyFlightsTitle' => 'No flight folders yet',
+			'media.emptyFlightsSubtitle' => 'Captures linked to saved flights will appear here.',
+			'media.deleteAction' => 'Delete',
+			'media.share' => 'Share',
+			'media.selectedCount' => ({required Object count}) => '${count} selected',
+			'media.groupNoFlight' => 'No flight context',
+			'media.groupNoFlightSubtitle' => 'Captures taken outside an active flight',
+			'media.groupUnknownFlight' => 'Flight capture',
+			'media.previewTitle' => 'Capture',
+			'media.captureCount' => ({required Object count}) => '${count} captures',
+			'media.deleteFolder' => 'Delete folder',
+			'media.deleteFolders' => ({required Object count}) => 'Delete ${count} folders',
+			'media.deleteFile' => 'Delete file',
+			'media.deleteFiles' => ({required Object count}) => 'Delete ${count} files',
+			'media.deleteFolderConfirm' => ({required Object count}) => 'Delete this folder and all ${count} files?',
+			'media.deleteFoldersConfirm' => ({required Object count}) => 'Delete ${count} folders and all files inside them?',
+			'media.deleteFileConfirm' => 'Delete this file?',
+			'media.deleteFilesConfirm' => ({required Object count}) => 'Delete ${count} files?',
 			'learn.loadingCategories' => 'Loading learning categories...',
 			'learn.failedToLoadCategories' => 'Failed to load categories',
 			'learn.emptyCategoriesTitle' => 'No categories yet',
@@ -3688,6 +3912,8 @@ extension on Translations {
 			'createFlight.downloading.downloaded' => ({required Object size}) => 'Downloaded: ${size}',
 			'createFlight.downloading.finalizing' => 'Finalizing map package...',
 			'createFlight.downloading.verifying' => 'Verifying map package...',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.errors.failedLoadAirports' => 'Failed to load airports. Please try again.',
 			'createFlight.errors.airportSearchFailed' => 'Airport search failed. Try another query.',
 			'createFlight.errors.someArticlesFailed' => 'Some articles failed. Continuing with map download.',
@@ -3739,8 +3965,6 @@ extension on Translations {
 			'flight.map.validationFailed' => 'Offline map validation failed. Please re-download this route.',
 			'flight.map.loadStyleFailed' => 'Could not load offline map style.',
 			'flight.map.sunriseInMinutes' => ({required Object minutes}) => 'Sunrise in ${minutes} min',
-			_ => null,
-		} ?? switch (path) {
 			'flight.map.sunsetInMinutes' => ({required Object minutes}) => 'Sunset in ${minutes} min',
 			'flight.map.switchTo2D' => 'Switch to 2D',
 			'flight.map.switchTo3D' => 'Switch to 3D',

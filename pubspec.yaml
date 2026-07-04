@@ -37,6 +37,8 @@ dependencies:
   sqflite: ^2.3.2
   shared_preferences: ^2.2.3
   share_plus: ^10.0.2
+  sky_camera:
+    path: packages/sky_camera
   in_app_review: ^2.0.10
   url_launcher: ^6.3.2
   csv: ^5.0.2
@@ -60,6 +62,7 @@ dev_dependencies:
 
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.13.1
+  path_provider_platform_interface: ^2.1.2
   slang_build_runner: ^4.8.0
 
 flutter:

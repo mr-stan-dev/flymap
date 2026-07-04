@@ -893,7 +893,7 @@ SubscriptionCubit _buildSubscriptionCubit() {
   );
 }
 
-class _FakeGpsDataProvider extends GpsDataProvider {
+class _FakeGpsDataProvider implements GpsDataProvider {
   void Function(GpsStatus status, {GpsData? data})? _onUpdate;
 
   @override

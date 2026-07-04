@@ -42,6 +42,8 @@ class TranslationsFr extends Translations with BaseTranslations<AppLocale, Trans
 	@override String get appName => 'Flymap';
 	@override late final _TranslationsCommonFr common = _TranslationsCommonFr._(_root);
 	@override late final _TranslationsHomeFr home = _TranslationsHomeFr._(_root);
+	@override late final _TranslationsSkyCameraFr skyCamera = _TranslationsSkyCameraFr._(_root);
+	@override late final _TranslationsMediaFr media = _TranslationsMediaFr._(_root);
 	@override late final _TranslationsLearnFr learn = _TranslationsLearnFr._(_root);
 	@override late final _TranslationsSettingsFr settings = _TranslationsSettingsFr._(_root);
 	@override late final _TranslationsSubscriptionFr subscription = _TranslationsSubscriptionFr._(_root);
@@ -88,7 +90,9 @@ class _TranslationsHomeFr extends TranslationsHomeEn {
 	@override String get aboutTooltip => 'À propos';
 	@override String get settingsTooltip => 'Réglages';
 	@override String get tabFlights => 'Vols';
-	@override String get tabLearn => 'Apprendre et jouer';
+	@override String get tabLearn => 'Apprendre';
+	@override String get tabMedia => 'Médias';
+	@override String get openSkyCamera => 'Ouvrir Sky Camera';
 	@override String get loadingFlights => 'Chargement des vols...';
 	@override String get failedToLoadFlights => 'Échec du chargement des vols';
 	@override String get newFlight => 'Nouveau vol';
@@ -128,6 +132,73 @@ class _TranslationsHomeFr extends TranslationsHomeEn {
 	@override String hoursAgo({required Object hours}) => 'Il y a ${hours} h';
 	@override String minutesAgo({required Object minutes}) => 'Il y a ${minutes} min';
 	@override late final _TranslationsHomeSortFr sort = _TranslationsHomeSortFr._(_root);
+}
+
+// Path: skyCamera
+class _TranslationsSkyCameraFr extends TranslationsSkyCameraEn {
+	_TranslationsSkyCameraFr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get loading => 'Chargement de l’appareil photo...';
+	@override String get loadingGpsData => 'Chargement des données GPS';
+	@override String get zoom => 'Zoom';
+	@override String get flash => 'Flash';
+	@override String get cameraUnavailable => 'L’appareil photo n’est pas disponible pour le moment.';
+	@override String get cameraPermissionDenied => 'L’accès à l’appareil photo est requis pour prendre des photos.';
+	@override String get captureFailed => 'Impossible de prendre la photo pour le moment.';
+	@override String get savedMessage => 'Photo enregistrée';
+	@override String get share => 'Partager';
+	@override String get noActiveFlightTitle => 'Aucun vol actif';
+	@override String get noActiveFlightMessage => 'Sky Camera fonctionne sans vol, mais les détails d’itinéraire n’apparaissent que pendant un vol actif.';
+	@override String get telemetrySpeed => 'Vitesse';
+	@override String get telemetryAltitude => 'Altitude';
+	@override String get telemetryHeading => 'Cap';
+	@override String get telemetryTime => 'Heure';
+	@override String get contextCaption => 'Contexte';
+	@override String get mapCaption => 'Carte';
+	@override String get coordinatesCaption => 'Coordonnées';
+	@override String get noValuePlaceholder => '--';
+	@override String get placeholderRoute => 'LHR -> BCN';
+	@override String get placeholderOriginCode => 'LHR';
+	@override String get placeholderDestinationCode => 'BCN';
+	@override String get placeholderContext => 'Mer Méditerranée';
+	@override String get placeholderMap => 'Aperçu de l’itinéraire';
+}
+
+// Path: media
+class _TranslationsMediaFr extends TranslationsMediaEn {
+	_TranslationsMediaFr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Médias côté hublot';
+	@override String get loading => 'Chargement des médias...';
+	@override String get failedToLoad => 'Impossible de charger les médias';
+	@override String get filesTab => 'Fichiers';
+	@override String get flightsTab => 'Vols';
+	@override String get emptyTitle => 'Bienvenue dans votre Sky Camera côté hublot';
+	@override String get emptySubtitle => 'Capturez et partagez de magnifiques vues depuis votre siège côté hublot avec des données de vol et GPS en surimpression.';
+	@override String get emptyFlightsTitle => 'Aucun dossier de vol pour l’instant';
+	@override String get emptyFlightsSubtitle => 'Les captures liées aux vols enregistrés apparaîtront ici.';
+	@override String get deleteAction => 'Supprimer';
+	@override String get share => 'Partager';
+	@override String selectedCount({required Object count}) => '${count} sélectionné(s)';
+	@override String get groupNoFlight => 'Aucun contexte de vol';
+	@override String get groupNoFlightSubtitle => 'Captures prises hors d’un vol actif';
+	@override String get groupUnknownFlight => 'Capture de vol';
+	@override String get previewTitle => 'Capture';
+	@override String captureCount({required Object count}) => '${count} captures';
+	@override String get deleteFolder => 'Supprimer le dossier';
+	@override String deleteFolders({required Object count}) => 'Supprimer ${count} dossiers';
+	@override String get deleteFile => 'Supprimer le fichier';
+	@override String deleteFiles({required Object count}) => 'Supprimer ${count} fichiers';
+	@override String deleteFolderConfirm({required Object count}) => 'Supprimer ce dossier et ses ${count} fichiers ?';
+	@override String deleteFoldersConfirm({required Object count}) => 'Supprimer ${count} dossiers et tous les fichiers qu’ils contiennent ?';
+	@override String get deleteFileConfirm => 'Supprimer ce fichier ?';
+	@override String deleteFilesConfirm({required Object count}) => 'Supprimer ${count} fichiers ?';
 }
 
 // Path: learn
@@ -1364,7 +1435,9 @@ extension on TranslationsFr {
 			'home.aboutTooltip' => 'À propos',
 			'home.settingsTooltip' => 'Réglages',
 			'home.tabFlights' => 'Vols',
-			'home.tabLearn' => 'Apprendre et jouer',
+			'home.tabLearn' => 'Apprendre',
+			'home.tabMedia' => 'Médias',
+			'home.openSkyCamera' => 'Ouvrir Sky Camera',
 			'home.loadingFlights' => 'Chargement des vols...',
 			'home.failedToLoadFlights' => 'Échec du chargement des vols',
 			'home.newFlight' => 'Nouveau vol',
@@ -1406,6 +1479,55 @@ extension on TranslationsFr {
 			'home.sort.mostRecent' => 'Le plus récent',
 			'home.sort.longest' => 'Le plus long',
 			'home.sort.alphabetical' => 'A-Z',
+			'skyCamera.loading' => 'Chargement de l’appareil photo...',
+			'skyCamera.loadingGpsData' => 'Chargement des données GPS',
+			'skyCamera.zoom' => 'Zoom',
+			'skyCamera.flash' => 'Flash',
+			'skyCamera.cameraUnavailable' => 'L’appareil photo n’est pas disponible pour le moment.',
+			'skyCamera.cameraPermissionDenied' => 'L’accès à l’appareil photo est requis pour prendre des photos.',
+			'skyCamera.captureFailed' => 'Impossible de prendre la photo pour le moment.',
+			'skyCamera.savedMessage' => 'Photo enregistrée',
+			'skyCamera.share' => 'Partager',
+			'skyCamera.noActiveFlightTitle' => 'Aucun vol actif',
+			'skyCamera.noActiveFlightMessage' => 'Sky Camera fonctionne sans vol, mais les détails d’itinéraire n’apparaissent que pendant un vol actif.',
+			'skyCamera.telemetrySpeed' => 'Vitesse',
+			'skyCamera.telemetryAltitude' => 'Altitude',
+			'skyCamera.telemetryHeading' => 'Cap',
+			'skyCamera.telemetryTime' => 'Heure',
+			'skyCamera.contextCaption' => 'Contexte',
+			'skyCamera.mapCaption' => 'Carte',
+			'skyCamera.coordinatesCaption' => 'Coordonnées',
+			'skyCamera.noValuePlaceholder' => '--',
+			'skyCamera.placeholderRoute' => 'LHR -> BCN',
+			'skyCamera.placeholderOriginCode' => 'LHR',
+			'skyCamera.placeholderDestinationCode' => 'BCN',
+			'skyCamera.placeholderContext' => 'Mer Méditerranée',
+			'skyCamera.placeholderMap' => 'Aperçu de l’itinéraire',
+			'media.title' => 'Médias côté hublot',
+			'media.loading' => 'Chargement des médias...',
+			'media.failedToLoad' => 'Impossible de charger les médias',
+			'media.filesTab' => 'Fichiers',
+			'media.flightsTab' => 'Vols',
+			'media.emptyTitle' => 'Bienvenue dans votre Sky Camera côté hublot',
+			'media.emptySubtitle' => 'Capturez et partagez de magnifiques vues depuis votre siège côté hublot avec des données de vol et GPS en surimpression.',
+			'media.emptyFlightsTitle' => 'Aucun dossier de vol pour l’instant',
+			'media.emptyFlightsSubtitle' => 'Les captures liées aux vols enregistrés apparaîtront ici.',
+			'media.deleteAction' => 'Supprimer',
+			'media.share' => 'Partager',
+			'media.selectedCount' => ({required Object count}) => '${count} sélectionné(s)',
+			'media.groupNoFlight' => 'Aucun contexte de vol',
+			'media.groupNoFlightSubtitle' => 'Captures prises hors d’un vol actif',
+			'media.groupUnknownFlight' => 'Capture de vol',
+			'media.previewTitle' => 'Capture',
+			'media.captureCount' => ({required Object count}) => '${count} captures',
+			'media.deleteFolder' => 'Supprimer le dossier',
+			'media.deleteFolders' => ({required Object count}) => 'Supprimer ${count} dossiers',
+			'media.deleteFile' => 'Supprimer le fichier',
+			'media.deleteFiles' => ({required Object count}) => 'Supprimer ${count} fichiers',
+			'media.deleteFolderConfirm' => ({required Object count}) => 'Supprimer ce dossier et ses ${count} fichiers ?',
+			'media.deleteFoldersConfirm' => ({required Object count}) => 'Supprimer ${count} dossiers et tous les fichiers qu’ils contiennent ?',
+			'media.deleteFileConfirm' => 'Supprimer ce fichier ?',
+			'media.deleteFilesConfirm' => ({required Object count}) => 'Supprimer ${count} fichiers ?',
 			'learn.loadingCategories' => 'Chargement des catégories...',
 			'learn.failedToLoadCategories' => 'Échec du chargement des catégories',
 			'learn.emptyCategoriesTitle' => 'Aucune catégorie pour l’instant',
@@ -1807,6 +1929,8 @@ extension on TranslationsFr {
 			'createFlight.downloading.downloaded' => ({required Object size}) => 'Téléchargé : ${size}',
 			'createFlight.downloading.finalizing' => 'Finalisation du pack de cartes...',
 			'createFlight.downloading.verifying' => 'Vérification du pack de cartes...',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.errors.failedLoadAirports' => 'Échec du chargement des aéroports. Veuillez réessayer.',
 			'createFlight.errors.airportSearchFailed' => 'La recherche d’aéroport a échoué. Essayez une autre requête.',
 			'createFlight.errors.someArticlesFailed' => 'Certains articles ont échoué. Le téléchargement de la carte continue.',
@@ -1858,8 +1982,6 @@ extension on TranslationsFr {
 			'flight.map.validationFailed' => 'La validation de la carte hors ligne a échoué. Veuillez retélécharger cet itinéraire.',
 			'flight.map.loadStyleFailed' => 'Impossible de charger le style de la carte hors ligne.',
 			'flight.map.sunriseInMinutes' => ({required Object minutes}) => 'Lever du soleil dans ${minutes} min',
-			_ => null,
-		} ?? switch (path) {
 			'flight.map.sunsetInMinutes' => ({required Object minutes}) => 'Coucher du soleil dans ${minutes} min',
 			'flight.map.switchTo2D' => 'Passer en 2D',
 			'flight.map.switchTo3D' => 'Passer en 3D',

@@ -120,5 +120,23 @@ void main() {
         'learn_locked_content',
       );
     });
+
+    test('Sky Camera events have stable provider-specific properties', () {
+      const event = SkyCameraPhotoSavedEvent(
+        hasActiveFlightContext: true,
+        hasLiveLocation: true,
+        saveCleanCopy: true,
+        saveOverlayCopy: true,
+      );
+
+      expect(event.firebaseEventName, 'sky_camera_photo_saved');
+      expect(event.firebaseParameters, <String, Object>{
+        'overlay_mode': 'placeholder_v1',
+      });
+      expect(event.postHogEventName, 'sky_camera_photo_saved');
+      expect(event.postHogParameters['save_clean_copy'], isTrue);
+      expect(event.postHogParameters['save_overlay_copy'], isTrue);
+      expect(event.postHogParameters['overlay_mode'], 'placeholder_v1');
+    });
   });
 }
