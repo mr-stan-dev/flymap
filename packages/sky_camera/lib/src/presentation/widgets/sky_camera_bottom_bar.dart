@@ -23,10 +23,15 @@ class SkyCameraBottomBar extends StatelessWidget {
   final double currentZoomLevel;
   final ValueChanged<double> onZoomSelected;
 
+  static const _thumbnailSize = 72 * 0.8;
+  static const _thumbnailRadius = 18 * 0.8;
+  static const _thumbnailProgressSize = 20 * 0.8;
+
   @override
   Widget build(BuildContext context) {
     final thumbnailPath = this.thumbnailPath;
     return SizedBox(
+      key: const Key('sky_camera.bottom_bar'),
       height: 180,
       child: Stack(
         children: [
@@ -43,31 +48,28 @@ class SkyCameraBottomBar extends StatelessWidget {
             left: 0,
             right: 0,
             height: 84,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: thumbnailPath != null
-                          ? _SkyCameraThumbnail(
-                              path: thumbnailPath,
-                              isSaving: isCapturing,
-                              onTap: onThumbnailTap,
-                            )
-                          : isCapturing
-                          ? const _SkyCameraSavingThumbnail()
-                          : const SizedBox(width: 72, height: 72),
-                    ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Center(
+                    child: thumbnailPath != null
+                        ? _SkyCameraThumbnail(
+                            path: thumbnailPath,
+                            isSaving: isCapturing,
+                            onTap: onThumbnailTap,
+                          )
+                        : isCapturing
+                        ? const _SkyCameraSavingThumbnail()
+                        : const SizedBox.square(dimension: _thumbnailSize),
                   ),
-                  _SkyCameraCaptureButton(
-                    isCapturing: isCapturing,
-                    onCapture: onCapture,
-                  ),
-                  const Expanded(child: SizedBox()),
-                ],
-              ),
+                ),
+                _SkyCameraCaptureButton(
+                  isCapturing: isCapturing,
+                  onCapture: onCapture,
+                ),
+                const Expanded(child: SizedBox()),
+              ],
             ),
           ),
           Positioned(
@@ -170,10 +172,12 @@ class _SkyCameraThumbnail extends StatelessWidget {
       key: const Key('sky_camera.last_capture_thumbnail'),
       onTap: onTap,
       child: Container(
-        width: 72,
-        height: 72,
+        width: SkyCameraBottomBar._thumbnailSize,
+        height: SkyCameraBottomBar._thumbnailSize,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(
+            SkyCameraBottomBar._thumbnailRadius,
+          ),
           border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
           boxShadow: [
             BoxShadow(
@@ -209,8 +213,8 @@ class _SkyCameraThumbnail extends StatelessWidget {
                 ),
                 child: const Center(
                   child: SizedBox(
-                    width: 20,
-                    height: 20,
+                    width: SkyCameraBottomBar._thumbnailProgressSize,
+                    height: SkyCameraBottomBar._thumbnailProgressSize,
                     child: CircularProgressIndicator(
                       key: Key('sky_camera.saving_thumbnail_indicator'),
                       strokeWidth: 2.2,
@@ -244,11 +248,13 @@ class _SkyCameraSavingThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('sky_camera.last_capture_thumbnail'),
-      width: 72,
-      height: 72,
+      width: SkyCameraBottomBar._thumbnailSize,
+      height: SkyCameraBottomBar._thumbnailSize,
       decoration: BoxDecoration(
         color: const Color(0xCC121824),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(
+          SkyCameraBottomBar._thumbnailRadius,
+        ),
         border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
@@ -260,8 +266,8 @@ class _SkyCameraSavingThumbnail extends StatelessWidget {
       ),
       child: const Center(
         child: SizedBox(
-          width: 20,
-          height: 20,
+          width: SkyCameraBottomBar._thumbnailProgressSize,
+          height: SkyCameraBottomBar._thumbnailProgressSize,
           child: CircularProgressIndicator(
             key: Key('sky_camera.saving_thumbnail_indicator'),
             strokeWidth: 2.2,

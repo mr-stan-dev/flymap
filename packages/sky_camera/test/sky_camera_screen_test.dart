@@ -228,10 +228,19 @@ void main() {
     final thumbnailSize = tester.getSize(
       find.byKey(const Key('sky_camera.last_capture_thumbnail')),
     );
+    final bottomBarLeft = tester
+        .getTopLeft(find.byKey(const Key('sky_camera.bottom_bar')))
+        .dx;
+    final shutterLeft = tester
+        .getTopLeft(find.byKey(const Key('sky_camera.capture_button')))
+        .dx;
+    final expectedThumbnailCenter = (bottomBarLeft + shutterLeft) / 2;
     final screenCenter = tester.getCenter(find.byType(Scaffold));
     expect(shutterCenter.dx, closeTo(screenCenter.dx, 0.01));
     expect(thumbnailCenter.dy, closeTo(shutterCenter.dy, 0.01));
+    expect(thumbnailCenter.dx, closeTo(expectedThumbnailCenter, 0.01));
     expect(thumbnailSize.width, thumbnailSize.height);
+    expect(thumbnailSize.width, closeTo(57.6, 0.01));
   });
 
   testWidgets('tap on thumbnail opens full screen preview', (tester) async {
