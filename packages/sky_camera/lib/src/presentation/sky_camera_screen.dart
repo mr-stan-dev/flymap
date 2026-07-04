@@ -212,9 +212,9 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
       });
       unawaited(_startSnapshotSource());
       await widget.driver.initialize();
-      await _loadCameraCapabilities();
       if (!mounted) return;
       setState(() => _isCameraLoading = false);
+      await _loadCameraCapabilities();
     } on CameraException catch (error) {
       if (!mounted) return;
       setState(() {
@@ -245,7 +245,25 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   }
 
   Future<void> _handleAppLifecycleStateChanged(AppLifecycleState state) async {
-    await widget.driver.onAppLifecycleStateChanged(state);
+    try {
+      await widget.driver.onAppLifecycleStateChanged(state);
+    } on CameraException catch (error) {
+      if (!mounted || widget.driver.isInitialized) return;
+      setState(() {
+        _isCameraLoading = false;
+        _errorMessage = error.code == 'CameraAccessDenied'
+            ? widget.strings.cameraPermissionDenied
+            : widget.strings.cameraUnavailable;
+      });
+      return;
+    } catch (_) {
+      if (!mounted || widget.driver.isInitialized) return;
+      setState(() {
+        _isCameraLoading = false;
+        _errorMessage = widget.strings.cameraUnavailable;
+      });
+      return;
+    }
     if (!mounted || state != AppLifecycleState.resumed) return;
     await _loadCameraCapabilities();
   }
@@ -356,7 +374,12 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   }
 
   Future<void> _loadCameraCapabilities() async {
-    await _zoomController.loadBounds(widget.driver);
+    try {
+      await _zoomController.loadBounds(widget.driver);
+    } catch (_) {
+      // Zoom discovery is optional; preview and capture remain usable.
+      return;
+    }
     if (!mounted) return;
     setState(() {});
   }

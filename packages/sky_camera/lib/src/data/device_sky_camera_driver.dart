@@ -51,12 +51,19 @@ class DeviceSkyCameraDriver implements SkyCameraDriver {
       );
       _controller = controller;
       await controller.initialize();
-      await controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
+      await _runBestEffort(
+        () => controller.lockCaptureOrientation(DeviceOrientation.portraitUp),
+      );
       await _configureCaptureDefaults(controller);
-      await _applyFlashMode();
-      _minZoomLevel = await controller.getMinZoomLevel();
-      _maxZoomLevel = await controller.getMaxZoomLevel();
-      await controller.setZoomLevel(_minZoomLevel);
+      await _runBestEffort(_applyFlashMode);
+      try {
+        _minZoomLevel = await controller.getMinZoomLevel();
+        _maxZoomLevel = await controller.getMaxZoomLevel();
+        await controller.setZoomLevel(_minZoomLevel);
+      } catch (_) {
+        _minZoomLevel = 1.0;
+        _maxZoomLevel = 1.0;
+      }
     });
   }
 
@@ -206,6 +213,14 @@ class DeviceSkyCameraDriver implements SkyCameraDriver {
       await controller.setExposureMode(ExposureMode.auto);
     } catch (_) {
       // Best-effort only.
+    }
+  }
+
+  Future<void> _runBestEffort(Future<void> Function() action) async {
+    try {
+      await action();
+    } catch (_) {
+      // Optional camera capabilities must not invalidate a working preview.
     }
   }
 

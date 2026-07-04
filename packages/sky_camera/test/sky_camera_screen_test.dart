@@ -663,6 +663,40 @@ void main() {
 
     expect(find.byKey(const Key('sky_camera.gps_loading_badge')), findsNothing);
   });
+
+  testWidgets('zoom capability failure does not mark camera unavailable', (
+    tester,
+  ) async {
+    final driver = _FakeSkyCameraDriver(throwOnZoomBounds: true);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SkyCameraScreen(
+          driver: driver,
+          snapshotSource: const _FakeSnapshotSource(),
+          exportService: _FakeExportService(),
+          observer: const _FakeObserver(),
+          photoCropper: const _FakePhotoCropper(),
+          openCapturePreview: _openFakeCapturePreview,
+          overlayComposer: const _FakeOverlayComposer(),
+          strings: _strings,
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Camera unavailable'), findsNothing);
+    expect(find.byKey(const Key('test.preview')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.runAsync(() async {
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    });
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    expect(driver.didCapture, isTrue);
+  });
 }
 
 const _strings = SkyCameraStrings(
@@ -711,6 +745,9 @@ Future<Set<String>> _openFakeCapturePreview(
 }
 
 class _FakeSkyCameraDriver implements SkyCameraDriver {
+  _FakeSkyCameraDriver({this.throwOnZoomBounds = false});
+
+  final bool throwOnZoomBounds;
   bool _isInitialized = false;
   bool didCapture = false;
   Offset? lastFocusPoint;
@@ -768,6 +805,9 @@ class _FakeSkyCameraDriver implements SkyCameraDriver {
 
   @override
   Future<SkyCameraZoomBounds> getZoomBounds() async {
+    if (throwOnZoomBounds) {
+      throw StateError('Zoom bounds are unavailable.');
+    }
     return const SkyCameraZoomBounds(min: 1.0, max: 4.0);
   }
 
