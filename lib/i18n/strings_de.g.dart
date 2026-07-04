@@ -440,6 +440,7 @@ class _TranslationsFlightDe extends TranslationsFlightEn {
 	@override String get tabDashboard => 'Dashboard';
 	@override String get tabRoute => 'Route';
 	@override String get tabRead => 'Lesen';
+	@override String get tabCamera => 'Kamera';
 	@override String get tabInfo => 'Info';
 	@override String get completeDialogTitle => 'Flug abschließen?';
 	@override String get completeDialogBody => 'Damit wird dein Flug als abgeschlossen markiert.';
@@ -1961,6 +1962,7 @@ extension on TranslationsDe {
 			'flight.tabDashboard' => 'Dashboard',
 			'flight.tabRoute' => 'Route',
 			'flight.tabRead' => 'Lesen',
+			'flight.tabCamera' => 'Kamera',
 			'flight.tabInfo' => 'Info',
 			'flight.completeDialogTitle' => 'Flug abschließen?',
 			'flight.completeDialogBody' => 'Damit wird dein Flug als abgeschlossen markiert.',

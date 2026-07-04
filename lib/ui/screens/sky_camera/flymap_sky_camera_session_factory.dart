@@ -61,6 +61,26 @@ class FlymapSkyCameraSessionFactory {
   FlymapSkyCameraSession create({
     required FlymapSkyCameraPlaceholderCopy placeholderCopy,
   }) {
+    return _create(
+      placeholderCopy: placeholderCopy,
+      sessionExportService: exportService,
+    );
+  }
+
+  FlymapSkyCameraSession createForFlight({
+    required FlymapSkyCameraPlaceholderCopy placeholderCopy,
+    required String flightId,
+  }) {
+    return _create(
+      placeholderCopy: placeholderCopy,
+      sessionExportService: exportService.scopedToFlight(flightId),
+    );
+  }
+
+  FlymapSkyCameraSession _create({
+    required FlymapSkyCameraPlaceholderCopy placeholderCopy,
+    required SkyCameraExportService sessionExportService,
+  }) {
     return FlymapSkyCameraSession(
       driver: DeviceSkyCameraDriver(),
       snapshotSource: FlymapSkyCameraOverlaySnapshotSource(
@@ -69,7 +89,7 @@ class FlymapSkyCameraSessionFactory {
         ),
         locationService: locationService,
       ),
-      exportService: exportService,
+      exportService: sessionExportService,
       shareService: shareService,
       observer: FlymapSkyCameraAnalyticsObserver(
         analytics: analytics,

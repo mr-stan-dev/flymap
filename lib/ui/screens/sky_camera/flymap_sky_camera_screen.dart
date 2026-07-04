@@ -13,7 +13,14 @@ import 'package:get_it/get_it.dart';
 import 'package:sky_camera/sky_camera.dart';
 
 class FlymapSkyCameraScreen extends StatefulWidget {
-  const FlymapSkyCameraScreen({super.key});
+  const FlymapSkyCameraScreen({super.key}) : flightId = null;
+
+  const FlymapSkyCameraScreen.forFlight({
+    required String this.flightId,
+    super.key,
+  });
+
+  final String? flightId;
 
   @override
   State<FlymapSkyCameraScreen> createState() => _FlymapSkyCameraScreenState();
@@ -123,7 +130,12 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
       _altitudeUnit = _mapAltitudeUnit(altitudeUnit);
       _speedUnit = _mapSpeedUnit(speedUnit);
       _dateDisplayFormat = _mapDateDisplayFormat(dateDisplayFormat);
-      _session = factory.create(placeholderCopy: placeholderCopy);
+      _session = currentFlight == null
+          ? factory.create(placeholderCopy: placeholderCopy)
+          : factory.createForFlight(
+              placeholderCopy: placeholderCopy,
+              flightId: currentFlight.id,
+            );
       _isLoadingSession = false;
     });
     if (currentFlight == null) {
@@ -168,6 +180,10 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
   }
 
   Future<Flight?> _currentFlight(FlymapSkyCameraSessionFactory factory) async {
+    final requestedFlightId = widget.flightId;
+    if (requestedFlightId != null) {
+      return factory.flightRepository.getFlightById(requestedFlightId);
+    }
     final flights = await factory.flightRepository.getAllFlights();
     final inProgressFlights = flights
         .where((flight) => flight.status == FlightStatus.inProgress)

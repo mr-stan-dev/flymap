@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/domain/entity/flight.dart';
@@ -6,6 +7,7 @@ import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/widgets/complete_flight_confirmation_dialog.dart';
 import 'package:flymap/ui/screens/flight/widgets/delete_flight_confirmation_dialog.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/debug/flight_debug_screen.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
 import 'package:flymap/ui/widgets/pro_widgets.dart';
@@ -113,6 +115,12 @@ class FlightAppBar extends StatelessWidget {
                               value: 'share_route',
                               child: Text(context.t.flight.shareRoute),
                             ),
+                            if (kDebugMode)
+                              PopupMenuItem(
+                                key: const Key('flight.debug_menu_item'),
+                                value: 'debug',
+                                child: Text(context.t.common.debug),
+                              ),
                             PopupMenuDivider(),
                             PopupMenuItem(
                               value: 'complete_flight',
@@ -140,6 +148,18 @@ class FlightAppBar extends StatelessWidget {
     switch (value) {
       case 'share_route':
         AppRouter.goToShareImage(context, flightId: flight.id);
+        break;
+      case 'debug':
+        if (!kDebugMode) return;
+        final cubit = context.read<FlightScreenCubit>();
+        await Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => BlocProvider.value(
+              value: cubit,
+              child: const FlightDebugScreen(),
+            ),
+          ),
+        );
         break;
       case 'delete_flight':
         final confirmed = await DeleteFlightConfirmationDialog.show(

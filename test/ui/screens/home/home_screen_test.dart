@@ -48,6 +48,7 @@ import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/subscription/subscription_status.dart';
 import 'package:flymap/ui/screens/home/home_screen.dart';
+import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_screen.dart';
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_session_factory.dart';
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_export_service.dart';
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_share_service.dart';
@@ -242,6 +243,40 @@ void main() {
     await tester.pump();
 
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('camera launched for a flight keeps that exact flight context', (
+    tester,
+  ) async {
+    final selectedFlight = _buildFlight(
+      id: 'selected-flight',
+      status: FlightStatus.completed,
+    );
+    final newerActiveFlight = _buildFlight(
+      id: 'newer-active-flight',
+      status: FlightStatus.inProgress,
+    );
+    final factory = _FakeFlymapSkyCameraSessionFactory(
+      mediaRepository: mediaRepository,
+      flightRepository: _FakeFlightRepository(
+        flights: [newerActiveFlight, selectedFlight],
+      ),
+    );
+    await GetIt.I.unregister<FlymapSkyCameraSessionFactory>();
+    GetIt.I.registerSingleton<FlymapSkyCameraSessionFactory>(factory);
+
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(
+          home: FlymapSkyCameraScreen.forFlight(flightId: selectedFlight.id),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(factory.createdForFlightId, selectedFlight.id);
+    expect(find.textContaining('LHR'), findsOneWidget);
   });
 
   testWidgets(
@@ -541,7 +576,12 @@ class _FakeFlightRepository implements FlightRepository {
   Future<List<Flight>> getAllFlights() async => flights;
 
   @override
-  Future<Flight?> getFlightById(String flightId) async => null;
+  Future<Flight?> getFlightById(String flightId) async {
+    for (final flight in flights) {
+      if (flight.id == flightId) return flight;
+    }
+    return null;
+  }
 
   @override
   Future<int> getTotalDownloadedMaps() async => 0;
@@ -835,10 +875,27 @@ class _FakeFlymapSkyCameraSessionFactory extends FlymapSkyCameraSessionFactory {
          ),
        );
 
+  String? createdForFlightId;
+
   @override
   FlymapSkyCameraSession create({
     required FlymapSkyCameraPlaceholderCopy placeholderCopy,
   }) {
+    return _createSession(placeholderCopy);
+  }
+
+  @override
+  FlymapSkyCameraSession createForFlight({
+    required FlymapSkyCameraPlaceholderCopy placeholderCopy,
+    required String flightId,
+  }) {
+    createdForFlightId = flightId;
+    return _createSession(placeholderCopy);
+  }
+
+  FlymapSkyCameraSession _createSession(
+    FlymapSkyCameraPlaceholderCopy placeholderCopy,
+  ) {
     return FlymapSkyCameraSession(
       driver: _FakeSkyCameraDriver(),
       snapshotSource: _FakeSkyCameraSnapshotSource(

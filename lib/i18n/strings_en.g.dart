@@ -1009,6 +1009,9 @@ class TranslationsFlightEn {
 	/// en: 'Read'
 	String get tabRead => 'Read';
 
+	/// en: 'Camera'
+	String get tabCamera => 'Camera';
+
 	/// en: 'Info'
 	String get tabInfo => 'Info';
 
@@ -3944,6 +3947,7 @@ extension on Translations {
 			'flight.tabDashboard' => 'Dashboard',
 			'flight.tabRoute' => 'Route',
 			'flight.tabRead' => 'Read',
+			'flight.tabCamera' => 'Camera',
 			'flight.tabInfo' => 'Info',
 			'flight.completeDialogTitle' => 'Complete flight?',
 			'flight.completeDialogBody' => 'This marks your flight as completed.',

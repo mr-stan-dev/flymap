@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/analytics/app_analytics.dart';
@@ -13,11 +12,11 @@ import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/widgets/flight_app_bar.dart';
 import 'package:flymap/ui/screens/flight/widgets/gps_signal_help_sheet.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/dashboard_tab_view.dart';
-import 'package:flymap/ui/screens/flight/widgets/tabs/debug/debug_tab_view.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_tab.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/read/read_tab_view.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/route/flight_route_tab_view.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
+import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_screen.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:get_it/get_it.dart';
 
@@ -76,7 +75,7 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
         selectedIconTheme: const IconThemeData(size: 26),
         unselectedIconTheme: const IconThemeData(size: 24),
         currentIndex: _tabIndex,
-        onTap: (index) => setState(() => _tabIndex = index),
+        onTap: _handleNavigationTap,
         items: [
           BottomNavigationBarItem(
             icon: const Icon(Icons.map_outlined),
@@ -98,12 +97,14 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
             activeIcon: const Icon(Icons.article),
             label: t.flight.tabRead,
           ),
-          if (kDebugMode)
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bug_report_outlined),
-              activeIcon: Icon(Icons.bug_report),
-              label: t.common.debug,
+          BottomNavigationBarItem(
+            icon: const Icon(
+              Icons.camera_alt_outlined,
+              key: Key('flight.camera_action'),
             ),
+            activeIcon: const Icon(Icons.camera_alt),
+            label: t.flight.tabCamera,
+          ),
         ],
       ),
       body: BlocConsumer<FlightScreenCubit, FlightScreenState>(
@@ -147,11 +148,6 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
                       state: state,
                       topPadding: _tabTopPadding(context),
                     ),
-                    if (kDebugMode)
-                      FlightDebugTabView(
-                        state: state,
-                        topPadding: _tabTopPadding(context),
-                      ),
                   ],
                 ),
               ),
@@ -193,6 +189,24 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
     } finally {
       _isGpsHelpSheetOpen = false;
     }
+  }
+
+  void _handleNavigationTap(int index) {
+    if (index == 4) {
+      unawaited(_openCamera());
+      return;
+    }
+    setState(() => _tabIndex = index);
+  }
+
+  Future<void> _openCamera() async {
+    final flightId = context.read<FlightScreenCubit>().flight.id;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => FlymapSkyCameraScreen.forFlight(flightId: flightId),
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   void _logFlightOpened() {

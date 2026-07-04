@@ -34,6 +34,7 @@ import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/subscription/subscription_status.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
+import 'package:flymap/ui/screens/flight/flight_screen.dart';
 import 'package:flymap/ui/screens/flight/widgets/gps_signal_help_sheet.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/dashboard_panel.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/dashboard_tab_view.dart';
@@ -686,9 +687,104 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('camera action keeps the selected flight tab', (tester) async {
+    final flight = _buildFlight(status: FlightStatus.inProgress);
+    final cubit = FlightScreenCubit(
+      flight: flight,
+      deleteFlightUseCase: _NoopDeleteFlightUseCase(),
+      completeFlightUseCase: _NoopCompleteFlightUseCase(),
+      startFlightUseCase: _FakeStartFlightUseCase(result: true),
+      gpsProvider: _FakeGpsDataProvider(),
+      enableGpsCheckTimer: false,
+    );
+    final subscriptionCubit = _buildSubscriptionCubit();
+    final navigatorObserver = _RecordingNavigatorObserver();
+    addTearDown(cubit.close);
+    addTearDown(subscriptionCubit.close);
+
+    await tester.pumpWidget(
+      _testApp(
+        navigatorObservers: [navigatorObserver],
+        child: BlocProvider.value(
+          value: subscriptionCubit,
+          child: FlightScreen(flight: flight, cubit: cubit),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.text('Route'));
+    await tester.pump();
+
+    expect(
+      tester
+          .widget<BottomNavigationBar>(find.byType(BottomNavigationBar))
+          .currentIndex,
+      2,
+    );
+    expect(
+      tester
+          .widget<BottomNavigationBar>(find.byType(BottomNavigationBar))
+          .items,
+      hasLength(5),
+    );
+
+    await tester.tap(find.byKey(const Key('flight.camera_action')));
+
+    expect(navigatorObserver.pushedRoutes, hasLength(2));
+    expect(
+      tester
+          .widget<BottomNavigationBar>(find.byType(BottomNavigationBar))
+          .currentIndex,
+      2,
+    );
+
+    navigatorObserver.navigator!.pop();
+    await tester.pump();
+  });
+
+  testWidgets('debug simulation is available from the overflow menu', (
+    tester,
+  ) async {
+    final flight = _buildFlight(status: FlightStatus.inProgress);
+    final gpsProvider = _FakeGpsDataProvider();
+    final cubit = FlightScreenCubit(
+      flight: flight,
+      deleteFlightUseCase: _NoopDeleteFlightUseCase(),
+      completeFlightUseCase: _NoopCompleteFlightUseCase(),
+      startFlightUseCase: _FakeStartFlightUseCase(result: true),
+      gpsProvider: gpsProvider,
+      enableGpsCheckTimer: false,
+    );
+    final subscriptionCubit = _buildSubscriptionCubit();
+    addTearDown(cubit.close);
+    addTearDown(subscriptionCubit.close);
+
+    await tester.pumpWidget(
+      _testApp(
+        child: BlocProvider.value(
+          value: subscriptionCubit,
+          child: FlightScreen(flight: flight, cubit: cubit),
+        ),
+      ),
+    );
+    await tester.pump();
+    gpsProvider.emit(GpsStatus.searching);
+    await tester.pump();
+
+    expect(find.text('Debug'), findsNothing);
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.byKey(const Key('flight.debug_menu_item')), findsOneWidget);
+  });
 }
 
-Widget _testApp({required Widget child}) {
+Widget _testApp({
+  required Widget child,
+  List<NavigatorObserver> navigatorObservers = const [],
+}) {
   return TranslationProvider(
     child: MaterialApp(
       theme: AppTheme.lightTheme,
@@ -696,9 +792,20 @@ Widget _testApp({required Widget child}) {
       locale: AppLocale.en.flutterLocale,
       supportedLocales: AppLocaleUtils.supportedLocales,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      navigatorObservers: navigatorObservers,
       home: Scaffold(body: child),
     ),
   );
+}
+
+class _RecordingNavigatorObserver extends NavigatorObserver {
+  final List<Route<dynamic>> pushedRoutes = [];
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    pushedRoutes.add(route);
+    super.didPush(route, previousRoute);
+  }
 }
 
 FlightScreenLoaded _loadedState({

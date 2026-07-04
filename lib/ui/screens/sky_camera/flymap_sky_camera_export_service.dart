@@ -13,10 +13,26 @@ class FlymapSkyCameraExportService implements SkyCameraExportService {
     required FlightRepository flightRepository,
     required SkyCameraMediaRepository mediaRepository,
   }) : _flightRepository = flightRepository,
-       _mediaRepository = mediaRepository;
+       _mediaRepository = mediaRepository,
+       _fixedFlightId = null;
 
-  final FlightRepository _flightRepository;
+  FlymapSkyCameraExportService.forFlight({
+    required SkyCameraMediaRepository mediaRepository,
+    required String flightId,
+  }) : _flightRepository = null,
+       _mediaRepository = mediaRepository,
+       _fixedFlightId = _normalizeFlightId(flightId);
+
+  final FlightRepository? _flightRepository;
   final SkyCameraMediaRepository _mediaRepository;
+  final String? _fixedFlightId;
+
+  FlymapSkyCameraExportService scopedToFlight(String flightId) {
+    return FlymapSkyCameraExportService.forFlight(
+      mediaRepository: _mediaRepository,
+      flightId: flightId,
+    );
+  }
 
   @override
   Future<SkyCameraSavedCapture> saveCapture({
@@ -45,7 +61,7 @@ class FlymapSkyCameraExportService implements SkyCameraExportService {
 
     await File(originalPath).writeAsBytes(originalPhoto.bytes, flush: true);
     await File(overlayPath).writeAsBytes(overlayBytes, flush: true);
-    final activeFlight = await _currentFlightContext();
+    final flightId = await _resolveFlightId();
     await _mediaRepository.addCapture(
       SkyCameraMediaItem(
         id: baseName,
@@ -64,7 +80,7 @@ class FlymapSkyCameraExportService implements SkyCameraExportService {
           ),
         ],
         trackPoints: const [],
-        flightId: activeFlight?.id,
+        flightId: flightId,
         latitude: snapshot.latitude,
         longitude: snapshot.longitude,
         previewImagePath: overlayPath,
@@ -80,8 +96,10 @@ class FlymapSkyCameraExportService implements SkyCameraExportService {
     );
   }
 
-  Future<_MediaFlightContext?> _currentFlightContext() async {
-    final flights = await _flightRepository.getAllFlights();
+  Future<String?> _resolveFlightId() async {
+    final fixedFlightId = _fixedFlightId;
+    if (fixedFlightId != null) return fixedFlightId;
+    final flights = await _flightRepository!.getAllFlights();
     final inProgressFlights = flights
         .where((flight) => flight.status == FlightStatus.inProgress)
         .toList(growable: false);
@@ -92,12 +110,14 @@ class FlymapSkyCameraExportService implements SkyCameraExportService {
       return bDate.compareTo(aDate);
     });
     final flight = inProgressFlights.first;
-    return _MediaFlightContext(id: flight.id);
+    return flight.id;
   }
-}
 
-class _MediaFlightContext {
-  const _MediaFlightContext({required this.id});
-
-  final String id;
+  static String _normalizeFlightId(String flightId) {
+    final normalizedFlightId = flightId.trim();
+    if (normalizedFlightId.isEmpty) {
+      throw ArgumentError.value(flightId, 'flightId', 'Must not be empty.');
+    }
+    return normalizedFlightId;
+  }
 }
