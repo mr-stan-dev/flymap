@@ -33,6 +33,29 @@ void main() {
     }
   });
 
+  test('media records include schema version and read legacy records', () {
+    final item = _item(id: 'versioned', capturedAt: DateTime(2026, 7, 4, 12));
+    final record = item.toRecord();
+
+    expect(record['schemaVersion'], SkyCameraMediaItem.currentSchemaVersion);
+    expect(
+      SkyCameraMediaItem.fromRecord(Map<String, dynamic>.from(record))?.id,
+      item.id,
+    );
+
+    record.remove('schemaVersion');
+    expect(
+      SkyCameraMediaItem.fromRecord(Map<String, dynamic>.from(record))?.id,
+      item.id,
+    );
+
+    record['schemaVersion'] = SkyCameraMediaItem.currentSchemaVersion + 1;
+    expect(
+      SkyCameraMediaItem.fromRecord(Map<String, dynamic>.from(record)),
+      isNull,
+    );
+  });
+
   test('persists media items and loads them newest first', () async {
     final repository = await _buildRepository('persist');
 

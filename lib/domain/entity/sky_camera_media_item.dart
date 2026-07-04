@@ -147,6 +147,8 @@ class SkyCameraMediaTrackPoint extends Equatable {
 }
 
 class SkyCameraMediaItem extends Equatable {
+  static const currentSchemaVersion = 1;
+
   const SkyCameraMediaItem({
     required this.id,
     required this.capturedAt,
@@ -289,6 +291,7 @@ class SkyCameraMediaItem extends Equatable {
 
   Map<String, Object?> toRecord() {
     return <String, Object?>{
+      'schemaVersion': currentSchemaVersion,
       'id': id,
       'capturedAt': capturedAt.toIso8601String(),
       'mediaType': mediaType.name,
@@ -311,6 +314,8 @@ class SkyCameraMediaItem extends Equatable {
   }
 
   static SkyCameraMediaItem? fromRecord(Map<String, dynamic> json) {
+    final schemaVersion = _toInt(json['schemaVersion']) ?? 0;
+    if (schemaVersion > currentSchemaVersion) return null;
     final id = json['id']?.toString().trim() ?? '';
     final capturedAtRaw = json['capturedAt']?.toString().trim() ?? '';
     final sourcePath =
