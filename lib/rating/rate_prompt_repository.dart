@@ -14,6 +14,18 @@ abstract interface class RatePromptRepository {
 
   Future<void> setSnoozedUntil(DateTime? value);
 
+  Future<bool> hasPositiveResponse();
+
+  Future<void> setHasPositiveResponse(bool value);
+
+  Future<DateTime?> getReviewSnoozedUntil();
+
+  Future<void> setReviewSnoozedUntil(DateTime? value);
+
+  Future<DateTime?> getShareSnoozedUntil();
+
+  Future<void> setShareSnoozedUntil(DateTime? value);
+
   Future<DateTime?> getFirstSeenAt();
 
   Future<void> setFirstSeenAt(DateTime value);
@@ -22,6 +34,9 @@ abstract interface class RatePromptRepository {
 class SharedPrefsRatePromptRepository implements RatePromptRepository {
   static const _kCompleted = 'rate_prompt.completed';
   static const _kSnoozedUntil = 'rate_prompt.snoozed_until';
+  static const _kHasPositiveResponse = 'rate_prompt.has_positive_response';
+  static const _kReviewSnoozedUntil = 'rate_prompt.review_snoozed_until';
+  static const _kShareSnoozedUntil = 'rate_prompt.share_snoozed_until';
   static const _kFirstSeenAt = 'rate_prompt.first_seen_at';
   static const _kTriggerCountPrefix = 'rate_prompt.trigger_count';
 
@@ -59,26 +74,57 @@ class SharedPrefsRatePromptRepository implements RatePromptRepository {
 
   @override
   Future<void> setSnoozedUntil(DateTime? value) async {
-    final prefs = await SharedPreferences.getInstance();
-    if (value == null) {
-      await prefs.remove(_kSnoozedUntil);
-      return;
-    }
-    await prefs.setString(_kSnoozedUntil, value.toUtc().toIso8601String());
+    await _setDateTime(_kSnoozedUntil, value);
   }
 
   @override
-  Future<DateTime?> getFirstSeenAt() async {
+  Future<bool> hasPositiveResponse() async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_kFirstSeenAt);
+    return prefs.getBool(_kHasPositiveResponse) ?? false;
+  }
+
+  @override
+  Future<void> setHasPositiveResponse(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_kHasPositiveResponse, value);
+  }
+
+  @override
+  Future<DateTime?> getReviewSnoozedUntil() =>
+      _getDateTime(_kReviewSnoozedUntil);
+
+  @override
+  Future<void> setReviewSnoozedUntil(DateTime? value) =>
+      _setDateTime(_kReviewSnoozedUntil, value);
+
+  @override
+  Future<DateTime?> getShareSnoozedUntil() => _getDateTime(_kShareSnoozedUntil);
+
+  @override
+  Future<void> setShareSnoozedUntil(DateTime? value) =>
+      _setDateTime(_kShareSnoozedUntil, value);
+
+  @override
+  Future<DateTime?> getFirstSeenAt() => _getDateTime(_kFirstSeenAt);
+
+  @override
+  Future<void> setFirstSeenAt(DateTime value) =>
+      _setDateTime(_kFirstSeenAt, value);
+
+  Future<DateTime?> _getDateTime(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(key);
     if (raw == null || raw.trim().isEmpty) return null;
     return DateTime.tryParse(raw);
   }
 
-  @override
-  Future<void> setFirstSeenAt(DateTime value) async {
+  Future<void> _setDateTime(String key, DateTime? value) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kFirstSeenAt, value.toUtc().toIso8601String());
+    if (value == null) {
+      await prefs.remove(key);
+      return;
+    }
+    await prefs.setString(key, value.toUtc().toIso8601String());
   }
 
   String _triggerCountKey(RatePromptTrigger trigger) =>

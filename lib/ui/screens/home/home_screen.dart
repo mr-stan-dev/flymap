@@ -2,15 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flymap/analytics/events/share_with_friends_event.dart';
 import 'package:flymap/i18n/strings.g.dart';
+import 'package:flymap/rating/app_share_service.dart';
+import 'package:flymap/rating/native_review_requester.dart';
 import 'package:flymap/rating/rate_prompt_policy_service.dart';
-import 'package:flymap/rating/rate_review_launcher.dart';
 import 'package:flymap/repository/feature_announcement_repository.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/learn_tab.dart';
 import 'package:flymap/ui/screens/home/tabs/media/media_tab.dart';
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_screen.dart';
 import 'package:flymap/ui/screens/settings/settings_screen.dart';
+import 'package:flymap/ui/widgets/app_advocacy_dialog.dart';
 import 'package:flymap/ui/widgets/rate_app_dialog.dart';
 import 'package:get_it/get_it.dart';
 
@@ -158,40 +161,76 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _isRatePromptInFlight = true;
     final policy = GetIt.I.get<RatePromptPolicyService>();
     try {
-      final shouldShow = await policy.shouldShowPromptNow();
-      if (!mounted || !shouldShow) return;
+      final promptState = await policy.getPromptState();
+      if (!mounted || promptState == null) return;
 
-      final result = await RateAppDialog.show(context);
-      final action = result == true
-          ? 'yes'
-          : result == false
-          ? 'no'
-          : 'dismiss';
-      unawaited(
-        GetIt.I.get<AppAnalytics>().log(
-          RatePromptActionEvent(source: 'home_rate_prompt', action: action),
-        ),
-      );
+      if (promptState.requiresSentimentAnswer) {
+        final result = await RateAppDialog.show(context);
+        final action = result == true
+            ? 'yes'
+            : result == false
+            ? 'no'
+            : 'dismiss';
+        unawaited(
+          GetIt.I.get<AppAnalytics>().log(
+            RatePromptActionEvent(source: 'home_rate_prompt', action: action),
+          ),
+        );
 
-      if (result == true) {
-        await policy.recordAccepted();
-        final opened = await GetIt.I.get<RateReviewLauncher>().requestReview();
-        if (!opened && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(context.t.settings.couldNotOpenStorePage)),
-          );
+        if (result == false) {
+          await policy.recordDeclined();
+          return;
         }
-        return;
+        if (result != true) {
+          await policy.recordDismissed();
+          return;
+        }
+
+        await policy.recordAccepted();
+        if (!mounted) return;
       }
 
-      if (result == false) {
-        await policy.recordDeclined();
-        return;
-      }
-
-      await policy.recordDismissed();
+      await _showAppAdvocacyDialog(policy: policy, promptState: promptState);
     } finally {
       _isRatePromptInFlight = false;
+    }
+  }
+
+  Future<void> _showAppAdvocacyDialog({
+    required RatePromptPolicyService policy,
+    required RatePromptState promptState,
+  }) async {
+    final action = await AppAdvocacyDialog.show(
+      context,
+      showRateAction: promptState.canRequestReview,
+      showShareAction: promptState.canShare,
+    );
+    if (!mounted) return;
+
+    switch (action) {
+      case AppAdvocacyAction.share:
+        unawaited(
+          GetIt.I.get<AppAnalytics>().log(
+            const ShareWithFriendsEvent(source: 'home_rate_prompt'),
+          ),
+        );
+        final renderBox = context.findRenderObject() as RenderBox?;
+        final origin = renderBox == null
+            ? Rect.zero
+            : renderBox.localToGlobal(Offset.zero) & renderBox.size;
+        final shared = await GetIt.I.get<AppShareService>().shareApp(
+          sharePositionOrigin: origin,
+        );
+        if (shared) await policy.recordAppShared();
+        return;
+      case AppAdvocacyAction.rate:
+        await GetIt.I.get<NativeReviewRequester>().requestReview();
+        await policy.recordReviewRequested();
+        return;
+      case AppAdvocacyAction.notNow:
+      case null:
+        await policy.recordDismissed();
+        return;
     }
   }
 }

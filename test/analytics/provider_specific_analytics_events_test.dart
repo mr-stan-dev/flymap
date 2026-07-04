@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flymap/analytics/events/share_with_friends_event.dart';
 import 'package:flymap/domain/entity/learn_access.dart';
 
 void main() {
@@ -58,6 +59,17 @@ void main() {
     expect(event, isA<FirebaseAnalyticsEvent>());
     expect(event, isNot(isA<PostHogAnalyticsEvent>()));
     expect(event.firebaseEventName, 'learn_category_opened');
+  });
+
+  test('share with friends uses the same compact provider payload', () {
+    const event = ShareWithFriendsEvent(source: 'home_rate_prompt');
+
+    expect(event.firebaseEventName, 'share_with_friends');
+    expect(event.postHogEventName, 'share_with_friends');
+    expect(event.firebaseParameters, <String, Object>{
+      'source': 'home_rate_prompt',
+    });
+    expect(event.postHogParameters, event.firebaseParameters);
   });
 
   test('Sky Camera events keep Firebase minimal and PostHog rich', () {

@@ -17,19 +17,21 @@ void main() {
         await service.registerTrigger(
           RatePromptTrigger.flightMapDownloadSuccess,
         );
-        expect(await service.shouldShowPromptNow(), isFalse);
+        expect(await service.getPromptState(), isNull);
 
         await service.registerTrigger(
           RatePromptTrigger.flightMapDownloadSuccess,
         );
-        expect(await service.shouldShowPromptNow(), isFalse);
+        expect(await service.getPromptState(), isNull);
 
         repository.firstSeenAt = DateTime.utc(2026, 4, 1);
-        expect(await service.shouldShowPromptNow(), isTrue);
+        final state = await service.getPromptState();
+        expect(state, isNotNull);
+        expect(state!.requiresSentimentAnswer, isTrue);
       },
     );
 
-    test('decline snoozes prompts for 30 days', () async {
+    test('decline snoozes prompts for 90 days', () async {
       var now = DateTime.utc(2026, 4, 9);
       final repository = _InMemoryRatePromptRepository();
       final service = DefaultRatePromptPolicyService(
@@ -38,24 +40,25 @@ void main() {
         firstSeenMinAge: Duration.zero,
       );
 
-      expect(await service.shouldShowPromptNow(), isFalse);
+      expect(await service.getPromptState(), isNull);
       for (var i = 0; i < 2; i++) {
         await service.registerTrigger(
           RatePromptTrigger.flightMapDownloadSuccess,
         );
       }
-      expect(await service.shouldShowPromptNow(), isTrue);
+      expect(await service.getPromptState(), isNotNull);
       await service.recordDeclined();
 
-      final whileSnoozed = await service.shouldShowPromptNow();
-      expect(whileSnoozed, isFalse);
+      expect(await service.getPromptState(), isNull);
 
-      now = now.add(const Duration(days: 31));
-      final afterSnooze = await service.shouldShowPromptNow();
-      expect(afterSnooze, isTrue);
+      now = now.add(const Duration(days: 89));
+      expect(await service.getPromptState(), isNull);
+
+      now = now.add(const Duration(days: 2));
+      expect(await service.getPromptState(), isNotNull);
     });
 
-    test('accepted users are snoozed for 180 days', () async {
+    test('review attempt leaves only sharing after prompt snooze', () async {
       var now = DateTime.utc(2026, 4, 9);
       final repository = _InMemoryRatePromptRepository();
       final service = DefaultRatePromptPolicyService(
@@ -64,21 +67,60 @@ void main() {
         firstSeenMinAge: Duration.zero,
       );
 
-      expect(await service.shouldShowPromptNow(), isFalse);
+      expect(await service.getPromptState(), isNull);
       for (var i = 0; i < 2; i++) {
         await service.registerTrigger(
           RatePromptTrigger.flightMapDownloadSuccess,
         );
       }
-      expect(await service.shouldShowPromptNow(), isTrue);
+      expect(await service.getPromptState(), isNotNull);
       await service.recordAccepted();
+      await service.recordReviewRequested();
 
-      await service.registerTrigger(RatePromptTrigger.flightMapDownloadSuccess);
-      expect(await service.shouldShowPromptNow(), isFalse);
+      expect(await service.getPromptState(), isNull);
 
-      now = now.add(const Duration(days: 181));
-      expect(await service.shouldShowPromptNow(), isTrue);
+      now = now.add(const Duration(days: 15));
+      final shareOnly = await service.getPromptState();
+      expect(shareOnly, isNotNull);
+      expect(shareOnly!.requiresSentimentAnswer, isFalse);
+      expect(shareOnly.canRequestReview, isFalse);
+      expect(shareOnly.canShare, isTrue);
+
+      now = now.add(const Duration(days: 166));
+      final bothActions = await service.getPromptState();
+      expect(bothActions, isNotNull);
+      expect(bothActions!.canRequestReview, isTrue);
+      expect(bothActions.canShare, isTrue);
     });
+
+    test(
+      'completed share leaves only native review after prompt snooze',
+      () async {
+        var now = DateTime.utc(2026, 4, 9);
+        final repository = _InMemoryRatePromptRepository();
+        final service = DefaultRatePromptPolicyService(
+          repository: repository,
+          nowProvider: () => now,
+          firstSeenMinAge: Duration.zero,
+        );
+
+        await service.getPromptState();
+        for (var i = 0; i < 2; i++) {
+          await service.registerTrigger(
+            RatePromptTrigger.flightMapDownloadSuccess,
+          );
+        }
+        await service.recordAccepted();
+        await service.recordAppShared();
+
+        now = now.add(const Duration(days: 15));
+        final reviewOnly = await service.getPromptState();
+        expect(reviewOnly, isNotNull);
+        expect(reviewOnly!.requiresSentimentAnswer, isFalse);
+        expect(reviewOnly.canRequestReview, isTrue);
+        expect(reviewOnly.canShare, isFalse);
+      },
+    );
 
     test('legacy completed users are migrated to a 180-day snooze', () async {
       var now = DateTime.utc(2026, 4, 9);
@@ -91,19 +133,22 @@ void main() {
         nowProvider: () => now,
       );
 
-      expect(await service.shouldShowPromptNow(), isFalse);
+      expect(await service.getPromptState(), isNull);
       expect(repository._completed, isFalse);
-      expect(await service.shouldShowPromptNow(), isFalse);
+      expect(await service.getPromptState(), isNull);
 
       now = now.add(const Duration(days: 181));
-      expect(await service.shouldShowPromptNow(), isTrue);
+      expect(await service.getPromptState(), isNotNull);
     });
   });
 }
 
 class _InMemoryRatePromptRepository implements RatePromptRepository {
   bool _completed = false;
+  bool _hasPositiveResponse = false;
   DateTime? _snoozedUntil;
+  DateTime? _reviewSnoozedUntil;
+  DateTime? _shareSnoozedUntil;
   DateTime? firstSeenAt;
   final Map<RatePromptTrigger, int> _counts = {};
 
@@ -131,6 +176,30 @@ class _InMemoryRatePromptRepository implements RatePromptRepository {
   @override
   Future<void> setSnoozedUntil(DateTime? value) async {
     _snoozedUntil = value;
+  }
+
+  @override
+  Future<bool> hasPositiveResponse() async => _hasPositiveResponse;
+
+  @override
+  Future<void> setHasPositiveResponse(bool value) async {
+    _hasPositiveResponse = value;
+  }
+
+  @override
+  Future<DateTime?> getReviewSnoozedUntil() async => _reviewSnoozedUntil;
+
+  @override
+  Future<void> setReviewSnoozedUntil(DateTime? value) async {
+    _reviewSnoozedUntil = value;
+  }
+
+  @override
+  Future<DateTime?> getShareSnoozedUntil() async => _shareSnoozedUntil;
+
+  @override
+  Future<void> setShareSnoozedUntil(DateTime? value) async {
+    _shareSnoozedUntil = value;
   }
 
   @override

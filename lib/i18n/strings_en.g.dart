@@ -730,6 +730,21 @@ class TranslationsSettingsEn {
 	/// en: 'No'
 	String get rateDialogNo => 'No';
 
+	/// en: 'Glad you're enjoying Flymap'
+	String get advocacyDialogTitle => 'Glad you\'re enjoying Flymap';
+
+	/// en: 'Help other travellers discover Flymap.'
+	String get advocacyDialogBody => 'Help other travellers discover Flymap.';
+
+	/// en: 'Share with friends'
+	String get advocacyDialogShare => 'Share with friends';
+
+	/// en: 'Rate Flymap'
+	String get advocacyDialogRate => 'Rate Flymap';
+
+	/// en: 'Not now'
+	String get advocacyDialogNotNow => 'Not now';
+
 	/// en: 'Leave a Feedback'
 	String get feedbackTitle => 'Leave a Feedback';
 
@@ -3660,6 +3675,11 @@ extension on Translations {
 			'settings.rateDialogBody' => 'We work hard to make every flight more enjoyable, and your feedback really helps us improve.',
 			'settings.rateDialogYes' => 'Yes',
 			'settings.rateDialogNo' => 'No',
+			'settings.advocacyDialogTitle' => 'Glad you\'re enjoying Flymap',
+			'settings.advocacyDialogBody' => 'Help other travellers discover Flymap.',
+			'settings.advocacyDialogShare' => 'Share with friends',
+			'settings.advocacyDialogRate' => 'Rate Flymap',
+			'settings.advocacyDialogNotNow' => 'Not now',
 			'settings.feedbackTitle' => 'Leave a Feedback',
 			'settings.feedbackBody' => 'Help us to make Flymap better',
 			'settings.feedbackCategoryTitle' => 'Feedback type',
@@ -3910,13 +3930,13 @@ extension on Translations {
 			'createFlight.downloading.articlesProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Articles: ${completed}/${total} (${failed} failed)',
 			'createFlight.downloading.preparingMap' => 'Preparing map download...',
 			'createFlight.downloading.computingTiles' => 'Computing map tiles...',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.downloading.computingTilesWithCount' => ({required Object count}) => 'Computing map tiles (${count})...',
 			'createFlight.downloading.preparingForDownload' => 'Preparing for download...',
 			'createFlight.downloading.downloaded' => ({required Object size}) => 'Downloaded: ${size}',
 			'createFlight.downloading.finalizing' => 'Finalizing map package...',
 			'createFlight.downloading.verifying' => 'Verifying map package...',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.errors.failedLoadAirports' => 'Failed to load airports. Please try again.',
 			'createFlight.errors.airportSearchFailed' => 'Airport search failed. Try another query.',
 			'createFlight.errors.someArticlesFailed' => 'Some articles failed. Continuing with map download.',

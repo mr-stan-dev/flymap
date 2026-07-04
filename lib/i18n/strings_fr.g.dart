@@ -315,6 +315,11 @@ class _TranslationsSettingsFr extends TranslationsSettingsEn {
 	@override String get rateDialogBody => 'Nous travaillons dur pour rendre chaque vol plus agréable, et votre retour nous aide vraiment à progresser.';
 	@override String get rateDialogYes => 'Oui';
 	@override String get rateDialogNo => 'Non';
+	@override String get advocacyDialogTitle => 'Ravis que Flymap vous plaise';
+	@override String get advocacyDialogBody => 'Aidez d’autres voyageurs à découvrir Flymap.';
+	@override String get advocacyDialogShare => 'Partager avec des amis';
+	@override String get advocacyDialogRate => 'Noter Flymap';
+	@override String get advocacyDialogNotNow => 'Plus tard';
 	@override String get feedbackTitle => 'Laisser un avis';
 	@override String get feedbackBody => 'Aidez-nous à rendre Flymap meilleur';
 	@override String get feedbackCategoryTitle => 'Type de retour';
@@ -1675,6 +1680,11 @@ extension on TranslationsFr {
 			'settings.rateDialogBody' => 'Nous travaillons dur pour rendre chaque vol plus agréable, et votre retour nous aide vraiment à progresser.',
 			'settings.rateDialogYes' => 'Oui',
 			'settings.rateDialogNo' => 'Non',
+			'settings.advocacyDialogTitle' => 'Ravis que Flymap vous plaise',
+			'settings.advocacyDialogBody' => 'Aidez d’autres voyageurs à découvrir Flymap.',
+			'settings.advocacyDialogShare' => 'Partager avec des amis',
+			'settings.advocacyDialogRate' => 'Noter Flymap',
+			'settings.advocacyDialogNotNow' => 'Plus tard',
 			'settings.feedbackTitle' => 'Laisser un avis',
 			'settings.feedbackBody' => 'Aidez-nous à rendre Flymap meilleur',
 			'settings.feedbackCategoryTitle' => 'Type de retour',
@@ -1925,13 +1935,13 @@ extension on TranslationsFr {
 			'createFlight.downloading.articlesProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Articles : ${completed}/${total} (${failed} échecs)',
 			'createFlight.downloading.preparingMap' => 'Préparation du téléchargement de la carte...',
 			'createFlight.downloading.computingTiles' => 'Calcul des tuiles de carte...',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.downloading.computingTilesWithCount' => ({required Object count}) => 'Calcul des tuiles de carte (${count})...',
 			'createFlight.downloading.preparingForDownload' => 'Préparation du téléchargement...',
 			'createFlight.downloading.downloaded' => ({required Object size}) => 'Téléchargé : ${size}',
 			'createFlight.downloading.finalizing' => 'Finalisation du pack de cartes...',
 			'createFlight.downloading.verifying' => 'Vérification du pack de cartes...',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.errors.failedLoadAirports' => 'Échec du chargement des aéroports. Veuillez réessayer.',
 			'createFlight.errors.airportSearchFailed' => 'La recherche d’aéroport a échoué. Essayez une autre requête.',
 			'createFlight.errors.someArticlesFailed' => 'Certains articles ont échoué. Le téléchargement de la carte continue.',

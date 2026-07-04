@@ -38,9 +38,10 @@ import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/wiki/wikipedia_article_client.dart';
 import 'package:flymap/data/wiki/wikimedia_api_client.dart';
 import 'package:flymap/data/wiki/wikidata_wikipedia_preview_repository.dart';
+import 'package:flymap/rating/app_share_service.dart';
+import 'package:flymap/rating/native_review_requester.dart';
 import 'package:flymap/rating/rate_prompt_policy_service.dart';
 import 'package:flymap/rating/rate_prompt_repository.dart';
-import 'package:flymap/rating/rate_review_launcher.dart';
 import 'package:flymap/rating/rate_store_launcher.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/repository/feature_announcement_repository.dart';
@@ -250,12 +251,10 @@ class DiModule {
     i.registerLazySingleton<RateStoreLauncher>(
       () => DefaultRateStoreLauncher(httpClient: i.get()),
     );
-    i.registerLazySingleton<RateReviewLauncher>(
-      () => DefaultRateReviewLauncher(
-        inAppReview: InAppReview.instance,
-        storeLauncher: i.get(),
-      ),
+    i.registerLazySingleton<NativeReviewRequester>(
+      () => DefaultNativeReviewRequester(inAppReview: InAppReview.instance),
     );
+    i.registerLazySingleton<AppShareService>(() => DefaultAppShareService());
     i.registerLazySingleton<FeedbackApi>(() => FeedbackApi());
     i.registerLazySingleton<SubmitFeedbackUseCase>(
       () => DefaultSubmitFeedbackUseCase(feedbackApi: i.get()),
