@@ -2,6 +2,8 @@ enum SkyCameraAltitudeUnit { meter, foot }
 
 enum SkyCameraSpeedUnit { kmh, mph }
 
+enum SkyCameraTemperatureUnit { celsius, fahrenheit }
+
 enum SkyCameraDateDisplayFormat { monthDayYear, dayMonthYear }
 
 class SkyCameraStrings {
@@ -27,6 +29,7 @@ class SkyCameraStrings {
     required this.noValuePlaceholder,
     required this.altitudeUnit,
     required this.speedUnit,
+    required this.temperatureUnit,
     required this.dateDisplayFormat,
   });
 
@@ -51,5 +54,6 @@ class SkyCameraStrings {
   final String noValuePlaceholder;
   final SkyCameraAltitudeUnit altitudeUnit;
   final SkyCameraSpeedUnit speedUnit;
+  final SkyCameraTemperatureUnit temperatureUnit;
   final SkyCameraDateDisplayFormat dateDisplayFormat;
 }

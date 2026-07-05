@@ -46,6 +46,8 @@ void main() {
       expect(snapshot.headingDegrees, 187);
       expect(snapshot.altitudeMeters, 1240);
       expect(snapshot.speedMetersPerSecond, 128);
+      expect(snapshot.outsideTemperatureCelsius, isNull);
+      expect(snapshot.outsideTemperatureIsEstimated, isFalse);
     },
   );
 
@@ -78,6 +80,7 @@ void main() {
       expect(snapshot.speedMetersPerSecond, isNull);
       expect(snapshot.horizontalAccuracyMeters, isNull);
       expect(snapshot.outsideTemperatureCelsius, isNull);
+      expect(snapshot.outsideTemperatureIsEstimated, isFalse);
     },
   );
 
@@ -117,6 +120,40 @@ void main() {
       expect(snapshot.longitude, 2.1734);
       expect(snapshot.speedMetersPerSecond, isNull);
       expect(snapshot.outsideTemperatureCelsius, isNull);
+      expect(snapshot.outsideTemperatureIsEstimated, isFalse);
     },
   );
+
+  test('estimates outside temperature only at reliable altitude', () {
+    const builder = FlymapSkyCameraOverlaySnapshotBuilder(
+      placeholderCopy: FlymapSkyCameraPlaceholderCopy(
+        routeLabel: 'London, UK → Barcelona, ES',
+        originCode: 'LHR',
+        destinationCode: 'BCN',
+        originCountryCode: 'GB',
+        destinationCountryCode: 'ES',
+        contextLabel: 'Mediterranean Sea',
+        mapPlaceholder: 'Route preview',
+      ),
+    );
+
+    final snapshot = builder.build(
+      timestamp: DateTime.utc(2026, 6, 29, 12, 30),
+      position: Position(
+        longitude: 2.1734,
+        latitude: 41.3851,
+        timestamp: DateTime.utc(2026, 6, 29, 12, 30),
+        accuracy: 12,
+        altitude: 11000,
+        altitudeAccuracy: 18,
+        heading: 187,
+        headingAccuracy: 4,
+        speed: 230,
+        speedAccuracy: 6,
+      ),
+    );
+
+    expect(snapshot.outsideTemperatureCelsius, isNotNull);
+    expect(snapshot.outsideTemperatureIsEstimated, isTrue);
+  });
 }

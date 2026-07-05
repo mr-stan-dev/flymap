@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sky_camera/src/domain/models/sky_camera_overlay_snapshot.dart';
 import 'package:sky_camera/src/presentation/sky_camera_strings.dart';
@@ -17,39 +16,77 @@ class SkyCameraMetricDisplay {
 
 enum SkyCameraGpsSignalStrength { none, bad, poor, good }
 
+class SkyCameraTelemetryVisibilityPolicy {
+  const SkyCameraTelemetryVisibilityPolicy({
+    this.minimumSpeedMetersPerSecond = 5,
+    this.showUnavailableData = false,
+  });
+
+  const SkyCameraTelemetryVisibilityPolicy.debug()
+    : minimumSpeedMetersPerSecond = 5,
+      showUnavailableData = true;
+
+  /// Filters stationary GPS noise while retaining taxi and airborne speeds.
+  final double minimumSpeedMetersPerSecond;
+
+  /// Intended for explicit component previews only, never selected by build mode.
+  final bool showUnavailableData;
+
+  bool hasGpsData(SkyCameraOverlaySnapshot snapshot) {
+    final latitude = snapshot.latitude;
+    final longitude = snapshot.longitude;
+    return snapshot.hasLiveLocation &&
+        latitude != null &&
+        longitude != null &&
+        latitude.isFinite &&
+        longitude.isFinite &&
+        latitude >= -90 &&
+        latitude <= 90 &&
+        longitude >= -180 &&
+        longitude <= 180;
+  }
+
+  bool hasAltitudeData(SkyCameraOverlaySnapshot snapshot) {
+    final value = snapshot.altitudeMeters;
+    return value != null && value.isFinite;
+  }
+
+  bool hasSpeedData(SkyCameraOverlaySnapshot snapshot) {
+    final value = snapshot.speedMetersPerSecond;
+    return value != null &&
+        value.isFinite &&
+        value >= minimumSpeedMetersPerSecond;
+  }
+
+  bool hasTemperatureData(SkyCameraOverlaySnapshot snapshot) {
+    final value = snapshot.outsideTemperatureCelsius;
+    return value != null && value.isFinite;
+  }
+
+  bool shouldShowTechStrip(SkyCameraOverlaySnapshot snapshot) =>
+      showUnavailableData || hasGpsData(snapshot);
+}
+
 class SkyCameraTelemetryFormatter {
   const SkyCameraTelemetryFormatter({
     required this.snapshot,
     required this.strings,
+    this.visibilityPolicy = const SkyCameraTelemetryVisibilityPolicy(),
   });
 
   final SkyCameraOverlaySnapshot snapshot;
   final SkyCameraStrings strings;
+  final SkyCameraTelemetryVisibilityPolicy visibilityPolicy;
 
-  bool get _forceDebugTelemetryUi => kDebugMode;
+  bool get hasGpsData => visibilityPolicy.hasGpsData(snapshot);
 
-  bool get hasGpsData =>
-      snapshot.hasLiveLocation &&
-      snapshot.latitude != null &&
-      snapshot.longitude != null &&
-      snapshot.latitude!.isFinite &&
-      snapshot.longitude!.isFinite;
-
-  bool get hasSpeedData {
-    final value = snapshot.speedMetersPerSecond;
-    return value != null && value.isFinite && value > 0;
-  }
-
-  bool get shouldShowMetrics =>
-      _forceDebugTelemetryUi || (hasGpsData && hasSpeedData);
-
-  bool get shouldShowTechStrip => shouldShowMetrics;
+  bool get shouldShowTechStrip =>
+      visibilityPolicy.shouldShowTechStrip(snapshot);
 
   List<SkyCameraMetricDisplay> get visibleMetricDisplays {
-    if (!shouldShowMetrics) return const [];
     final metrics = <SkyCameraMetricDisplay>[];
-    if (_forceDebugTelemetryUi ||
-        _hasTemperatureData(snapshot.outsideTemperatureCelsius)) {
+    if (visibilityPolicy.showUnavailableData ||
+        visibilityPolicy.hasTemperatureData(snapshot)) {
       metrics.add(
         SkyCameraMetricDisplay(
           icon: Icons.device_thermostat_rounded,
@@ -58,20 +95,26 @@ class SkyCameraTelemetryFormatter {
         ),
       );
     }
-    metrics.add(
-      SkyCameraMetricDisplay(
-        icon: Icons.swap_vert_rounded,
-        iconColor: const Color(0xFFFF7A2F),
-        value: altitudeLabel,
-      ),
-    );
-    metrics.add(
-      SkyCameraMetricDisplay(
-        icon: Icons.speed_rounded,
-        iconColor: const Color(0xFF19D3A2),
-        value: speedLabel,
-      ),
-    );
+    if (visibilityPolicy.showUnavailableData ||
+        visibilityPolicy.hasAltitudeData(snapshot)) {
+      metrics.add(
+        SkyCameraMetricDisplay(
+          icon: Icons.swap_vert_rounded,
+          iconColor: const Color(0xFFFF7A2F),
+          value: altitudeLabel,
+        ),
+      );
+    }
+    if (visibilityPolicy.showUnavailableData ||
+        visibilityPolicy.hasSpeedData(snapshot)) {
+      metrics.add(
+        SkyCameraMetricDisplay(
+          icon: Icons.speed_rounded,
+          iconColor: const Color(0xFF19D3A2),
+          value: speedLabel,
+        ),
+      );
+    }
     return metrics;
   }
 
@@ -162,12 +205,12 @@ class SkyCameraTelemetryFormatter {
     if (value == null || !value.isFinite) {
       return strings.noValuePlaceholder;
     }
-    return '${value.round()}°C';
-  }
-
-  bool _hasTemperatureData(double? value) {
-    if (value == null || !value.isFinite) return false;
-    return value.round() != 0;
+    final prefix = snapshot.outsideTemperatureIsEstimated ? '~' : '';
+    return switch (strings.temperatureUnit) {
+      SkyCameraTemperatureUnit.celsius => '$prefix${value.round()}°C',
+      SkyCameraTemperatureUnit.fahrenheit =>
+        '$prefix${((value * 9 / 5) + 32).round()}°F',
+    };
   }
 
   String _formatDate(DateTime value) {

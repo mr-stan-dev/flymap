@@ -20,6 +20,7 @@ void main() {
       speedMetersPerSecond: 230.0,
       horizontalAccuracyMeters: 12.0,
       outsideTemperatureCelsius: -48.5,
+      outsideTemperatureIsEstimated: true,
     );
 
     final decoded = SkyCameraOverlaySnapshot.fromJson(snapshot.toJson());
@@ -43,6 +44,10 @@ void main() {
     expect(
       decoded.outsideTemperatureCelsius,
       snapshot.outsideTemperatureCelsius,
+    );
+    expect(
+      decoded.outsideTemperatureIsEstimated,
+      snapshot.outsideTemperatureIsEstimated,
     );
   });
 }

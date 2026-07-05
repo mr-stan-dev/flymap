@@ -16,6 +16,7 @@ class SkyCameraOverlaySnapshot {
     required this.speedMetersPerSecond,
     this.horizontalAccuracyMeters,
     this.outsideTemperatureCelsius,
+    this.outsideTemperatureIsEstimated = false,
   });
 
   final DateTime timestamp;
@@ -34,6 +35,7 @@ class SkyCameraOverlaySnapshot {
   final double? speedMetersPerSecond;
   final double? horizontalAccuracyMeters;
   final double? outsideTemperatureCelsius;
+  final bool outsideTemperatureIsEstimated;
 
   bool get isDomestic {
     final origin = originCountryCode.trim().toUpperCase();
@@ -59,6 +61,7 @@ class SkyCameraOverlaySnapshot {
       'speedMetersPerSecond': speedMetersPerSecond,
       'horizontalAccuracyMeters': horizontalAccuracyMeters,
       'outsideTemperatureCelsius': outsideTemperatureCelsius,
+      'outsideTemperatureIsEstimated': outsideTemperatureIsEstimated,
     };
   }
 
@@ -95,6 +98,8 @@ class SkyCameraOverlaySnapshot {
       speedMetersPerSecond: _toDouble(json['speedMetersPerSecond']),
       horizontalAccuracyMeters: _toDouble(json['horizontalAccuracyMeters']),
       outsideTemperatureCelsius: _toDouble(json['outsideTemperatureCelsius']),
+      outsideTemperatureIsEstimated:
+          json['outsideTemperatureIsEstimated'] == true,
     );
   }
 

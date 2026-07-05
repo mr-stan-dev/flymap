@@ -32,6 +32,7 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
   bool _didShowNoFlightContextDialog = false;
   SkyCameraAltitudeUnit _altitudeUnit = SkyCameraAltitudeUnit.foot;
   SkyCameraSpeedUnit _speedUnit = SkyCameraSpeedUnit.kmh;
+  SkyCameraTemperatureUnit _temperatureUnit = SkyCameraTemperatureUnit.celsius;
   SkyCameraDateDisplayFormat _dateDisplayFormat =
       SkyCameraDateDisplayFormat.monthDayYear;
 
@@ -82,6 +83,7 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
         noValuePlaceholder: context.t.skyCamera.noValuePlaceholder,
         altitudeUnit: _altitudeUnit,
         speedUnit: _speedUnit,
+        temperatureUnit: _temperatureUnit,
         dateDisplayFormat: _dateDisplayFormat,
       ),
     );
@@ -117,6 +119,7 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
     final placeholderMap = skyCameraT.placeholderMap;
     final altitudeUnit = await metricUnitsRepository.getAltitudeUnit();
     final speedUnit = await metricUnitsRepository.getSpeedUnit();
+    final temperatureUnit = await metricUnitsRepository.getTemperatureUnit();
     final dateDisplayFormat = await metricUnitsRepository
         .getDateDisplayFormat();
     final currentFlight = await _currentFlight(factory);
@@ -129,6 +132,7 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
     setState(() {
       _altitudeUnit = _mapAltitudeUnit(altitudeUnit);
       _speedUnit = _mapSpeedUnit(speedUnit);
+      _temperatureUnit = _mapTemperatureUnit(temperatureUnit);
       _dateDisplayFormat = _mapDateDisplayFormat(dateDisplayFormat);
       _session = currentFlight == null
           ? factory.create(placeholderCopy: placeholderCopy)
@@ -209,6 +213,12 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
     return unit == SpeedUnit.mph
         ? SkyCameraSpeedUnit.mph
         : SkyCameraSpeedUnit.kmh;
+  }
+
+  SkyCameraTemperatureUnit _mapTemperatureUnit(TemperatureUnit unit) {
+    return unit == TemperatureUnit.fahrenheit
+        ? SkyCameraTemperatureUnit.fahrenheit
+        : SkyCameraTemperatureUnit.celsius;
   }
 
   SkyCameraDateDisplayFormat _mapDateDisplayFormat(DateDisplayFormat format) {

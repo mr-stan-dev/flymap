@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flymap/data/location/app_location_service.dart';
+import 'package:flymap/domain/policy/outside_temperature_policy.dart';
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_session_factory.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sky_camera/sky_camera.dart';
@@ -14,8 +15,8 @@ class FlymapSkyCameraOverlaySnapshotBuilder {
     required DateTime timestamp,
     required Position? position,
   }) {
-    final latitude = position?.latitude;
-    final longitude = position?.longitude;
+    final latitude = _normalizeCoordinate(position?.latitude, maximum: 90);
+    final longitude = _normalizeCoordinate(position?.longitude, maximum: 180);
     final headingDegrees = _normalizeNumeric(position?.heading, minimum: 0);
     final altitudeMeters = _normalizeNumeric(position?.altitude);
     final speedMetersPerSecond = _normalizeNumeric(position?.speed, minimum: 0);
@@ -23,6 +24,16 @@ class FlymapSkyCameraOverlaySnapshotBuilder {
       position?.accuracy,
       minimum: 0,
     );
+    final outsideTemperatureCelsius =
+        altitudeMeters != null &&
+            OutsideTemperaturePolicy.isAvailable(altitudeMeters: altitudeMeters)
+        ? OutsideTemperaturePolicy.estimate(
+            altitudeMeters: altitudeMeters,
+            latitude: latitude,
+            longitude: longitude,
+            timestampUtc: timestamp.toUtc(),
+          ).celsius
+        : null;
 
     return SkyCameraOverlaySnapshot(
       timestamp: timestamp,
@@ -43,7 +54,8 @@ class FlymapSkyCameraOverlaySnapshotBuilder {
           ? speedMetersPerSecond
           : null,
       horizontalAccuracyMeters: horizontalAccuracyMeters,
-      outsideTemperatureCelsius: null,
+      outsideTemperatureCelsius: outsideTemperatureCelsius,
+      outsideTemperatureIsEstimated: outsideTemperatureCelsius != null,
     );
   }
 
@@ -51,6 +63,12 @@ class FlymapSkyCameraOverlaySnapshotBuilder {
     if (value == null || !value.isFinite) return null;
     if (minimum != null && value < minimum) return null;
     return value;
+  }
+
+  double? _normalizeCoordinate(double? value, {required double maximum}) {
+    final normalized = _normalizeNumeric(value);
+    if (normalized == null || normalized.abs() > maximum) return null;
+    return normalized;
   }
 }
 

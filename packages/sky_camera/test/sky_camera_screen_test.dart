@@ -597,39 +597,38 @@ void main() {
     expect(position!.x != 0 || position.y != 0.5, isTrue);
   });
 
-  testWidgets(
-    'keeps metrics panel visible in debug when gps data is unavailable',
-    (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: SkyCameraScreen(
-            driver: _FakeSkyCameraDriver(),
-            snapshotSource: _FakeSnapshotSource(
-              snapshot: _testSnapshot(
-                hasLiveLocation: false,
-                latitude: null,
-                longitude: null,
-              ),
+  testWidgets('keeps available metrics visible when gps data is unavailable', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SkyCameraScreen(
+          driver: _FakeSkyCameraDriver(),
+          snapshotSource: _FakeSnapshotSource(
+            snapshot: _testSnapshot(
+              hasLiveLocation: false,
+              latitude: null,
+              longitude: null,
             ),
-            exportService: _FakeExportService(),
-            observer: const _FakeObserver(),
-            photoCropper: const _FakePhotoCropper(),
-            openCapturePreview: _openFakeCapturePreview,
-            overlayComposer: const _FakeOverlayComposer(),
-            strings: _strings,
           ),
+          exportService: _FakeExportService(),
+          observer: const _FakeObserver(),
+          photoCropper: const _FakePhotoCropper(),
+          openCapturePreview: _openFakeCapturePreview,
+          overlayComposer: const _FakeOverlayComposer(),
+          strings: _strings,
         ),
-      );
+      ),
+    );
 
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
 
-      expect(
-        find.byKey(const Key('sky_camera.metrics_panel_drag_area')),
-        findsOneWidget,
-      );
-    },
-  );
+    expect(
+      find.byKey(const Key('sky_camera.metrics_panel_drag_area')),
+      findsOneWidget,
+    );
+  });
 
   testWidgets('camera preview shows before gps startup completes', (
     tester,
@@ -730,6 +729,7 @@ const _strings = SkyCameraStrings(
   noValuePlaceholder: '--',
   altitudeUnit: SkyCameraAltitudeUnit.foot,
   speedUnit: SkyCameraSpeedUnit.kmh,
+  temperatureUnit: SkyCameraTemperatureUnit.celsius,
   dateDisplayFormat: SkyCameraDateDisplayFormat.dayMonthYear,
 );
 
