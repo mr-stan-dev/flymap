@@ -25,7 +25,6 @@ class MediaCapturePreviewScreen extends StatefulWidget {
 }
 
 class _MediaCapturePreviewScreenState extends State<MediaCapturePreviewScreen> {
-  static const _shareMenuValue = 'share';
   static const _deleteMenuValue = 'delete';
   static const _thumbnailExtent = 64.0;
   static const _thumbnailGap = 8.0;
@@ -77,15 +76,17 @@ class _MediaCapturePreviewScreenState extends State<MediaCapturePreviewScreen> {
           ),
           title: Text(capture.routeLabel ?? context.t.media.previewTitle),
           actions: [
+            IconButton(
+              key: const Key('media.capture_preview_share'),
+              tooltip: context.t.media.share,
+              onPressed: _shareCurrentCapture,
+              icon: const Icon(Icons.share_outlined),
+            ),
             PopupMenuButton<String>(
               key: const Key('media.capture_preview_menu'),
               icon: const Icon(Icons.more_vert_rounded),
               onSelected: _handleMenuAction,
               itemBuilder: (context) => [
-                PopupMenuItem<String>(
-                  value: _shareMenuValue,
-                  child: Text(context.t.media.share),
-                ),
                 PopupMenuItem<String>(
                   value: _deleteMenuValue,
                   child: Text(context.t.media.deleteFile),
@@ -135,15 +136,15 @@ class _MediaCapturePreviewScreenState extends State<MediaCapturePreviewScreen> {
   }
 
   Future<void> _handleMenuAction(String value) async {
-    if (value == _shareMenuValue) {
-      await GetIt.I<FlymapSkyCameraShareService>().shareMediaItems(
-        captures: [_currentCapture],
-        sharePositionOrigin: mediaShareRectForContext(context),
-      );
-      return;
-    }
     if (value != _deleteMenuValue) return;
     await _deleteCurrentCapture();
+  }
+
+  Future<void> _shareCurrentCapture() async {
+    await GetIt.I<FlymapSkyCameraShareService>().shareMediaItems(
+      captures: [_currentCapture],
+      sharePositionOrigin: mediaShareRectForContext(context),
+    );
   }
 
   Future<void> _deleteCurrentCapture() async {

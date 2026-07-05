@@ -27,7 +27,6 @@ class _MediaFolderScreenState extends State<MediaFolderScreen> {
 
   bool get _isSelecting => _selectedCaptureIds.isNotEmpty;
 
-  static const _shareMenuValue = 'share';
   static const _deleteMenuValue = 'delete';
 
   @override
@@ -74,29 +73,28 @@ class _MediaFolderScreenState extends State<MediaFolderScreen> {
               onPressed: _deleteSelectedCaptures,
               icon: const Icon(Icons.delete_outline_rounded),
             )
-          else
+          else ...[
+            IconButton(
+              key: const Key('media.folder_share'),
+              tooltip: context.t.media.share,
+              onPressed: _shareCurrentFolder,
+              icon: const Icon(Icons.share_outlined),
+            ),
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert_rounded),
               onSelected: (value) async {
-                if (value == _shareMenuValue) {
-                  await _shareCurrentFolder();
-                  return;
-                }
                 if (value == _deleteMenuValue) {
                   await _deleteCurrentFolder();
                 }
               },
               itemBuilder: (context) => [
                 PopupMenuItem<String>(
-                  value: _shareMenuValue,
-                  child: Text(context.t.media.share),
-                ),
-                PopupMenuItem<String>(
                   value: _deleteMenuValue,
                   child: Text(context.t.media.deleteFolder),
                 ),
               ],
             ),
+          ],
         ],
       ),
       body: SafeArea(

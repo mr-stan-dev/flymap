@@ -8,7 +8,7 @@ import 'package:sky_camera/sky_camera.dart';
 void main() {
   setUpAll(() => LocaleSettings.setLocaleSync(AppLocale.en));
 
-  testWidgets('shows share and delete actions in the top-right menu', (
+  testWidgets('shows share in the app bar and delete in the overflow menu', (
     tester,
   ) async {
     final capture = _capture(id: 'capture-1', routeLabel: 'LHR - BCN');
@@ -28,11 +28,15 @@ void main() {
       find.byKey(const Key('media.capture_preview_filmstrip')),
       findsNothing,
     );
+    expect(
+      find.byKey(const Key('media.capture_preview_share')),
+      findsOneWidget,
+    );
 
     await tester.tap(find.byKey(const Key('media.capture_preview_menu')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Share'), findsOneWidget);
+    expect(find.text('Share'), findsNothing);
     expect(find.text('Delete file'), findsOneWidget);
   });
 
