@@ -52,6 +52,7 @@ class TranslationsDe extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _TranslationsFlightDe flight = _TranslationsFlightDe._(_root);
 	@override late final _TranslationsShareFlightDe shareFlight = _TranslationsShareFlightDe._(_root);
 	@override late final _TranslationsShareImageDe shareImage = _TranslationsShareImageDe._(_root);
+	@override late final _TranslationsFlightVideoDe flightVideo = _TranslationsFlightVideoDe._(_root);
 	@override late final _TranslationsAboutDe about = _TranslationsAboutDe._(_root);
 	@override late final _TranslationsOnboardingDe onboarding = _TranslationsOnboardingDe._(_root);
 	@override late final _TranslationsCountriesDe countries = _TranslationsCountriesDe._(_root);
@@ -424,7 +425,9 @@ class _TranslationsPreviewDe extends TranslationsPreviewEn {
 	@override String get downloadCongratsTitle => 'Glückwunsch! Alles ist bereit.';
 	@override String get offlineSavedDetail => 'Karte und ausgewählte Flugdaten wurden für die Offline-Nutzung während deines Flugs gespeichert.';
 	@override String get downloadCompletedTitle => 'Download abgeschlossen';
-	@override String get shareFlightCard => 'Teile deine großartige Flugkarte';
+	@override String get shareFlightCard => 'Zeig deinen großartigen Flug';
+	@override String get shareVideo => 'Flugvideo teilen';
+	@override String get shareVideoNewBadge => 'NEU';
 	@override String get share => 'Flugkarte teilen';
 	@override String get home => 'Start';
 	@override String get navigatingHome => 'Zur Startseite...';
@@ -512,6 +515,42 @@ class _TranslationsShareImageDe extends TranslationsShareImageEn {
 	@override String get durationUnavailable => '--';
 	@override String durationMinutes({required Object minutes}) => '${minutes} Min';
 	@override String durationHoursMinutes({required Object hours, required Object minutes}) => '${hours} Std ${minutes} Min';
+}
+
+// Path: flightVideo
+class _TranslationsFlightVideoDe extends TranslationsFlightVideoEn {
+	_TranslationsFlightVideoDe._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Flugvideo';
+	@override String get preparing => 'Karte wird vorbereitet...';
+	@override String get rendering => 'Dein Video wird erstellt...';
+	@override String get export => 'Video speichern';
+	@override String get savedToGallery => 'In deiner Galerie gespeichert';
+	@override String get saveSkipped => 'Speichern in der Galerie nicht möglich — du kannst es trotzdem teilen';
+	@override String get share => 'Teilen';
+	@override String get sharing => 'Wird geteilt...';
+	@override String get retry => 'Erneut versuchen';
+	@override String get errorNetwork => 'Kartenbilder konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.';
+	@override String get errorGeneric => 'Flugvideo konnte nicht erstellt werden';
+	@override String get madeWith => 'Erstellt mit Flymap';
+	@override String shareText({required Object fromCity, required Object fromCode, required Object toCity, required Object toCode}) => '${fromCity} (${fromCode}) → ${toCity} (${toCode}) auf Flymap ✈️';
+	@override String get removeWatermark => 'Wasserzeichen entfernen';
+	@override String get styleSatellite => 'Satellit';
+	@override String get styleDefault => 'Standard';
+	@override String get videoSettings => 'Video-Einstellungen';
+	@override String get mapStyle => 'Kartenstil';
+	@override String get mysteryDestination => 'Geheimes Ziel';
+	@override String get mysteryDestinationHint => '"?" anzeigen, bis das Flugzeug landet';
+	@override String get showPins => 'Länder-Pins';
+	@override String get showPinsHint => 'Setzt eine Markierung, wenn das Flugzeug ein Land überquert';
+	@override String get showEndCard => 'Übersichtskarte';
+	@override String get showEndCardHint => 'Übersichtskarte am Ende anzeigen';
+	@override String get styleShine => 'Lè Shine';
+	@override String get applySettings => 'Änderungen anwenden';
+	@override String get applying => 'Änderungen werden angewendet...';
 }
 
 // Path: about
@@ -1954,7 +1993,9 @@ extension on TranslationsDe {
 			'preview.downloadCongratsTitle' => 'Glückwunsch! Alles ist bereit.',
 			'preview.offlineSavedDetail' => 'Karte und ausgewählte Flugdaten wurden für die Offline-Nutzung während deines Flugs gespeichert.',
 			'preview.downloadCompletedTitle' => 'Download abgeschlossen',
-			'preview.shareFlightCard' => 'Teile deine großartige Flugkarte',
+			'preview.shareFlightCard' => 'Zeig deinen großartigen Flug',
+			'preview.shareVideo' => 'Flugvideo teilen',
+			'preview.shareVideoNewBadge' => 'NEU',
 			'preview.share' => 'Flugkarte teilen',
 			'preview.home' => 'Start',
 			'preview.navigatingHome' => 'Zur Startseite...',
@@ -2159,6 +2200,33 @@ extension on TranslationsDe {
 			'shareImage.durationUnavailable' => '--',
 			'shareImage.durationMinutes' => ({required Object minutes}) => '${minutes} Min',
 			'shareImage.durationHoursMinutes' => ({required Object hours, required Object minutes}) => '${hours} Std ${minutes} Min',
+			'flightVideo.title' => 'Flugvideo',
+			'flightVideo.preparing' => 'Karte wird vorbereitet...',
+			'flightVideo.rendering' => 'Dein Video wird erstellt...',
+			'flightVideo.export' => 'Video speichern',
+			'flightVideo.savedToGallery' => 'In deiner Galerie gespeichert',
+			'flightVideo.saveSkipped' => 'Speichern in der Galerie nicht möglich — du kannst es trotzdem teilen',
+			'flightVideo.share' => 'Teilen',
+			'flightVideo.sharing' => 'Wird geteilt...',
+			'flightVideo.retry' => 'Erneut versuchen',
+			'flightVideo.errorNetwork' => 'Kartenbilder konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.',
+			'flightVideo.errorGeneric' => 'Flugvideo konnte nicht erstellt werden',
+			'flightVideo.madeWith' => 'Erstellt mit Flymap',
+			'flightVideo.shareText' => ({required Object fromCity, required Object fromCode, required Object toCity, required Object toCode}) => '${fromCity} (${fromCode}) → ${toCity} (${toCode}) auf Flymap ✈️',
+			'flightVideo.removeWatermark' => 'Wasserzeichen entfernen',
+			'flightVideo.styleSatellite' => 'Satellit',
+			'flightVideo.styleDefault' => 'Standard',
+			'flightVideo.videoSettings' => 'Video-Einstellungen',
+			'flightVideo.mapStyle' => 'Kartenstil',
+			'flightVideo.mysteryDestination' => 'Geheimes Ziel',
+			'flightVideo.mysteryDestinationHint' => '"?" anzeigen, bis das Flugzeug landet',
+			'flightVideo.showPins' => 'Länder-Pins',
+			'flightVideo.showPinsHint' => 'Setzt eine Markierung, wenn das Flugzeug ein Land überquert',
+			'flightVideo.showEndCard' => 'Übersichtskarte',
+			'flightVideo.showEndCardHint' => 'Übersichtskarte am Ende anzeigen',
+			'flightVideo.styleShine' => 'Lè Shine',
+			'flightVideo.applySettings' => 'Änderungen anwenden',
+			'flightVideo.applying' => 'Änderungen werden angewendet...',
 			'about.title' => 'Über Flymap',
 			'about.tagline' => 'Mach aus jedem Flug ein Fenster zur Welt.',
 			'about.chipCuriosity' => 'Neugier',

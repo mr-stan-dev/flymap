@@ -49,6 +49,7 @@ class _DownloadCompletedRouteScreenState
         body: DownloadCompletedScreen(
           onHomePressed: () => unawaited(_onHomePressed()),
           onSharePressed: () => _onSharePressed(widget.args.flightId),
+          onShareVideoPressed: () => _onShareVideoPressed(widget.args.flightId),
         ),
       ),
     );
@@ -58,6 +59,10 @@ class _DownloadCompletedRouteScreenState
     unawaited(_openShareFromHomeStack(flightId));
   }
 
+  void _onShareVideoPressed(String flightId) {
+    unawaited(_openVideoFromHomeStack(flightId));
+  }
+
   Future<void> _openShareFromHomeStack(String flightId) async {
     if (!mounted) return;
     homeRefreshNotifier.value = true;
@@ -65,6 +70,15 @@ class _DownloadCompletedRouteScreenState
     await Future<void>.delayed(Duration.zero);
     if (!mounted) return;
     AppRouter.goToShareImage(context, flightId: flightId);
+  }
+
+  Future<void> _openVideoFromHomeStack(String flightId) async {
+    if (!mounted) return;
+    homeRefreshNotifier.value = true;
+    AppRouter.goHome(context);
+    await Future<void>.delayed(Duration.zero);
+    if (!mounted) return;
+    AppRouter.goToFlightVideo(context, flightId: flightId);
   }
 
   Future<void> _onHomePressed() async {
@@ -93,17 +107,20 @@ class DownloadCompletedScreen extends StatelessWidget {
   const DownloadCompletedScreen({
     required this.onHomePressed,
     required this.onSharePressed,
+    required this.onShareVideoPressed,
     super.key,
   });
 
   final VoidCallback onHomePressed;
   final VoidCallback onSharePressed;
+  final VoidCallback onShareVideoPressed;
 
   @override
   Widget build(BuildContext context) {
     return FlightDownloadCompletion(
       onHomePressed: onHomePressed,
       onSharePressed: onSharePressed,
+      onShareVideoPressed: onShareVideoPressed,
     );
   }
 }

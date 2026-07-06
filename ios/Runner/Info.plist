@@ -55,5 +55,7 @@
 	<string>Flymap uses your location to keep in-flight progress accurate and add GPS data to captures while a flight is active.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Flymap uses the camera so you can capture window-seat photos with route-style overlays.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Flymap saves your generated flight videos to the photo library so you can share them.</string>
 </dict>
 </plist>

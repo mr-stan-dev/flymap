@@ -18,6 +18,7 @@ import 'package:flymap/ui/screens/flight/flight_screen.dart';
 import 'package:flymap/ui/screens/home/home_screen.dart';
 import 'package:flymap/ui/screens/home/tabs/learn/learn_article_screen.dart';
 import 'package:flymap/ui/screens/onboarding/onboarding_screen.dart';
+import 'package:flymap/ui/screens/flight_video/flight_video_screen.dart';
 import 'package:flymap/ui/screens/share_flight/share_flight_image_screen.dart';
 import 'package:flymap/ui/screens/settings/profile/settings_profile_screen.dart';
 import 'package:flymap/ui/screens/settings/history/history_screen.dart';
@@ -38,6 +39,7 @@ class AppRouter {
   static const String flightPreviewRoute = '/flight-preview';
   static const String flightRoute = '/flight';
   static const String shareImageRoute = '/share-image';
+  static const String flightVideoRoute = '/flight-video';
   static const String downloadCompletedRoute = '/download-completed';
   static const String settingsRoute = '/settings';
   static const String feedbackRoute = '/feedback';
@@ -160,6 +162,21 @@ class AppRouter {
             }
 
             return ShareFlightImageScreen(flightId: flightId);
+          },
+        ),
+
+        // Flight Video Screen route
+        GoRoute(
+          path: flightVideoRoute,
+          name: 'flight-video',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>?;
+            final flightId = extra?['flightId'] as String?;
+            if (flightId == null || flightId.isEmpty) {
+              return const HomeScreen();
+            }
+
+            return FlightVideoScreen(flightId: flightId);
           },
         ),
 
@@ -320,6 +337,14 @@ class AppRouter {
   /// Navigate to share image screen with flight id.
   static void goToShareImage(BuildContext context, {required String flightId}) {
     context.push(shareImageRoute, extra: {'flightId': flightId});
+  }
+
+  /// Navigate to flight video screen with flight id.
+  static void goToFlightVideo(
+    BuildContext context, {
+    required String flightId,
+  }) {
+    context.push(flightVideoRoute, extra: {'flightId': flightId});
   }
 
   static void goToDownloadCompleted(

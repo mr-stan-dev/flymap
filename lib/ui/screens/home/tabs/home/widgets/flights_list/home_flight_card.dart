@@ -113,6 +113,10 @@ class HomeFlightCard extends StatelessWidget {
                         value: _FlightCardAction.share,
                         child: Text(context.t.home.shareRoute),
                       ),
+                    PopupMenuItem(
+                      value: _FlightCardAction.flightVideo,
+                      child: Text(context.t.flightVideo.title),
+                    ),
                     PopupMenuDivider(),
                     PopupMenuItem(
                       value: _FlightCardAction.completeFlight,
@@ -160,6 +164,8 @@ class HomeFlightCard extends StatelessWidget {
         AppRouter.goToFlight(context, flight: flight);
       case _FlightCardAction.share:
         AppRouter.goToShareImage(context, flightId: flight.id);
+      case _FlightCardAction.flightVideo:
+        AppRouter.goToFlightVideo(context, flightId: flight.id);
       case _FlightCardAction.completeFlight:
         final result = await CompleteFlightConfirmationDialog.show(context);
         if (result == null || !context.mounted) return;
@@ -311,7 +317,13 @@ class _SavedFlightCardBody extends StatelessWidget {
   }
 }
 
-enum _FlightCardAction { open, share, completeFlight, deleteFlight }
+enum _FlightCardAction {
+  open,
+  share,
+  flightVideo,
+  completeFlight,
+  deleteFlight,
+}
 
 class _InProgressChip extends StatelessWidget {
   @override

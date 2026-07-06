@@ -51,9 +51,13 @@ dependencies:
   purchases_ui_flutter: ^9.15.1
   package_info_plus: ^8.3.0
   uuid: ^4.5.1
+  flutter_quick_video_encoder: ^1.7.2
+  gal: ^2.3.0
+  vector_math: ^2.1.4
   slang: ^4.8.0
   slang_flutter: ^4.8.0
   country_flags: ^3.0.1
+  jovial_svg: ^1.1.19
   zo_animated_border: ^1.0.7
 
 dev_dependencies:
@@ -92,6 +96,10 @@ flutter:
     - assets/images/quiz/
     - assets/images/poi/
     - assets/images/regions/
+    - assets/images/map_styles/
+    # Only the active plane model ships in the bundle; other .glb files in
+    # assets/models/ are alternatives kept out of the app.
+    - assets/models/airplane_3d_3.glb
 
   fonts:
     - family: Caveat

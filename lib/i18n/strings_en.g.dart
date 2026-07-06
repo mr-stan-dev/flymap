@@ -56,6 +56,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final TranslationsFlightEn flight = TranslationsFlightEn.internal(_root);
 	late final TranslationsShareFlightEn shareFlight = TranslationsShareFlightEn.internal(_root);
 	late final TranslationsShareImageEn shareImage = TranslationsShareImageEn.internal(_root);
+	late final TranslationsFlightVideoEn flightVideo = TranslationsFlightVideoEn.internal(_root);
 	late final TranslationsAboutEn about = TranslationsAboutEn.internal(_root);
 	late final TranslationsOnboardingEn onboarding = TranslationsOnboardingEn.internal(_root);
 	late final TranslationsCountriesEn countries = TranslationsCountriesEn.internal(_root);
@@ -979,8 +980,14 @@ class TranslationsPreviewEn {
 	/// en: 'Download completed'
 	String get downloadCompletedTitle => 'Download completed';
 
-	/// en: 'Share your awesome flight card'
-	String get shareFlightCard => 'Share your awesome flight card';
+	/// en: 'Show off your awesome flight'
+	String get shareFlightCard => 'Show off your awesome flight';
+
+	/// en: 'Share flight video'
+	String get shareVideo => 'Share flight video';
+
+	/// en: 'NEW'
+	String get shareVideoNewBadge => 'NEW';
 
 	/// en: 'Share flight card'
 	String get share => 'Share flight card';
@@ -1179,6 +1186,96 @@ class TranslationsShareImageEn {
 
 	/// en: '$hours h $minutes m'
 	String durationHoursMinutes({required Object hours, required Object minutes}) => '${hours} h ${minutes} m';
+}
+
+// Path: flightVideo
+class TranslationsFlightVideoEn {
+	TranslationsFlightVideoEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Flight video'
+	String get title => 'Flight video';
+
+	/// en: 'Preparing your map...'
+	String get preparing => 'Preparing your map...';
+
+	/// en: 'Creating your video...'
+	String get rendering => 'Creating your video...';
+
+	/// en: 'Save video'
+	String get export => 'Save video';
+
+	/// en: 'Saved to your camera roll'
+	String get savedToGallery => 'Saved to your camera roll';
+
+	/// en: 'Couldn't save to camera roll — you can still share it'
+	String get saveSkipped => 'Couldn\'t save to camera roll — you can still share it';
+
+	/// en: 'Share'
+	String get share => 'Share';
+
+	/// en: 'Sharing...'
+	String get sharing => 'Sharing...';
+
+	/// en: 'Retry'
+	String get retry => 'Retry';
+
+	/// en: 'Couldn't load map imagery. Check your connection and try again.'
+	String get errorNetwork => 'Couldn\'t load map imagery. Check your connection and try again.';
+
+	/// en: 'Could not create flight video'
+	String get errorGeneric => 'Could not create flight video';
+
+	/// en: 'Made with Flymap'
+	String get madeWith => 'Made with Flymap';
+
+	/// en: '$fromCity ($fromCode) → $toCity ($toCode) on Flymap ✈️'
+	String shareText({required Object fromCity, required Object fromCode, required Object toCity, required Object toCode}) => '${fromCity} (${fromCode}) → ${toCity} (${toCode}) on Flymap ✈️';
+
+	/// en: 'Remove watermark'
+	String get removeWatermark => 'Remove watermark';
+
+	/// en: 'Satellite'
+	String get styleSatellite => 'Satellite';
+
+	/// en: 'Default'
+	String get styleDefault => 'Default';
+
+	/// en: 'Video settings'
+	String get videoSettings => 'Video settings';
+
+	/// en: 'Map style'
+	String get mapStyle => 'Map style';
+
+	/// en: 'Mystery destination'
+	String get mysteryDestination => 'Mystery destination';
+
+	/// en: 'Show "?" until the plane lands'
+	String get mysteryDestinationHint => 'Show "?" until the plane lands';
+
+	/// en: 'Country pins'
+	String get showPins => 'Country pins';
+
+	/// en: 'Drop a pin as the plane crosses each country'
+	String get showPinsHint => 'Drop a pin as the plane crosses each country';
+
+	/// en: 'Summary card'
+	String get showEndCard => 'Summary card';
+
+	/// en: 'Show the summary card at the end'
+	String get showEndCardHint => 'Show the summary card at the end';
+
+	/// en: 'Lè Shine'
+	String get styleShine => 'Lè Shine';
+
+	/// en: 'Apply changes'
+	String get applySettings => 'Apply changes';
+
+	/// en: 'Applying changes...'
+	String get applying => 'Applying changes...';
 }
 
 // Path: about
@@ -3937,7 +4034,9 @@ extension on Translations {
 			'preview.downloadCongratsTitle' => 'Congrats! You are all set.',
 			'preview.offlineSavedDetail' => 'Map and selected flight data are saved for offline use during your flight.',
 			'preview.downloadCompletedTitle' => 'Download completed',
-			'preview.shareFlightCard' => 'Share your awesome flight card',
+			'preview.shareFlightCard' => 'Show off your awesome flight',
+			'preview.shareVideo' => 'Share flight video',
+			'preview.shareVideoNewBadge' => 'NEW',
 			'preview.share' => 'Share flight card',
 			'preview.home' => 'Home',
 			'preview.navigatingHome' => 'Navigating to home...',
@@ -4142,6 +4241,33 @@ extension on Translations {
 			'shareImage.durationUnavailable' => '--',
 			'shareImage.durationMinutes' => ({required Object minutes}) => '${minutes} m',
 			'shareImage.durationHoursMinutes' => ({required Object hours, required Object minutes}) => '${hours} h ${minutes} m',
+			'flightVideo.title' => 'Flight video',
+			'flightVideo.preparing' => 'Preparing your map...',
+			'flightVideo.rendering' => 'Creating your video...',
+			'flightVideo.export' => 'Save video',
+			'flightVideo.savedToGallery' => 'Saved to your camera roll',
+			'flightVideo.saveSkipped' => 'Couldn\'t save to camera roll — you can still share it',
+			'flightVideo.share' => 'Share',
+			'flightVideo.sharing' => 'Sharing...',
+			'flightVideo.retry' => 'Retry',
+			'flightVideo.errorNetwork' => 'Couldn\'t load map imagery. Check your connection and try again.',
+			'flightVideo.errorGeneric' => 'Could not create flight video',
+			'flightVideo.madeWith' => 'Made with Flymap',
+			'flightVideo.shareText' => ({required Object fromCity, required Object fromCode, required Object toCity, required Object toCode}) => '${fromCity} (${fromCode}) → ${toCity} (${toCode}) on Flymap ✈️',
+			'flightVideo.removeWatermark' => 'Remove watermark',
+			'flightVideo.styleSatellite' => 'Satellite',
+			'flightVideo.styleDefault' => 'Default',
+			'flightVideo.videoSettings' => 'Video settings',
+			'flightVideo.mapStyle' => 'Map style',
+			'flightVideo.mysteryDestination' => 'Mystery destination',
+			'flightVideo.mysteryDestinationHint' => 'Show "?" until the plane lands',
+			'flightVideo.showPins' => 'Country pins',
+			'flightVideo.showPinsHint' => 'Drop a pin as the plane crosses each country',
+			'flightVideo.showEndCard' => 'Summary card',
+			'flightVideo.showEndCardHint' => 'Show the summary card at the end',
+			'flightVideo.styleShine' => 'Lè Shine',
+			'flightVideo.applySettings' => 'Apply changes',
+			'flightVideo.applying' => 'Applying changes...',
 			'about.title' => 'About Flymap',
 			'about.tagline' => 'Turn every flight into a window on the world.',
 			'about.chipCuriosity' => 'Curiosity',

@@ -15,7 +15,10 @@ import 'package:flymap/data/api/flight_number_search_api.dart';
 import 'package:flymap/data/api/mapbox_env_config.dart';
 import 'package:flymap/data/api/flight_route_preview_api.dart';
 import 'package:flymap/data/api/flight_route_search_api.dart';
+import 'package:flymap/data/api/mapbox_raster_tile_api.dart';
 import 'package:flymap/data/api/mapbox_static_image_api.dart';
+import 'package:flymap/data/flight_video/media_gallery_saver.dart';
+import 'package:flymap/data/flight_video/video_encoder.dart';
 import 'package:flymap/data/api/route_overview_api.dart';
 import 'package:flymap/data/api/flight_info_api_mapper.dart';
 import 'package:flymap/data/gps_data_provider.dart';
@@ -78,6 +81,7 @@ import 'package:flymap/domain/usecase/get_flight_info_use_case.dart';
 import 'package:flymap/domain/usecase/lookup_flight_by_number_use_case.dart';
 import 'package:flymap/domain/usecase/search_flights_by_number_use_case.dart';
 import 'package:flymap/domain/usecase/build_flight_route_preview_use_case.dart';
+import 'package:flymap/domain/usecase/generate_flight_video_use_case.dart';
 import 'package:flymap/domain/usecase/generate_share_image_use_case.dart';
 import 'package:flymap/domain/usecase/search_flights_by_route_use_case.dart';
 
@@ -215,6 +219,22 @@ class DiModule {
     );
     i.registerLazySingleton<GenerateShareImageUseCase>(
       () => GenerateShareImageUseCase(mapboxApi: i.get()),
+    );
+    i.registerLazySingleton<MapboxRasterTileApi>(
+      () => MapboxRasterTileApi(
+        httpClient: i.get(),
+        accessToken: i.get<MapboxEnvConfig>().trimmedAccessToken,
+      ),
+    );
+    i.registerLazySingleton<FlightVideoEncoder>(
+      () => FallbackFlightVideoEncoder(
+        primary: NativeFlightVideoEncoder(),
+        secondary: QuickVideoEncoderAdapter(),
+      ),
+    );
+    i.registerLazySingleton<MediaGallerySaver>(() => const MediaGallerySaver());
+    i.registerLazySingleton<GenerateFlightVideoUseCase>(
+      () => GenerateFlightVideoUseCase(tileApi: i.get(), encoder: i.get()),
     );
 
     // Connectivity checker

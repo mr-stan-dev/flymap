@@ -115,6 +115,10 @@ class FlightAppBar extends StatelessWidget {
                               value: 'share_route',
                               child: Text(context.t.flight.shareRoute),
                             ),
+                            PopupMenuItem(
+                              value: 'flight_video',
+                              child: Text(context.t.flightVideo.title),
+                            ),
                             if (kDebugMode)
                               PopupMenuItem(
                                 key: const Key('flight.debug_menu_item'),
@@ -148,6 +152,9 @@ class FlightAppBar extends StatelessWidget {
     switch (value) {
       case 'share_route':
         AppRouter.goToShareImage(context, flightId: flight.id);
+        break;
+      case 'flight_video':
+        AppRouter.goToFlightVideo(context, flightId: flight.id);
         break;
       case 'debug':
         if (!kDebugMode) return;

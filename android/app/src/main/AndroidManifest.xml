@@ -1,10 +1,18 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- Location permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <!-- Internet permission for map tiles -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Saving generated flight videos to the gallery on Android 10 and below
+         (gal). camera_android_camerax declares the same permission with
+         maxSdkVersion=28, so we must explicitly override the merged value. -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29"
+        tools:replace="android:maxSdkVersion" />
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
     <application
         android:label="Flymap"

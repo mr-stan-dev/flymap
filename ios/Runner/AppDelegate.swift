@@ -5,6 +5,7 @@ import MapLibre
 @main
 @objc class AppDelegate: FlutterAppDelegate {
   private let nativeCaptureDelegate = NativeCaptureDelegate()
+  private let flightVideoEncoderDelegate = FlightVideoEncoderDelegate()
 
   override func application(
     _ application: UIApplication,
@@ -23,6 +24,7 @@ import MapLibre
 
     if let controller = window?.rootViewController as? FlutterViewController {
       nativeCaptureDelegate.register(with: controller)
+      flightVideoEncoderDelegate.register(with: controller)
     }
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
