@@ -24,6 +24,24 @@ void main() {
     expect(formatter.temperatureLabel, '~32°F');
   });
 
+  test('rounds feet altitude for photo overlay readability', () {
+    final formatter = SkyCameraTelemetryFormatter(
+      snapshot: _snapshot(altitudeMeters: 5100),
+      strings: _stringsFeet,
+    );
+
+    expect(formatter.altitudeLabel, '16,700 ft');
+  });
+
+  test('rounds low metric altitude to the nearest ten meters', () {
+    final formatter = SkyCameraTelemetryFormatter(
+      snapshot: _snapshot(altitudeMeters: 854),
+      strings: _strings,
+    );
+
+    expect(formatter.altitudeLabel, '850 m');
+  });
+
   test('shows tech strip with valid GPS even when speed is unavailable', () {
     final formatter = SkyCameraTelemetryFormatter(
       snapshot: _snapshot(
@@ -180,6 +198,32 @@ const _stringsFahrenheit = SkyCameraStrings(
   altitudeUnit: SkyCameraAltitudeUnit.meter,
   speedUnit: SkyCameraSpeedUnit.mph,
   temperatureUnit: SkyCameraTemperatureUnit.fahrenheit,
+  dateDisplayFormat: SkyCameraDateDisplayFormat.dayMonthYear,
+);
+
+const _stringsFeet = SkyCameraStrings(
+  loadingCamera: 'Loading camera...',
+  loadingGpsData: 'Loading GPS data',
+  retry: 'Retry',
+  close: 'Close',
+  zoom: 'Zoom',
+  flash: 'Flash',
+  captureFailed: 'Capture failed',
+  cameraUnavailable: 'Camera unavailable',
+  cameraPermissionDenied: 'Permission denied',
+  savedMessage: 'Photo saved',
+  share: 'Share',
+  telemetrySpeed: 'Speed',
+  telemetryAltitude: 'Altitude',
+  telemetryHeading: 'Heading',
+  telemetryTime: 'Time',
+  contextCaption: 'Context',
+  mapCaption: 'Map',
+  coordinatesCaption: 'Coordinates',
+  noValuePlaceholder: '--',
+  altitudeUnit: SkyCameraAltitudeUnit.foot,
+  speedUnit: SkyCameraSpeedUnit.mph,
+  temperatureUnit: SkyCameraTemperatureUnit.celsius,
   dateDisplayFormat: SkyCameraDateDisplayFormat.dayMonthYear,
 );
 

@@ -181,7 +181,7 @@ class SkyCameraTelemetryFormatter {
     }
     return switch (strings.altitudeUnit) {
       SkyCameraAltitudeUnit.meter => _formatMetricAltitude(value),
-      SkyCameraAltitudeUnit.foot => '${(value * 3.28084).round()} ft',
+      SkyCameraAltitudeUnit.foot => _formatFeetAltitude(value),
     };
   }
 
@@ -190,7 +190,33 @@ class SkyCameraTelemetryFormatter {
       final kilometers = meters / 1000;
       return '${kilometers.toStringAsFixed(1)} km';
     }
-    return '${meters.round()} m';
+    final roundedMeters = _roundToNearest(meters, 10);
+    if (roundedMeters.abs() >= 1000) {
+      final kilometers = roundedMeters / 1000;
+      return '${kilometers.toStringAsFixed(1)} km';
+    }
+    return '$roundedMeters m';
+  }
+
+  String _formatFeetAltitude(double meters) {
+    final roundedFeet = _roundToNearest(meters * 3.28084, 100);
+    return '${_formatGroupedInt(roundedFeet)} ft';
+  }
+
+  int _roundToNearest(double value, int increment) =>
+      (value / increment).round() * increment;
+
+  String _formatGroupedInt(int value) {
+    final sign = value < 0 ? '-' : '';
+    final digits = value.abs().toString();
+    final buffer = StringBuffer(sign);
+    for (var i = 0; i < digits.length; i += 1) {
+      if (i > 0 && (digits.length - i) % 3 == 0) {
+        buffer.write(',');
+      }
+      buffer.write(digits[i]);
+    }
+    return buffer.toString();
   }
 
   String _formatHeading(double? value) {
