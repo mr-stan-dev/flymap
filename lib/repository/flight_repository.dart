@@ -51,22 +51,34 @@ class FlightRepository {
     return (await getAllFlights()).length;
   }
 
-  /// Get total downloaded maps count (sum of maps per flight)
+  /// Get total downloaded maps count.
+  ///
+  /// Maps are keyed by route, so two flights on the same route share one
+  /// physical MBTiles file — counting per flight would double-count it.
   Future<int> getTotalDownloadedMaps() async {
     final flights = await _flightsService.getAllFlights();
-    int total = 0;
+    final uniqueFiles = <String>{};
+    var pathlessMaps = 0;
     for (final f in flights) {
-      total += f.maps.length;
+      for (final m in f.maps) {
+        if (m.filePath.isEmpty) {
+          pathlessMaps++;
+        } else {
+          uniqueFiles.add(m.filePath);
+        }
+      }
     }
-    return total;
+    return uniqueFiles.length + pathlessMaps;
   }
 
-  /// Get total map size in bytes (sum of sizeBytes across all flight maps)
+  /// Get total map size in bytes, counting each shared physical file once.
   Future<int> getTotalMapSize() async {
     final flights = await _flightsService.getAllFlights();
+    final seenFiles = <String>{};
     int totalBytes = 0;
     for (final f in flights) {
       for (final m in f.maps) {
+        if (m.filePath.isNotEmpty && !seenFiles.add(m.filePath)) continue;
         totalBytes += m.sizeBytes;
       }
     }

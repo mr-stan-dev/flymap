@@ -61,7 +61,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.byType(SecondaryButton), findsNWidgets(2));
+    expect(find.byType(PrimaryButton), findsNWidgets(2));
     expect(find.byType(TertiaryButton), findsOneWidget);
   });
 }

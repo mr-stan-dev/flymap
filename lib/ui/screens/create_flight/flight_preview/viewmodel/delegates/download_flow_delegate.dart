@@ -46,8 +46,11 @@ class DownloadFlowDelegate {
   int get _freeWikiArticlesSelectionLimit =>
       ProLimits.freeWikiArticlesSelectionLimit;
 
-  String _articleBundleId(FlightRoute route) =>
-      '${route.routeCode}_${route.departure.displayCode}_${route.arrival.displayCode}';
+  /// Flight-scoped: article media is owned by one flight, so cancel/failure
+  /// cleanup of this bundle can never touch another flight's images. Legacy
+  /// route-scoped bundles remain protected by FlightAssetsDeleter.
+  String _articleBundleId(FlightRoute route, String flightId) =>
+      '${route.routeCode}_${route.departure.displayCode}_${route.arrival.displayCode}_$flightId';
 
   String _articlesProgressMessage({
     required int completed,
@@ -195,7 +198,7 @@ class DownloadFlowDelegate {
     final regionsToDownloadCount = _downloadRegionWikiArticlesUseCase
         .downloadTargetCount(regionsToDownload);
     final flightId = DownloadMapUseCase.newFlightId();
-    final articleBundleId = _articleBundleId(route);
+    final articleBundleId = _articleBundleId(route, flightId);
     _activeArticleBundleId = articleBundleId;
     final initialHasArticlePhase = selectedUrls.isNotEmpty;
     final initialSections = DownloadSectionsState(

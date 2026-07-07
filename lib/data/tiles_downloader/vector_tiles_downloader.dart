@@ -73,6 +73,7 @@ class VectorTilesDownloader {
   ) async {
     Database? db;
     String? mbtilesPath;
+    String? workPath;
     var keepArtifacts = false;
     _cancelCompleter = Completer<void>();
     try {
@@ -104,7 +105,12 @@ class VectorTilesDownloader {
       );
 
       mbtilesPath = p.join(targetDirPath, '$fileName.mbtiles');
-      _logger.log('MBTiles file: $mbtilesPath');
+      // All writes go to a .part work file; the final path is only touched
+      // by the atomic promotion after verification. A failed or cancelled
+      // re-download of a route can therefore never destroy an existing good
+      // map for that route (which another flight may still depend on).
+      workPath = '$mbtilesPath.part';
+      _logger.log('MBTiles file: $mbtilesPath (work file: $workPath)');
 
       // Ensure target directory exists
       final targetDirectory = Directory(targetDirPath);
@@ -113,12 +119,13 @@ class VectorTilesDownloader {
         await targetDirectory.create(recursive: true);
       }
 
-      await _resetMbtilesSidecars(mbtilesPath);
+      // Clear any stale work file left by an earlier kill/crash.
+      await _deleteMbtilesArtifacts(workPath);
 
       // Create database using sqflite
       final dbHelper = VectorTilesDb();
       db = await openDatabase(
-        mbtilesPath,
+        workPath,
         version: 1,
         onCreate: dbHelper.createMbtilesSchema,
       );
@@ -360,7 +367,7 @@ class VectorTilesDownloader {
           'Success rate below threshold (70%). Failing download and deleting MBTiles.',
         );
         try {
-          final f = File(mbtilesPath);
+          final f = File(workPath);
           if (await f.exists()) {
             await f.delete();
           }
@@ -386,9 +393,14 @@ class VectorTilesDownloader {
       _logger.log('Verifying MBTiles file...');
       controller.add(const DownloadMapVerifying());
 
-      final verification = await MbtilesVerifier.verifyMbtilesFile(mbtilesPath);
+      final verification = await MbtilesVerifier.verifyMbtilesFile(workPath);
 
       if (verification.isValid) {
+        // Close before renaming so the data is checkpointed into the main
+        // file and no handle points at the old path.
+        await db.close();
+        db = null;
+        await _promoteWorkFile(workPath, mbtilesPath);
         _logger.log('File verification successful, yielding success event');
         keepArtifacts = true;
         controller.add(DownloadMapDone(mbtilesPath, verification.fileSize));
@@ -423,10 +435,28 @@ class VectorTilesDownloader {
       try {
         await db?.close();
       } catch (_) {}
-      if (!keepArtifacts && mbtilesPath != null) {
-        await _deleteMbtilesArtifacts(mbtilesPath);
+      // Only ever clean up the work file: the final path holds the previous
+      // good map (if any) and must survive failed/cancelled re-downloads.
+      if (!keepArtifacts && workPath != null) {
+        await _deleteMbtilesArtifacts(workPath);
       }
     }
+  }
+
+  /// Replaces the final MBTiles with the verified work file. The previous
+  /// good file stays intact until this moment, so interruptions before the
+  /// rename leave it untouched.
+  Future<void> _promoteWorkFile(String workPath, String finalPath) async {
+    // Sqlite data is checkpointed into the main file on close; leftover
+    // sidecars from either path are stale and must not shadow the new db.
+    await _resetMbtilesSidecars(workPath);
+    await _resetMbtilesSidecars(finalPath);
+    final finalFile = File(finalPath);
+    if (await finalFile.exists()) {
+      await finalFile.delete();
+    }
+    await File(workPath).rename(finalPath);
+    _logger.log('Promoted work file to $finalPath');
   }
 
   /// Splits the input into near-even chunks for worker fan-out.

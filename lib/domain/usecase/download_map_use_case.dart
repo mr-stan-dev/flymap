@@ -107,8 +107,16 @@ class DownloadMapUseCase {
 
   static String newFlightId() => _uuid.v4();
 
-  static String routeKeyForRoute(FlightRoute route) {
-    return '${route.routeCode}_${MapDownloadConfig.mapLayerId}';
+  /// Map files are owned by ONE flight: the flightId in the name guarantees
+  /// two flights on the same airport pair (which can have different real
+  /// tracks and corridors) never share or overwrite each other's map.
+  /// Legacy files without a flightId are still resolved via the stored
+  /// [FlightMap.filePath] and protected by FlightAssetsDeleter refcounting.
+  static String mapFileName({
+    required FlightRoute route,
+    required String flightId,
+  }) {
+    return '${route.routeCode}_${flightId}_${MapDownloadConfig.mapLayerId}';
   }
 
   Stream<DownloadMapEvent> call({
@@ -137,7 +145,7 @@ class DownloadMapUseCase {
       _currentDownloader = downloader;
 
       final mapLayer = MapDownloadConfig.mapLayerId;
-      final fileName = '${flightRoute.routeCode}_$mapLayer';
+      final fileName = mapFileName(route: flightRoute, flightId: flightId);
 
       // Forward the download stream and handle completion
       await for (final event in downloader.download(fileName)) {
