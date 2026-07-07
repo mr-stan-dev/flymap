@@ -30,7 +30,9 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
   FlymapSkyCameraSession? _session;
   bool _isLoadingSession = false;
   bool _didShowNoFlightContextDialog = false;
-  SkyCameraAltitudeUnit _altitudeUnit = SkyCameraAltitudeUnit.foot;
+  // Transient value shown until the saved unit loads from the repo (which
+  // now defaults to meters); avoids a feet flash on open.
+  SkyCameraAltitudeUnit _altitudeUnit = SkyCameraAltitudeUnit.meter;
   SkyCameraSpeedUnit _speedUnit = SkyCameraSpeedUnit.kmh;
   SkyCameraTemperatureUnit _temperatureUnit = SkyCameraTemperatureUnit.celsius;
   SkyCameraDateDisplayFormat _dateDisplayFormat =

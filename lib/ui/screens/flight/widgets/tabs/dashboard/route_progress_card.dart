@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/i18n/strings.g.dart';
+import 'package:flymap/ui/screens/settings/distance_unit_context.dart';
+import 'package:flymap/utils/unit_format_utils.dart';
 
 class RouteProgressCard extends StatelessWidget {
   const RouteProgressCard({
@@ -19,7 +21,8 @@ class RouteProgressCard extends StatelessWidget {
     final totalKm = route.distanceInKm;
     final coveredKm = coveredDistanceKm.clamp(0.0, totalKm);
     final progress = totalKm > 0 ? (coveredKm / totalKm).clamp(0.0, 1.0) : 0.0;
-    final remainingKm = (totalKm - coveredKm).clamp(0, totalKm);
+    final remainingKm = (totalKm - coveredKm).clamp(0.0, totalKm);
+    final unit = context.distanceUnit;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -88,27 +91,21 @@ class RouteProgressCard extends StatelessWidget {
               Expanded(
                 child: _Metric(
                   label: context.t.flight.dashboard.covered,
-                  value: context.t.flight.info.distanceKm(
-                    distance: coveredKm.toStringAsFixed(0),
-                  ),
+                  value: UnitFormatUtils.formatDistance(coveredKm, unit),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _Metric(
                   label: context.t.flight.dashboard.remaining,
-                  value: context.t.flight.info.distanceKm(
-                    distance: remainingKm.toStringAsFixed(0),
-                  ),
+                  value: UnitFormatUtils.formatDistance(remainingKm, unit),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _Metric(
                   label: context.t.flight.dashboard.total,
-                  value: context.t.flight.info.distanceKm(
-                    distance: totalKm.toStringAsFixed(0),
-                  ),
+                  value: UnitFormatUtils.formatDistance(totalKm, unit),
                 ),
               ),
             ],

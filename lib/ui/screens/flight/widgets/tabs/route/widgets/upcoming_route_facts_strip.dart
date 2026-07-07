@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/i18n/strings.g.dart';
+import 'package:flymap/ui/screens/settings/distance_unit_context.dart';
+import 'package:flymap/utils/unit_format_utils.dart';
 
 class UpcomingRouteFactsStrip extends StatelessWidget {
   const UpcomingRouteFactsStrip({
@@ -14,8 +16,9 @@ class UpcomingRouteFactsStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final distanceLabel = context.t.flight.info.distanceKm(
-      distance: route.displayDistanceKm.toString(),
+    final distanceLabel = UnitFormatUtils.formatDistance(
+      route.displayDistanceKm.toDouble(),
+      context.distanceUnit,
     );
     final durationLabel = _formatMinutesCompact(context, totalMinutes);
     final routeLabel =

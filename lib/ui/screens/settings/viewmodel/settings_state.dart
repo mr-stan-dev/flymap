@@ -18,7 +18,7 @@ class SettingsState extends Equatable {
 
   const SettingsState({
     this.themeMode = ThemeMode.dark,
-    this.altitudeUnit = 'ft',
+    this.altitudeUnit = 'm',
     this.speedUnit = 'km/h',
     this.timeFormat = '24h',
     this.distanceUnit = 'km',

@@ -24,4 +24,26 @@ void main() {
 
     expect(unit, TemperatureUnit.fahrenheit);
   });
+
+  test('defaults altitude unit to meters', () async {
+    final unit = await repository.getAltitudeUnit();
+
+    expect(unit, AltitudeUnit.meter);
+  });
+
+  test('keeps an explicitly chosen feet altitude', () async {
+    await repository.setAltitudeUnit(AltitudeUnit.foot);
+
+    final unit = await repository.getAltitudeUnit();
+
+    expect(unit, AltitudeUnit.foot);
+  });
+
+  test('defaults distance unit to km and persists miles', () async {
+    expect(await repository.getDistanceUnit(), DistanceUnit.km);
+
+    await repository.setDistanceUnit(DistanceUnit.mile);
+
+    expect(await repository.getDistanceUnit(), DistanceUnit.mile);
+  });
 }

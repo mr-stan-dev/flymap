@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/i18n/strings.g.dart';
+import 'package:flymap/ui/screens/settings/distance_unit_context.dart';
 import 'package:flymap/ui/screens/share_flight/widgets/overlay/config/share_overlay_chip_config.dart';
+import 'package:flymap/utils/unit_format_utils.dart';
 
 class ShareDistanceChip extends StatelessWidget {
   const ShareDistanceChip({required this.distanceKm, super.key});
@@ -12,8 +14,9 @@ class ShareDistanceChip extends StatelessWidget {
     final t = context.t;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final distanceLabel = t.shareFlight.distanceKm(
-      distance: distanceKm.toStringAsFixed(0),
+    final distanceLabel = UnitFormatUtils.formatDistance(
+      distanceKm,
+      context.distanceUnit,
     );
 
     return Container(

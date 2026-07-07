@@ -84,11 +84,14 @@ class MetricUnitsRepository {
   // Backward-compatible parsing helpers
   AltitudeUnit _parseAltitude(String? v) {
     switch (v) {
-      case 'meter':
-        return AltitudeUnit.meter;
       case 'foot':
-      default:
         return AltitudeUnit.foot;
+      // Default (including unset) is meters: most of the user base is
+      // metric, matching the km distance default. Users who picked feet have
+      // 'foot' stored and are unaffected.
+      case 'meter':
+      default:
+        return AltitudeUnit.meter;
     }
   }
 
