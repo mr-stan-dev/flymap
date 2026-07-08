@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/domain/entity/flight.dart';
-import 'package:flymap/domain/entity/flight_poi_type.dart';
-import 'package:flymap/domain/entity/route_poi_rank.dart';
-import 'package:flymap/domain/entity/route_poi_summary.dart';
 import 'package:flymap/domain/entity/units.dart';
+import 'package:flymap/domain/policy/route_region_timeline_policy.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/size_utils.dart';
@@ -48,7 +46,13 @@ class HomeFlightCard extends StatelessWidget {
     final offlineSize = _formatOfflineSize(flight);
     final poiCount = flight.info.poi.length;
     final articleCount = flight.info.articles.length;
-    final routePreviewPoi = _selectRoutePreviewPoi(flight.info.poi);
+    final routeRegions = RouteRegionTimelinePolicy.forFlight(
+      regions: flight.info.routeRegions,
+      departureCountryCode: departure.countryCode,
+      arrivalCountryCode: arrival.countryCode,
+      totalRouteKm: route.distanceInKm,
+      languageCode: LocaleSettings.currentLocale.languageCode,
+    );
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
@@ -135,7 +139,9 @@ class HomeFlightCard extends StatelessWidget {
               articleCount: articleCount,
               departureCode: departure.displayCode,
               arrivalCode: arrival.displayCode,
-              routePreviewPoi: routePreviewPoi,
+              departureCountryCode: departure.countryCode,
+              arrivalCountryCode: arrival.countryCode,
+              routeRegions: routeRegions,
               showInProgressStatusChip: highlightInProgress,
             ),
           ],
@@ -209,55 +215,6 @@ class HomeFlightCard extends StatelessWidget {
     return t.home.savedTime(time: savedTime);
   }
 
-  List<RoutePoiSummary> _selectRoutePreviewPoi(List<RoutePoiSummary> allPoi) {
-    if (allPoi.isEmpty) return const [];
-
-    final sorted = [...allPoi]
-      ..sort((a, b) {
-        final aScore = RoutePoiRank.baseScore(
-          type: a.type,
-          sitelinks: a.sitelinks,
-        );
-        final bScore = RoutePoiRank.baseScore(
-          type: b.type,
-          sitelinks: b.sitelinks,
-        );
-        return bScore.compareTo(aScore);
-      });
-
-    final selected = <RoutePoiSummary>[];
-    final selectedQids = <String>{};
-
-    void addMatching(FlightPoiType type, int maxCount) {
-      for (final poi in sorted) {
-        if (selected.length >= 3) return;
-        if (poi.type != type || selectedQids.contains(poi.qid)) continue;
-        selected.add(poi);
-        selectedQids.add(poi.qid);
-        if (selected.where((item) => item.type == type).length >= maxCount) {
-          return;
-        }
-      }
-    }
-
-    addMatching(FlightPoiType.volcano, 2);
-    addMatching(FlightPoiType.mountain, 1);
-    addMatching(FlightPoiType.island, 1);
-
-    for (final poi in sorted) {
-      if (selected.length >= 3) break;
-      if (selectedQids.contains(poi.qid)) continue;
-      selected.add(poi);
-      selectedQids.add(poi.qid);
-    }
-
-    selected.sort((a, b) {
-      final aProgress = a.routeProgress ?? 0.5;
-      final bProgress = b.routeProgress ?? 0.5;
-      return aProgress.compareTo(bProgress);
-    });
-    return selected;
-  }
 }
 
 class _SavedFlightCardBody extends StatelessWidget {
@@ -270,7 +227,9 @@ class _SavedFlightCardBody extends StatelessWidget {
     required this.articleCount,
     required this.departureCode,
     required this.arrivalCode,
-    required this.routePreviewPoi,
+    required this.departureCountryCode,
+    required this.arrivalCountryCode,
+    required this.routeRegions,
     required this.showInProgressStatusChip,
   });
 
@@ -282,7 +241,9 @@ class _SavedFlightCardBody extends StatelessWidget {
   final int articleCount;
   final String departureCode;
   final String arrivalCode;
-  final List<RoutePoiSummary> routePreviewPoi;
+  final String departureCountryCode;
+  final String arrivalCountryCode;
+  final List<RouteRegionMarker> routeRegions;
   final bool showInProgressStatusChip;
 
   @override
@@ -341,7 +302,9 @@ class _SavedFlightCardBody extends StatelessWidget {
         HomeRoutePreviewStrip(
           departureCode: departureCode,
           arrivalCode: arrivalCode,
-          poi: routePreviewPoi,
+          departureCountryCode: departureCountryCode,
+          arrivalCountryCode: arrivalCountryCode,
+          regions: routeRegions,
         ),
       ],
     );

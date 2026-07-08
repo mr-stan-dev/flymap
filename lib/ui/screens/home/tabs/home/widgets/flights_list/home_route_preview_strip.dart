@@ -1,19 +1,33 @@
+import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
-import 'package:flymap/domain/entity/flight_poi_type.dart';
-import 'package:flymap/domain/entity/route_poi_summary.dart';
-import 'package:flymap/ui/screens/shared/poi_type_marker_asset.dart';
+import 'package:flymap/domain/entity/route_region_type.dart';
+import 'package:flymap/domain/policy/route_region_timeline_policy.dart';
+import 'package:flymap/i18n/strings.g.dart';
+import 'package:flymap/ui/screens/shared/region_artwork.dart';
+import 'package:flymap/utils/country_name_utils.dart';
 
 class HomeRoutePreviewStrip extends StatelessWidget {
   const HomeRoutePreviewStrip({
     required this.departureCode,
     required this.arrivalCode,
-    required this.poi,
+    required this.departureCountryCode,
+    required this.arrivalCountryCode,
+    required this.regions,
     super.key,
   });
 
   final String departureCode;
   final String arrivalCode;
-  final List<RoutePoiSummary> poi;
+
+  /// ISO country codes for the two airports, rendered as a flag at each
+  /// endpoint (matches the flag/nature circles in between); falls back to a
+  /// generic airport icon when a code is missing.
+  final String departureCountryCode;
+  final String arrivalCountryCode;
+
+  /// Regions crossed, as circles between the two airports (adaptive:
+  /// countries abroad, natural features at home).
+  final List<RouteRegionMarker> regions;
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +35,13 @@ class HomeRoutePreviewStrip extends StatelessWidget {
       context,
     ).colorScheme.outline.withValues(alpha: 0.32);
     return SizedBox(
-      height: 42,
+      height: 46,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final width = constraints.maxWidth.isFinite
               ? constraints.maxWidth
               : 0.0;
-          final poiOffsets = _poiOffsets(width);
+          final offsets = _regionOffsets(width);
           return Stack(
             clipBehavior: Clip.none,
             children: [
@@ -39,18 +53,24 @@ class HomeRoutePreviewStrip extends StatelessWidget {
               Positioned(
                 left: 0,
                 top: 4,
-                child: _AirportEndpointMarker(code: departureCode),
+                child: _AirportEndpointMarker(
+                  code: departureCode,
+                  countryCode: departureCountryCode,
+                ),
               ),
-              for (var i = 0; i < poi.length; i++)
+              for (var i = 0; i < regions.length; i++)
                 Positioned(
-                  left: poiOffsets[i],
+                  left: offsets[i],
                   top: 4,
-                  child: _PoiRouteMarker(type: poi[i].type),
+                  child: _RegionRouteMarker(region: regions[i]),
                 ),
               Positioned(
                 right: 0,
                 top: 4,
-                child: _AirportEndpointMarker(code: arrivalCode),
+                child: _AirportEndpointMarker(
+                  code: arrivalCode,
+                  countryCode: arrivalCountryCode,
+                ),
               ),
             ],
           );
@@ -59,75 +79,72 @@ class HomeRoutePreviewStrip extends StatelessWidget {
     );
   }
 
-  List<double> _markerPositions() {
-    if (poi.isEmpty) return const [];
-    final raw = poi.map((item) => item.routeProgress ?? 0.5).toList();
-    final adjusted = <double>[];
-    const minX = 0.18;
-    const maxX = 0.82;
-    const minGap = 0.14;
+  /// Left offsets (in px) for each middle marker's 48px labelled column.
+  ///
+  /// Spacing is enforced in PIXELS, not in route-progress fractions: markers
+  /// are placed at their route position, then pushed apart so their centers are
+  /// always at least a caption-width apart — otherwise two nearby regions'
+  /// captions overlap ("BritishGreat…"). Assumes [regions] is route-ordered.
+  List<double> _regionOffsets(double width) {
+    if (regions.isEmpty || !width.isFinite || width <= 0) return const [];
 
-    for (final progress in raw) {
-      var next = progress.clamp(minX, maxX);
-      if (adjusted.isNotEmpty && next - adjusted.last < minGap) {
-        next = (adjusted.last + minGap).clamp(minX, maxX);
-      }
-      adjusted.add(next);
+    const slotWidth = 48.0;
+    // Clear of the 44px airport endpoints at each edge.
+    const endpointClearance = 46.0;
+    // Min distance between two marker centers so captions never touch.
+    const minGap = slotWidth + 6.0;
+
+    final lo = endpointClearance + slotWidth / 2;
+    final hi = width - endpointClearance - slotWidth / 2;
+    if (hi <= lo) {
+      // Too narrow to space them; stack at the start rather than crash.
+      return List<double>.filled(regions.length, (lo - slotWidth / 2).clamp(0, width));
     }
 
-    for (var i = adjusted.length - 2; i >= 0; i--) {
-      if (adjusted[i + 1] - adjusted[i] < minGap) {
-        adjusted[i] = (adjusted[i + 1] - minGap).clamp(minX, maxX);
-      }
-    }
-    return adjusted;
-  }
-
-  List<double> _poiOffsets(double width) {
-    final positions = _markerPositions();
-    if (positions.isEmpty || !width.isFinite || width <= 0) return const [];
-
-    const markerSize = 24.0;
-    const lineInset = 12.0;
-    const edgePadding = 8.0;
-    final minLeft = lineInset + edgePadding;
-    final maxLeft = width - lineInset - edgePadding - markerSize;
-
-    if (maxLeft <= minLeft) {
-      return List<double>.filled(positions.length, minLeft);
-    }
-
-    return positions
-        .map((p) => (width * p - markerSize / 2).clamp(minLeft, maxLeft))
+    final centers = regions
+        .map((r) => (width * r.routeProgress).clamp(lo, hi).toDouble())
         .toList();
+
+    // Push right so no pair is closer than minGap...
+    for (var i = 1; i < centers.length; i++) {
+      if (centers[i] - centers[i - 1] < minGap) {
+        centers[i] = (centers[i - 1] + minGap).clamp(lo, hi).toDouble();
+      }
+    }
+    // ...then pull left for any that hit the right bound.
+    for (var i = centers.length - 2; i >= 0; i--) {
+      if (centers[i + 1] - centers[i] < minGap) {
+        centers[i] = (centers[i + 1] - minGap).clamp(lo, hi).toDouble();
+      }
+    }
+
+    return centers.map((c) => c - slotWidth / 2).toList();
   }
 }
 
 class _AirportEndpointMarker extends StatelessWidget {
-  const _AirportEndpointMarker({required this.code});
+  const _AirportEndpointMarker({required this.code, required this.countryCode});
 
   final String code;
+  final String countryCode;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    // Circle width stays 24 (aligned to the line end), but the label is wider
+    // and centered under it so 3-4 letter airport codes are never clipped.
     return SizedBox(
-      width: 24,
+      width: 44,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(
-            'assets/images/poi/airport.png',
-            width: 24,
-            height: 24,
-            fit: BoxFit.contain,
-          ),
+          _EndpointFlag(countryCode: countryCode),
           const SizedBox(height: 3),
           Text(
             code,
             textAlign: TextAlign.center,
             maxLines: 1,
             softWrap: false,
-            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w700,
@@ -139,29 +156,128 @@ class _AirportEndpointMarker extends StatelessWidget {
   }
 }
 
-class _PoiRouteMarker extends StatelessWidget {
-  const _PoiRouteMarker({required this.type});
+/// The airport endpoint icon with a small country-flag badge in the top-right
+/// corner (about a quarter of the icon), so the country reads at a glance
+/// without a full flag dominating — useful abroad, unobtrusive at home. The
+/// badge is omitted when the country code is unknown.
+class _EndpointFlag extends StatelessWidget {
+  const _EndpointFlag({required this.countryCode});
 
-  final FlightPoiType type;
+  final String countryCode;
+
+  static const double _iconSize = 24;
+  static const double _badgeSize = 14;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 24,
-      height: 24,
-      padding: const EdgeInsets.all(2),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.18),
-        ),
-      ),
-      child: Image.asset(
-        PoiTypeMarkerAsset.iconPathFor(type),
-        fit: BoxFit.contain,
+    final colorScheme = Theme.of(context).colorScheme;
+    final code = countryCode.trim();
+    final hasFlag = code.length == 2;
+    return SizedBox(
+      width: _iconSize,
+      height: _iconSize,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Image.asset(
+            'assets/images/poi/airport.png',
+            width: _iconSize,
+            height: _iconSize,
+            fit: BoxFit.contain,
+          ),
+          if (hasFlag)
+            Positioned(
+              top: -4,
+              right: -4,
+              child: Container(
+                width: _badgeSize,
+                height: _badgeSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  // A ring in the card colour separates the badge from the icon.
+                  border: Border.all(color: colorScheme.surface, width: 1.5),
+                ),
+                child: ClipOval(
+                  child: CountryFlag.fromCountryCode(
+                    code.toUpperCase(),
+                    width: _badgeSize,
+                    height: _badgeSize,
+                    shape: const Rectangle(),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
+  }
+}
+
+class _RegionRouteMarker extends StatelessWidget {
+  const _RegionRouteMarker({required this.region});
+
+  final RouteRegionMarker region;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isCountry = region.regionType == RouteRegionType.country;
+    final label = _label();
+    return SizedBox(
+      width: 48,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: colorScheme.outline.withValues(alpha: 0.18),
+              ),
+            ),
+            // The shared region artwork: a flag for countries, a natural-
+            // feature icon (sea, mountains, desert…) otherwise.
+            child: RegionArtwork(
+              regionName: region.name,
+              regionType: region.regionType,
+              size: 24,
+              isCircle: true,
+              flagOpacity: 1.0,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              // Country codes read like the airport codes (bold); region names
+              // are lighter so the two are visually distinct.
+              fontWeight: isCountry ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The caption under the circle: a 2-letter country code for countries
+  /// (matching the airport endpoints), otherwise the region's name.
+  String _label() {
+    if (region.regionType == RouteRegionType.country) {
+      final code = CountryNameUtils.toCode(
+        region.name,
+        languageCode: LocaleSettings.currentLocale.languageCode,
+      );
+      if (code != null) return code.toUpperCase();
+    }
+    return region.name;
   }
 }
 

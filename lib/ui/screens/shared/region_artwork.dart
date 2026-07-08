@@ -11,6 +11,7 @@ class RegionArtwork extends StatelessWidget {
     this.size = 64,
     this.borderRadius = 12,
     this.isCircle = false,
+    this.flagOpacity = 0.70,
     super.key,
   });
 
@@ -19,6 +20,11 @@ class RegionArtwork extends StatelessWidget {
   final double size;
   final double borderRadius;
   final bool isCircle;
+
+  /// Opacity of the country flag artwork (natural-feature icons are always
+  /// full strength). Defaults to a muted 0.70 for chip contexts; pass 1.0
+  /// where the flag should read at full brightness.
+  final double flagOpacity;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +51,7 @@ class RegionArtwork extends StatelessWidget {
       if (countryCode != null) {
         return Center(
           child: Opacity(
-            opacity: 0.70,
+            opacity: flagOpacity,
             child: CountryFlag.fromCountryCode(
               countryCode,
               width: size,
