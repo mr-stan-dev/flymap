@@ -7,143 +7,60 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
+    final t = context.t;
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.t.about.title)),
+      appBar: AppBar(title: Text(t.about.title)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(DsSpacing.md),
           children: [
+            const _AboutHero(),
+            const SizedBox(height: DsSpacing.md),
             SectionCard(
+              title: t.about.missionTitle,
+              child: Text(
+                t.about.missionText,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  height: 1.45,
+                ),
+              ),
+            ),
+            const SizedBox(height: DsSpacing.md),
+            SectionCard(
+              title: t.about.valuesTitle,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary.withValues(alpha: 0.14),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.public_rounded,
-                          color: colorScheme.primary,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: DsSpacing.sm),
-                      Expanded(
-                        child: Text(
-                          context.t.about.welcome,
-                          style: textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
+                  _AboutValue(
+                    icon: Icons.travel_explore_rounded,
+                    title: t.about.valueCuriosityTitle,
+                    text: t.about.valueCuriosityText,
                   ),
-                  const SizedBox(height: DsSpacing.sm),
-                  Text(
-                    context.t.about.intro,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                  const SizedBox(height: DsSpacing.md),
+                  _AboutValue(
+                    icon: Icons.public_rounded,
+                    title: t.about.valueGeographyTitle,
+                    text: t.about.valueGeographyText,
                   ),
-                  const SizedBox(height: DsSpacing.sm),
-                  Wrap(
-                    spacing: DsSpacing.xs,
-                    runSpacing: DsSpacing.xs,
-                    children: [
-                      StatusChip(
-                        label: context.t.about.chipOffline,
-                        tone: StatusChipTone.info,
-                        icon: Icons.download_for_offline_rounded,
-                      ),
-                      StatusChip(
-                        label: context.t.about.chipDashboard,
-                        tone: StatusChipTone.neutral,
-                        icon: Icons.speed_rounded,
-                      ),
-                      StatusChip(
-                        label: context.t.about.chipSharing,
-                        tone: StatusChipTone.success,
-                        icon: Icons.ios_share_rounded,
-                      ),
-                    ],
+                  const SizedBox(height: DsSpacing.md),
+                  _AboutValue(
+                    icon: Icons.self_improvement_rounded,
+                    title: t.about.valueAwarenessTitle,
+                    text: t.about.valueAwarenessText,
+                  ),
+                  const SizedBox(height: DsSpacing.md),
+                  _AboutValue(
+                    icon: Icons.offline_bolt_rounded,
+                    title: t.about.valueOfflineTitle,
+                    text: t.about.valueOfflineText,
                   ),
                 ],
               ),
             ),
             const SizedBox(height: DsSpacing.md),
-            InfoBanner(
-              message: context.t.about.infoBanner,
-              tone: DsMessageTone.info,
-              icon: Icons.download_for_offline_rounded,
-            ),
-            const SizedBox(height: DsSpacing.md),
-            SectionCard(
-              title: context.t.about.whatYouCanDo,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _AboutFeature(
-                    icon: Icons.route_rounded,
-                    title: context.t.about.featurePlanTitle,
-                    text: context.t.about.featurePlanText,
-                  ),
-                  SizedBox(height: DsSpacing.xs),
-                  _AboutFeature(
-                    icon: Icons.explore_rounded,
-                    title: context.t.about.featureTrackTitle,
-                    text: context.t.about.featureTrackText,
-                  ),
-                  SizedBox(height: DsSpacing.xs),
-                  _AboutFeature(
-                    icon: Icons.info_outline_rounded,
-                    title: context.t.about.featureDetailsTitle,
-                    text: context.t.about.featureDetailsText,
-                  ),
-                  SizedBox(height: DsSpacing.xs),
-                  _AboutFeature(
-                    icon: Icons.ios_share_rounded,
-                    title: context.t.about.featureShareTitle,
-                    text: context.t.about.featureShareText,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: DsSpacing.md),
-            SectionCard(
-              title: context.t.about.quickStart,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _AboutStep(index: 1, text: context.t.about.step1),
-                  SizedBox(height: DsSpacing.xs),
-                  _AboutStep(index: 2, text: context.t.about.step2),
-                  SizedBox(height: DsSpacing.xs),
-                  _AboutStep(index: 3, text: context.t.about.step3),
-                  SizedBox(height: DsSpacing.xs),
-                  _AboutStep(index: 4, text: context.t.about.step4),
-                ],
-              ),
-            ),
-            const SizedBox(height: DsSpacing.md),
-            SectionCard(
-              title: context.t.about.tips,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _AboutTip(text: context.t.about.tip1),
-                  SizedBox(height: DsSpacing.xs),
-                  _AboutTip(text: context.t.about.tip2),
-                ],
-              ),
-            ),
+            const _AboutClosing(),
           ],
         ),
       ),
@@ -151,8 +68,112 @@ class AboutScreen extends StatelessWidget {
   }
 }
 
-class _AboutFeature extends StatelessWidget {
-  const _AboutFeature({
+/// Bold, mission-first header: a globe, the product name, the one-line promise,
+/// and the three values Flymap stands for as chips.
+class _AboutHero extends StatelessWidget {
+  const _AboutHero();
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      padding: const EdgeInsets.all(DsSpacing.lg),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(DsRadii.lg),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colorScheme.primary,
+            Color.alphaBlend(
+              colorScheme.primary.withValues(alpha: 0.75),
+              colorScheme.tertiary,
+            ),
+          ],
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: colorScheme.onPrimary.withValues(alpha: 0.18),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.public_rounded,
+              color: colorScheme.onPrimary,
+              size: 30,
+            ),
+          ),
+          const SizedBox(height: DsSpacing.md),
+          Text(
+            t.appName,
+            style: textTheme.headlineSmall?.copyWith(
+              color: colorScheme.onPrimary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: DsSpacing.xxs),
+          Text(
+            t.about.tagline,
+            style: textTheme.titleMedium?.copyWith(
+              color: colorScheme.onPrimary.withValues(alpha: 0.92),
+              fontWeight: FontWeight.w500,
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: DsSpacing.md),
+          Wrap(
+            spacing: DsSpacing.xs,
+            runSpacing: DsSpacing.xs,
+            children: [
+              _HeroChip(label: t.about.chipCuriosity),
+              _HeroChip(label: t.about.chipGeography),
+              _HeroChip(label: t.about.chipAwareness),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroChip extends StatelessWidget {
+  const _HeroChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DsSpacing.sm,
+        vertical: DsSpacing.xxs,
+      ),
+      decoration: BoxDecoration(
+        color: colorScheme.onPrimary.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+          color: colorScheme.onPrimary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+class _AboutValue extends StatelessWidget {
+  const _AboutValue({
     required this.icon,
     required this.title,
     required this.text,
@@ -165,26 +186,38 @@ class _AboutFeature extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 1),
-          child: Icon(icon, size: 16, color: colorScheme.primary),
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: colorScheme.primary.withValues(alpha: 0.12),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, size: 20, color: colorScheme.primary),
         ),
-        const SizedBox(width: DsSpacing.xs),
+        const SizedBox(width: DsSpacing.sm),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                style: textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const SizedBox(height: DsSpacing.xxs),
-              Text(text, style: Theme.of(context).textTheme.bodyMedium),
+              Text(
+                text,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.4,
+                ),
+              ),
             ],
           ),
         ),
@@ -193,65 +226,51 @@ class _AboutFeature extends StatelessWidget {
   }
 }
 
-class _AboutStep extends StatelessWidget {
-  const _AboutStep({required this.index, required this.text});
-
-  final int index;
-  final String text;
+/// Warm closing note meant to leave users feeling something — and appreciated.
+class _AboutClosing extends StatelessWidget {
+  const _AboutClosing();
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     final colorScheme = Theme.of(context).colorScheme;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 22,
-          height: 22,
-          decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(alpha: 0.14),
-            shape: BoxShape.circle,
+    final textTheme = Theme.of(context).textTheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(DsSpacing.lg),
+      decoration: BoxDecoration(
+        color: colorScheme.primary.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(DsRadii.lg),
+        border: Border.all(
+          color: colorScheme.primary.withValues(alpha: 0.18),
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.favorite_rounded,
+            color: colorScheme.primary,
+            size: 26,
           ),
-          alignment: Alignment.center,
-          child: Text(
-            '$index',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: colorScheme.primary,
+          const SizedBox(height: DsSpacing.sm),
+          Text(
+            t.about.closingTitle,
+            textAlign: TextAlign.center,
+            style: textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
             ),
           ),
-        ),
-        const SizedBox(width: DsSpacing.xs),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 1),
-            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+          const SizedBox(height: DsSpacing.xxs),
+          Text(
+            t.about.closingText,
+            textAlign: TextAlign.center,
+            style: textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              height: 1.45,
+            ),
           ),
-        ),
-      ],
-    );
-  }
-}
-
-class _AboutTip extends StatelessWidget {
-  const _AboutTip({required this.text});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 4),
-          child: Icon(Icons.check_circle_outline_rounded, size: 14),
-        ),
-        const SizedBox(width: DsSpacing.xs),
-        Expanded(
-          child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

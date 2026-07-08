@@ -1192,74 +1192,56 @@ class TranslationsAboutEn {
 	/// en: 'About Flymap'
 	String get title => 'About Flymap';
 
-	/// en: 'Welcome to Flymap'
-	String get welcome => 'Welcome to Flymap';
+	/// en: 'Turn every flight into a window on the world.'
+	String get tagline => 'Turn every flight into a window on the world.';
 
-	/// en: 'Flymap keeps your route visible in the air. Plan the trip, download your map on the ground, and track your flight offline with confidence.'
-	String get intro => 'Flymap keeps your route visible in the air. Plan the trip, download your map on the ground, and track your flight offline with confidence.';
+	/// en: 'Curiosity'
+	String get chipCuriosity => 'Curiosity';
 
-	/// en: 'Offline map'
-	String get chipOffline => 'Offline map';
+	/// en: 'Geography'
+	String get chipGeography => 'Geography';
 
-	/// en: 'Live dashboard'
-	String get chipDashboard => 'Live dashboard';
+	/// en: 'Awareness'
+	String get chipAwareness => 'Awareness';
 
-	/// en: 'Route sharing'
-	String get chipSharing => 'Route sharing';
+	/// en: 'Why Flymap'
+	String get missionTitle => 'Why Flymap';
 
-	/// en: 'Before takeoff, download your route map. In flight mode, internet access may be limited or unavailable.'
-	String get infoBanner => 'Before takeoff, download your route map. In flight mode, internet access may be limited or unavailable.';
+	/// en: 'We fly over oceans, mountains and whole countries without ever knowing. Flymap brings back the wonder.'
+	String get missionText => 'We fly over oceans, mountains and whole countries without ever knowing. Flymap brings back the wonder.';
 
-	/// en: 'What You Can Do'
-	String get whatYouCanDo => 'What You Can Do';
+	/// en: 'What we stand for'
+	String get valuesTitle => 'What we stand for';
 
-	/// en: 'Plan your route'
-	String get featurePlanTitle => 'Plan your route';
+	/// en: 'Curiosity'
+	String get valueCuriosityTitle => 'Curiosity';
 
-	/// en: 'Choose departure and arrival airports, then preview the path before downloading.'
-	String get featurePlanText => 'Choose departure and arrival airports, then preview the path before downloading.';
+	/// en: 'Always know what's below you.'
+	String get valueCuriosityText => 'Always know what\'s below you.';
 
-	/// en: 'Track flight data'
-	String get featureTrackTitle => 'Track flight data';
+	/// en: 'Geography'
+	String get valueGeographyTitle => 'Geography';
 
-	/// en: 'Use Dashboard to monitor heading, speed, altitude, and route progress.'
-	String get featureTrackText => 'Use Dashboard to monitor heading, speed, altitude, and route progress.';
+	/// en: 'The world becomes a living atlas.'
+	String get valueGeographyText => 'The world becomes a living atlas.';
 
-	/// en: 'Check route details'
-	String get featureDetailsTitle => 'Check route details';
+	/// en: 'Awareness'
+	String get valueAwarenessTitle => 'Awareness';
 
-	/// en: 'Open the Info tab for airport details and a clean route overview.'
-	String get featureDetailsText => 'Open the Info tab for airport details and a clean route overview.';
+	/// en: 'Reconnect with the journey itself.'
+	String get valueAwarenessText => 'Reconnect with the journey itself.';
 
-	/// en: 'Share your journey'
-	String get featureShareTitle => 'Share your journey';
+	/// en: 'Offline & private'
+	String get valueOfflineTitle => 'Offline & private';
 
-	/// en: 'Generate and share a flight map screenshot with route highlights.'
-	String get featureShareText => 'Generate and share a flight map screenshot with route highlights.';
+	/// en: 'On your device. Nothing tracked.'
+	String get valueOfflineText => 'On your device. Nothing tracked.';
 
-	/// en: 'Quick Start'
-	String get quickStart => 'Quick Start';
+	/// en: 'See the world differently'
+	String get closingTitle => 'See the world differently';
 
-	/// en: 'Tap New flight on Home.'
-	String get step1 => 'Tap New flight on Home.';
-
-	/// en: 'Choose departure and arrival airports.'
-	String get step2 => 'Choose departure and arrival airports.';
-
-	/// en: 'Open Map preview and download the map before the flight.'
-	String get step3 => 'Open Map preview and download the map before the flight.';
-
-	/// en: 'Open your flight and use Map, Dashboard, and Info in the air.'
-	String get step4 => 'Open your flight and use Map, Dashboard, and Info in the air.';
-
-	/// en: 'Tips For Better GPS'
-	String get tips => 'Tips For Better GPS';
-
-	/// en: 'For stronger GPS signal, sit closer to a window.'
-	String get tip1 => 'For stronger GPS signal, sit closer to a window.';
-
-	/// en: 'Signal can drop in the middle of the aircraft. Flymap keeps the last known route view while searching.'
-	String get tip2 => 'Signal can drop in the middle of the aircraft. Flymap keeps the last known route view while searching.';
+	/// en: 'Thank you for exploring it with us.'
+	String get closingText => 'Thank you for exploring it with us.';
 }
 
 // Path: onboarding
@@ -4161,29 +4143,23 @@ extension on Translations {
 			'shareImage.durationMinutes' => ({required Object minutes}) => '${minutes} m',
 			'shareImage.durationHoursMinutes' => ({required Object hours, required Object minutes}) => '${hours} h ${minutes} m',
 			'about.title' => 'About Flymap',
-			'about.welcome' => 'Welcome to Flymap',
-			'about.intro' => 'Flymap keeps your route visible in the air. Plan the trip, download your map on the ground, and track your flight offline with confidence.',
-			'about.chipOffline' => 'Offline map',
-			'about.chipDashboard' => 'Live dashboard',
-			'about.chipSharing' => 'Route sharing',
-			'about.infoBanner' => 'Before takeoff, download your route map. In flight mode, internet access may be limited or unavailable.',
-			'about.whatYouCanDo' => 'What You Can Do',
-			'about.featurePlanTitle' => 'Plan your route',
-			'about.featurePlanText' => 'Choose departure and arrival airports, then preview the path before downloading.',
-			'about.featureTrackTitle' => 'Track flight data',
-			'about.featureTrackText' => 'Use Dashboard to monitor heading, speed, altitude, and route progress.',
-			'about.featureDetailsTitle' => 'Check route details',
-			'about.featureDetailsText' => 'Open the Info tab for airport details and a clean route overview.',
-			'about.featureShareTitle' => 'Share your journey',
-			'about.featureShareText' => 'Generate and share a flight map screenshot with route highlights.',
-			'about.quickStart' => 'Quick Start',
-			'about.step1' => 'Tap New flight on Home.',
-			'about.step2' => 'Choose departure and arrival airports.',
-			'about.step3' => 'Open Map preview and download the map before the flight.',
-			'about.step4' => 'Open your flight and use Map, Dashboard, and Info in the air.',
-			'about.tips' => 'Tips For Better GPS',
-			'about.tip1' => 'For stronger GPS signal, sit closer to a window.',
-			'about.tip2' => 'Signal can drop in the middle of the aircraft. Flymap keeps the last known route view while searching.',
+			'about.tagline' => 'Turn every flight into a window on the world.',
+			'about.chipCuriosity' => 'Curiosity',
+			'about.chipGeography' => 'Geography',
+			'about.chipAwareness' => 'Awareness',
+			'about.missionTitle' => 'Why Flymap',
+			'about.missionText' => 'We fly over oceans, mountains and whole countries without ever knowing. Flymap brings back the wonder.',
+			'about.valuesTitle' => 'What we stand for',
+			'about.valueCuriosityTitle' => 'Curiosity',
+			'about.valueCuriosityText' => 'Always know what\'s below you.',
+			'about.valueGeographyTitle' => 'Geography',
+			'about.valueGeographyText' => 'The world becomes a living atlas.',
+			'about.valueAwarenessTitle' => 'Awareness',
+			'about.valueAwarenessText' => 'Reconnect with the journey itself.',
+			'about.valueOfflineTitle' => 'Offline & private',
+			'about.valueOfflineText' => 'On your device. Nothing tracked.',
+			'about.closingTitle' => 'See the world differently',
+			'about.closingText' => 'Thank you for exploring it with us.',
 			'onboarding.skip' => 'Skip',
 			'onboarding.letsStart' => 'Let\'s start',
 			'onboarding.welcomeTitle' => 'Discover what’s below',

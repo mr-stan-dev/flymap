@@ -522,29 +522,23 @@ class _TranslationsAboutFr extends TranslationsAboutEn {
 
 	// Translations
 	@override String get title => 'À propos de Flymap';
-	@override String get welcome => 'Bienvenue sur Flymap';
-	@override String get intro => 'Flymap garde votre itinéraire visible dans les airs. Planifiez le voyage, téléchargez votre carte au sol et suivez votre vol hors ligne en toute confiance.';
-	@override String get chipOffline => 'Carte hors ligne';
-	@override String get chipDashboard => 'Tableau de bord en direct';
-	@override String get chipSharing => 'Partage d’itinéraire';
-	@override String get infoBanner => 'Avant le décollage, téléchargez la carte de votre itinéraire. En mode avion, l’accès Internet peut être limité ou indisponible.';
-	@override String get whatYouCanDo => 'Ce que vous pouvez faire';
-	@override String get featurePlanTitle => 'Planifiez votre itinéraire';
-	@override String get featurePlanText => 'Choisissez les aéroports de départ et d’arrivée, puis prévisualisez le trajet avant le téléchargement.';
-	@override String get featureTrackTitle => 'Suivez les données du vol';
-	@override String get featureTrackText => 'Utilisez le tableau de bord pour surveiller le cap, la vitesse, l’altitude et la progression de l’itinéraire.';
-	@override String get featureDetailsTitle => 'Consultez les détails de l’itinéraire';
-	@override String get featureDetailsText => 'Ouvrez l’onglet Infos pour voir les détails des aéroports et un aperçu clair de l’itinéraire.';
-	@override String get featureShareTitle => 'Partagez votre voyage';
-	@override String get featureShareText => 'Générez et partagez une capture d’écran de la carte de vol avec les points forts du trajet.';
-	@override String get quickStart => 'Démarrage rapide';
-	@override String get step1 => 'Touchez Nouveau vol sur l’accueil.';
-	@override String get step2 => 'Choisissez les aéroports de départ et d’arrivée.';
-	@override String get step3 => 'Ouvrez l’aperçu de la carte et téléchargez-la avant le vol.';
-	@override String get step4 => 'Ouvrez votre vol et utilisez Carte, Tableau de bord et Infos en l’air.';
-	@override String get tips => 'Conseils pour un meilleur GPS';
-	@override String get tip1 => 'Pour un meilleur signal GPS, asseyez-vous près d’un hublot.';
-	@override String get tip2 => 'Le signal peut chuter au milieu de l’avion. Flymap conserve la dernière vue connue de l’itinéraire pendant la recherche.';
+	@override String get tagline => 'Faites de chaque vol une fenêtre sur le monde.';
+	@override String get chipCuriosity => 'Curiosité';
+	@override String get chipGeography => 'Géographie';
+	@override String get chipAwareness => 'Conscience';
+	@override String get missionTitle => 'Pourquoi Flymap';
+	@override String get missionText => 'Nous survolons océans, montagnes et pays entiers sans jamais le savoir. Flymap ravive l’émerveillement.';
+	@override String get valuesTitle => 'Ce que nous défendons';
+	@override String get valueCuriosityTitle => 'Curiosité';
+	@override String get valueCuriosityText => 'Sachez toujours ce qui se trouve sous vous.';
+	@override String get valueGeographyTitle => 'Géographie';
+	@override String get valueGeographyText => 'Le monde devient un atlas vivant.';
+	@override String get valueAwarenessTitle => 'Conscience';
+	@override String get valueAwarenessText => 'Reconnectez-vous au voyage lui-même.';
+	@override String get valueOfflineTitle => 'Hors ligne et privé';
+	@override String get valueOfflineText => 'Sur votre appareil. Aucun suivi.';
+	@override String get closingTitle => 'Voyez le monde autrement';
+	@override String get closingText => 'Merci de l’explorer avec nous.';
 }
 
 // Path: onboarding
@@ -2166,29 +2160,23 @@ extension on TranslationsFr {
 			'shareImage.durationMinutes' => ({required Object minutes}) => '${minutes} min',
 			'shareImage.durationHoursMinutes' => ({required Object hours, required Object minutes}) => '${hours} h ${minutes} min',
 			'about.title' => 'À propos de Flymap',
-			'about.welcome' => 'Bienvenue sur Flymap',
-			'about.intro' => 'Flymap garde votre itinéraire visible dans les airs. Planifiez le voyage, téléchargez votre carte au sol et suivez votre vol hors ligne en toute confiance.',
-			'about.chipOffline' => 'Carte hors ligne',
-			'about.chipDashboard' => 'Tableau de bord en direct',
-			'about.chipSharing' => 'Partage d’itinéraire',
-			'about.infoBanner' => 'Avant le décollage, téléchargez la carte de votre itinéraire. En mode avion, l’accès Internet peut être limité ou indisponible.',
-			'about.whatYouCanDo' => 'Ce que vous pouvez faire',
-			'about.featurePlanTitle' => 'Planifiez votre itinéraire',
-			'about.featurePlanText' => 'Choisissez les aéroports de départ et d’arrivée, puis prévisualisez le trajet avant le téléchargement.',
-			'about.featureTrackTitle' => 'Suivez les données du vol',
-			'about.featureTrackText' => 'Utilisez le tableau de bord pour surveiller le cap, la vitesse, l’altitude et la progression de l’itinéraire.',
-			'about.featureDetailsTitle' => 'Consultez les détails de l’itinéraire',
-			'about.featureDetailsText' => 'Ouvrez l’onglet Infos pour voir les détails des aéroports et un aperçu clair de l’itinéraire.',
-			'about.featureShareTitle' => 'Partagez votre voyage',
-			'about.featureShareText' => 'Générez et partagez une capture d’écran de la carte de vol avec les points forts du trajet.',
-			'about.quickStart' => 'Démarrage rapide',
-			'about.step1' => 'Touchez Nouveau vol sur l’accueil.',
-			'about.step2' => 'Choisissez les aéroports de départ et d’arrivée.',
-			'about.step3' => 'Ouvrez l’aperçu de la carte et téléchargez-la avant le vol.',
-			'about.step4' => 'Ouvrez votre vol et utilisez Carte, Tableau de bord et Infos en l’air.',
-			'about.tips' => 'Conseils pour un meilleur GPS',
-			'about.tip1' => 'Pour un meilleur signal GPS, asseyez-vous près d’un hublot.',
-			'about.tip2' => 'Le signal peut chuter au milieu de l’avion. Flymap conserve la dernière vue connue de l’itinéraire pendant la recherche.',
+			'about.tagline' => 'Faites de chaque vol une fenêtre sur le monde.',
+			'about.chipCuriosity' => 'Curiosité',
+			'about.chipGeography' => 'Géographie',
+			'about.chipAwareness' => 'Conscience',
+			'about.missionTitle' => 'Pourquoi Flymap',
+			'about.missionText' => 'Nous survolons océans, montagnes et pays entiers sans jamais le savoir. Flymap ravive l’émerveillement.',
+			'about.valuesTitle' => 'Ce que nous défendons',
+			'about.valueCuriosityTitle' => 'Curiosité',
+			'about.valueCuriosityText' => 'Sachez toujours ce qui se trouve sous vous.',
+			'about.valueGeographyTitle' => 'Géographie',
+			'about.valueGeographyText' => 'Le monde devient un atlas vivant.',
+			'about.valueAwarenessTitle' => 'Conscience',
+			'about.valueAwarenessText' => 'Reconnectez-vous au voyage lui-même.',
+			'about.valueOfflineTitle' => 'Hors ligne et privé',
+			'about.valueOfflineText' => 'Sur votre appareil. Aucun suivi.',
+			'about.closingTitle' => 'Voyez le monde autrement',
+			'about.closingText' => 'Merci de l’explorer avec nous.',
 			'onboarding.skip' => 'Passer',
 			'onboarding.letsStart' => 'Commençons',
 			'onboarding.welcomeTitle' => 'Découvrez ce qu’il y a en dessous',

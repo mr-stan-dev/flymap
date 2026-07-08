@@ -522,29 +522,23 @@ class _TranslationsAboutEs extends TranslationsAboutEn {
 
 	// Translations
 	@override String get title => 'Acerca de Flymap';
-	@override String get welcome => 'Bienvenido a Flymap';
-	@override String get intro => 'Flymap mantiene tu ruta visible en el aire. Planifica el viaje, descarga tu mapa en tierra y sigue tu vuelo offline con confianza.';
-	@override String get chipOffline => 'Mapa offline';
-	@override String get chipDashboard => 'Panel en vivo';
-	@override String get chipSharing => 'Compartir ruta';
-	@override String get infoBanner => 'Antes del despegue, descarga el mapa de tu ruta. En modo vuelo, el acceso a internet puede ser limitado o no estar disponible.';
-	@override String get whatYouCanDo => 'Lo que puedes hacer';
-	@override String get featurePlanTitle => 'Planifica tu ruta';
-	@override String get featurePlanText => 'Elige los aeropuertos de salida y llegada y luego previsualiza el trayecto antes de descargarlo.';
-	@override String get featureTrackTitle => 'Sigue los datos del vuelo';
-	@override String get featureTrackText => 'Usa el Panel para controlar rumbo, velocidad, altitud y progreso de la ruta.';
-	@override String get featureDetailsTitle => 'Consulta los detalles de la ruta';
-	@override String get featureDetailsText => 'Abre la pestaña Info para ver los detalles del aeropuerto y un resumen claro de la ruta.';
-	@override String get featureShareTitle => 'Comparte tu viaje';
-	@override String get featureShareText => 'Genera y comparte una captura del mapa del vuelo con los puntos destacados de la ruta.';
-	@override String get quickStart => 'Inicio rápido';
-	@override String get step1 => 'Toca Nuevo vuelo en Inicio.';
-	@override String get step2 => 'Elige los aeropuertos de salida y llegada.';
-	@override String get step3 => 'Abre la vista previa del mapa y descarga el mapa antes del vuelo.';
-	@override String get step4 => 'Abre tu vuelo y usa Mapa, Panel e Info en el aire.';
-	@override String get tips => 'Consejos para mejorar el GPS';
-	@override String get tip1 => 'Para una mejor señal GPS, siéntate más cerca de una ventana.';
-	@override String get tip2 => 'La señal puede perderse en el centro del avión. Flymap mantiene la última vista conocida de la ruta mientras sigue buscando.';
+	@override String get tagline => 'Convierte cada vuelo en una ventana al mundo.';
+	@override String get chipCuriosity => 'Curiosidad';
+	@override String get chipGeography => 'Geografía';
+	@override String get chipAwareness => 'Conciencia';
+	@override String get missionTitle => 'Por qué Flymap';
+	@override String get missionText => 'Sobrevolamos océanos, montañas y países enteros sin llegar a saberlo. Flymap devuelve el asombro.';
+	@override String get valuesTitle => 'Lo que defendemos';
+	@override String get valueCuriosityTitle => 'Curiosidad';
+	@override String get valueCuriosityText => 'Sé siempre consciente de lo que sobrevuelas.';
+	@override String get valueGeographyTitle => 'Geografía';
+	@override String get valueGeographyText => 'El mundo se vuelve un atlas vivo.';
+	@override String get valueAwarenessTitle => 'Conciencia';
+	@override String get valueAwarenessText => 'Reconecta con el viaje en sí.';
+	@override String get valueOfflineTitle => 'Offline y privado';
+	@override String get valueOfflineText => 'En tu dispositivo. Sin rastreo.';
+	@override String get closingTitle => 'Mira el mundo de otra manera';
+	@override String get closingText => 'Gracias por explorarlo con nosotros.';
 }
 
 // Path: onboarding
@@ -2166,29 +2160,23 @@ extension on TranslationsEs {
 			'shareImage.durationMinutes' => ({required Object minutes}) => '${minutes} min',
 			'shareImage.durationHoursMinutes' => ({required Object hours, required Object minutes}) => '${hours} h ${minutes} min',
 			'about.title' => 'Acerca de Flymap',
-			'about.welcome' => 'Bienvenido a Flymap',
-			'about.intro' => 'Flymap mantiene tu ruta visible en el aire. Planifica el viaje, descarga tu mapa en tierra y sigue tu vuelo offline con confianza.',
-			'about.chipOffline' => 'Mapa offline',
-			'about.chipDashboard' => 'Panel en vivo',
-			'about.chipSharing' => 'Compartir ruta',
-			'about.infoBanner' => 'Antes del despegue, descarga el mapa de tu ruta. En modo vuelo, el acceso a internet puede ser limitado o no estar disponible.',
-			'about.whatYouCanDo' => 'Lo que puedes hacer',
-			'about.featurePlanTitle' => 'Planifica tu ruta',
-			'about.featurePlanText' => 'Elige los aeropuertos de salida y llegada y luego previsualiza el trayecto antes de descargarlo.',
-			'about.featureTrackTitle' => 'Sigue los datos del vuelo',
-			'about.featureTrackText' => 'Usa el Panel para controlar rumbo, velocidad, altitud y progreso de la ruta.',
-			'about.featureDetailsTitle' => 'Consulta los detalles de la ruta',
-			'about.featureDetailsText' => 'Abre la pestaña Info para ver los detalles del aeropuerto y un resumen claro de la ruta.',
-			'about.featureShareTitle' => 'Comparte tu viaje',
-			'about.featureShareText' => 'Genera y comparte una captura del mapa del vuelo con los puntos destacados de la ruta.',
-			'about.quickStart' => 'Inicio rápido',
-			'about.step1' => 'Toca Nuevo vuelo en Inicio.',
-			'about.step2' => 'Elige los aeropuertos de salida y llegada.',
-			'about.step3' => 'Abre la vista previa del mapa y descarga el mapa antes del vuelo.',
-			'about.step4' => 'Abre tu vuelo y usa Mapa, Panel e Info en el aire.',
-			'about.tips' => 'Consejos para mejorar el GPS',
-			'about.tip1' => 'Para una mejor señal GPS, siéntate más cerca de una ventana.',
-			'about.tip2' => 'La señal puede perderse en el centro del avión. Flymap mantiene la última vista conocida de la ruta mientras sigue buscando.',
+			'about.tagline' => 'Convierte cada vuelo en una ventana al mundo.',
+			'about.chipCuriosity' => 'Curiosidad',
+			'about.chipGeography' => 'Geografía',
+			'about.chipAwareness' => 'Conciencia',
+			'about.missionTitle' => 'Por qué Flymap',
+			'about.missionText' => 'Sobrevolamos océanos, montañas y países enteros sin llegar a saberlo. Flymap devuelve el asombro.',
+			'about.valuesTitle' => 'Lo que defendemos',
+			'about.valueCuriosityTitle' => 'Curiosidad',
+			'about.valueCuriosityText' => 'Sé siempre consciente de lo que sobrevuelas.',
+			'about.valueGeographyTitle' => 'Geografía',
+			'about.valueGeographyText' => 'El mundo se vuelve un atlas vivo.',
+			'about.valueAwarenessTitle' => 'Conciencia',
+			'about.valueAwarenessText' => 'Reconecta con el viaje en sí.',
+			'about.valueOfflineTitle' => 'Offline y privado',
+			'about.valueOfflineText' => 'En tu dispositivo. Sin rastreo.',
+			'about.closingTitle' => 'Mira el mundo de otra manera',
+			'about.closingText' => 'Gracias por explorarlo con nosotros.',
 			'onboarding.skip' => 'Omitir',
 			'onboarding.letsStart' => 'Empecemos',
 			'onboarding.welcomeTitle' => 'Descubre lo que hay debajo',
