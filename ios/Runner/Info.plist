@@ -57,5 +57,7 @@
 	<string>Flymap uses the camera so you can capture window-seat photos with route-style overlays.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Flymap saves your generated flight videos to the photo library so you can share them.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Flymap lets you pick a photo from your library to use as your avatar in flight videos.</string>
 </dict>
 </plist>
