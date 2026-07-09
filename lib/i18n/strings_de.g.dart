@@ -535,6 +535,9 @@ class _TranslationsFlightVideoDe extends TranslationsFlightVideoEn {
 	@override String get retry => 'Erneut versuchen';
 	@override String get errorNetwork => 'Kartenbilder konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.';
 	@override String get errorGeneric => 'Flugvideo konnte nicht erstellt werden';
+	@override String get errorOfflineTitle => 'Du bist offline';
+	@override String get errorOffline => 'Flugvideos laden aktuelle Kartenbilder und brauchen daher eine Internetverbindung. Deaktiviere den Flugmodus oder verbinde dich neu und versuche es erneut.';
+	@override String get offlineStyleChange => 'Für einen Wechsel des Kartenstils ist eine Verbindung nötig.';
 	@override String get madeWith => 'Erstellt mit Flymap';
 	@override String shareText({required Object fromCity, required Object fromCode, required Object toCity, required Object toCode}) => '${fromCity} (${fromCode}) → ${toCity} (${toCode}) auf Flymap ✈️';
 	@override String get removeWatermark => 'Wasserzeichen entfernen';
@@ -2221,6 +2224,9 @@ extension on TranslationsDe {
 			'flightVideo.retry' => 'Erneut versuchen',
 			'flightVideo.errorNetwork' => 'Kartenbilder konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.',
 			'flightVideo.errorGeneric' => 'Flugvideo konnte nicht erstellt werden',
+			'flightVideo.errorOfflineTitle' => 'Du bist offline',
+			'flightVideo.errorOffline' => 'Flugvideos laden aktuelle Kartenbilder und brauchen daher eine Internetverbindung. Deaktiviere den Flugmodus oder verbinde dich neu und versuche es erneut.',
+			'flightVideo.offlineStyleChange' => 'Für einen Wechsel des Kartenstils ist eine Verbindung nötig.',
 			'flightVideo.madeWith' => 'Erstellt mit Flymap',
 			'flightVideo.shareText' => ({required Object fromCity, required Object fromCode, required Object toCity, required Object toCode}) => '${fromCity} (${fromCode}) → ${toCity} (${toCode}) auf Flymap ✈️',
 			'flightVideo.removeWatermark' => 'Wasserzeichen entfernen',
@@ -2489,11 +2495,11 @@ extension on TranslationsDe {
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Usbekistan',
 			'countries.VE' => 'Venezuela',
+			_ => null,
+		} ?? switch (path) {
 			'countries.VI' => 'Amerikanische Jungferninseln',
 			'countries.VN' => 'Vietnam',
 			'countries.YE' => 'Jemen',
-			_ => null,
-		} ?? switch (path) {
 			'countries.ZA' => 'Südafrika',
 			'countries.ZM' => 'Sambia',
 			'countries.ZW' => 'Simbabwe',

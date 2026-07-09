@@ -6,6 +6,7 @@ import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/analytics/events/flight_video_generated_event.dart';
 import 'package:flymap/analytics/events/flight_video_shared_event.dart';
 import 'package:flymap/data/flight_video/media_gallery_saver.dart';
+import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/entity/flight_video_spec.dart';
 import 'package:flymap/domain/entity/units.dart';
@@ -26,6 +27,10 @@ import 'package:share_plus/share_plus.dart';
 
 import 'flight_video_state.dart';
 
+/// Outcome of [FlightVideoCubit.applySettings], so the screen can surface an
+/// offline notice when a map-style change couldn't download its tiles.
+enum FlightVideoApplyResult { done, styleOffline }
+
 /// Drives the flight-video screen.
 ///
 /// State flow: initial → preparing(tiles) → previewReady → exporting(frames)
@@ -39,6 +44,7 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
       _subscriptionRepository = GetIt.I.get<SubscriptionRepository>(),
       _ratePromptPolicyService = GetIt.I.get<RatePromptPolicyService>(),
       _avatarRepository = GetIt.I.get<VideoAvatarRepository>(),
+      _connectivity = GetIt.I.get<ConnectivityChecker>(),
       _analytics = GetIt.I.get<AppAnalytics>(),
       super(FlightVideoState.initial(flightId: flightId)) {
     _prepare();
@@ -51,6 +57,7 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
   final SubscriptionRepository _subscriptionRepository;
   final RatePromptPolicyService _ratePromptPolicyService;
   final VideoAvatarRepository _avatarRepository;
+  final ConnectivityChecker _connectivity;
   final AppAnalytics _analytics;
   final Logger _logger = const Logger('FlightVideoCubit');
 
@@ -103,6 +110,23 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
     final avatar = await _avatarRepository.load();
     if (isClosed) return;
 
+    // Video generation streams live map tiles, so it needs a connection. Bail
+    // out early with a clear offline state instead of grinding through a doomed
+    // tile prefetch — users often open this in Flight Mode.
+    if (!await _connectivity.hasInternetConnectivity()) {
+      if (isClosed) return;
+      _analytics.log(
+        const FlightVideoGeneratedEvent(success: false, error: 'offline'),
+      );
+      emit(
+        state.copyWith(
+          status: FlightVideoStatus.error,
+          errorKind: FlightVideoErrorKind.offline,
+        ),
+      );
+      return;
+    }
+
     final cancel = FlightVideoCancelToken();
     _cancelToken = cancel;
     final session = await _useCase.prepare(
@@ -129,13 +153,22 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
     }
 
     if (session == null) {
+      // Tell "connection dropped mid-prefetch" apart from a server/other
+      // failure, so the offline state can explain Flight Mode.
+      final offline = !await _connectivity.hasInternetConnectivity();
+      if (isClosed) return;
       _analytics.log(
-        const FlightVideoGeneratedEvent(success: false, error: 'prepare'),
+        FlightVideoGeneratedEvent(
+          success: false,
+          error: offline ? 'offline' : 'prepare',
+        ),
       );
       emit(
         state.copyWith(
           status: FlightVideoStatus.error,
-          errorKind: FlightVideoErrorKind.network,
+          errorKind: offline
+              ? FlightVideoErrorKind.offline
+              : FlightVideoErrorKind.network,
         ),
       );
       return;
@@ -165,7 +198,7 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
   /// Cheap renderer flags (mystery/pins/end card/watermark) apply to the
   /// cached renderer instantly; the session is only rebuilt when the map style
   /// changes or a fresh Pro upgrade needs full-resolution tiles.
-  Future<void> applySettings({
+  Future<FlightVideoApplyResult> applySettings({
     required FlightVideoMapStyle style,
     required bool mysteryDestination,
     required bool showPins,
@@ -173,13 +206,15 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
     required bool watermarkRemoved,
     required bool avatarEnabled,
   }) async {
-    if (state.isExporting || state.isSharing || state.isPreparing) return;
+    if (state.isExporting || state.isSharing || state.isPreparing) {
+      return FlightVideoApplyResult.done;
+    }
 
     // The avatar isn't Pro-gated: persist the toggle and read the stored photo
     // (the setup sheet already saved the picked file to the repo).
     await _avatarRepository.setEnabled(avatarEnabled);
     final avatar = await _avatarRepository.load();
-    if (isClosed) return;
+    if (isClosed) return FlightVideoApplyResult.done;
 
     // Resolve the watermark request against Pro access / the paywall.
     var effectiveWatermarkRemoved = state.watermarkRemoved;
@@ -195,7 +230,7 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
         } catch (e) {
           _logger.error('Paywall failed: $e');
         }
-        if (isClosed) return;
+        if (isClosed) return FlightVideoApplyResult.done;
         if (_subscriptionRepository.currentStatus.isPro) {
           isPro = true;
           effectiveWatermarkRemoved = true;
@@ -229,7 +264,7 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
         enabled: avatarEnabled,
         path: avatar.imagePath,
       );
-      if (isClosed) return;
+      if (isClosed) return FlightVideoApplyResult.done;
     }
 
     emit(
@@ -246,13 +281,24 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
       ),
     );
 
+    // A style change and a Pro re-prepare both download tiles — guard them
+    // behind a connectivity check so an offline change fails fast with a hint
+    // instead of spinning on doomed downloads. (The cheap flags already applied
+    // above; only the tile download is blocked.)
+    if ((styleChanged || becamePro) &&
+        !await _connectivity.hasInternetConnectivity()) {
+      return isClosed
+          ? FlightVideoApplyResult.done
+          : FlightVideoApplyResult.styleOffline;
+    }
+
     // A Pro upgrade changes resolution → full rebuild (tears down to prepare).
     if (becamePro) {
       _cancelToken?.cancel();
       _session?.dispose();
       _session = null;
       await _prepare();
-      return;
+      return FlightVideoApplyResult.done;
     }
 
     // A pure style change reuses the renderer: download the new style's tiles
@@ -278,12 +324,13 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
       if (next == null) {
         // Cancelled or failed with the old session left intact.
         if (!isClosed) emit(state.copyWith(isApplyingSettings: false));
-        return;
+        return FlightVideoApplyResult.done;
       }
       _session = next;
-      if (isClosed) return;
+      if (isClosed) return FlightVideoApplyResult.done;
       emit(state.copyWith(style: style, isApplyingSettings: false));
     }
+    return FlightVideoApplyResult.done;
   }
 
   Future<void> exportAndSave() async {

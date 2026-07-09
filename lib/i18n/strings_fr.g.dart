@@ -535,6 +535,9 @@ class _TranslationsFlightVideoFr extends TranslationsFlightVideoEn {
 	@override String get retry => 'Réessayer';
 	@override String get errorNetwork => 'Impossible de charger les images de la carte. Vérifiez votre connexion et réessayez.';
 	@override String get errorGeneric => 'Impossible de créer la vidéo du vol';
+	@override String get errorOfflineTitle => 'Tu es hors ligne';
+	@override String get errorOffline => 'Les vidéos de vol chargent des images cartographiques en direct : une connexion internet est donc nécessaire. Désactive le mode Avion ou reconnecte-toi, puis réessaie.';
+	@override String get offlineStyleChange => 'Changer le style de carte nécessite une connexion.';
 	@override String get madeWith => 'Créé avec Flymap';
 	@override String shareText({required Object fromCity, required Object fromCode, required Object toCity, required Object toCode}) => '${fromCity} (${fromCode}) → ${toCity} (${toCode}) sur Flymap ✈️';
 	@override String get removeWatermark => 'Supprimer le filigrane';
@@ -2221,6 +2224,9 @@ extension on TranslationsFr {
 			'flightVideo.retry' => 'Réessayer',
 			'flightVideo.errorNetwork' => 'Impossible de charger les images de la carte. Vérifiez votre connexion et réessayez.',
 			'flightVideo.errorGeneric' => 'Impossible de créer la vidéo du vol',
+			'flightVideo.errorOfflineTitle' => 'Tu es hors ligne',
+			'flightVideo.errorOffline' => 'Les vidéos de vol chargent des images cartographiques en direct : une connexion internet est donc nécessaire. Désactive le mode Avion ou reconnecte-toi, puis réessaie.',
+			'flightVideo.offlineStyleChange' => 'Changer le style de carte nécessite une connexion.',
 			'flightVideo.madeWith' => 'Créé avec Flymap',
 			'flightVideo.shareText' => ({required Object fromCity, required Object fromCode, required Object toCity, required Object toCode}) => '${fromCity} (${fromCode}) → ${toCity} (${toCode}) sur Flymap ✈️',
 			'flightVideo.removeWatermark' => 'Supprimer le filigrane',
@@ -2489,11 +2495,11 @@ extension on TranslationsFr {
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Ouzbékistan',
 			'countries.VE' => 'Venezuela',
+			_ => null,
+		} ?? switch (path) {
 			'countries.VI' => 'Îles Vierges américaines',
 			'countries.VN' => 'Viêt Nam',
 			'countries.YE' => 'Yémen',
-			_ => null,
-		} ?? switch (path) {
 			'countries.ZA' => 'Afrique du Sud',
 			'countries.ZM' => 'Zambie',
 			'countries.ZW' => 'Zimbabwe',

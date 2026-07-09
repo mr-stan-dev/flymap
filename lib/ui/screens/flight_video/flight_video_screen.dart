@@ -48,7 +48,7 @@ class _FlightVideoViewState extends State<_FlightVideoView> {
     // downloads tiles) never blocks the dismissal and the loading state shows
     // on the screen itself.
     if (!mounted || draft == null) return;
-    await cubit.applySettings(
+    final result = await cubit.applySettings(
       style: draft.style,
       mysteryDestination: draft.mysteryDestination,
       showPins: draft.showPins,
@@ -56,6 +56,12 @@ class _FlightVideoViewState extends State<_FlightVideoView> {
       watermarkRemoved: draft.watermarkRemoved,
       avatarEnabled: draft.avatarEnabled,
     );
+    if (!mounted) return;
+    if (result == FlightVideoApplyResult.styleOffline) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.t.flightVideo.offlineStyleChange)),
+      );
+    }
   }
 
   @override
@@ -115,6 +121,16 @@ class _FlightVideoViewState extends State<_FlightVideoView> {
   Widget _buildContent(BuildContext context, FlightVideoState state) {
     final t = context.t;
     if (state.isError) {
+      final theme = Theme.of(context);
+      // Offline is a first-class, expected state (users often open this in
+      // Flight Mode): an airplane-mode icon in the brand colour and a friendly
+      // explanation, not a red error.
+      final isOffline = state.errorKind == FlightVideoErrorKind.offline;
+      final message = switch (state.errorKind) {
+        FlightVideoErrorKind.offline => t.flightVideo.errorOffline,
+        FlightVideoErrorKind.network => t.flightVideo.errorNetwork,
+        _ => t.flightVideo.errorGeneric,
+      };
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(DsSpacing.xl),
@@ -122,16 +138,28 @@ class _FlightVideoViewState extends State<_FlightVideoView> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                Icons.error_outline,
+                isOffline
+                    ? Icons.airplanemode_active_rounded
+                    : Icons.error_outline,
                 size: 64,
-                color: Theme.of(context).colorScheme.error,
+                color: isOffline
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.error,
               ),
               const SizedBox(height: DsSpacing.md),
+              if (isOffline) ...[
+                Text(
+                  t.flightVideo.errorOfflineTitle,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: DsSpacing.xs),
+              ],
               Text(
-                state.errorKind == FlightVideoErrorKind.network
-                    ? t.flightVideo.errorNetwork
-                    : t.flightVideo.errorGeneric,
-                style: Theme.of(context).textTheme.bodyLarge,
+                message,
+                style: theme.textTheme.bodyLarge,
                 textAlign: TextAlign.center,
               ),
             ],

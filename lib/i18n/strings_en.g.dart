@@ -1229,6 +1229,15 @@ class TranslationsFlightVideoEn {
 	/// en: 'Could not create flight video'
 	String get errorGeneric => 'Could not create flight video';
 
+	/// en: 'You're offline'
+	String get errorOfflineTitle => 'You\'re offline';
+
+	/// en: 'Flight videos load live map imagery, so they need an internet connection. Turn off Flight Mode or reconnect, then try again.'
+	String get errorOffline => 'Flight videos load live map imagery, so they need an internet connection. Turn off Flight Mode or reconnect, then try again.';
+
+	/// en: 'Changing the map style needs a connection.'
+	String get offlineStyleChange => 'Changing the map style needs a connection.';
+
 	/// en: 'Made with Flymap'
 	String get madeWith => 'Made with Flymap';
 
@@ -4282,6 +4291,9 @@ extension on Translations {
 			'flightVideo.retry' => 'Retry',
 			'flightVideo.errorNetwork' => 'Couldn\'t load map imagery. Check your connection and try again.',
 			'flightVideo.errorGeneric' => 'Could not create flight video',
+			'flightVideo.errorOfflineTitle' => 'You\'re offline',
+			'flightVideo.errorOffline' => 'Flight videos load live map imagery, so they need an internet connection. Turn off Flight Mode or reconnect, then try again.',
+			'flightVideo.offlineStyleChange' => 'Changing the map style needs a connection.',
 			'flightVideo.madeWith' => 'Made with Flymap',
 			'flightVideo.shareText' => ({required Object fromCity, required Object fromCode, required Object toCity, required Object toCode}) => '${fromCity} (${fromCode}) → ${toCity} (${toCode}) on Flymap ✈️',
 			'flightVideo.removeWatermark' => 'Remove watermark',
@@ -4550,11 +4562,11 @@ extension on Translations {
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Uzbekistan',
 			'countries.VE' => 'Venezuela, Bolivarian Rep. of',
+			_ => null,
+		} ?? switch (path) {
 			'countries.VI' => 'Virgin Islands (US)',
 			'countries.VN' => 'Viet Nam',
 			'countries.YE' => 'Yemen',
-			_ => null,
-		} ?? switch (path) {
 			'countries.ZA' => 'South Africa',
 			'countries.ZM' => 'Zambia',
 			'countries.ZW' => 'Zimbabwe',

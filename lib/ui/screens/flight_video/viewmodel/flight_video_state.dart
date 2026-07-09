@@ -12,7 +12,7 @@ enum FlightVideoStatus {
   error,
 }
 
-enum FlightVideoErrorKind { network, encoder, generic }
+enum FlightVideoErrorKind { network, offline, encoder, generic }
 
 class FlightVideoState extends Equatable {
   const FlightVideoState({
