@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/analytics/app_analytics.dart';
-import 'package:flymap/analytics/events/share_with_friends_event.dart';
+import 'package:flymap/analytics/events/sharing/share_with_friends_event.dart';
 import 'package:flymap/domain/entity/learn_access.dart';
 
 void main() {

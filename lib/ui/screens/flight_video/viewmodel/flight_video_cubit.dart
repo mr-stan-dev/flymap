@@ -3,9 +3,9 @@ import 'dart:ui';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/analytics/app_analytics.dart';
-import 'package:flymap/analytics/events/flight_video_generated_event.dart';
-import 'package:flymap/analytics/events/flight_video_preview_ready_event.dart';
-import 'package:flymap/analytics/events/flight_video_shared_event.dart';
+import 'package:flymap/analytics/events/flight_video/flight_video_generated_event.dart';
+import 'package:flymap/analytics/events/flight_video/flight_video_preview_ready_event.dart';
+import 'package:flymap/analytics/events/flight_video/flight_video_shared_event.dart';
 import 'package:flymap/data/flight_video/media_gallery_saver.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/domain/entity/flight.dart';

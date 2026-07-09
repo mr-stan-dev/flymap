@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flymap/analytics/app_analytics.dart';
-import 'package:flymap/analytics/events/share_with_friends_event.dart';
+import 'package:flymap/analytics/events/sharing/share_with_friends_event.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/rating/app_share_service.dart';
 import 'package:flymap/rating/native_review_requester.dart';
