@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/analytics/events/flight_video_generated_event.dart';
+import 'package:flymap/analytics/events/flight_video_preview_ready_event.dart';
 import 'package:flymap/analytics/events/flight_video_shared_event.dart';
 import 'package:flymap/data/flight_video/media_gallery_saver.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
@@ -181,6 +182,12 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
     session.renderer.showEndCard = state.showEndCard;
     // The avatar (showAvatar/name/photo) was applied inside prepare from the
     // repo config; mirror the enabled flag into state.
+    _analytics.log(
+      FlightVideoPreviewReadyEvent(
+        videoSeconds: session.spec.duration.inSeconds,
+        tileCount: session.tileCount,
+      ),
+    );
     emit(
       state.copyWith(
         flight: flight,
