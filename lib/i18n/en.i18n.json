@@ -838,7 +838,17 @@
     "showEndCardHint": "Show the summary card at the end",
     "styleShine": "Lè Shine",
     "applySettings": "Apply changes",
-    "applying": "Applying changes..."
+    "applying": "Applying changes...",
+    "avatarTitle": "Your avatar",
+    "avatarHint": "Ride your route with your own photo",
+    "avatarSetupTitle": "Your avatar",
+    "avatarPick": "Choose photo",
+    "avatarChange": "Change photo",
+    "avatarNameLabel": "Name or @handle",
+    "avatarNameHint": "Optional — shown on the summary card",
+    "avatarSave": "Save avatar",
+    "mysteryTitle": "Guess where I'm flying? ✈️",
+    "avatarCardTagline": "My flight map"
   },
   "about": {
     "title": "About Flymap",

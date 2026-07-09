@@ -1,7 +1,8 @@
 import 'dart:math';
 import 'dart:ui' as ui;
 
-import 'package:flutter/painting.dart';
+// Material (re-exports painting) for the summary card's icon glyphs (Icons).
+import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/entity/flight_video_spec.dart';
 import 'package:flymap/ui/screens/flight_video/rendering/camera_path_planner.dart';
@@ -33,26 +34,22 @@ class MapFrameRenderer {
     this.regionHighlights,
     this.endCardChips = const [],
     this.routeColor = _routeCyan,
-    double tickerTotalKm = 0,
-    double tickerUnitFactor = 1,
-    String tickerUnitLabel = 'km',
     String attributionText = defaultAttribution,
     String? statsDistanceText,
     String? statsDurationText,
     String brandText = 'Flymap',
     String madeWithText = '',
+    String mysteryTitle = '',
   }) : _planeModel = planeModel,
        _planeMesh = planeModel == null
            ? null
            : PlaneMeshPainter(planeModel, modelYawOffset: planeYawOffset),
-       _tickerTotalKm = tickerTotalKm,
-       _tickerUnitFactor = tickerUnitFactor,
-       _tickerUnitLabel = tickerUnitLabel,
        _attributionText = attributionText,
        _statsDistanceText = statsDistanceText,
        _statsDurationText = statsDurationText,
        _brandText = brandText,
-       _madeWithText = madeWithText;
+       _madeWithText = madeWithText,
+       _mysteryTitle = mysteryTitle;
 
   /// Mapbox Static Tiles carry no baked attribution, so every exported frame
   /// must render it (satellite imagery adds Maxar).
@@ -61,6 +58,19 @@ class MapFrameRenderer {
   static const Color _routeCyan = Color(0xFF47EFFF);
   static const Color _pillBackground = Color(0xB2122235);
   static const Color _pillBorder = Color(0x8896AEC8);
+
+  // Summary-card palette.
+  static const Color _endCardFill = Color(0xE00E1B29);
+  static const Color _statPillFill = Color(0xF20A121C);
+  static const Color _statIconAmber = Color(0xFFF3B44C);
+  static const Color _chipOutline = Color(0x73FFFFFF);
+
+  /// Text shadow shared with the sky-camera overlays: one soft, slightly
+  /// dropped shadow. Keeps overlay text readable and consistent across
+  /// features (replaces the heavier double-shadow the header used before).
+  static const List<Shadow> _overlayTextShadows = [
+    Shadow(color: Color(0x42000000), blurRadius: 12, offset: Offset(0, 3)),
+  ];
 
   /// Same violet the in-app map uses for the selected region overlay.
   static const Color _skyTop = Color(0xFF3D6CA3);
@@ -108,6 +118,24 @@ class MapFrameRenderer {
   /// default; users can hide it for a pure map ending. Mutable.
   bool showEndCard = true;
 
+  /// Opt-in user avatar: a circular photo that rides above the plane during
+  /// the tilted follow and appears on the summary card. Off by default;
+  /// toggled from settings. All mutable so a settings change applies to the
+  /// cached renderer without a rebuild (like the flags above).
+  bool showAvatar = false;
+
+  /// The avatar photo (user-picked). Swapped via [setAvatar] so a superseded
+  /// image is retired rather than freed mid-paint.
+  ui.Image? avatarImage;
+
+  /// Which file [avatarImage] was decoded from, so a re-apply can skip the
+  /// decode when the photo is unchanged.
+  String? avatarSourcePath;
+
+  /// Avatar images replaced by [setAvatar]; freed in [dispose] instead of at
+  /// swap time, so an in-flight paint never reads a disposed image.
+  final List<ui.Image> _retiredAvatars = [];
+
   // Two header variants, both laid out once: destination hidden behind "?"
   // during the flight (open-ended hook), the real airport revealed the
   // moment the plane lands.
@@ -116,9 +144,7 @@ class MapFrameRenderer {
   TextPainter? _headerSubtitleMystery;
   TextPainter? _headerSubtitleRevealed;
   TextPainter? _attribution;
-  final double _tickerTotalKm;
-  final double _tickerUnitFactor;
-  final String _tickerUnitLabel;
+  TextPainter? _mysteryHookPainter;
   String _attributionText;
   final String? _statsDistanceText;
   final String? _statsDurationText;
@@ -127,6 +153,10 @@ class MapFrameRenderer {
   /// "Made with Flymap" line on the end card. Shown only when the watermark
   /// is on, so a Pro user who removes the watermark removes this too.
   final String _madeWithText;
+
+  /// Hook title drawn over the intro when mystery mode is on
+  /// ("Guess where I'm flying?").
+  final String _mysteryTitle;
 
   Size get _size => Size(spec.width.toDouble(), spec.height.toDouble());
 
@@ -161,7 +191,7 @@ class MapFrameRenderer {
     _drawLandingPulse(canvas, wt, t);
     _drawPlane(canvas, wt, t);
     _drawHeader(canvas, t);
-    _drawDistanceTicker(canvas, t);
+    _drawMysteryHook(canvas, t);
     if (showEndCard) _drawStatsOverlay(canvas, t);
     _drawWatermark(canvas);
     _drawAttribution(canvas, t);
@@ -171,7 +201,23 @@ class MapFrameRenderer {
   void dispose() {
     planeSprite?.dispose();
     brandLogo?.dispose();
+    avatarImage?.dispose();
+    for (final image in _retiredAvatars) {
+      image.dispose();
+    }
+    _retiredAvatars.clear();
     _planeModel?.dispose();
+  }
+
+  /// Swaps in a new avatar photo (from [avatarSourcePath]). The previous image
+  /// is retired for disposal at [dispose] rather than freed now, so a
+  /// concurrent 60fps preview paint can never read a disposed image.
+  void setAvatar(ui.Image? image, {String? sourcePath}) {
+    avatarSourcePath = sourcePath;
+    if (identical(image, avatarImage)) return;
+    final previous = avatarImage;
+    if (previous != null) _retiredAvatars.add(previous);
+    avatarImage = image;
   }
 
   /// Swaps in a different map style's tiles and its per-style styling
@@ -191,34 +237,25 @@ class MapFrameRenderer {
     }
   }
 
-  /// Soft dark gradients along the top and bottom edges so the header,
-  /// chip, watermark and attribution stay readable over bright imagery.
+  /// Sky-blue gradient along the top edge — the exact overlay the in-app sky
+  /// camera uses (#0259DE fading to transparent), so the two features match.
+  /// A navy/black scrim read as "dirty" over the blue-ish map. No bottom
+  /// gradient: the summary card and attribution carry their own backing there.
   void _drawScrims(Canvas canvas) {
-    final topRect = Rect.fromLTWH(0, 0, _size.width, _size.height * 0.18);
+    final topRect = Rect.fromLTWH(0, 0, _size.width, _size.height * 0.42);
     canvas.drawRect(
       topRect,
       Paint()
         ..shader = ui.Gradient.linear(topRect.topCenter, topRect.bottomCenter, [
-          const Color(0x8C000000),
-          const Color(0x00000000),
+          _skyOverlayTop,
+          _skyOverlayBottom,
         ]),
     );
-    final bottomRect = Rect.fromLTWH(
-      0,
-      _size.height * 0.84,
-      _size.width,
-      _size.height * 0.16,
-    );
-    canvas.drawRect(
-      bottomRect,
-      Paint()
-        ..shader = ui.Gradient.linear(
-          bottomRect.topCenter,
-          bottomRect.bottomCenter,
-          [const Color(0x00000000), const Color(0x99000000)],
-        ),
-    );
   }
+
+  /// Sky-camera overlay blue (top opaque-ish → fully transparent).
+  static const Color _skyOverlayTop = Color(0xE60259DE);
+  static const Color _skyOverlayBottom = Color(0x000259DE);
 
   // --- Map plane (tiles + route), drawn under the perspective transform ---
 
@@ -563,6 +600,10 @@ class MapFrameRenderer {
 
     final scale = 0.7 + 0.3 * presence;
 
+    // The plane's on-screen visual centre (route point + the bob/lift dance);
+    // the avatar rides above this point.
+    final planeCenter = screen + Offset(0, bob - lift);
+
     final mesh = _planeMesh;
     if (mesh != null) {
       final sizePx = 250.0 * scale;
@@ -580,13 +621,14 @@ class MapFrameRenderer {
       );
       mesh.paint(
         canvas,
-        center: screen + Offset(0, bob - lift),
+        center: planeCenter,
         headingRad: heading,
         tiltRad: tiltRad,
         sizePx: sizePx,
         bankRad: bank,
         opacity: presence,
       );
+      _drawUserAvatar(canvas, wt, planeCenter, t);
       return;
     }
     screen += Offset(0, bob - lift);
@@ -630,6 +672,104 @@ class MapFrameRenderer {
         ..color = Color.fromRGBO(0, 0, 0, presence),
     );
     canvas.restore();
+    _drawUserAvatar(canvas, wt, planeCenter, t);
+  }
+
+  /// Circular "user avatar" puck that rides above the plane during the tilted
+  /// follow. Keyed to camera pitch: [CameraPathPlanner] runs pitch
+  /// `0 -> followPitch -> 0`, so the avatar grows in only once the camera has
+  /// tilted into the follow pose ("pitch in position") and shrinks back into
+  /// the plane as the camera returns top-down for the outro — absent from the
+  /// flat opening and closing overview, present only while we chase the plane.
+  /// It rises out of the plane as it pops (the pin-style ease-out-back), and
+  /// sinks back down as it shrinks away. Placeholder art until a real avatar
+  /// feature exists.
+  void _drawUserAvatar(
+    Canvas canvas,
+    WorldTransform wt,
+    Offset planeCenter,
+    double t,
+  ) {
+    if (!showAvatar) return;
+    final avatar = avatarImage;
+    if (avatar == null) return;
+
+    final pitchFraction =
+        (wt.pose.pitchDeg / max(1.0, planner.followPitch)).clamp(0.0, 1.0);
+    // Emerge once the camera is a third of the way into the tilt, over a tight
+    // window so the pop reads. The strong ease-out-back overshoots: the avatar
+    // grows past full size, then springs back to rest.
+    final reveal = ((pitchFraction - 0.30) / 0.35).clamp(0.0, 1.0);
+    final presence = _easeOutBackAvatar(reveal);
+    if (presence <= 0) return;
+
+    const baseRadius = 54.0;
+    final radius = baseRadius * presence;
+    // Rises out of the plane as it appears, sinks back as it shrinks away...
+    var center = planeCenter + Offset(0, -128 * presence);
+    // ...plus a barely-there live wobble, like a passenger riding the plane's
+    // motion. Two out-of-phase sines so it never reads as a clean loop; scaled
+    // by presence so it fades in/out with the avatar.
+    final seconds = t * spec.duration.inMilliseconds / 1000;
+    final wobbleBeat = 2 * pi * seconds * 0.55;
+    center += Offset(
+          sin(wobbleBeat) * 2.4,
+          sin(wobbleBeat * 1.7 + 0.9) * 3.0,
+        ) *
+        min(1.0, presence);
+
+    // Cheap offset shadow (no blur — a MaskFilter here is a per-frame render
+    // pass, the same cost the pins avoid).
+    canvas.drawCircle(
+      center + const Offset(0, 6),
+      radius + 3,
+      Paint()..color = const Color(0x33000000),
+    );
+    // White backing ring, like the region pins and endpoint markers.
+    canvas.drawCircle(
+      center,
+      radius + 6,
+      Paint()..color = const Color(0xFFFFFFFF),
+    );
+
+    // Circular avatar image, cover-fit (square source, but be safe).
+    canvas.save();
+    canvas.clipPath(
+      Path()..addOval(Rect.fromCircle(center: center, radius: radius)),
+    );
+    final sourceSize = min(avatar.width, avatar.height).toDouble();
+    canvas.drawImageRect(
+      avatar,
+      Rect.fromCenter(
+        center: Offset(avatar.width / 2, avatar.height / 2),
+        width: sourceSize,
+        height: sourceSize,
+      ),
+      Rect.fromCircle(center: center, radius: radius),
+      Paint()..filterQuality = FilterQuality.high,
+    );
+    canvas.restore();
+
+    // Accent ring in the route colour ties it to the trail/markers.
+    canvas.drawCircle(
+      center,
+      radius + 4,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.2
+        ..color = routeColor,
+    );
+  }
+
+  /// Ease-out-back tuned for the avatar pop: overshoots ~15% past full size
+  /// before settling, so it grows big then springs back — a lively bounce.
+  static double _easeOutBackAvatar(double u) {
+    if (u <= 0) return 0;
+    if (u >= 1) return 1;
+    const c1 = 2.2;
+    const c3 = c1 + 1;
+    final x = u - 1;
+    return 1 + c3 * x * x * x + c1 * x * x;
   }
 
   /// Expanding pulse rings at the arrival airport as the plane lands.
@@ -659,34 +799,6 @@ class MapFrameRenderer {
       );
     }
   }
-
-  /// Distance counter under the header, ticking up as the plane flies.
-  void _drawDistanceTicker(Canvas canvas, double t) {
-    if (_tickerTotalKm <= 0) return;
-    final s = planner.planeProgressAt(t);
-    final value = _tickerTotalKm * _tickerUnitFactor * s;
-    final rounded = value < 10 ? value.round() : (value / 10).round() * 10;
-    final text = '${_formatThousands(rounded)} $_tickerUnitLabel';
-    _paintTextLeft(
-      canvas,
-      text: text,
-      // Same white as the city subtitle: the accent-colored counter fought
-      // the header for attention.
-      style: const TextStyle(
-        color: Color(0xE6FFFFFF),
-        fontSize: 38,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 0.6,
-        shadows: [Shadow(color: Color(0xCC000000), blurRadius: 8)],
-      ),
-      topLeft: const Offset(headerInsetX, 222),
-    );
-  }
-
-  static String _formatThousands(int value) => value.toString().replaceAllMapped(
-    RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
-    (match) => '${match[1]},',
-  );
 
   /// Google-Maps-style pins that pop in as the plane enters each country and
   /// stay on the map — the outro zoom-out shows the whole trip decorated
@@ -873,22 +985,18 @@ class MapFrameRenderer {
 
     final dep = flight.departure;
     final arr = flight.arrival;
-    const shadows = [
-      Shadow(color: Color(0xCC000000), blurRadius: 10),
-      Shadow(color: Color(0x66000000), blurRadius: 3),
-    ];
     const titleStyle = TextStyle(
       color: Color(0xFFFFFFFF),
       fontSize: 54,
       fontWeight: FontWeight.w800,
       letterSpacing: 1.0,
-      shadows: shadows,
+      shadows: _overlayTextShadows,
     );
     const subtitleStyle = TextStyle(
       color: Color(0xE6FFFFFF),
       fontSize: 34,
       fontWeight: FontWeight.w600,
-      shadows: shadows,
+      shadows: _overlayTextShadows,
     );
 
     final depCountry = dep.countryCode.trim().toUpperCase();
@@ -945,26 +1053,83 @@ class MapFrameRenderer {
     return '$city, $country';
   }
 
-  /// Constant brand watermark, TOP-right of every frame: the white logo
-  /// asset when available, otherwise a text fallback.
-  ///
-  /// Top-right is the TikTok-safe spot: their UI covers the bottom ~20%
-  /// (caption/music), the right rail from roughly mid-height down
-  /// (like/comment/share), and the top ~130px (tabs/search) — a bottom-right
-  /// watermark disappears under the rail the moment the video is posted.
+  /// Hook title over the intro when mystery mode is on: a bold centered line
+  /// ("Guess where I'm flying?") that fades in at the start and out as the
+  /// camera dives into the follow — the scroll-stopping opener that the "?"
+  /// ending pays off. The "?" header carries the mystery for the rest of the
+  /// video, so the hook only needs to land the first couple of seconds.
+  void _drawMysteryHook(Canvas canvas, double t) {
+    if (!mysteryDestination || _mysteryTitle.isEmpty) return;
+    const fadeInEnd = 0.05;
+    const holdEnd = 0.22;
+    const fadeOutEnd = 0.30;
+    if (t >= fadeOutEnd) return;
+    final opacity = t < fadeInEnd
+        ? (t / fadeInEnd).clamp(0.0, 1.0)
+        : t < holdEnd
+        ? 1.0
+        : 1 - ((t - holdEnd) / (fadeOutEnd - holdEnd)).clamp(0.0, 1.0);
+    if (opacity <= 0) return;
+
+    final painter = _mysteryHookPainter ??= TextPainter(
+      text: TextSpan(
+        text: _mysteryTitle,
+        style: const TextStyle(
+          color: Color(0xFFFFFFFF),
+          fontSize: 52,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.3,
+          shadows: _overlayTextShadows,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
+      maxLines: 2,
+      ellipsis: '…',
+    )..layout(maxWidth: _size.width - 160);
+
+    // Upper third, clear of the header.
+    final origin = Offset((_size.width - painter.width) / 2, _size.height * 0.30);
+    final bg = RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        origin.dx - 30,
+        origin.dy - 22,
+        painter.width + 60,
+        painter.height + 44,
+      ),
+      const Radius.circular(30),
+    );
+    // Fade the pill and text as one group so the semi-transparent backing
+    // doesn't double up over the glyphs.
+    canvas.saveLayer(
+      bg.outerRect.inflate(20),
+      Paint()..color = Color.fromRGBO(0, 0, 0, opacity),
+    );
+    canvas.drawRRect(bg, Paint()..color = _pillBackground);
+    canvas.drawRRect(
+      bg,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.6
+        ..color = _pillBorder,
+    );
+    painter.paint(canvas, origin);
+    canvas.restore();
+  }
+
+  /// Constant brand watermark, BOTTOM-right of every frame: the white logo
+  /// asset when available, otherwise a text fallback. (Bottom-right reads
+  /// cleaner even though a posted TikTok's action rail can sit over it.)
   void _drawWatermark(Canvas canvas) {
     if (!watermarkEnabled) return;
     const padding = 40.0;
-    // Top edge aligned with the header airport codes (drawn at y=96) so the
-    // brand and the route title sit on the same line across the frame.
-    const topInset = 96.0;
     final logo = brandLogo;
     if (logo != null && logo.width > 0 && logo.height > 0) {
       const targetWidth = 220.0;
       final targetHeight = targetWidth * logo.height / logo.width;
       final dst = Rect.fromLTWH(
         _size.width - targetWidth - padding,
-        topInset,
+        _size.height - targetHeight - padding,
         targetWidth,
         targetHeight,
       );
@@ -995,7 +1160,10 @@ class MapFrameRenderer {
     )..layout();
     painter.paint(
       canvas,
-      Offset(_size.width - painter.width - padding, topInset),
+      Offset(
+        _size.width - painter.width - padding,
+        _size.height - painter.height - padding,
+      ),
     );
   }
 
@@ -1006,9 +1174,7 @@ class MapFrameRenderer {
     final chipRows = _layoutEndCardChips();
     final width = _size.width - 120;
 
-    // Content strings.
-    final depCode = flight.departure.displayCode.trim().toUpperCase();
-    final arrCode = flight.arrival.displayCode.trim().toUpperCase();
+    // Content.
     final depSub = _cityWithCountry(
       RouteUtils.cityLabel(flight.departure.city).trim(),
       flight.departure.countryCode.trim().toUpperCase(),
@@ -1020,31 +1186,31 @@ class MapFrameRenderer {
     final subtitle = (depSub.isEmpty && arrSub.isEmpty)
         ? ''
         : '$depSub → $arrSub';
-    final details = <String>[
-      if (_statsDistanceText != null) _statsDistanceText,
-      if (_statsDurationText != null) _statsDurationText,
-    ].join('   ·   ');
+    final hasStats = _statsDistanceText != null || _statsDurationText != null;
     // "Made with Flymap" rides with the watermark toggle: Pro users who
     // remove the watermark lose this line too.
     final showMadeWith = watermarkEnabled && _madeWithText.isNotEmpty;
 
     // Measure the vertical layout, then place — so the card is exactly as
-    // tall as its content (codes + city/country + stats + chips + credit).
-    const padTop = 34.0;
-    const padBottom = 30.0;
-    const titleH = 66.0;
-    const subtitleH = 52.0;
-    const detailsH = 54.0;
-    const chipsGap = 14.0;
+    // tall as its content (codes + city/country + stat pills + chips + credit).
+    const padTop = 38.0;
+    const padBottom = 34.0;
+    const titleH = 72.0;
+    const subtitleH = 50.0;
+    const statsGap = 20.0;
+    const statsH = 74.0;
+    const chipsGap = 20.0;
     const chipRowStep = 78.0;
-    const madeWithGap = 18.0;
-    const madeWithH = 44.0;
+    const madeWithGap = 24.0;
+    const madeWithH = 40.0;
 
     var height = padTop + titleH;
     if (subtitle.isNotEmpty) height += subtitleH;
-    if (details.isNotEmpty) height += detailsH;
+    if (hasStats) height += statsGap + statsH;
     if (chipRows.isNotEmpty) {
-      height += chipsGap + chipRows.length * chipRowStep - (chipRowStep - 58);
+      height += chipsGap +
+          chipRows.length * chipRowStep -
+          (chipRowStep - _endCardChipHeight);
     }
     if (showMadeWith) height += madeWithGap + madeWithH;
     height += padBottom;
@@ -1064,8 +1230,8 @@ class MapFrameRenderer {
       Paint()..color = Color.fromRGBO(0, 0, 0, opacity),
     );
 
-    final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(36));
-    canvas.drawRRect(rrect, Paint()..color = _pillBackground);
+    final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(40));
+    canvas.drawRRect(rrect, Paint()..color = _endCardFill);
     canvas.drawRRect(
       rrect,
       Paint()
@@ -1075,17 +1241,7 @@ class MapFrameRenderer {
     );
 
     var y = rect.top + padTop;
-    _paintText(
-      canvas,
-      text: '$depCode  →  $arrCode',
-      style: const TextStyle(
-        color: Color(0xFFFFFFFF),
-        fontSize: 56,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 1.2,
-      ),
-      center: Offset(rect.center.dx, y + titleH / 2),
-    );
+    _drawEndCardTitle(canvas, rect.center.dx, y, titleH);
     y += titleH;
 
     if (subtitle.isNotEmpty) {
@@ -1102,18 +1258,10 @@ class MapFrameRenderer {
       y += subtitleH;
     }
 
-    if (details.isNotEmpty) {
-      _paintText(
-        canvas,
-        text: details,
-        style: const TextStyle(
-          color: Color(0xE6FFFFFF),
-          fontSize: 38,
-          fontWeight: FontWeight.w600,
-        ),
-        center: Offset(rect.center.dx, y + detailsH / 2),
-      );
-      y += detailsH;
+    if (hasStats) {
+      y += statsGap;
+      _drawEndCardStatPills(canvas, rect.center.dx, y, statsH);
+      y += statsH;
     }
 
     if (chipRows.isNotEmpty) {
@@ -1122,7 +1270,7 @@ class MapFrameRenderer {
         _drawEndCardChipRow(canvas, row, rect.center.dx, y);
         y += chipRowStep;
       }
-      y -= chipRowStep - 58;
+      y -= chipRowStep - _endCardChipHeight;
     }
 
     if (showMadeWith) {
@@ -1144,20 +1292,120 @@ class MapFrameRenderer {
     canvas.restore();
   }
 
+  /// Route header on the card: departure/arrival airport codes prefixed with
+  /// country flags, centered.
+  void _drawEndCardTitle(
+    Canvas canvas,
+    double centerX,
+    double top,
+    double titleH,
+  ) {
+    final depCode = flight.departure.displayCode.trim().toUpperCase();
+    final arrCode = flight.arrival.displayCode.trim().toUpperCase();
+    final depFlag = RegionHighlightModel.flagEmoji(flight.departure.countryCode);
+    final arrFlag = RegionHighlightModel.flagEmoji(flight.arrival.countryCode);
+    final depPrefix = depFlag == null ? '' : '$depFlag ';
+    final arrPrefix = arrFlag == null ? '' : '$arrFlag ';
+
+    _paintText(
+      canvas,
+      text: '$depPrefix$depCode  →  $arrPrefix$arrCode',
+      style: const TextStyle(
+        color: Color(0xFFFFFFFF),
+        fontSize: 54,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.0,
+        shadows: _overlayTextShadows,
+      ),
+      center: Offset(centerX, top + titleH / 2),
+    );
+  }
+
+  /// Distance and duration as two dark pills with amber icons.
+  void _drawEndCardStatPills(
+    Canvas canvas,
+    double centerX,
+    double top,
+    double h,
+  ) {
+    final pills = <(IconData, String)>[
+      if (_statsDistanceText != null) (Icons.route, _statsDistanceText),
+      if (_statsDurationText != null) (Icons.schedule, _statsDurationText),
+    ];
+    if (pills.isEmpty) return;
+
+    const iconSize = 40.0;
+    const iconGap = 12.0;
+    const hPad = 26.0;
+    const pillGap = 20.0;
+    const textStyle = TextStyle(
+      color: Color(0xFFFFFFFF),
+      fontSize: 40,
+      fontWeight: FontWeight.w800,
+      letterSpacing: 0.4,
+    );
+
+    final measured = <(IconData, TextPainter, double)>[];
+    var totalWidth = pillGap * (pills.length - 1);
+    for (final (icon, label) in pills) {
+      final tp = TextPainter(
+        text: TextSpan(text: label, style: textStyle),
+        textDirection: TextDirection.ltr,
+        maxLines: 1,
+      )..layout();
+      final w = hPad * 2 + iconSize + iconGap + tp.width;
+      measured.add((icon, tp, w));
+      totalWidth += w;
+    }
+
+    var x = centerX - totalWidth / 2;
+    for (final (icon, tp, w) in measured) {
+      final rect = Rect.fromLTWH(x, top, w, h);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(rect, const Radius.circular(20)),
+        Paint()..color = _statPillFill,
+      );
+      final iconP = _iconPainter(icon, iconSize, _statIconAmber);
+      iconP.paint(canvas, Offset(x + hPad, rect.center.dy - iconP.height / 2));
+      tp.paint(
+        canvas,
+        Offset(x + hPad + iconSize + iconGap, rect.center.dy - tp.height / 2),
+      );
+      x += w + pillGap;
+    }
+  }
+
+  TextPainter _iconPainter(IconData icon, double size, Color color) =>
+      TextPainter(
+        text: TextSpan(
+          text: String.fromCharCode(icon.codePoint),
+          style: TextStyle(
+            fontFamily: icon.fontFamily,
+            package: icon.fontPackage,
+            fontSize: size,
+            color: color,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+
+
   static const double _endCardChipFontSize = 30;
   static const double _endCardChipHPad = 20;
   static const double _endCardChipGap = 16;
   static const double _endCardChipHeight = 58;
-  static const double _endCardChipArtworkSize = 40;
-  static const double _endCardChipArtworkGap = 10;
   static const int _maxEndCardChipRows = 4;
 
   String _endCardChipText(RegionChipData chip) =>
-      chip.artwork == null ? '${chip.emoji} ${chip.label}' : chip.label;
+      '${chip.emoji} ${_chipCode(chip)}';
 
-  double _endCardChipLeading(RegionChipData chip) => chip.artwork == null
-      ? 0
-      : _endCardChipArtworkSize + _endCardChipArtworkGap;
+  /// Short 2-letter code for a country chip (GB shown as the familiar UK),
+  /// falling back to the region label when there's no country code.
+  String _chipCode(RegionChipData chip) {
+    final code = chip.countryCode?.trim().toUpperCase();
+    if (code == null || code.isEmpty) return chip.label.trim();
+    return code == 'GB' ? 'UK' : code;
+  }
 
   /// Wraps the end-card chips into measured rows that fit the card width.
   List<List<(RegionChipData, double)>> _layoutEndCardChips() {
@@ -1175,8 +1423,7 @@ class MapFrameRenderer {
         textDirection: TextDirection.ltr,
         maxLines: 1,
       )..layout();
-      final width =
-          painter.width + _endCardChipHPad * 2 + _endCardChipLeading(chip);
+      final width = painter.width + _endCardChipHPad * 2;
       final needed = row.isEmpty ? width : rowWidth + _endCardChipGap + width;
       if (row.isNotEmpty && needed > maxRowWidth) {
         rows.add(row);
@@ -1205,39 +1452,18 @@ class MapFrameRenderer {
     var x = centerX - totalWidth / 2;
     for (final (chip, width) in row) {
       final rect = Rect.fromLTWH(x, top, width, _endCardChipHeight);
+      // Outlined pill (transparent interior), matching the reference.
       final rrect = RRect.fromRectAndRadius(
         rect,
         const Radius.circular(_endCardChipHeight / 2),
       );
-      canvas.drawRRect(rrect, Paint()..color = const Color(0x33FFFFFF));
       canvas.drawRRect(
         rrect,
         Paint()
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.4
-          ..color = _pillBorder,
+          ..strokeWidth = 1.8
+          ..color = _chipOutline,
       );
-      final artwork = chip.artwork;
-      if (artwork != null) {
-        canvas.drawImageRect(
-          artwork,
-          Rect.fromLTWH(
-            0,
-            0,
-            artwork.width.toDouble(),
-            artwork.height.toDouble(),
-          ),
-          Rect.fromCenter(
-            center: Offset(
-              x + _endCardChipHPad + _endCardChipArtworkSize / 2,
-              rect.center.dy,
-            ),
-            width: _endCardChipArtworkSize,
-            height: _endCardChipArtworkSize,
-          ),
-          Paint()..filterQuality = FilterQuality.high,
-        );
-      }
       final painter = TextPainter(
         text: TextSpan(
           text: _endCardChipText(chip),
@@ -1253,7 +1479,7 @@ class MapFrameRenderer {
       painter.paint(
         canvas,
         Offset(
-          x + _endCardChipHPad + _endCardChipLeading(chip),
+          x + _endCardChipHPad,
           top + (_endCardChipHeight - painter.height) / 2,
         ),
       );
@@ -1277,21 +1503,6 @@ class MapFrameRenderer {
       canvas,
       Offset(center.dx - painter.width / 2, center.dy - painter.height / 2),
     );
-  }
-
-  void _paintTextLeft(
-    Canvas canvas, {
-    required String text,
-    required TextStyle style,
-    required Offset topLeft,
-  }) {
-    final painter = TextPainter(
-      text: TextSpan(text: text, style: style),
-      textDirection: TextDirection.ltr,
-      maxLines: 1,
-      ellipsis: '…',
-    )..layout(maxWidth: _size.width - topLeft.dx - 48);
-    painter.paint(canvas, topLeft);
   }
 
   void _drawAttribution(Canvas canvas, double t) {

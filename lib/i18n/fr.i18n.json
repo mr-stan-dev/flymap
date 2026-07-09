@@ -838,7 +838,17 @@
     "showEndCardHint": "Afficher la carte récapitulative à la fin",
     "styleShine": "Lè Shine",
     "applySettings": "Appliquer les modifications",
-    "applying": "Application des modifications..."
+    "applying": "Application des modifications...",
+    "avatarTitle": "Ton avatar",
+    "avatarHint": "Voyage sur ta route avec ta propre photo",
+    "avatarSetupTitle": "Ton avatar",
+    "avatarPick": "Choisir une photo",
+    "avatarChange": "Changer de photo",
+    "avatarNameLabel": "Nom ou @pseudo",
+    "avatarNameHint": "Facultatif — affiché sur la carte récap",
+    "avatarSave": "Enregistrer l'avatar",
+    "mysteryTitle": "Devine où je vole ? ✈️",
+    "avatarCardTagline": "Ma carte de vol"
   },
   "about": {
     "title": "À propos de Flymap",

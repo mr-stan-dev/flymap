@@ -33,7 +33,9 @@ class _FlightVideoPreviewState extends State<FlightVideoPreview>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: widget.session.spec.duration,
+      // Includes the held summary-card tail, so the preview loops the full
+      // exported length.
+      duration: widget.session.spec.totalDuration,
     );
     _controller.addListener(_decodeAhead);
     if (widget.playing) _controller.repeat();
@@ -57,8 +59,9 @@ class _FlightVideoPreviewState extends State<FlightVideoPreview>
     if (_decoding || !widget.playing) return;
     _decoding = true;
     final session = widget.session;
-    final t = _controller.value;
-    final lookAheadT = (t + 0.06) % 1.0;
+    final raw = _controller.value;
+    final t = session.spec.choreographyTime(raw);
+    final lookAheadT = session.spec.choreographyTime((raw + 0.06) % 1.0);
     final tiles = {
       ...session.renderer.tilesForFrame(t),
       ...session.renderer.tilesForFrame(lookAheadT),
@@ -106,7 +109,7 @@ class _FlightVideoPainter extends CustomPainter {
     final scale = size.width / spec.width;
     canvas.save();
     canvas.scale(scale);
-    session.renderer.paintFrame(canvas, animation.value);
+    session.renderer.paintFrame(canvas, spec.choreographyTime(animation.value));
     canvas.restore();
   }
 

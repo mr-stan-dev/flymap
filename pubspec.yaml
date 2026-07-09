@@ -25,6 +25,8 @@ dependencies:
   maplibre_gl: 0.25.0
   
   path_provider: ^2.1.1
+  image_picker: ^1.1.2
+  crop_your_image: ^2.0.0
 
   get_it: ^7.6.7
   

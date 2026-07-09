@@ -838,7 +838,17 @@
     "showEndCardHint": "Übersichtskarte am Ende anzeigen",
     "styleShine": "Lè Shine",
     "applySettings": "Änderungen anwenden",
-    "applying": "Änderungen werden angewendet..."
+    "applying": "Änderungen werden angewendet...",
+    "avatarTitle": "Dein Avatar",
+    "avatarHint": "Fliege deine Route mit deinem eigenen Foto",
+    "avatarSetupTitle": "Dein Avatar",
+    "avatarPick": "Foto wählen",
+    "avatarChange": "Foto ändern",
+    "avatarNameLabel": "Name oder @Handle",
+    "avatarNameHint": "Optional – auf der Zusammenfassungskarte sichtbar",
+    "avatarSave": "Avatar speichern",
+    "mysteryTitle": "Rate, wohin ich fliege? ✈️",
+    "avatarCardTagline": "Meine Flugkarte"
   },
   "about": {
     "title": "Über Flymap",

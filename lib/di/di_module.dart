@@ -62,6 +62,7 @@ import 'package:flymap/repository/route_overview_repository.dart';
 import 'package:flymap/repository/settings_repository.dart';
 import 'package:flymap/repository/sky_camera_media_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
+import 'package:flymap/repository/video_avatar_repository.dart';
 import 'package:flymap/repository/user_flight_prefs_repository.dart';
 import 'package:flymap/repository/flight_search_repository.dart';
 
@@ -317,6 +318,9 @@ class DiModule {
     i.registerLazySingleton<SettingsRepository>(() => SettingsRepository());
     i.registerLazySingleton<MetricUnitsRepository>(
       () => MetricUnitsRepository(),
+    );
+    i.registerLazySingleton<VideoAvatarRepository>(
+      () => VideoAvatarRepository(),
     );
     i.registerLazySingleton<RecentAirportsRepository>(
       () => RecentAirportsRepository(),

@@ -17,6 +17,7 @@ import 'package:flymap/rating/rate_prompt_trigger.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/metric_units_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
+import 'package:flymap/repository/video_avatar_repository.dart';
 import 'package:flymap/ui/screens/share_flight/widgets/card/utils/share_image_card_formatters.dart';
 import 'package:flymap/utils/route_utils.dart';
 import 'package:flymap/utils/unit_format_utils.dart';
@@ -37,6 +38,7 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
       _gallerySaver = GetIt.I.get<MediaGallerySaver>(),
       _subscriptionRepository = GetIt.I.get<SubscriptionRepository>(),
       _ratePromptPolicyService = GetIt.I.get<RatePromptPolicyService>(),
+      _avatarRepository = GetIt.I.get<VideoAvatarRepository>(),
       _analytics = GetIt.I.get<AppAnalytics>(),
       super(FlightVideoState.initial(flightId: flightId)) {
     _prepare();
@@ -48,6 +50,7 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
   final MediaGallerySaver _gallerySaver;
   final SubscriptionRepository _subscriptionRepository;
   final RatePromptPolicyService _ratePromptPolicyService;
+  final VideoAvatarRepository _avatarRepository;
   final AppAnalytics _analytics;
   final Logger _logger = const Logger('FlightVideoCubit');
 
@@ -97,6 +100,9 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
       );
     }
 
+    final avatar = await _avatarRepository.load();
+    if (isClosed) return;
+
     final cancel = FlightVideoCancelToken();
     _cancelToken = cancel;
     final session = await _useCase.prepare(
@@ -104,6 +110,8 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
       texts: await _buildTexts(flight),
       style: state.style,
       isPro: isPro,
+      avatarEnabled: avatar.enabled,
+      avatarPath: avatar.imagePath,
       cancel: cancel,
       onTileProgress: (done, total) {
         if (isClosed || cancel.isCancelled) return;
@@ -138,8 +146,14 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
     session.renderer.mysteryDestination = state.mysteryDestination;
     session.renderer.showPins = state.showPins;
     session.renderer.showEndCard = state.showEndCard;
+    // The avatar (showAvatar/name/photo) was applied inside prepare from the
+    // repo config; mirror the enabled flag into state.
     emit(
-      state.copyWith(flight: flight, status: FlightVideoStatus.previewReady),
+      state.copyWith(
+        flight: flight,
+        status: FlightVideoStatus.previewReady,
+        avatarEnabled: avatar.enabled,
+      ),
     );
   }
 
@@ -157,8 +171,15 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
     required bool showPins,
     required bool showEndCard,
     required bool watermarkRemoved,
+    required bool avatarEnabled,
   }) async {
     if (state.isExporting || state.isSharing || state.isPreparing) return;
+
+    // The avatar isn't Pro-gated: persist the toggle and read the stored photo
+    // (the setup sheet already saved the picked file to the repo).
+    await _avatarRepository.setEnabled(avatarEnabled);
+    final avatar = await _avatarRepository.load();
+    if (isClosed) return;
 
     // Resolve the watermark request against Pro access / the paywall.
     var effectiveWatermarkRemoved = state.watermarkRemoved;
@@ -198,6 +219,19 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
       ..showEndCard = showEndCard
       ..watermarkEnabled = !effectiveWatermarkRemoved;
 
+    // The avatar may need a photo decode (first enable / changed photo), so it
+    // goes through the use case rather than the cheap cascade. A Pro rebuild
+    // re-prepares below and reloads the avatar from the repo, so skip it there.
+    final avatarSession = _session;
+    if (!becamePro && avatarSession != null) {
+      await _useCase.applyAvatar(
+        avatarSession,
+        enabled: avatarEnabled,
+        path: avatar.imagePath,
+      );
+      if (isClosed) return;
+    }
+
     emit(
       state.copyWith(
         // Style is committed only once its tiles are ready (below); the cheap
@@ -208,6 +242,7 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
         mysteryDestination: mysteryDestination,
         showPins: showPins,
         showEndCard: showEndCard,
+        avatarEnabled: avatarEnabled,
       ),
     );
 
@@ -374,6 +409,7 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
       ),
       brand: t.shareImage.brand,
       madeWith: t.flightVideo.madeWith,
+      mysteryTitle: t.flightVideo.mysteryTitle,
       distanceUnitLabel: UnitFormatUtils.formatDistanceUnit(unit),
       distanceUnitFactor: unit == DistanceUnit.mile ? 0.621371 : 1.0,
       languageCode: LocaleSettings.currentLocale.languageCode,

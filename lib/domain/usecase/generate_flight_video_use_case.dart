@@ -27,6 +27,7 @@ class FlightVideoTexts {
     required this.duration,
     required this.brand,
     this.madeWith = '',
+    this.mysteryTitle = '',
     this.distanceUnitLabel = 'km',
     this.distanceUnitFactor = 1,
     this.languageCode,
@@ -38,6 +39,9 @@ class FlightVideoTexts {
 
   /// "Made with Flymap" credit line on the end card (empty to hide).
   final String madeWith;
+
+  /// Hook title drawn over the intro in mystery mode.
+  final String mysteryTitle;
 
   /// Unit label and km->unit factor for the animated distance ticker.
   final String distanceUnitLabel;
@@ -146,6 +150,8 @@ class GenerateFlightVideoUseCase {
     required FlightVideoTexts texts,
     FlightVideoMapStyle style = FlightVideoMapStyle.outdoors,
     bool isPro = false,
+    bool avatarEnabled = false,
+    String? avatarPath,
     void Function(int done, int total)? onTileProgress,
     FlightVideoCancelToken? cancel,
   }) async {
@@ -239,14 +245,19 @@ class GenerateFlightVideoUseCase {
         // Cyan pops on satellite imagery; a vivid red reads best on the
         // light terrain and Lè Shine styles.
         routeColor: _routeColorFor(style),
-        tickerTotalKm: flight.route.metrics.effectiveDistanceKm,
-        tickerUnitFactor: texts.distanceUnitFactor,
-        tickerUnitLabel: texts.distanceUnitLabel,
         attributionText: style.attribution,
         statsDistanceText: texts.distance,
         statsDurationText: texts.duration,
         brandText: texts.brand,
         madeWithText: texts.madeWith,
+        mysteryTitle: texts.mysteryTitle,
+      );
+
+      // Load the opt-in user avatar (if configured) onto the renderer.
+      await _loadAvatarInto(
+        renderer,
+        enabled: avatarEnabled,
+        path: avatarPath,
       );
 
       // Warm-decode the opening frame so the preview never starts blank.
@@ -444,7 +455,7 @@ class GenerateFlightVideoUseCase {
             (k + 1) * frameBytes,
           );
           if (staticTailBytes == null &&
-              (read.frame + k) / lastFrame >=
+              spec.choreographyTime((read.frame + k) / lastFrame) >=
                   CameraPathPlanner.staticTailStart) {
             staticTailBytes = Uint8List.fromList(slice);
           }
@@ -469,7 +480,8 @@ class GenerateFlightVideoUseCase {
 
           // Entering the static tail: drain the pipeline (which renders and
           // captures the tail frame) and switch to append-only.
-          if (frame / lastFrame >= CameraPathPlanner.staticTailStart) {
+          if (spec.choreographyTime(frame / lastFrame) >=
+              CameraPathPlanner.staticTailStart) {
             while (pendingReads.isNotEmpty) {
               await flushOldestRead();
             }
@@ -481,10 +493,16 @@ class GenerateFlightVideoUseCase {
           stageWatch
             ..reset()
             ..start();
-          final tiles = {...session.renderer.tilesForFrame(frame / lastFrame)};
+          final tiles = {
+            ...session.renderer.tilesForFrame(
+              spec.choreographyTime(frame / lastFrame),
+            ),
+          };
           for (var k = 1; k < batchCount; k++) {
             tiles.addAll(
-              session.renderer.tilesForFrame((frame + k) / lastFrame),
+              session.renderer.tilesForFrame(
+                spec.choreographyTime((frame + k) / lastFrame),
+              ),
             );
           }
           await session.tileStore.ensureDecoded(tiles);
@@ -515,7 +533,10 @@ class GenerateFlightVideoUseCase {
                 spec.height.toDouble(),
               ),
             );
-            session.renderer.paintFrame(canvas, (frame + k) / lastFrame);
+            session.renderer.paintFrame(
+              canvas,
+              spec.choreographyTime((frame + k) / lastFrame),
+            );
             canvas.restore();
           }
           final picture = recorder.endRecording();
@@ -624,6 +645,54 @@ class GenerateFlightVideoUseCase {
       return frame.image;
     } catch (e) {
       _logger.error('Failed to load plane sprite: $e');
+      return null;
+    }
+  }
+
+  /// Applies an avatar settings change to a live session's renderer — used when
+  /// the user toggles the avatar or picks a new photo from settings, so the
+  /// change lands without a full session rebuild (like the other cheap flags).
+  Future<void> applyAvatar(
+    FlightVideoSession session, {
+    required bool enabled,
+    required String? path,
+  }) => _loadAvatarInto(session.renderer, enabled: enabled, path: path);
+
+  /// Reconciles the renderer's avatar (flag + photo) with the requested config.
+  /// Skips the decode when the same file is already loaded, and never throws —
+  /// a missing/broken file just leaves the avatar off.
+  Future<void> _loadAvatarInto(
+    MapFrameRenderer renderer, {
+    required bool enabled,
+    required String? path,
+  }) async {
+    if (!enabled || path == null || path.isEmpty) {
+      renderer.showAvatar = false;
+      return;
+    }
+    if (renderer.avatarImage != null && renderer.avatarSourcePath == path) {
+      renderer.showAvatar = true;
+      return;
+    }
+    final image = await _decodeFileImage(path);
+    if (image == null) {
+      renderer.showAvatar = false;
+      return;
+    }
+    renderer.setAvatar(image, sourcePath: path);
+    renderer.showAvatar = true;
+  }
+
+  Future<ui.Image?> _decodeFileImage(String path) async {
+    try {
+      final bytes = await File(path).readAsBytes();
+      // The avatar renders small (~110px on the plane); 256px keeps it crisp
+      // at a trivial memory cost.
+      final codec = await ui.instantiateImageCodec(bytes, targetWidth: 256);
+      final frame = await codec.getNextFrame();
+      return frame.image;
+    } catch (e) {
+      _logger.error('Failed to load avatar image: $e');
       return null;
     }
   }

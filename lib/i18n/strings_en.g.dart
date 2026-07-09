@@ -1276,6 +1276,36 @@ class TranslationsFlightVideoEn {
 
 	/// en: 'Applying changes...'
 	String get applying => 'Applying changes...';
+
+	/// en: 'Your avatar'
+	String get avatarTitle => 'Your avatar';
+
+	/// en: 'Ride your route with your own photo'
+	String get avatarHint => 'Ride your route with your own photo';
+
+	/// en: 'Your avatar'
+	String get avatarSetupTitle => 'Your avatar';
+
+	/// en: 'Choose photo'
+	String get avatarPick => 'Choose photo';
+
+	/// en: 'Change photo'
+	String get avatarChange => 'Change photo';
+
+	/// en: 'Name or @handle'
+	String get avatarNameLabel => 'Name or @handle';
+
+	/// en: 'Optional — shown on the summary card'
+	String get avatarNameHint => 'Optional — shown on the summary card';
+
+	/// en: 'Save avatar'
+	String get avatarSave => 'Save avatar';
+
+	/// en: 'Guess where I'm flying? ✈️'
+	String get mysteryTitle => 'Guess where I\'m flying? ✈️';
+
+	/// en: 'My flight map'
+	String get avatarCardTagline => 'My flight map';
 }
 
 // Path: about
@@ -4268,6 +4298,16 @@ extension on Translations {
 			'flightVideo.styleShine' => 'Lè Shine',
 			'flightVideo.applySettings' => 'Apply changes',
 			'flightVideo.applying' => 'Applying changes...',
+			'flightVideo.avatarTitle' => 'Your avatar',
+			'flightVideo.avatarHint' => 'Ride your route with your own photo',
+			'flightVideo.avatarSetupTitle' => 'Your avatar',
+			'flightVideo.avatarPick' => 'Choose photo',
+			'flightVideo.avatarChange' => 'Change photo',
+			'flightVideo.avatarNameLabel' => 'Name or @handle',
+			'flightVideo.avatarNameHint' => 'Optional — shown on the summary card',
+			'flightVideo.avatarSave' => 'Save avatar',
+			'flightVideo.mysteryTitle' => 'Guess where I\'m flying? ✈️',
+			'flightVideo.avatarCardTagline' => 'My flight map',
 			'about.title' => 'About Flymap',
 			'about.tagline' => 'Turn every flight into a window on the world.',
 			'about.chipCuriosity' => 'Curiosity',
@@ -4513,6 +4553,8 @@ extension on Translations {
 			'countries.VI' => 'Virgin Islands (US)',
 			'countries.VN' => 'Viet Nam',
 			'countries.YE' => 'Yemen',
+			_ => null,
+		} ?? switch (path) {
 			'countries.ZA' => 'South Africa',
 			'countries.ZM' => 'Zambia',
 			'countries.ZW' => 'Zimbabwe',

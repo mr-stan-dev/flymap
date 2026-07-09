@@ -25,6 +25,7 @@ class FlightVideoState extends Equatable {
     this.mysteryDestination = false,
     this.showPins = false,
     this.showEndCard = true,
+    this.avatarEnabled = false,
     this.prepareProgress = 0,
     this.exportProgress = 0,
     this.isApplyingSettings = false,
@@ -60,6 +61,10 @@ class FlightVideoState extends Equatable {
 
   /// Show the outro info card. On by default.
   final bool showEndCard;
+
+  /// Show the user's avatar (photo on the plane + summary card). Off by
+  /// default; the photo/name live in [VideoAvatarRepository].
+  final bool avatarEnabled;
 
   /// Tile prefetch progress 0..1 while [FlightVideoStatus.preparing].
   final double prepareProgress;
@@ -103,6 +108,7 @@ class FlightVideoState extends Equatable {
     bool? mysteryDestination,
     bool? showPins,
     bool? showEndCard,
+    bool? avatarEnabled,
     double? prepareProgress,
     double? exportProgress,
     bool? isApplyingSettings,
@@ -122,6 +128,7 @@ class FlightVideoState extends Equatable {
       mysteryDestination: mysteryDestination ?? this.mysteryDestination,
       showPins: showPins ?? this.showPins,
       showEndCard: showEndCard ?? this.showEndCard,
+      avatarEnabled: avatarEnabled ?? this.avatarEnabled,
       prepareProgress: prepareProgress ?? this.prepareProgress,
       exportProgress: exportProgress ?? this.exportProgress,
       isApplyingSettings: isApplyingSettings ?? this.isApplyingSettings,
@@ -140,7 +147,7 @@ class FlightVideoState extends Equatable {
   String toString() =>
       'FlightVideoState(${status.name}, style: ${style.name}, isPro: $isPro, '
       'watermarkRemoved: $watermarkRemoved, mystery: $mysteryDestination, '
-      'pins: $showPins, endCard: $showEndCard, '
+      'pins: $showPins, endCard: $showEndCard, avatar: $avatarEnabled, '
       'prepare: ${prepareProgress.toStringAsFixed(2)}, '
       'export: ${exportProgress.toStringAsFixed(2)}, '
       'applying: $isApplyingSettings ${applyProgress.toStringAsFixed(2)}, '
@@ -157,6 +164,7 @@ class FlightVideoState extends Equatable {
     mysteryDestination,
     showPins,
     showEndCard,
+    avatarEnabled,
     prepareProgress,
     exportProgress,
     isApplyingSettings,

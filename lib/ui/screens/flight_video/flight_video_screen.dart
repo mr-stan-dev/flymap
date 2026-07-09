@@ -54,6 +54,7 @@ class _FlightVideoViewState extends State<_FlightVideoView> {
       showPins: draft.showPins,
       showEndCard: draft.showEndCard,
       watermarkRemoved: draft.watermarkRemoved,
+      avatarEnabled: draft.avatarEnabled,
     );
   }
 

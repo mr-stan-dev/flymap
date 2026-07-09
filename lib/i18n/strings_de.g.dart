@@ -551,6 +551,16 @@ class _TranslationsFlightVideoDe extends TranslationsFlightVideoEn {
 	@override String get styleShine => 'Lè Shine';
 	@override String get applySettings => 'Änderungen anwenden';
 	@override String get applying => 'Änderungen werden angewendet...';
+	@override String get avatarTitle => 'Dein Avatar';
+	@override String get avatarHint => 'Fliege deine Route mit deinem eigenen Foto';
+	@override String get avatarSetupTitle => 'Dein Avatar';
+	@override String get avatarPick => 'Foto wählen';
+	@override String get avatarChange => 'Foto ändern';
+	@override String get avatarNameLabel => 'Name oder @Handle';
+	@override String get avatarNameHint => 'Optional – auf der Zusammenfassungskarte sichtbar';
+	@override String get avatarSave => 'Avatar speichern';
+	@override String get mysteryTitle => 'Rate, wohin ich fliege? ✈️';
+	@override String get avatarCardTagline => 'Meine Flugkarte';
 }
 
 // Path: about
@@ -2227,6 +2237,16 @@ extension on TranslationsDe {
 			'flightVideo.styleShine' => 'Lè Shine',
 			'flightVideo.applySettings' => 'Änderungen anwenden',
 			'flightVideo.applying' => 'Änderungen werden angewendet...',
+			'flightVideo.avatarTitle' => 'Dein Avatar',
+			'flightVideo.avatarHint' => 'Fliege deine Route mit deinem eigenen Foto',
+			'flightVideo.avatarSetupTitle' => 'Dein Avatar',
+			'flightVideo.avatarPick' => 'Foto wählen',
+			'flightVideo.avatarChange' => 'Foto ändern',
+			'flightVideo.avatarNameLabel' => 'Name oder @Handle',
+			'flightVideo.avatarNameHint' => 'Optional – auf der Zusammenfassungskarte sichtbar',
+			'flightVideo.avatarSave' => 'Avatar speichern',
+			'flightVideo.mysteryTitle' => 'Rate, wohin ich fliege? ✈️',
+			'flightVideo.avatarCardTagline' => 'Meine Flugkarte',
 			'about.title' => 'Über Flymap',
 			'about.tagline' => 'Mach aus jedem Flug ein Fenster zur Welt.',
 			'about.chipCuriosity' => 'Neugier',
@@ -2472,6 +2492,8 @@ extension on TranslationsDe {
 			'countries.VI' => 'Amerikanische Jungferninseln',
 			'countries.VN' => 'Vietnam',
 			'countries.YE' => 'Jemen',
+			_ => null,
+		} ?? switch (path) {
 			'countries.ZA' => 'Südafrika',
 			'countries.ZM' => 'Sambia',
 			'countries.ZW' => 'Simbabwe',

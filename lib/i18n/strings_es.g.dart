@@ -551,6 +551,16 @@ class _TranslationsFlightVideoEs extends TranslationsFlightVideoEn {
 	@override String get styleShine => 'Lè Shine';
 	@override String get applySettings => 'Aplicar cambios';
 	@override String get applying => 'Aplicando cambios...';
+	@override String get avatarTitle => 'Tu avatar';
+	@override String get avatarHint => 'Vuela tu ruta con tu propia foto';
+	@override String get avatarSetupTitle => 'Tu avatar';
+	@override String get avatarPick => 'Elegir foto';
+	@override String get avatarChange => 'Cambiar foto';
+	@override String get avatarNameLabel => 'Nombre o @usuario';
+	@override String get avatarNameHint => 'Opcional: se muestra en la tarjeta de resumen';
+	@override String get avatarSave => 'Guardar avatar';
+	@override String get mysteryTitle => '¿Adivinas adónde vuelo? ✈️';
+	@override String get avatarCardTagline => 'Mi mapa de vuelo';
 }
 
 // Path: about
@@ -2227,6 +2237,16 @@ extension on TranslationsEs {
 			'flightVideo.styleShine' => 'Lè Shine',
 			'flightVideo.applySettings' => 'Aplicar cambios',
 			'flightVideo.applying' => 'Aplicando cambios...',
+			'flightVideo.avatarTitle' => 'Tu avatar',
+			'flightVideo.avatarHint' => 'Vuela tu ruta con tu propia foto',
+			'flightVideo.avatarSetupTitle' => 'Tu avatar',
+			'flightVideo.avatarPick' => 'Elegir foto',
+			'flightVideo.avatarChange' => 'Cambiar foto',
+			'flightVideo.avatarNameLabel' => 'Nombre o @usuario',
+			'flightVideo.avatarNameHint' => 'Opcional: se muestra en la tarjeta de resumen',
+			'flightVideo.avatarSave' => 'Guardar avatar',
+			'flightVideo.mysteryTitle' => '¿Adivinas adónde vuelo? ✈️',
+			'flightVideo.avatarCardTagline' => 'Mi mapa de vuelo',
 			'about.title' => 'Acerca de Flymap',
 			'about.tagline' => 'Convierte cada vuelo en una ventana al mundo.',
 			'about.chipCuriosity' => 'Curiosidad',
@@ -2472,6 +2492,8 @@ extension on TranslationsEs {
 			'countries.VI' => 'Islas Virgenes de EE. UU.',
 			'countries.VN' => 'Vietnam',
 			'countries.YE' => 'Yemen',
+			_ => null,
+		} ?? switch (path) {
 			'countries.ZA' => 'Sudafrica',
 			'countries.ZM' => 'Zambia',
 			'countries.ZW' => 'Zimbabue',

@@ -98,6 +98,7 @@ class FlightVideoSpec extends Equatable {
     this.height = defaultHeight,
     this.fps = defaultFps,
     this.renderScale = proRenderScale,
+    this.tailHold = defaultTailHold,
     required this.duration,
   });
 
@@ -135,11 +136,37 @@ class FlightVideoSpec extends Equatable {
   static const double minSeconds = 16;
   static const double maxSeconds = 40;
 
+  /// Extra time held on the settled summary card after the flight animation
+  /// finishes — a frozen tail so viewers can read the route/stats. Appended to
+  /// [duration]; the flight itself keeps its pace (see [choreographyTime]).
+  static const Duration defaultTailHold = Duration(seconds: 2);
+
   final int width;
   final int height;
   final int fps;
   final double renderScale;
+
+  /// The animated flight duration (excludes [tailHold]).
   final Duration duration;
+
+  /// Held summary-card time appended after the flight; see [defaultTailHold].
+  final Duration tailHold;
+
+  /// Total played/exported length: the flight plus the held summary card.
+  Duration get totalDuration => duration + tailHold;
+
+  /// Maps a linear progress `raw in [0, 1]` over [totalDuration] to the
+  /// choreography time `t in [0, 1]` the planner/renderer expect. The flight
+  /// plays across the first [duration] worth of frames (so it keeps its pace),
+  /// then `t` saturates at 1.0 for the [tailHold] — freezing the settled
+  /// summary card instead of slowing the whole video down.
+  double choreographyTime(double raw) {
+    final total = totalDuration.inMicroseconds;
+    if (total <= 0) return raw.clamp(0.0, 1.0);
+    final active = duration.inMicroseconds / total;
+    if (active >= 1.0) return raw.clamp(0.0, 1.0);
+    return (raw / active).clamp(0.0, 1.0);
+  }
 
   /// Pixel width of the exported video file (kept even for encoders).
   int get outputWidth => _even((width * renderScale).round());
@@ -147,12 +174,20 @@ class FlightVideoSpec extends Equatable {
   /// Pixel height of the exported video file.
   int get outputHeight => _even((height * renderScale).round());
 
-  int get frameCount => max(2, (duration.inMilliseconds * fps / 1000).round());
+  int get frameCount =>
+      max(2, (totalDuration.inMilliseconds * fps / 1000).round());
 
   static int _even(int v) => v - (v % 2);
 
   static double _log10(double x) => log(x) / ln10;
 
   @override
-  List<Object?> get props => [width, height, fps, renderScale, duration];
+  List<Object?> get props => [
+    width,
+    height,
+    fps,
+    renderScale,
+    duration,
+    tailHold,
+  ];
 }
