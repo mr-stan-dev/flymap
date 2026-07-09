@@ -33,6 +33,8 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+# Package build output (e.g. from running `make test` in packages/*).
+packages/*/build/
 
 # Symbolication related
 app.*.symbols

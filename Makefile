@@ -23,7 +23,7 @@ help: ## Show available Make commands.
 prepare-ios-for-release: ## Generate iOS release config for a manual Xcode archive.
 	fvm flutter build ios --config-only --release --dart-define-from-file=env/app_config.prod.json
 
-prep: prepare-ios-for-release ## Alias for prepare-ios-for-release.
+prep: test prepare-ios-for-release ## Run the test suite, then generate the iOS release config.
 
 build-android-release: ## Build the Android release App Bundle (.aab).
 	fvm flutter build appbundle --release --dart-define-from-file=env/app_config.prod.json
@@ -35,6 +35,22 @@ bar: build-android-release ## Build the Android release bundle and reveal it in 
 		echo "Expected bundle not found: $(ANDROID_RELEASE_BUNDLE)" >&2; \
 		exit 1; \
 	fi
+
+test: ## Run all tests (app + every package under packages/).
+	fvm flutter test
+	@for pkg in packages/*/; do \
+		if [ -d "$${pkg}test" ]; then \
+			echo "==> Testing $$pkg"; \
+			( cd "$$pkg" && fvm flutter test ) || exit 1; \
+		fi; \
+	done
+
+t: test ## Alias for test.
+
+analyze: ## Run static analysis.
+	fvm flutter analyze
+
+a: analyze ## Alias for analyze.
 
 bump: ## Bump version, commit it, and create a local tag. Usage: make bump 1.2.0 [BUILD=7]
 ifndef VERSION
