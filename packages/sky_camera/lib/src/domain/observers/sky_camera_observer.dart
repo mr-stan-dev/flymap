@@ -4,4 +4,9 @@ abstract class SkyCameraObserver {
   Future<void> onOpened({required SkyCameraOverlaySnapshot snapshot});
 
   Future<void> onPhotoCaptured({required SkyCameraOverlaySnapshot snapshot});
+
+  Future<void> onVideoCaptured({
+    required SkyCameraOverlaySnapshot snapshot,
+    required Duration duration,
+  });
 }

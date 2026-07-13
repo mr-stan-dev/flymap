@@ -166,6 +166,11 @@ class _TranslationsSkyCameraDe extends TranslationsSkyCameraEn {
 	@override String get placeholderDestinationCode => 'BCN';
 	@override String get placeholderContext => 'Mittelmeer';
 	@override String get placeholderMap => 'Routenvorschau';
+	@override String get settingsTitle => 'Kameraeinstellungen';
+	@override String get recordAudio => 'Ton aufnehmen';
+	@override String get recordAudioHint => 'Videos nehmen Mikrofonton auf.';
+	@override String get microphonePermissionDenied => 'Mikrofonzugriff ist aus — Videos werden ohne Ton aufgenommen.';
+	@override String get preparingVideo => 'Video wird vorbereitet…';
 }
 
 // Path: media
@@ -1555,6 +1560,11 @@ extension on TranslationsDe {
 			'skyCamera.placeholderDestinationCode' => 'BCN',
 			'skyCamera.placeholderContext' => 'Mittelmeer',
 			'skyCamera.placeholderMap' => 'Routenvorschau',
+			'skyCamera.settingsTitle' => 'Kameraeinstellungen',
+			'skyCamera.recordAudio' => 'Ton aufnehmen',
+			'skyCamera.recordAudioHint' => 'Videos nehmen Mikrofonton auf.',
+			'skyCamera.microphonePermissionDenied' => 'Mikrofonzugriff ist aus — Videos werden ohne Ton aufgenommen.',
+			'skyCamera.preparingVideo' => 'Video wird vorbereitet…',
 			'media.title' => 'Medien vom Fensterplatz',
 			'media.loading' => 'Medien werden geladen...',
 			'media.failedToLoad' => 'Medien konnten nicht geladen werden',
@@ -1976,13 +1986,13 @@ extension on TranslationsDe {
 			'createFlight.downloading.poiProgress' => ({required Object completed, required Object total}) => 'Orte: ${completed}/${total}',
 			'createFlight.downloading.poiProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Orte: ${completed}/${total} (${failed} fehlgeschlagen)',
 			'createFlight.downloading.noArticlesSelected' => 'Keine Artikel ausgewählt.',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.downloading.preparingArticles' => 'Artikel-Downloads werden vorbereitet...',
 			'createFlight.downloading.articlesProgress' => ({required Object completed, required Object total}) => 'Artikel: ${completed}/${total}',
 			'createFlight.downloading.articlesProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Artikel: ${completed}/${total} (${failed} fehlgeschlagen)',
 			'createFlight.downloading.preparingMap' => 'Kartendownload wird vorbereitet...',
 			'createFlight.downloading.computingTiles' => 'Kartenkacheln werden berechnet...',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.downloading.computingTilesWithCount' => ({required Object count}) => 'Kartenkacheln werden berechnet (${count})...',
 			'createFlight.downloading.preparingForDownload' => 'Download wird vorbereitet...',
 			'createFlight.downloading.downloaded' => ({required Object size}) => 'Heruntergeladen: ${size}',
@@ -2490,13 +2500,13 @@ extension on TranslationsDe {
 			'countries.TW' => 'Taiwan, China',
 			'countries.TZ' => 'Tansania',
 			'countries.UA' => 'Ukraine',
+			_ => null,
+		} ?? switch (path) {
 			'countries.UG' => 'Uganda',
 			'countries.US' => 'Vereinigte Staaten',
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Usbekistan',
 			'countries.VE' => 'Venezuela',
-			_ => null,
-		} ?? switch (path) {
 			'countries.VI' => 'Amerikanische Jungferninseln',
 			'countries.VN' => 'Vietnam',
 			'countries.YE' => 'Jemen',

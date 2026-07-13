@@ -35,6 +35,7 @@ export 'package:flymap/analytics/events/sharing/share_card_generated_event.dart'
 export 'package:flymap/analytics/events/sharing/share_card_shared_event.dart';
 export 'package:flymap/analytics/events/sky_camera/sky_camera_opened_event.dart';
 export 'package:flymap/analytics/events/sky_camera/sky_photo_capture_event.dart';
+export 'package:flymap/analytics/events/sky_camera/sky_video_capture_event.dart';
 export 'package:flymap/analytics/events/sky_camera/sky_photo_share_event.dart';
 export 'package:flymap/analytics/events/subscription/subscription_status_changed_event.dart';
 

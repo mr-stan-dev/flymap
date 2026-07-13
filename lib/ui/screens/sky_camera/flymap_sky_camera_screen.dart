@@ -6,6 +6,7 @@ import 'package:flymap/domain/entity/flight_status.dart';
 import 'package:flymap/domain/entity/units.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/metric_units_repository.dart';
+import 'package:flymap/repository/settings_repository.dart';
 import 'package:flymap/repository/sky_camera_media_repository.dart';
 import 'package:flymap/ui/screens/home/tabs/media/media_capture_preview_screen.dart';
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_session_factory.dart';
@@ -63,6 +64,9 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
       overlayComposer: const SkyCameraOverlayComposer(),
       photoCropper: const SkyCameraPhotoCropper(),
       openCapturePreview: _openCapturePreview,
+      onRecordAudioChanged: (enabled) => unawaited(
+        GetIt.I<SettingsRepository>().setSkyCameraRecordAudio(enabled),
+      ),
       strings: SkyCameraStrings(
         loadingCamera: context.t.skyCamera.loading,
         loadingGpsData: context.t.skyCamera.loadingGpsData,
@@ -87,6 +91,11 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
         speedUnit: _speedUnit,
         temperatureUnit: _temperatureUnit,
         dateDisplayFormat: _dateDisplayFormat,
+        settingsTitle: context.t.skyCamera.settingsTitle,
+        recordAudio: context.t.skyCamera.recordAudio,
+        recordAudioHint: context.t.skyCamera.recordAudioHint,
+        microphonePermissionDenied:
+            context.t.skyCamera.microphonePermissionDenied,
       ),
     );
   }
@@ -124,6 +133,8 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
     final temperatureUnit = await metricUnitsRepository.getTemperatureUnit();
     final dateDisplayFormat = await metricUnitsRepository
         .getDateDisplayFormat();
+    final recordAudioEnabled = await GetIt.I<SettingsRepository>()
+        .getSkyCameraRecordAudio();
     final currentFlight = await _currentFlight(factory);
     if (!mounted) return;
     final placeholderCopy = _buildPlaceholderCopy(
@@ -137,10 +148,14 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
       _temperatureUnit = _mapTemperatureUnit(temperatureUnit);
       _dateDisplayFormat = _mapDateDisplayFormat(dateDisplayFormat);
       _session = currentFlight == null
-          ? factory.create(placeholderCopy: placeholderCopy)
+          ? factory.create(
+              placeholderCopy: placeholderCopy,
+              recordAudioEnabled: recordAudioEnabled,
+            )
           : factory.createForFlight(
               placeholderCopy: placeholderCopy,
               flightId: currentFlight.id,
+              recordAudioEnabled: recordAudioEnabled,
             );
       _isLoadingSession = false;
     });

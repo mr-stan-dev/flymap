@@ -38,6 +38,264 @@ void main() {
     expect(signalBarsSize.height, closeTo(14.4, 0.01));
   });
 
+  testWidgets('records a video and saves it with its track', (tester) async {
+    final driver = _FakeSkyCameraDriver();
+    final exportService = _FakeExportService();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SkyCameraScreen(
+          driver: driver,
+          snapshotSource: const _FakeSnapshotSource(),
+          exportService: exportService,
+          observer: const _FakeObserver(),
+          photoCropper: const _FakePhotoCropper(),
+          openCapturePreview: _openFakeCapturePreview,
+          overlayComposer: const SkyCameraOverlayComposer(),
+          strings: _strings,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('sky_camera.mode_video')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.pump();
+
+    expect(driver.didStartVideo, isTrue);
+    expect(driver.isRecordingVideo, isTrue);
+    expect(find.byKey(const Key('sky_camera.recording_chip')), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pump();
+    // Shutter countdown: the cap minus 2 elapsed seconds.
+    expect(
+      tester
+          .widget<Text>(
+            find.byKey(const Key('sky_camera.recording_countdown_seconds')),
+          )
+          .data,
+      '${SkyCameraMediaFormat.maxVideoDuration.inSeconds - 2}',
+    );
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.pumpAndSettle();
+
+    expect(driver.didStopVideo, isTrue);
+    expect(exportService.didSave, isTrue);
+    expect(find.byKey(const Key('sky_camera.recording_chip')), findsNothing);
+    expect(
+      find.byKey(const Key('sky_camera.last_capture_thumbnail')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('locks capture and mode controls while video start is pending', (
+    tester,
+  ) async {
+    final startCompleter = Completer<void>();
+    final driver = _FakeSkyCameraDriver(startVideoCompleter: startCompleter);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SkyCameraScreen(
+          driver: driver,
+          snapshotSource: const _FakeSnapshotSource(),
+          exportService: _FakeExportService(),
+          observer: const _FakeObserver(),
+          photoCropper: const _FakePhotoCropper(),
+          openCapturePreview: _openFakeCapturePreview,
+          overlayComposer: const SkyCameraOverlayComposer(),
+          strings: _strings,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('sky_camera.mode_video')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.pump();
+
+    expect(driver.startVideoCount, 1);
+    expect(find.byKey(const Key('sky_camera.recording_chip')), findsNothing);
+
+    await tester.tap(find.byKey(const Key('sky_camera.mode_photo')));
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.pump();
+    expect(driver.startVideoCount, 1);
+
+    startCompleter.complete();
+    await tester.pump();
+    expect(find.byKey(const Key('sky_camera.recording_chip')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.pumpAndSettle();
+    expect(driver.didStopVideo, isTrue);
+    expect(driver.didCapture, isFalse);
+  });
+
+  testWidgets('close waits for pending video start and saves before popping', (
+    tester,
+  ) async {
+    final startCompleter = Completer<void>();
+    final driver = _FakeSkyCameraDriver(startVideoCompleter: startCompleter);
+    final exportService = _FakeExportService();
+    await tester.pumpWidget(
+      _cameraRouteHost(driver: driver, exportService: exportService),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('sky_camera.mode_video')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('sky_camera.close_button')));
+    await tester.pump();
+
+    expect(find.byKey(const Key('sky_camera.close_button')), findsOneWidget);
+    expect(driver.didStopVideo, isFalse);
+
+    startCompleter.complete();
+    await tester.pumpAndSettle();
+
+    expect(driver.didStopVideo, isTrue);
+    expect(exportService.didSave, isTrue);
+    expect(find.byKey(const Key('sky_camera.close_button')), findsNothing);
+    expect(find.text('Open'), findsOneWidget);
+  });
+
+  testWidgets('system back saves an active video before popping', (
+    tester,
+  ) async {
+    final driver = _FakeSkyCameraDriver();
+    final exportService = _FakeExportService();
+    await tester.pumpWidget(
+      _cameraRouteHost(driver: driver, exportService: exportService),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('sky_camera.mode_video')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.pump();
+    expect(driver.isRecordingVideo, isTrue);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+
+    expect(driver.didStopVideo, isTrue);
+    expect(exportService.didSave, isTrue);
+    expect(find.byKey(const Key('sky_camera.close_button')), findsNothing);
+    expect(find.text('Open'), findsOneWidget);
+  });
+
+  testWidgets('swiping the mode strip left enters video mode', (tester) async {
+    final driver = _FakeSkyCameraDriver();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SkyCameraScreen(
+          driver: driver,
+          snapshotSource: const _FakeSnapshotSource(),
+          exportService: _FakeExportService(),
+          observer: const _FakeObserver(),
+          photoCropper: const _FakePhotoCropper(),
+          openCapturePreview: _openFakeCapturePreview,
+          overlayComposer: const _FakeOverlayComposer(),
+          strings: _strings,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.fling(
+      find.byKey(const Key('sky_camera.mode_selector')),
+      const Offset(-60, 0),
+      600,
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.pump();
+    expect(driver.didStartVideo, isTrue);
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.pumpAndSettle();
+    expect(driver.didStopVideo, isTrue);
+  });
+
+  testWidgets('swiping the mode strip right returns to photo mode', (
+    tester,
+  ) async {
+    final driver = _FakeSkyCameraDriver();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SkyCameraScreen(
+          driver: driver,
+          snapshotSource: const _FakeSnapshotSource(),
+          exportService: _FakeExportService(),
+          observer: const _FakeObserver(),
+          photoCropper: const _FakePhotoCropper(),
+          openCapturePreview: _openFakeCapturePreview,
+          overlayComposer: const _FakeOverlayComposer(),
+          strings: _strings,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('sky_camera.mode_video')));
+    await tester.pump();
+    await tester.fling(
+      find.byKey(const Key('sky_camera.mode_selector')),
+      const Offset(60, 0),
+      600,
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    // Real image work inside the fake driver needs wall-clock turns that
+    // pumpAndSettle's tight loop can starve after a fling; bounded pumps
+    // give the engine callbacks room to land.
+    for (var i = 0; i < 20 && !driver.didCapture; i++) {
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    // A photo capture (not a recording) proves the swipe landed on PHOTO.
+    expect(driver.didCapture, isTrue);
+    expect(driver.didStartVideo, isFalse);
+  });
+
+  testWidgets('auto-stops recording at the maximum duration', (tester) async {
+    final driver = _FakeSkyCameraDriver();
+    final exportService = _FakeExportService();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SkyCameraScreen(
+          driver: driver,
+          snapshotSource: const _FakeSnapshotSource(),
+          exportService: exportService,
+          observer: const _FakeObserver(),
+          photoCropper: const _FakePhotoCropper(),
+          openCapturePreview: _openFakeCapturePreview,
+          overlayComposer: const SkyCameraOverlayComposer(),
+          strings: _strings,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('sky_camera.mode_video')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.pump();
+    expect(driver.isRecordingVideo, isTrue);
+
+    await tester.pump(SkyCameraMediaFormat.maxVideoDuration);
+    await tester.pumpAndSettle();
+
+    expect(driver.didStopVideo, isTrue);
+    expect(exportService.didSave, isTrue);
+  });
+
   testWidgets('uses a fixed portrait 9:16 camera viewport', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -323,6 +581,7 @@ void main() {
   testWidgets('close button pops the camera screen', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
+        theme: ThemeData(splashFactory: NoSplash.splashFactory),
         home: Builder(
           builder: (context) => Scaffold(
             body: Center(
@@ -707,6 +966,44 @@ void main() {
   });
 }
 
+Widget _cameraRouteHost({
+  required _FakeSkyCameraDriver driver,
+  required SkyCameraExportService exportService,
+}) {
+  return MaterialApp(
+    theme: ThemeData(splashFactory: NoSplash.splashFactory),
+    home: Builder(
+      builder: (context) => Scaffold(
+        body: Center(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              Navigator.of(context).push<void>(
+                MaterialPageRoute<void>(
+                  builder: (_) => SkyCameraScreen(
+                    driver: driver,
+                    snapshotSource: const _FakeSnapshotSource(),
+                    exportService: exportService,
+                    observer: const _FakeObserver(),
+                    photoCropper: const _FakePhotoCropper(),
+                    openCapturePreview: _openFakeCapturePreview,
+                    overlayComposer: const SkyCameraOverlayComposer(),
+                    strings: _strings,
+                  ),
+                ),
+              );
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(24),
+              child: Text('Open'),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 const _strings = SkyCameraStrings(
   loadingCamera: 'Loading camera...',
   loadingGpsData: 'Loading GPS data',
@@ -754,16 +1051,56 @@ Future<Set<String>> _openFakeCapturePreview(
 }
 
 class _FakeSkyCameraDriver implements SkyCameraDriver {
-  _FakeSkyCameraDriver({this.throwOnZoomBounds = false});
+  _FakeSkyCameraDriver({
+    this.throwOnZoomBounds = false,
+    this.startVideoCompleter,
+  });
 
   final bool throwOnZoomBounds;
+  final Completer<void>? startVideoCompleter;
   bool _isInitialized = false;
   bool didCapture = false;
+  bool didStartVideo = false;
+  int startVideoCount = 0;
+  bool didStopVideo = false;
+  bool _isRecordingVideo = false;
+  bool _audioEnabled = false;
   Offset? lastFocusPoint;
   final List<double> zoomUpdates = <double>[];
 
   @override
   SkyCameraFlashState get flashState => SkyCameraFlashState.off;
+
+  @override
+  bool get isAudioEnabled => _audioEnabled;
+
+  @override
+  Future<void> setAudioEnabled(bool enabled) async {
+    _audioEnabled = enabled;
+  }
+
+  @override
+  bool get isRecordingVideo => _isRecordingVideo;
+
+  @override
+  Future<void> startVideoRecording() async {
+    didStartVideo = true;
+    startVideoCount += 1;
+    await startVideoCompleter?.future;
+    _isRecordingVideo = true;
+  }
+
+  @override
+  Future<SkyCameraCapturedVideo> stopVideoRecording() async {
+    didStopVideo = true;
+    _isRecordingVideo = false;
+    return SkyCameraCapturedVideo(
+      filePath: '/tmp/sky_camera_test.mp4',
+      fileExtension: 'mp4',
+      capturedAt: DateTime(2026, 6, 29, 12, 0),
+      duration: const Duration(seconds: 3),
+    );
+  }
 
   @override
   bool get isInitialized => _isInitialized;
@@ -903,6 +1240,22 @@ class _FakeExportService implements SkyCameraExportService {
       overlayPath: '/tmp/overlay.png',
     );
   }
+
+  @override
+  Future<SkyCameraSavedCapture> saveVideoCapture({
+    required SkyCameraCapturedVideo video,
+    required SkyCameraOverlaySnapshot snapshot,
+    required List<SkyCameraVideoTrackSample> track,
+  }) async {
+    didSave = true;
+    _saveCount += 1;
+    return SkyCameraSavedCapture(
+      id: 'capture-$_saveCount',
+      originalPath: video.filePath,
+      overlayPath: '/tmp/poster.png',
+      isVideo: true,
+    );
+  }
 }
 
 class _DelayedExportService implements SkyCameraExportService {
@@ -925,6 +1278,21 @@ class _DelayedExportService implements SkyCameraExportService {
       id: 'capture-1',
       originalPath: '/tmp/original.png',
       overlayPath: '/tmp/overlay.png',
+    );
+  }
+
+  @override
+  Future<SkyCameraSavedCapture> saveVideoCapture({
+    required SkyCameraCapturedVideo video,
+    required SkyCameraOverlaySnapshot snapshot,
+    required List<SkyCameraVideoTrackSample> track,
+  }) async {
+    await _completer.future;
+    return const SkyCameraSavedCapture(
+      id: 'capture-1',
+      originalPath: '/tmp/original.mp4',
+      overlayPath: '/tmp/poster.png',
+      isVideo: true,
     );
   }
 }
@@ -968,6 +1336,12 @@ class _FakeObserver implements SkyCameraObserver {
   @override
   Future<void> onPhotoCaptured({
     required SkyCameraOverlaySnapshot snapshot,
+  }) async {}
+
+  @override
+  Future<void> onVideoCaptured({
+    required SkyCameraOverlaySnapshot snapshot,
+    required Duration duration,
   }) async {}
 }
 

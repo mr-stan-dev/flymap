@@ -91,7 +91,12 @@
     "placeholderOriginCode": "LHR",
     "placeholderDestinationCode": "BCN",
     "placeholderContext": "Mar Mediterráneo",
-    "placeholderMap": "Vista previa de la ruta"
+    "placeholderMap": "Vista previa de la ruta",
+    "settingsTitle": "Ajustes de cámara",
+    "recordAudio": "Grabar audio",
+    "recordAudioHint": "Los vídeos capturan el sonido del micrófono.",
+    "microphonePermissionDenied": "El acceso al micrófono está desactivado: los vídeos se graban sin sonido.",
+    "preparingVideo": "Preparando el vídeo…"
   },
   "media": {
     "title": "Contenido desde la ventanilla",

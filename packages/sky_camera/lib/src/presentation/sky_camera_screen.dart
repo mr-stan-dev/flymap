@@ -12,9 +12,11 @@ import 'package:sky_camera/src/domain/services/sky_camera_overlay_snapshot_sourc
 import 'package:sky_camera/src/presentation/sky_camera_capture_coordinator.dart';
 import 'package:sky_camera/src/presentation/sky_camera_metrics_position.dart';
 import 'package:sky_camera/src/presentation/sky_camera_strings.dart';
+import 'package:sky_camera/src/presentation/sky_camera_video_track_recorder.dart';
 import 'package:sky_camera/src/presentation/sky_camera_zoom_controller.dart';
 import 'package:sky_camera/src/presentation/widgets/sky_camera_bottom_bar.dart';
 import 'package:sky_camera/src/presentation/widgets/sky_camera_close_button.dart';
+import 'package:sky_camera/src/presentation/widgets/sky_camera_settings_sheet.dart';
 import 'package:sky_camera/src/presentation/widgets/sky_camera_error_banner.dart';
 import 'package:sky_camera/src/presentation/widgets/sky_camera_focus_ring.dart';
 import 'package:sky_camera/src/presentation/widgets/sky_camera_gps_loading_badge.dart';
@@ -33,6 +35,7 @@ class SkyCameraScreen extends StatefulWidget {
     required this.overlayComposer,
     required this.photoCropper,
     required this.openCapturePreview,
+    this.onRecordAudioChanged,
     super.key,
   });
 
@@ -49,6 +52,9 @@ class SkyCameraScreen extends StatefulWidget {
     String initialCaptureId,
   )
   openCapturePreview;
+
+  /// Persists the record-audio preference after the driver applied it.
+  final ValueChanged<bool>? onRecordAudioChanged;
 
   @override
   State<SkyCameraScreen> createState() => _SkyCameraScreenState();
@@ -69,6 +75,22 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   bool _didLogOpened = false;
   int _pointers = 0;
   SkyCameraMetricsPosition _metricsPosition = SkyCameraMetricsPosition.initial;
+  SkyCameraCaptureMode _captureMode = SkyCameraCaptureMode.photo;
+  final SkyCameraVideoTrackRecorder _trackRecorder =
+      SkyCameraVideoTrackRecorder();
+  bool _isStartingVideo = false;
+  bool _isRecordingVideo = false;
+  bool _isStoppingVideo = false;
+  bool _isClosing = false;
+  bool _allowPop = false;
+  Future<void>? _startingVideoOperation;
+  Future<void>? _stoppingVideoOperation;
+
+  /// Advanced by the one-second ticker so the chip and shutter countdown
+  /// share one clock with the auto-stop timer.
+  Duration _recordingElapsed = Duration.zero;
+  Timer? _recordingTicker;
+  Timer? _recordingAutoStop;
 
   @override
   void initState() {
@@ -80,6 +102,8 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _recordingTicker?.cancel();
+    _recordingAutoStop?.cancel();
     unawaited(_snapshotSubscription?.cancel());
     unawaited(widget.snapshotSource.dispose());
     unawaited(widget.driver.dispose());
@@ -94,47 +118,116 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   @override
   Widget build(BuildContext context) {
     final snapshot = _snapshot;
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Center(child: _buildMediaViewport(snapshot)),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-              child: Column(
-                children: [
-                  const Spacer(),
-                  if (_errorMessage != null)
-                    SkyCameraErrorBanner(message: _errorMessage!),
-                  const SizedBox(height: 12),
-                  SkyCameraBottomBar(
-                    isCapturing: _isCapturing,
-                    thumbnailPath: _lastCapture?.overlayPath,
-                    onThumbnailTap: _lastCapture == null
-                        ? null
-                        : _openLastCapturePreview,
-                    zoomLevels: _zoomController.presets(),
-                    currentZoomLevel: _zoomController.currentZoomLevel,
-                    onZoomSelected: _selectZoom,
-                    onCapture:
-                        _isCameraLoading ||
+    return PopScope(
+      canPop: _allowPop,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        unawaited(_close());
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            Center(child: _buildMediaViewport(snapshot)),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                child: Column(
+                  children: [
+                    const Spacer(),
+                    if (_errorMessage != null)
+                      SkyCameraErrorBanner(message: _errorMessage!),
+                    const SizedBox(height: 12),
+                    SkyCameraBottomBar(
+                      isCapturing: _isCapturing,
+                      thumbnailPath: _lastCapture?.overlayPath,
+                      onThumbnailTap: _lastCapture == null
+                          ? null
+                          : _openLastCapturePreview,
+                      zoomLevels: _zoomController.presets(),
+                      currentZoomLevel: _zoomController.currentZoomLevel,
+                      onZoomSelected: _selectZoom,
+                      captureMode: _captureMode,
+                      isRecording: _isRecordingVideo,
+                      isTransitioning: _isStartingVideo || _isClosing,
+                      recordingElapsed: _isRecordingVideo
+                          ? _recordingElapsed
+                          : null,
+                      maxRecordingDuration:
+                          SkyCameraMediaFormat.maxVideoDuration,
+                      onCaptureModeChanged: (mode) {
+                        if (_isStartingVideo ||
+                            _isRecordingVideo ||
                             _isCapturing ||
-                            !widget.driver.isInitialized
-                        ? null
-                        : _capture,
-                  ),
-                ],
+                            _isClosing) {
+                          return;
+                        }
+                        setState(() => _captureMode = mode);
+                      },
+                      onCapture:
+                          _isCameraLoading ||
+                              _isStartingVideo ||
+                              _isCapturing ||
+                              _isClosing ||
+                              !widget.driver.isInitialized
+                          ? null
+                          : _capture,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          SkyCameraCloseButton(label: widget.strings.close, onPressed: _close),
-          if (_isGpsLoading && widget.driver.isInitialized)
-            SkyCameraGpsLoadingBadge(label: widget.strings.loadingGpsData),
-          if (_isCameraLoading)
-            SkyCameraLoadingOverlay(strings: widget.strings),
-        ],
+            SkyCameraCloseButton(
+              label: widget.strings.close,
+              onPressed: _close,
+            ),
+            if (!_isStartingVideo &&
+                !_isRecordingVideo &&
+                !_isCapturing &&
+                !_isClosing)
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 16, top: 12),
+                    child: Material(
+                      color: const Color(0xAA161A20),
+                      shape: const CircleBorder(),
+                      child: IconButton(
+                        key: const Key('sky_camera.settings_button'),
+                        onPressed: _openSettings,
+                        tooltip: widget.strings.settingsTitle,
+                        iconSize: 22,
+                        padding: const EdgeInsets.all(12),
+                        visualDensity: VisualDensity.compact,
+                        splashRadius: 22,
+                        color: Colors.white,
+                        icon: const Icon(Icons.tune_rounded),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            if (_isRecordingVideo)
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: _SkyCameraRecordingChip(
+                      elapsed: _recordingElapsed,
+                      maxDuration: SkyCameraMediaFormat.maxVideoDuration,
+                    ),
+                  ),
+                ),
+              ),
+            if (_isGpsLoading && widget.driver.isInitialized)
+              SkyCameraGpsLoadingBadge(label: widget.strings.loadingGpsData),
+            if (_isCameraLoading)
+              SkyCameraLoadingOverlay(strings: widget.strings),
+          ],
+        ),
       ),
     );
   }
@@ -200,6 +293,9 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
     try {
       _snapshotSubscription = widget.snapshotSource.watch().listen((snapshot) {
         if (!mounted) return;
+        if (_isRecordingVideo) {
+          _trackRecorder.addSnapshot(snapshot, at: DateTime.now());
+        }
         setState(() {
           _snapshot = snapshot;
           if (snapshot.hasLiveLocation) {
@@ -245,6 +341,15 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   }
 
   Future<void> _handleAppLifecycleStateChanged(AppLifecycleState state) async {
+    if (state == AppLifecycleState.inactive) {
+      // If startup is in flight, let it settle before mirroring the driver's
+      // discard. The driver's lifecycle queue guarantees its cleanup follows
+      // the pending start.
+      await _startingVideoOperation;
+      if (_isRecordingVideo) {
+        _resetRecordingState();
+      }
+    }
     try {
       await widget.driver.onAppLifecycleStateChanged(state);
     } on CameraException catch (error) {
@@ -268,11 +373,8 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
     await _loadCameraCapabilities();
   }
 
-  Future<void> _capture() async {
-    final snapshot = _snapshot;
-    if (snapshot == null) return;
-    final metricsPosition = _metricsPosition;
-    final captureCoordinator = SkyCameraCaptureCoordinator(
+  SkyCameraCaptureCoordinator _buildCoordinator() {
+    return SkyCameraCaptureCoordinator(
       driver: widget.driver,
       observer: widget.observer,
       exportService: widget.exportService,
@@ -280,12 +382,26 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
       photoCropper: widget.photoCropper,
       strings: widget.strings,
     );
+  }
+
+  Future<void> _capture() async {
+    if (_captureMode == SkyCameraCaptureMode.video) {
+      if (_isRecordingVideo) {
+        await _stopVideoRecording();
+      } else {
+        await _startVideoRecording();
+      }
+      return;
+    }
+    final snapshot = _snapshot;
+    if (snapshot == null) return;
+    final metricsPosition = _metricsPosition;
     setState(() {
       _isCapturing = true;
       _errorMessage = null;
     });
     try {
-      final saved = await captureCoordinator.capture(
+      final saved = await _buildCoordinator().capture(
         snapshot: snapshot,
         metricsPosition: metricsPosition,
       );
@@ -306,6 +422,153 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
     }
   }
 
+  Future<void> _startVideoRecording() {
+    final activeOperation = _startingVideoOperation;
+    if (activeOperation != null) return activeOperation;
+    late final Future<void> operation;
+    operation = _performStartVideoRecording().whenComplete(() {
+      if (identical(_startingVideoOperation, operation)) {
+        _startingVideoOperation = null;
+      }
+    });
+    _startingVideoOperation = operation;
+    return operation;
+  }
+
+  Future<void> _performStartVideoRecording() async {
+    final snapshot = _snapshot;
+    if (snapshot == null ||
+        _isStartingVideo ||
+        _isRecordingVideo ||
+        _isStoppingVideo ||
+        _isClosing) {
+      return;
+    }
+    setState(() {
+      _isStartingVideo = true;
+      _errorMessage = null;
+    });
+    try {
+      await widget.driver.startVideoRecording();
+    } catch (error) {
+      debugPrint('SkyCamera video start failed: $error');
+      if (!mounted) return;
+      setState(() {
+        _isStartingVideo = false;
+        _errorMessage = widget.strings.captureFailed;
+      });
+      return;
+    }
+    if (!mounted) return;
+    final startedAt = DateTime.now();
+    _trackRecorder.start(startedAt: startedAt);
+    _trackRecorder.addSnapshot(snapshot, at: startedAt);
+    _recordingTicker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      setState(() {
+        _recordingElapsed += const Duration(seconds: 1);
+      });
+    });
+    _recordingAutoStop = Timer(
+      SkyCameraMediaFormat.maxVideoDuration,
+      () => unawaited(_stopVideoRecording()),
+    );
+    setState(() {
+      _isStartingVideo = false;
+      _isRecordingVideo = true;
+      _recordingElapsed = Duration.zero;
+    });
+  }
+
+  Future<void> _stopVideoRecording() {
+    final activeOperation = _stoppingVideoOperation;
+    if (activeOperation != null) return activeOperation;
+    late final Future<void> operation;
+    operation = _performStopVideoRecording().whenComplete(() {
+      if (identical(_stoppingVideoOperation, operation)) {
+        _stoppingVideoOperation = null;
+      }
+    });
+    _stoppingVideoOperation = operation;
+    return operation;
+  }
+
+  Future<void> _performStopVideoRecording() async {
+    if (!_isRecordingVideo || _isStoppingVideo) return;
+    _isStoppingVideo = true;
+    _recordingTicker?.cancel();
+    _recordingAutoStop?.cancel();
+    final track = _trackRecorder.stop();
+    final snapshot = track.isNotEmpty ? track.first.snapshot : _snapshot;
+    setState(() {
+      _isRecordingVideo = false;
+      _isCapturing = true;
+    });
+    try {
+      final saved = await _buildCoordinator().finishVideoCapture(
+        snapshot: snapshot!,
+        track: track,
+      );
+      if (!mounted) return;
+      setState(() {
+        _isCapturing = false;
+        _sessionCaptures.add(saved);
+        _lastCapture = saved;
+      });
+    } catch (error, stackTrace) {
+      debugPrint('SkyCamera video capture failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      if (!mounted) return;
+      setState(() {
+        _isCapturing = false;
+        _errorMessage = widget.strings.captureFailed;
+      });
+    } finally {
+      _isStoppingVideo = false;
+    }
+  }
+
+  void _resetRecordingState() {
+    _recordingTicker?.cancel();
+    _recordingAutoStop?.cancel();
+    _trackRecorder.stop();
+    if (!mounted) return;
+    setState(() {
+      _isRecordingVideo = false;
+    });
+  }
+
+  Future<void> _openSettings() async {
+    if (_isStartingVideo || _isRecordingVideo || _isCapturing || _isClosing) {
+      return;
+    }
+    await showSkyCameraSettingsSheet(
+      context,
+      strings: widget.strings,
+      audioEnabled: widget.driver.isAudioEnabled,
+      onRecordAudioChanged: _applyRecordAudio,
+    );
+  }
+
+  Future<bool> _applyRecordAudio(bool enabled) async {
+    try {
+      await widget.driver.setAudioEnabled(enabled);
+    } catch (_) {
+      // Microphone denied (or re-init failed): the driver fell back to a
+      // silent camera; tell the user why the switch snapped back.
+      if (mounted) {
+        setState(
+          () => _errorMessage = widget.strings.microphonePermissionDenied,
+        );
+      }
+      widget.onRecordAudioChanged?.call(widget.driver.isAudioEnabled);
+      return widget.driver.isAudioEnabled;
+    }
+    widget.onRecordAudioChanged?.call(enabled);
+    if (mounted) setState(() {});
+    return enabled;
+  }
+
   Future<void> _openLastCapturePreview() async {
     final capture = _lastCapture;
     if (capture == null || !mounted) return;
@@ -323,15 +586,34 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
     });
   }
 
-  void _close() {
-    Navigator.of(context).maybePop();
+  Future<void> _close() async {
+    if (_isClosing) return;
+    setState(() => _isClosing = true);
+    try {
+      await _startingVideoOperation;
+      if (_isRecordingVideo) {
+        await _stopVideoRecording();
+      } else {
+        await _stoppingVideoOperation;
+      }
+      if (!mounted) return;
+      setState(() => _allowPop = true);
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted) return;
+      final didPop = await Navigator.of(context).maybePop();
+      if (!didPop && mounted) {
+        setState(() => _allowPop = false);
+      }
+    } finally {
+      if (mounted) _isClosing = false;
+    }
   }
 
   Future<void> _handlePreviewTap(
     BuildContext context,
     TapUpDetails details,
   ) async {
-    if (!widget.driver.isInitialized) return;
+    if (!widget.driver.isInitialized || _isStartingVideo || _isClosing) return;
     if (_zoomController.shouldIgnoreTap(DateTime.now())) {
       return;
     }
@@ -347,11 +629,12 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   }
 
   void _handleScaleStart(ScaleStartDetails details) {
+    if (_isStartingVideo || _isClosing) return;
     _zoomController.handleScaleStart();
   }
 
   Future<void> _handleScaleUpdate(ScaleUpdateDetails details) async {
-    if (!widget.driver.isInitialized) return;
+    if (!widget.driver.isInitialized || _isStartingVideo || _isClosing) return;
     final didChange = await _zoomController.handleScaleUpdate(
       driver: widget.driver,
       pointers: _pointers,
@@ -363,7 +646,7 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   }
 
   Future<void> _selectZoom(double zoomLevel) async {
-    if (!widget.driver.isInitialized) return;
+    if (!widget.driver.isInitialized || _isStartingVideo || _isClosing) return;
     final didChange = await _zoomController.setZoomLevel(
       driver: widget.driver,
       zoomLevel: zoomLevel,
@@ -390,5 +673,59 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
       alignment: Alignment.center,
       child: const SizedBox.expand(),
     );
+  }
+}
+
+/// "● 0:07 / 0:30" pill shown while a video is recording. Driven by the
+/// screen's one-second ticker.
+class _SkyCameraRecordingChip extends StatelessWidget {
+  const _SkyCameraRecordingChip({
+    required this.elapsed,
+    required this.maxDuration,
+  });
+
+  final Duration elapsed;
+  final Duration maxDuration;
+
+  @override
+  Widget build(BuildContext context) {
+    final clamped = elapsed > maxDuration ? maxDuration : elapsed;
+    return Container(
+      key: const Key('sky_camera.recording_chip'),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xAA161A20),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: const BoxDecoration(
+              color: Color(0xFFE53935),
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '${_format(clamped)} / ${_format(maxDuration)}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _format(Duration duration) {
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds % 60;
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 }

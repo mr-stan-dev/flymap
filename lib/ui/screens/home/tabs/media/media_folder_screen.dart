@@ -8,6 +8,7 @@ import 'package:flymap/ui/screens/home/tabs/media/viewmodel/media_tab_state.dart
 import 'package:flymap/ui/screens/home/tabs/media/widgets/media_capture_grid.dart';
 import 'package:flymap/ui/screens/home/tabs/media/widgets/media_shared.dart';
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_share_service.dart';
+import 'package:flymap/ui/screens/sky_camera/sky_camera_video_share_preparer.dart';
 import 'package:get_it/get_it.dart';
 
 class MediaFolderScreen extends StatefulWidget {
@@ -176,8 +177,18 @@ class _MediaFolderScreenState extends State<MediaFolderScreen> {
   }
 
   Future<void> _shareCurrentFolder() async {
-    await GetIt.I<FlymapSkyCameraShareService>().shareMediaItems(
+    final prepared = await prepareSkyCameraMediaForSharing(
+      context,
       captures: _captures,
+    );
+    if (prepared == null || !mounted) return;
+    setState(() {
+      _captures
+        ..clear()
+        ..addAll(prepared);
+    });
+    await GetIt.I<FlymapSkyCameraShareService>().shareMediaItems(
+      captures: prepared,
       sharePositionOrigin: mediaShareRectForContext(context),
     );
   }

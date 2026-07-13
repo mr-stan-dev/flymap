@@ -104,6 +104,7 @@ import 'package:flymap/ui/screens/home/tabs/learn/geo_quiz/viewmodel/geo_quiz_li
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_export_service.dart';
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_session_factory.dart';
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_share_service.dart';
+import 'package:flymap/ui/screens/sky_camera/sky_camera_video_rendition_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:in_app_review/in_app_review.dart';
@@ -370,6 +371,9 @@ class DiModule {
     );
     i.registerLazySingleton<FlymapSkyCameraShareService>(
       () => FlymapSkyCameraShareService(analytics: i.get()),
+    );
+    i.registerLazySingleton<SkyCameraVideoRenditionService>(
+      () => SkyCameraVideoRenditionService(repository: i.get()),
     );
     i.registerLazySingleton<FlymapSkyCameraSessionFactory>(
       () => FlymapSkyCameraSessionFactory(

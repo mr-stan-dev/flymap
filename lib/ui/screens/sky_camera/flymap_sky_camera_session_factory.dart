@@ -60,29 +60,34 @@ class FlymapSkyCameraSessionFactory {
 
   FlymapSkyCameraSession create({
     required FlymapSkyCameraPlaceholderCopy placeholderCopy,
+    bool recordAudioEnabled = false,
   }) {
     return _create(
       placeholderCopy: placeholderCopy,
       sessionExportService: exportService,
+      recordAudioEnabled: recordAudioEnabled,
     );
   }
 
   FlymapSkyCameraSession createForFlight({
     required FlymapSkyCameraPlaceholderCopy placeholderCopy,
     required String flightId,
+    bool recordAudioEnabled = false,
   }) {
     return _create(
       placeholderCopy: placeholderCopy,
       sessionExportService: exportService.scopedToFlight(flightId),
+      recordAudioEnabled: recordAudioEnabled,
     );
   }
 
   FlymapSkyCameraSession _create({
     required FlymapSkyCameraPlaceholderCopy placeholderCopy,
     required SkyCameraExportService sessionExportService,
+    required bool recordAudioEnabled,
   }) {
     return FlymapSkyCameraSession(
-      driver: DeviceSkyCameraDriver(),
+      driver: DeviceSkyCameraDriver(enableAudio: recordAudioEnabled),
       snapshotSource: FlymapSkyCameraOverlaySnapshotSource(
         builder: FlymapSkyCameraOverlaySnapshotBuilder(
           placeholderCopy: placeholderCopy,

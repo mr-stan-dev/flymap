@@ -7,4 +7,13 @@ abstract class SkyCameraExportService {
     required SkyCameraOverlaySnapshot snapshot,
     required List<int> overlayBytes,
   });
+
+  /// Persists a clean video recording plus its 1 Hz overlay track. The
+  /// overlay is NOT burned here — that happens lazily when the user shares
+  /// or saves the video.
+  Future<SkyCameraSavedCapture> saveVideoCapture({
+    required SkyCameraCapturedVideo video,
+    required SkyCameraOverlaySnapshot snapshot,
+    required List<SkyCameraVideoTrackSample> track,
+  });
 }

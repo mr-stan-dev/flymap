@@ -29,14 +29,77 @@ class SkyCameraOverlayComposer {
     final height = image.height.toDouble();
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    final rect = Rect.fromLTWH(0, 0, width, height);
     canvas.drawImageRect(
       image,
       Rect.fromLTWH(0, 0, width, height),
-      rect,
+      Rect.fromLTWH(0, 0, width, height),
       Paint(),
     );
 
+    await _paintOverlay(
+      canvas,
+      width: width,
+      height: height,
+      snapshot: snapshot,
+      strings: strings,
+      metricsPosition: metricsPosition,
+    );
+
+    final picture = recorder.endRecording();
+    final rendered = await picture.toImage(image.width, image.height);
+    final bytes = await rendered.toByteData(format: ui.ImageByteFormat.png);
+    image.dispose();
+    rendered.dispose();
+    picture.dispose();
+    codec.dispose();
+    if (bytes == null) {
+      throw StateError('Could not encode the camera overlay.');
+    }
+    return bytes.buffer.asUint8List();
+  }
+
+  /// The overlay alone on a transparent background — one frame of a video's
+  /// burned-in timeline, rendered at the video's display size.
+  Future<Uint8List> composeOverlayFrame({
+    required int width,
+    required int height,
+    required SkyCameraOverlaySnapshot snapshot,
+    required SkyCameraStrings strings,
+    required SkyCameraMetricsPosition metricsPosition,
+  }) async {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    await _paintOverlay(
+      canvas,
+      width: width.toDouble(),
+      height: height.toDouble(),
+      snapshot: snapshot,
+      strings: strings,
+      metricsPosition: metricsPosition,
+    );
+    final picture = recorder.endRecording();
+    final rendered = await picture.toImage(width, height);
+    final bytes = await rendered.toByteData(format: ui.ImageByteFormat.png);
+    rendered.dispose();
+    picture.dispose();
+    if (bytes == null) {
+      throw StateError('Could not encode the overlay frame.');
+    }
+    return bytes.buffer.asUint8List();
+  }
+
+  /// Scrims, route header, tech strip, metrics and brand — everything that
+  /// sits on top of the media, shared by photo compose and video overlay
+  /// frames so the two renders stay pixel-identical.
+  Future<void> _paintOverlay(
+    Canvas canvas, {
+    required double width,
+    required double height,
+    required SkyCameraOverlaySnapshot snapshot,
+    required SkyCameraStrings strings,
+    required SkyCameraMetricsPosition metricsPosition,
+  }) async {
+    final rect = Rect.fromLTWH(0, 0, width, height);
     final theme = _OverlayTheme(width: width, height: height);
     final formatter = SkyCameraTelemetryFormatter(
       snapshot: snapshot,
@@ -97,18 +160,6 @@ class SkyCameraOverlayComposer {
     }
 
     await _drawBrand(canvas, theme: theme);
-
-    final picture = recorder.endRecording();
-    final rendered = await picture.toImage(image.width, image.height);
-    final bytes = await rendered.toByteData(format: ui.ImageByteFormat.png);
-    image.dispose();
-    rendered.dispose();
-    picture.dispose();
-    codec.dispose();
-    if (bytes == null) {
-      throw StateError('Could not encode the camera overlay.');
-    }
-    return bytes.buffer.asUint8List();
   }
 
   Future<void> _drawBrand(Canvas canvas, {required _OverlayTheme theme}) async {

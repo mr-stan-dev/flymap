@@ -130,6 +130,7 @@ void main() {
     GetIt.I.registerSingleton<SkyCameraMediaRepository>(mediaRepository);
     GetIt.I.registerSingleton<AppAnalytics>(const _FakeAppAnalytics());
     GetIt.I.registerSingleton<MetricUnitsRepository>(MetricUnitsRepository());
+    GetIt.I.registerSingleton<SettingsRepository>(SettingsRepository());
     GetIt.I.registerSingleton<FlymapSkyCameraSessionFactory>(
       _FakeFlymapSkyCameraSessionFactory(mediaRepository: mediaRepository),
     );
@@ -878,6 +879,7 @@ class _FakeFlymapSkyCameraSessionFactory extends FlymapSkyCameraSessionFactory {
   @override
   FlymapSkyCameraSession create({
     required FlymapSkyCameraPlaceholderCopy placeholderCopy,
+    bool recordAudioEnabled = false,
   }) {
     return _createSession(placeholderCopy);
   }
@@ -886,6 +888,7 @@ class _FakeFlymapSkyCameraSessionFactory extends FlymapSkyCameraSessionFactory {
   FlymapSkyCameraSession createForFlight({
     required FlymapSkyCameraPlaceholderCopy placeholderCopy,
     required String flightId,
+    bool recordAudioEnabled = false,
   }) {
     createdForFlightId = flightId;
     return _createSession(placeholderCopy);
@@ -957,6 +960,28 @@ class _FakeSkyCameraDriver implements SkyCameraDriver {
 
   @override
   Future<void> toggleFlash() async {}
+
+  @override
+  bool get isAudioEnabled => false;
+
+  @override
+  Future<void> setAudioEnabled(bool enabled) async {}
+
+  @override
+  bool get isRecordingVideo => false;
+
+  @override
+  Future<void> startVideoRecording() async {}
+
+  @override
+  Future<SkyCameraCapturedVideo> stopVideoRecording() async {
+    return SkyCameraCapturedVideo(
+      filePath: '/tmp/test.mp4',
+      fileExtension: 'mp4',
+      capturedAt: DateTime(2026, 1, 1),
+      duration: const Duration(seconds: 1),
+    );
+  }
 }
 
 class _FakeAppLocationClient implements AppLocationClient {
@@ -1037,6 +1062,20 @@ class _NoopSkyCameraExportService implements SkyCameraExportService {
       overlayPath: '/tmp/overlay.png',
     );
   }
+
+  @override
+  Future<SkyCameraSavedCapture> saveVideoCapture({
+    required SkyCameraCapturedVideo video,
+    required SkyCameraOverlaySnapshot snapshot,
+    required List<SkyCameraVideoTrackSample> track,
+  }) async {
+    return const SkyCameraSavedCapture(
+      id: 'capture-1',
+      originalPath: '/tmp/original.mp4',
+      overlayPath: '/tmp/poster.png',
+      isVideo: true,
+    );
+  }
 }
 
 class _NoopSkyCameraShareService implements SkyCameraShareService {
@@ -1056,6 +1095,12 @@ class _NoopSkyCameraObserver implements SkyCameraObserver {
   @override
   Future<void> onPhotoCaptured({
     required SkyCameraOverlaySnapshot snapshot,
+  }) async {}
+
+  @override
+  Future<void> onVideoCaptured({
+    required SkyCameraOverlaySnapshot snapshot,
+    required Duration duration,
   }) async {}
 }
 

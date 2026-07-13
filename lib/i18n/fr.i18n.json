@@ -91,7 +91,12 @@
     "placeholderOriginCode": "LHR",
     "placeholderDestinationCode": "BCN",
     "placeholderContext": "Mer Méditerranée",
-    "placeholderMap": "Aperçu de l’itinéraire"
+    "placeholderMap": "Aperçu de l’itinéraire",
+    "settingsTitle": "Réglages de la caméra",
+    "recordAudio": "Enregistrer le son",
+    "recordAudioHint": "Les vidéos capturent le son du micro.",
+    "microphonePermissionDenied": "L'accès au micro est désactivé — les vidéos sont enregistrées sans son.",
+    "preparingVideo": "Préparation de la vidéo…"
   },
   "media": {
     "title": "Médias côté hublot",

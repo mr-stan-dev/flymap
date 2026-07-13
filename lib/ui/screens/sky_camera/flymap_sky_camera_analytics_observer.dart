@@ -36,6 +36,20 @@ class FlymapSkyCameraAnalyticsObserver implements SkyCameraObserver {
     );
   }
 
+  @override
+  Future<void> onVideoCaptured({
+    required SkyCameraOverlaySnapshot snapshot,
+    required Duration duration,
+  }) async {
+    await analytics.log(
+      SkyVideoCaptureEvent(
+        hasActiveFlightContext: await _hasActiveFlightContext,
+        hasLiveLocation: snapshot.hasLiveLocation,
+        durationSeconds: duration.inSeconds,
+      ),
+    );
+  }
+
   Future<bool> _loadFlightContext() async {
     final flights = await flightRepository.getAllFlights();
     return flights.any((flight) => flight.status == FlightStatus.inProgress);

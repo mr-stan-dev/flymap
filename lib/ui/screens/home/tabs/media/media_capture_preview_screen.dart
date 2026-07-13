@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/sky_camera_media_item.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/home/tabs/media/widgets/media_shared.dart';
+import 'package:flymap/ui/screens/home/tabs/media/widgets/media_video_preview.dart';
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_share_service.dart';
+import 'package:flymap/ui/screens/sky_camera/sky_camera_video_share_preparer.dart';
 import 'package:get_it/get_it.dart';
 
 class MediaCapturePreviewScreen extends StatefulWidget {
@@ -104,9 +106,18 @@ class _MediaCapturePreviewScreenState extends State<MediaCapturePreviewScreen> {
               itemCount: _captures.length,
               onPageChanged: _handlePageChanged,
               itemBuilder: (context, index) {
+                final pageCapture = _captures[index];
+                if (pageCapture.mediaType == SkyCameraMediaType.video) {
+                  return MediaVideoPreview(
+                    // Rebuild the player when the underlying item changes
+                    // (e.g. after a rendition was produced).
+                    key: ValueKey('video_${pageCapture.id}'),
+                    capture: pageCapture,
+                  );
+                }
                 return Center(
                   child: Image.file(
-                    File(_captures[index].galleryImagePath),
+                    File(pageCapture.galleryImagePath),
                     fit: BoxFit.contain,
                     errorBuilder: (_, _, _) => Icon(
                       Icons.broken_image_outlined,
@@ -141,8 +152,19 @@ class _MediaCapturePreviewScreenState extends State<MediaCapturePreviewScreen> {
   }
 
   Future<void> _shareCurrentCapture() async {
+    var capture = _currentCapture;
+    final prepared = await prepareSkyCameraMediaForSharing(
+      context,
+      captures: [capture],
+    );
+    if (prepared == null || !mounted) return;
+    capture = prepared.single;
+    if (!identical(capture, _currentCapture)) {
+      _captures[_currentIndex] = capture;
+      setState(() {});
+    }
     await GetIt.I<FlymapSkyCameraShareService>().shareMediaItems(
-      captures: [_currentCapture],
+      captures: [capture],
       sharePositionOrigin: mediaShareRectForContext(context),
     );
   }

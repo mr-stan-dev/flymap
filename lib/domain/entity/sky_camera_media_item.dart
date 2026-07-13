@@ -80,6 +80,7 @@ class SkyCameraMediaTrackPoint extends Equatable {
     this.headingDegrees,
     this.altitudeMeters,
     this.speedMetersPerSecond,
+    this.horizontalAccuracyMeters,
   });
 
   final int offsetMs;
@@ -88,6 +89,7 @@ class SkyCameraMediaTrackPoint extends Equatable {
   final double? headingDegrees;
   final double? altitudeMeters;
   final double? speedMetersPerSecond;
+  final double? horizontalAccuracyMeters;
 
   Map<String, Object?> toRecord() {
     return <String, Object?>{
@@ -97,6 +99,7 @@ class SkyCameraMediaTrackPoint extends Equatable {
       'headingDegrees': headingDegrees,
       'altitudeMeters': altitudeMeters,
       'speedMetersPerSecond': speedMetersPerSecond,
+      'horizontalAccuracyMeters': horizontalAccuracyMeters,
     };
   }
 
@@ -114,6 +117,7 @@ class SkyCameraMediaTrackPoint extends Equatable {
       headingDegrees: _toDouble(json['headingDegrees']),
       altitudeMeters: _toDouble(json['altitudeMeters']),
       speedMetersPerSecond: _toDouble(json['speedMetersPerSecond']),
+      horizontalAccuracyMeters: _toDouble(json['horizontalAccuracyMeters']),
     );
   }
 
@@ -143,6 +147,7 @@ class SkyCameraMediaTrackPoint extends Equatable {
     headingDegrees,
     altitudeMeters,
     speedMetersPerSecond,
+    horizontalAccuracyMeters,
   ];
 }
 

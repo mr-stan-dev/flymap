@@ -17,6 +17,7 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		A1B2C3D4E5F60718293A4B5D /* NativeCaptureDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* NativeCaptureDelegate.swift */; };
 		A1B2C3D4E5F60718293A4B6D /* FlightVideoEncoderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B6C /* FlightVideoEncoderDelegate.swift */; };
+		A1B2C3D4E5F60718293A4B8D /* VideoToolsDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B8C /* VideoToolsDelegate.swift */; };
 		B269D597E98532F1E731E077 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9519CC24B0A60BBDCAAC7C68 /* Pods_Runner.framework */; };
 		E6988C7611DF75F72BCF616C /* MBTilesURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 990BCB24EB902B24533C430D /* MBTilesURLProtocol.swift */; };
 		EAB4DB447AE3E23E3F46957E /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA9DA849E0C6676B694819B6 /* Pods_RunnerTests.framework */; };
@@ -70,6 +71,7 @@
 		990BCB24EB902B24533C430D /* MBTilesURLProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MBTilesURLProtocol.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B5C /* NativeCaptureDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeCaptureDelegate.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B6C /* FlightVideoEncoderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightVideoEncoderDelegate.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B8C /* VideoToolsDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoToolsDelegate.swift; sourceTree = "<group>"; };
 		D294FAE886774EFF56EA04EC /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
 		DD383BDACC73FC20E3A562D7 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		EA9DA849E0C6676B694819B6 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -150,6 +152,7 @@
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				A1B2C3D4E5F60718293A4B5C /* NativeCaptureDelegate.swift */,
 				A1B2C3D4E5F60718293A4B6C /* FlightVideoEncoderDelegate.swift */,
+				A1B2C3D4E5F60718293A4B8C /* VideoToolsDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				990BCB24EB902B24533C430D /* MBTilesURLProtocol.swift */,
 			);
@@ -410,6 +413,7 @@
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				A1B2C3D4E5F60718293A4B5D /* NativeCaptureDelegate.swift in Sources */,
 				A1B2C3D4E5F60718293A4B6D /* FlightVideoEncoderDelegate.swift in Sources */,
+				A1B2C3D4E5F60718293A4B8D /* VideoToolsDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				E6988C7611DF75F72BCF616C /* MBTilesURLProtocol.swift in Sources */,
 			);

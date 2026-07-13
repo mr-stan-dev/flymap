@@ -335,6 +335,21 @@ class TranslationsSkyCameraEn {
 
 	/// en: 'Route preview'
 	String get placeholderMap => 'Route preview';
+
+	/// en: 'Camera settings'
+	String get settingsTitle => 'Camera settings';
+
+	/// en: 'Record audio'
+	String get recordAudio => 'Record audio';
+
+	/// en: 'Videos capture microphone sound.'
+	String get recordAudioHint => 'Videos capture microphone sound.';
+
+	/// en: 'Microphone access is off — videos record without sound.'
+	String get microphonePermissionDenied => 'Microphone access is off — videos record without sound.';
+
+	/// en: 'Preparing video…'
+	String get preparingVideo => 'Preparing video…';
 }
 
 // Path: media
@@ -3622,6 +3637,11 @@ extension on Translations {
 			'skyCamera.placeholderDestinationCode' => 'BCN',
 			'skyCamera.placeholderContext' => 'Mediterranean Sea',
 			'skyCamera.placeholderMap' => 'Route preview',
+			'skyCamera.settingsTitle' => 'Camera settings',
+			'skyCamera.recordAudio' => 'Record audio',
+			'skyCamera.recordAudioHint' => 'Videos capture microphone sound.',
+			'skyCamera.microphonePermissionDenied' => 'Microphone access is off — videos record without sound.',
+			'skyCamera.preparingVideo' => 'Preparing video…',
 			'media.title' => 'Window Seat Media',
 			'media.loading' => 'Loading media...',
 			'media.failedToLoad' => 'Failed to load media',
@@ -4043,13 +4063,13 @@ extension on Translations {
 			'createFlight.downloading.poiProgress' => ({required Object completed, required Object total}) => 'Places: ${completed}/${total}',
 			'createFlight.downloading.poiProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Places: ${completed}/${total} (${failed} failed)',
 			'createFlight.downloading.noArticlesSelected' => 'No articles selected.',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.downloading.preparingArticles' => 'Preparing article downloads...',
 			'createFlight.downloading.articlesProgress' => ({required Object completed, required Object total}) => 'Articles: ${completed}/${total}',
 			'createFlight.downloading.articlesProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Articles: ${completed}/${total} (${failed} failed)',
 			'createFlight.downloading.preparingMap' => 'Preparing map download...',
 			'createFlight.downloading.computingTiles' => 'Computing map tiles...',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.downloading.computingTilesWithCount' => ({required Object count}) => 'Computing map tiles (${count})...',
 			'createFlight.downloading.preparingForDownload' => 'Preparing for download...',
 			'createFlight.downloading.downloaded' => ({required Object size}) => 'Downloaded: ${size}',
@@ -4557,13 +4577,13 @@ extension on Translations {
 			'countries.TW' => 'Taiwan, China',
 			'countries.TZ' => 'Tanzania, United Republic of',
 			'countries.UA' => 'Ukraine',
+			_ => null,
+		} ?? switch (path) {
 			'countries.UG' => 'Uganda',
 			'countries.US' => 'United States',
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Uzbekistan',
 			'countries.VE' => 'Venezuela, Bolivarian Rep. of',
-			_ => null,
-		} ?? switch (path) {
 			'countries.VI' => 'Virgin Islands (US)',
 			'countries.VN' => 'Viet Nam',
 			'countries.YE' => 'Yemen',

@@ -67,4 +67,18 @@ class SettingsRepository {
     }
     await prefs.setString(_kLocale, value.localeCode!);
   }
+
+  static const _kSkyCameraRecordAudio = 'settings.skyCameraRecordAudio';
+
+  /// Whether sky-camera videos record microphone audio. Off by default so
+  /// opening the camera never triggers a surprise permission prompt.
+  Future<bool> getSkyCameraRecordAudio() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_kSkyCameraRecordAudio) ?? false;
+  }
+
+  Future<void> setSkyCameraRecordAudio(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_kSkyCameraRecordAudio, enabled);
+  }
 }

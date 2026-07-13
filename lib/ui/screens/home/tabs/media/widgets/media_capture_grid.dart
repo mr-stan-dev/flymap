@@ -93,6 +93,25 @@ class MediaCaptureTile extends StatelessWidget {
             Positioned.fill(
               child: MediaCaptureThumbnailImage(path: capture.galleryImagePath),
             ),
+            if (capture.mediaType == SkyCameraMediaType.video)
+              const Positioned(
+                bottom: 8,
+                left: 8,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Color(0x99000000),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(4),
+                    child: Icon(
+                      Icons.play_arrow_rounded,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
             if (selectionMode || isSelected)
               Positioned(
                 top: 8,

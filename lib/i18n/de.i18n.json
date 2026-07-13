@@ -91,7 +91,12 @@
     "placeholderOriginCode": "LHR",
     "placeholderDestinationCode": "BCN",
     "placeholderContext": "Mittelmeer",
-    "placeholderMap": "Routenvorschau"
+    "placeholderMap": "Routenvorschau",
+    "settingsTitle": "Kameraeinstellungen",
+    "recordAudio": "Ton aufnehmen",
+    "recordAudioHint": "Videos nehmen Mikrofonton auf.",
+    "microphonePermissionDenied": "Mikrofonzugriff ist aus — Videos werden ohne Ton aufgenommen.",
+    "preparingVideo": "Video wird vorbereitet…"
   },
   "media": {
     "title": "Medien vom Fensterplatz",

@@ -31,6 +31,11 @@ class SkyCameraStrings {
     required this.speedUnit,
     required this.temperatureUnit,
     required this.dateDisplayFormat,
+    this.settingsTitle = 'Camera settings',
+    this.recordAudio = 'Record audio',
+    this.recordAudioHint = 'Videos capture microphone sound.',
+    this.microphonePermissionDenied =
+        'Microphone access is off — videos record without sound.',
   });
 
   final String loadingCamera;
@@ -56,4 +61,8 @@ class SkyCameraStrings {
   final SkyCameraSpeedUnit speedUnit;
   final SkyCameraTemperatureUnit temperatureUnit;
   final SkyCameraDateDisplayFormat dateDisplayFormat;
+  final String settingsTitle;
+  final String recordAudio;
+  final String recordAudioHint;
+  final String microphonePermissionDenied;
 }

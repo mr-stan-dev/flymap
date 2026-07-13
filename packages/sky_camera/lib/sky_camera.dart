@@ -11,5 +11,7 @@ export 'src/presentation/formatters/sky_camera_telemetry_formatter.dart';
 export 'src/presentation/sky_camera_metrics_position.dart';
 export 'src/presentation/sky_camera_screen.dart';
 export 'src/presentation/sky_camera_strings.dart';
+export 'src/presentation/sky_camera_video_track_recorder.dart';
+export 'src/presentation/widgets/sky_camera_overlay_view.dart';
 export 'src/rendering/sky_camera_overlay_composer.dart';
 export 'src/rendering/sky_camera_photo_cropper.dart';

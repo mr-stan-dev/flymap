@@ -45,4 +45,22 @@ class SkyCameraCaptureCoordinator {
     );
     return saved;
   }
+
+  /// Finishes the active recording and persists the clean video with its
+  /// 1 Hz track. Overlay burn-in happens later, at share/save time.
+  Future<SkyCameraSavedCapture> finishVideoCapture({
+    required SkyCameraOverlaySnapshot snapshot,
+    required List<SkyCameraVideoTrackSample> track,
+  }) async {
+    final video = await driver.stopVideoRecording();
+    await observer.onVideoCaptured(
+      snapshot: snapshot,
+      duration: video.duration,
+    );
+    return exportService.saveVideoCapture(
+      video: video,
+      snapshot: snapshot,
+      track: track,
+    );
+  }
 }

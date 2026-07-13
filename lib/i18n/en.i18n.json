@@ -91,7 +91,12 @@
     "placeholderOriginCode": "LHR",
     "placeholderDestinationCode": "BCN",
     "placeholderContext": "Mediterranean Sea",
-    "placeholderMap": "Route preview"
+    "placeholderMap": "Route preview",
+    "settingsTitle": "Camera settings",
+    "recordAudio": "Record audio",
+    "recordAudioHint": "Videos capture microphone sound.",
+    "microphonePermissionDenied": "Microphone access is off — videos record without sound.",
+    "preparingVideo": "Preparing video…"
   },
   "media": {
     "title": "Window Seat Media",

@@ -41,6 +41,7 @@ dependencies:
   share_plus: ^10.0.2
   sky_camera:
     path: packages/sky_camera
+  video_player: ^2.9.2
   in_app_review: ^2.0.10
   url_launcher: ^6.3.2
   csv: ^5.0.2

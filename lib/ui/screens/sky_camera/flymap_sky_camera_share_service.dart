@@ -26,6 +26,17 @@ class FlymapSkyCameraShareService implements SkyCameraShareService {
     required List<SkyCameraMediaItem> captures,
     required Rect sharePositionOrigin,
   }) async {
+    final unresolvedVideo = captures.where((capture) {
+      if (!capture.isVideo) return false;
+      final rendition = capture.selectedRendition;
+      return rendition?.mediaType != SkyCameraMediaType.video ||
+          (rendition?.path.trim().isEmpty ?? true);
+    });
+    if (unresolvedVideo.isNotEmpty) {
+      throw StateError(
+        'Sky-camera videos must have an overlay rendition before sharing.',
+      );
+    }
     final files = [
       for (final capture in captures)
         if (capture.sharePath.trim().isNotEmpty) XFile(capture.sharePath),
