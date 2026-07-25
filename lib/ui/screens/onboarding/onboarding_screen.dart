@@ -296,7 +296,11 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
     final subscriptionCubit = context.read<SubscriptionCubit>();
     SubscriptionPaywallResult? paywallResult;
     if (!subscriptionCubit.state.isPro) {
-      paywallResult = await subscriptionCubit.presentPaywallFromOnboarding();
+      try {
+        paywallResult = await subscriptionCubit.presentPaywallFromOnboarding();
+      } catch (_) {
+        // Whatever happens to the paywall, onboarding must complete.
+      }
     }
     await cubit.completeOnboarding();
     final durationSec = DateTime.now().difference(_startedAt).inSeconds;
