@@ -5,7 +5,6 @@ import 'package:flymap/domain/entity/units.dart';
 import 'package:flymap/domain/policy/route_region_timeline_policy.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/router/app_router.dart';
-import 'package:flymap/size_utils.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/widgets/complete_flight_confirmation_dialog.dart';
 import 'package:flymap/ui/screens/flight/widgets/delete_flight_confirmation_dialog.dart';
@@ -19,7 +18,6 @@ class HomeFlightCard extends StatelessWidget {
   const HomeFlightCard({
     required this.flight,
     required this.distanceUnit,
-    required this.dateDisplayFormat,
     this.highlightInProgress = false,
     super.key,
   });
@@ -28,7 +26,6 @@ class HomeFlightCard extends StatelessWidget {
 
   final Flight flight;
   final DistanceUnit distanceUnit;
-  final DateDisplayFormat dateDisplayFormat;
   final bool highlightInProgress;
 
   @override
@@ -39,13 +36,19 @@ class HomeFlightCard extends StatelessWidget {
     final route = flight.route;
     final departure = route.departure;
     final arrival = route.arrival;
-    final distance = UnitFormatUtils.formatDistance(
+    final distance = UnitFormatUtils.formatDistanceApprox(
       route.displayDistanceKm.toDouble(),
       distanceUnit,
     );
-    final offlineSize = _formatOfflineSize(flight);
+    final duration = _approxDuration(context, flight.info.routeTotalMinutes);
+    final flightNumber = flight.operationalData?.flightNumber.trim();
+    final regionCount = flight.info.routeRegions.length;
     final poiCount = flight.info.poi.length;
-    final articleCount = flight.info.articles.length;
+    final subtitle = [
+      if (flightNumber != null && flightNumber.isNotEmpty) flightNumber,
+      if (regionCount > 0) context.t.home.regionsCount(count: regionCount),
+      if (poiCount > 0) context.t.home.placesCount(count: poiCount),
+    ].join(' • ');
     final routeRegions = RouteRegionTimelinePolicy.forFlight(
       regions: flight.info.routeRegions,
       departureCountryCode: departure.countryCode,
@@ -54,13 +57,19 @@ class HomeFlightCard extends StatelessWidget {
       languageCode: LocaleSettings.currentLocale.languageCode,
     );
 
+    final cardColor = highlightInProgress
+        ? Color.alphaBlend(
+            AppColoursCommon.brandBlue.withValues(alpha: 0.06),
+            colorScheme.surfaceContainerLowest,
+          )
+        : colorScheme.surfaceContainerLowest;
+
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: () => AppRouter.goToFlight(context, flight: flight),
       child: Ink(
-        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerLowest,
+          color: cardColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: highlightInProgress
@@ -72,85 +81,104 @@ class HomeFlightCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        RouteUtils.routeCities(route),
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          RouteUtils.routeCities(route),
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        RouteUtils.routeCountries(context, route),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                        if (subtitle.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              if (showProStyling) ...[
+                                const Icon(
+                                  Icons.workspace_premium_rounded,
+                                  size: 12,
+                                  color: DsBrandColors.proAmber,
+                                ),
+                                const SizedBox(width: 4),
+                              ],
+                              Expanded(
+                                child: Text(
+                                  subtitle,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
-                ),
-                PopupMenuButton<_FlightCardAction>(
-                  tooltip: context.t.home.flightActions,
-                  onSelected: (value) =>
-                      _onActionSelected(context, value: value, flight: flight),
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: _FlightCardAction.open,
-                      child: Text(context.t.home.open),
-                    ),
-                    if (_shareRouteMenuEnabled)
-                      PopupMenuItem(
-                        value: _FlightCardAction.share,
-                        child: Text(context.t.home.shareRoute),
-                      ),
-                    PopupMenuItem(
-                      value: _FlightCardAction.flightVideo,
-                      child: Text(context.t.flightVideo.title),
-                    ),
-                    PopupMenuDivider(),
-                    PopupMenuItem(
-                      value: _FlightCardAction.completeFlight,
-                      child: Text(context.t.home.completeFlight),
-                    ),
-                    PopupMenuItem(
-                      value: _FlightCardAction.deleteFlight,
-                      child: Text(context.t.home.deleteFlight),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            _SavedFlightCardBody(
-              distance: distance,
-              offlineSize: offlineSize,
-              createdLabel: _createdLabel(
-                flight.createdAt,
-                format: dateDisplayFormat,
+                  _buildMenuButton(context),
+                ],
               ),
-              hasProAccess: showProStyling,
-              poiCount: poiCount,
-              articleCount: articleCount,
-              departureCode: departure.displayCode,
-              arrivalCode: arrival.displayCode,
-              departureCountryCode: departure.countryCode,
-              arrivalCountryCode: arrival.countryCode,
-              routeRegions: routeRegions,
-              showInProgressStatusChip: highlightInProgress,
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
+              child: _SavedFlightCardBody(
+                distance: distance,
+                duration: duration,
+                departureCode: departure.displayCode,
+                arrivalCode: arrival.displayCode,
+                departureCountryCode: departure.countryCode,
+                arrivalCountryCode: arrival.countryCode,
+                routeRegions: routeRegions,
+                showInProgressStatusChip: highlightInProgress,
+                planeProgress: _estimatedRouteProgress(),
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildMenuButton(BuildContext context) {
+    return PopupMenuButton<_FlightCardAction>(
+      tooltip: context.t.home.flightActions,
+      onSelected: (value) =>
+          _onActionSelected(context, value: value, flight: flight),
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: _FlightCardAction.open,
+          child: Text(context.t.home.open),
+        ),
+        if (_shareRouteMenuEnabled)
+          PopupMenuItem(
+            value: _FlightCardAction.share,
+            child: Text(context.t.home.shareRoute),
+          ),
+        PopupMenuItem(
+          value: _FlightCardAction.flightVideo,
+          child: Text(context.t.flightVideo.title),
+        ),
+        PopupMenuDivider(),
+        PopupMenuItem(
+          value: _FlightCardAction.completeFlight,
+          child: Text(context.t.home.completeFlight),
+        ),
+        PopupMenuItem(
+          value: _FlightCardAction.deleteFlight,
+          child: Text(context.t.home.deleteFlight),
+        ),
+      ],
     );
   }
 
@@ -195,68 +223,61 @@ class HomeFlightCard extends StatelessWidget {
     }
   }
 
-  String _formatOfflineSize(Flight flight) {
-    final bytes = _mapSizeBytes(flight);
-    if (bytes <= 0) return t.home.noOfflineMap;
-    return SizeUtils.formatBytes(bytes);
-  }
-
   int _mapSizeBytes(Flight flight) {
     if (flight.maps.isEmpty) return 0;
     return flight.maps.fold<int>(0, (sum, map) => sum + map.sizeBytes);
   }
 
-  String _createdLabel(
-    DateTime createdAt, {
-    required DateDisplayFormat format,
-  }) {
-    final delta = DateTime.now().difference(createdAt);
-    final savedTime = delta.inDays >= 1
-        ? UnitFormatUtils.formatDate(createdAt, format: format)
-        : delta.inHours >= 1
-        ? t.home.hoursAgo(hours: delta.inHours)
-        : delta.inMinutes >= 1
-        ? t.home.minutesAgo(minutes: delta.inMinutes)
-        : t.home.justNow;
-    return t.home.savedTime(time: savedTime);
+  /// Approximate flight time rounded to 5 minutes ("~2h 35m"), or null when
+  /// the route has no duration estimate.
+  String? _approxDuration(BuildContext context, int minutes) {
+    if (minutes <= 0) return null;
+    final rounded = (minutes / 5).round() * 5;
+    final timelineT = context.t.createFlight.overview.timeline;
+    if (rounded < 60) return '~$rounded ${timelineT.minuteUnit}';
+    final h = rounded ~/ 60;
+    final m = rounded % 60;
+    if (m == 0) return '~$h${timelineT.hourCompactUnit}';
+    return '~$h${timelineT.hourCompactUnit} $m${timelineT.minuteCompactUnit}';
   }
 
+  /// Time-based estimate of how far along the route an in-progress flight is
+  /// (no GPS on the home screen); null for flights that are not in progress.
+  double? _estimatedRouteProgress() {
+    if (!highlightInProgress) return null;
+    final startedAt = flight.inProgressAt;
+    final totalMinutes = flight.info.routeTotalMinutes;
+    if (startedAt == null || totalMinutes <= 0) return 0.5;
+    final elapsedMinutes = DateTime.now().difference(startedAt).inMinutes;
+    return (elapsedMinutes / totalMinutes).clamp(0.04, 0.96).toDouble();
+  }
 }
 
 class _SavedFlightCardBody extends StatelessWidget {
   const _SavedFlightCardBody({
     required this.distance,
-    required this.offlineSize,
-    required this.createdLabel,
-    required this.hasProAccess,
-    required this.poiCount,
-    required this.articleCount,
+    required this.duration,
     required this.departureCode,
     required this.arrivalCode,
     required this.departureCountryCode,
     required this.arrivalCountryCode,
     required this.routeRegions,
     required this.showInProgressStatusChip,
+    required this.planeProgress,
   });
 
   final String distance;
-  final String offlineSize;
-  final String createdLabel;
-  final bool hasProAccess;
-  final int poiCount;
-  final int articleCount;
+  final String? duration;
   final String departureCode;
   final String arrivalCode;
   final String departureCountryCode;
   final String arrivalCountryCode;
   final List<RouteRegionMarker> routeRegions;
   final bool showInProgressStatusChip;
+  final double? planeProgress;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final theme = Theme.of(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -265,45 +286,11 @@ class _SavedFlightCardBody extends StatelessWidget {
           runSpacing: 8,
           children: [
             MetaPill(icon: Icons.route, text: distance),
-            MetaPill(
-              icon: Icons.place_outlined,
-              text: context.t.home.placesCount(count: poiCount),
-            ),
-            if (articleCount > 0)
-              MetaPill(
-                icon: Icons.menu_book_outlined,
-                text: context.t.home.offlineArticlesCount(count: articleCount),
-              ),
+            if (duration != null)
+              MetaPill(icon: Icons.schedule_rounded, text: duration!),
+            if (showInProgressStatusChip) _InProgressChip(),
           ],
         ),
-        const SizedBox(height: 8),
-        if (showInProgressStatusChip)
-          _InProgressChip()
-        else
-          Row(
-            children: [
-              if (hasProAccess) ...[
-                const Icon(
-                  Icons.workspace_premium_rounded,
-                  size: 12,
-                  color: DsBrandColors.proAmber,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '• ',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-              Text(
-                '$offlineSize • $createdLabel',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
         const SizedBox(height: 14),
         HomeRoutePreviewStrip(
           departureCode: departureCode,
@@ -311,6 +298,7 @@ class _SavedFlightCardBody extends StatelessWidget {
           departureCountryCode: departureCountryCode,
           arrivalCountryCode: arrivalCountryCode,
           regions: routeRegions,
+          planeProgress: planeProgress,
         ),
       ],
     );
@@ -325,21 +313,65 @@ enum _FlightCardAction {
   deleteFlight,
 }
 
-class _InProgressChip extends StatelessWidget {
+/// Matches [MetaPill] dimensions and shape so it lines up with the other
+/// chips in the row, but in brand blue with a gently pulsing dot — the
+/// "live" cue that this flight is happening right now.
+class _InProgressChip extends StatefulWidget {
+  @override
+  State<_InProgressChip> createState() => _InProgressChipState();
+}
+
+class _InProgressChipState extends State<_InProgressChip>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1100),
+  )..repeat(reverse: true);
+  late final Animation<double> _dotOpacity = Tween<double>(
+    begin: 0.25,
+    end: 1,
+  ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
         color: AppColoursCommon.brandBlue.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        context.t.settings.historyStatusInProgress,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: AppColoursCommon.brandBlue,
-          fontWeight: FontWeight.w700,
+        borderRadius: BorderRadius.circular(DsRadii.sm),
+        border: Border.all(
+          color: AppColoursCommon.brandBlue.withValues(alpha: 0.35),
         ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FadeTransition(
+            opacity: _dotOpacity,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: const BoxDecoration(
+                color: AppColoursCommon.brandBlue,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            context.t.settings.historyStatusInProgress,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: AppColoursCommon.brandBlue,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }

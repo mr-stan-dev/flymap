@@ -55,6 +55,7 @@
     "failedDeleteFlight": "Échec de la suppression du vol",
     "noOfflineMap": "Aucune carte hors ligne",
     "placesCount": "$count lieux",
+    "regionsCount": "$count régions",
     "offlineArticlesCount": "$count articles",
     "savedTime": "Enregistré $time",
     "justNow": "À l’instant",

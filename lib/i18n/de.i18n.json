@@ -55,6 +55,7 @@
     "failedDeleteFlight": "Flug konnte nicht gelöscht werden",
     "noOfflineMap": "Keine Offline-Karte",
     "placesCount": "$count Orte",
+    "regionsCount": "$count Regionen",
     "offlineArticlesCount": "$count Artikel",
     "savedTime": "$time gespeichert",
     "justNow": "Gerade eben",

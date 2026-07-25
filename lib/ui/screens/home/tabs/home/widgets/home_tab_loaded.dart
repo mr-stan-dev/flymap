@@ -42,14 +42,9 @@ class HomeTabLoaded extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  HomeSummaryHeader(
-                    statistics: state.statistics,
-                    displayName: state.displayName,
-                    hasInternet: state.hasInternet,
-                    hasInProgressFlights: hasInProgressFlights,
-                  ),
+                  // The in-progress flight IS the hero: while one is active it
+                  // replaces the greeting/stats header entirely.
                   if (hasInProgressFlights) ...[
-                    const SizedBox(height: 24),
                     Text(
                       context.t.home.flightInProgressTitle,
                       style: context.textTheme.button18Bold,
@@ -63,18 +58,22 @@ class HomeTabLoaded extends StatelessWidget {
                       HomeFlightCard(
                         flight: inProgressFlights[index],
                         distanceUnit: state.distanceUnit,
-                        dateDisplayFormat: state.dateDisplayFormat,
                         highlightInProgress: true,
                       ),
                       if (index < inProgressFlights.length - 1)
                         const SizedBox(height: 12),
                     ],
-                  ],
+                  ] else
+                    HomeSummaryHeader(
+                      statistics: state.statistics,
+                      displayName: state.displayName,
+                      hasInternet: state.hasInternet,
+                      hasInProgressFlights: hasInProgressFlights,
+                    ),
                   const SizedBox(height: 24),
                   HomeFlightsList(
                     flights: listFlights,
                     distanceUnit: state.distanceUnit,
-                    dateDisplayFormat: state.dateDisplayFormat,
                     hasCompletedFlights:
                         state.statistics.totalFlights > state.flights.length,
                     onViewAll: () => AppRouter.goToSettingsHistory(context),

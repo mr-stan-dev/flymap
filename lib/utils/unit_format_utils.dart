@@ -29,6 +29,16 @@ class UnitFormatUtils {
     return '$rounded ${formatDistanceUnit(unit)}';
   }
 
+  /// Approximate distance for glanceable UI: rounded to the nearest 10 of
+  /// the display unit and prefixed with "~" (e.g. "~1230 km").
+  static String formatDistanceApprox(double distanceKm, DistanceUnit unit) {
+    final value = unit == DistanceUnit.mile
+        ? distanceKm * 0.621371
+        : distanceKm;
+    final rounded = (value / 10).round() * 10;
+    return '~$rounded ${formatDistanceUnit(unit)}';
+  }
+
   static String formatDate(DateTime date, {required DateDisplayFormat format}) {
     final mm = date.month.toString().padLeft(2, '0');
     final dd = date.day.toString().padLeft(2, '0');

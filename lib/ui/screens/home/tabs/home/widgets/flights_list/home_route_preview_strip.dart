@@ -4,6 +4,7 @@ import 'package:flymap/domain/entity/route_region_type.dart';
 import 'package:flymap/domain/policy/route_region_timeline_policy.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/shared/region_artwork.dart';
+import 'package:flymap/ui/theme/app_colours.dart';
 import 'package:flymap/utils/country_name_utils.dart';
 
 class HomeRoutePreviewStrip extends StatelessWidget {
@@ -13,6 +14,7 @@ class HomeRoutePreviewStrip extends StatelessWidget {
     required this.departureCountryCode,
     required this.arrivalCountryCode,
     required this.regions,
+    this.planeProgress,
     super.key,
   });
 
@@ -29,6 +31,10 @@ class HomeRoutePreviewStrip extends StatelessWidget {
   /// countries abroad, natural features at home).
   final List<RouteRegionMarker> regions;
 
+  /// 0..1 route progress for an in-progress flight: colors the traveled part
+  /// of the line and places a plane marker on it. Null hides both.
+  final double? planeProgress;
+
   @override
   Widget build(BuildContext context) {
     final lineColor = Theme.of(
@@ -42,12 +48,17 @@ class HomeRoutePreviewStrip extends StatelessWidget {
               ? constraints.maxWidth
               : 0.0;
           final offsets = _regionOffsets(width);
+          final progress = planeProgress?.clamp(0.0, 1.0);
           return Stack(
             clipBehavior: Clip.none,
             children: [
               Positioned.fill(
                 child: CustomPaint(
-                  painter: _RoutePreviewPainter(color: lineColor),
+                  painter: _RoutePreviewPainter(
+                    color: lineColor,
+                    progress: progress,
+                    progressColor: AppColoursCommon.brandBlue,
+                  ),
                 ),
               ),
               Positioned(
@@ -72,6 +83,14 @@ class HomeRoutePreviewStrip extends StatelessWidget {
                   countryCode: arrivalCountryCode,
                 ),
               ),
+              if (progress != null)
+                Positioned(
+                  left: (12 + (width - 24) * progress) - _PlaneMarker.size / 2,
+                  // Same row as the region/airport circles so the plane fully
+                  // covers a marker it happens to pass over.
+                  top: 4,
+                  child: const _PlaneMarker(),
+                ),
             ],
           );
         },
@@ -281,10 +300,47 @@ class _RegionRouteMarker extends StatelessWidget {
   }
 }
 
+/// The plane marker for in-progress flights: same size and chrome as the
+/// region/airport circles so it reads as part of the marker row and fully
+/// covers any marker it overlaps.
+class _PlaneMarker extends StatelessWidget {
+  const _PlaneMarker();
+
+  static const double size = 24;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        shape: BoxShape.circle,
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.18)),
+      ),
+      child: const RotatedBox(
+        quarterTurns: 1,
+        child: Icon(
+          Icons.flight,
+          size: size - 6,
+          color: AppColoursCommon.brandBlue,
+        ),
+      ),
+    );
+  }
+}
+
 class _RoutePreviewPainter extends CustomPainter {
-  const _RoutePreviewPainter({required this.color});
+  const _RoutePreviewPainter({
+    required this.color,
+    required this.progress,
+    required this.progressColor,
+  });
 
   final Color color;
+  final double? progress;
+  final Color progressColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -295,15 +351,24 @@ class _RoutePreviewPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     final y = size.height * 0.38;
-    final path = Path()
-      ..moveTo(12, y)
-      ..lineTo(size.width - 12, y);
+    canvas.drawLine(Offset(12, y), Offset(size.width - 12, y), paint);
 
-    canvas.drawPath(path, paint);
+    final traveled = progress;
+    if (traveled != null && traveled > 0) {
+      final progressPaint = Paint()
+        ..color = progressColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..strokeCap = StrokeCap.round;
+      final endX = 12 + (size.width - 24) * traveled;
+      canvas.drawLine(Offset(12, y), Offset(endX, y), progressPaint);
+    }
   }
 
   @override
   bool shouldRepaint(covariant _RoutePreviewPainter oldDelegate) {
-    return oldDelegate.color != color;
+    return oldDelegate.color != color ||
+        oldDelegate.progress != progress ||
+        oldDelegate.progressColor != progressColor;
   }
 }

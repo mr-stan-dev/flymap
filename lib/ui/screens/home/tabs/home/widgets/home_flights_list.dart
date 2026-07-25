@@ -12,7 +12,6 @@ class HomeFlightsList extends StatelessWidget {
     required this.onViewAll,
     required this.onAddFirstFlight,
     required this.distanceUnit,
-    required this.dateDisplayFormat,
     super.key,
   });
 
@@ -21,7 +20,6 @@ class HomeFlightsList extends StatelessWidget {
   final VoidCallback onViewAll;
   final VoidCallback onAddFirstFlight;
   final DistanceUnit distanceUnit;
-  final DateDisplayFormat dateDisplayFormat;
 
   @override
   Widget build(BuildContext context) {
@@ -51,11 +49,7 @@ class HomeFlightsList extends StatelessWidget {
         final flight = flights[index];
         return Padding(
           padding: EdgeInsets.only(bottom: index < flights.length - 1 ? 12 : 0),
-          child: HomeFlightCard(
-            flight: flight,
-            distanceUnit: distanceUnit,
-            dateDisplayFormat: dateDisplayFormat,
-          ),
+          child: HomeFlightCard(flight: flight, distanceUnit: distanceUnit),
         );
       },
     );

@@ -235,6 +235,9 @@ class TranslationsHomeEn {
 	/// en: '$count places'
 	String placesCount({required Object count}) => '${count} places';
 
+	/// en: '$count regions'
+	String regionsCount({required Object count}) => '${count} regions';
+
 	/// en: '$count articles'
 	String offlineArticlesCount({required Object count}) => '${count} articles';
 
@@ -3619,6 +3622,7 @@ extension on Translations {
 			'home.failedDeleteFlight' => 'Failed to delete flight',
 			'home.noOfflineMap' => 'No offline map',
 			'home.placesCount' => ({required Object count}) => '${count} places',
+			'home.regionsCount' => ({required Object count}) => '${count} regions',
 			'home.offlineArticlesCount' => ({required Object count}) => '${count} articles',
 			'home.savedTime' => ({required Object time}) => 'Saved ${time}',
 			'home.justNow' => 'Just now',
@@ -4077,9 +4081,9 @@ extension on Translations {
 			'createFlight.downloading.preparingPoi' => 'Preparing place summaries...',
 			'createFlight.downloading.poiProgress' => ({required Object completed, required Object total}) => 'Places: ${completed}/${total}',
 			'createFlight.downloading.poiProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Places: ${completed}/${total} (${failed} failed)',
-			'createFlight.downloading.noArticlesSelected' => 'No articles selected.',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.downloading.noArticlesSelected' => 'No articles selected.',
 			'createFlight.downloading.preparingArticles' => 'Preparing article downloads...',
 			'createFlight.downloading.articlesProgress' => ({required Object completed, required Object total}) => 'Articles: ${completed}/${total}',
 			'createFlight.downloading.articlesProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Articles: ${completed}/${total} (${failed} failed)',
@@ -4591,9 +4595,9 @@ extension on Translations {
 			'countries.TZ' => 'Tanzania, United Republic of',
 			'countries.UA' => 'Ukraine',
 			'countries.UG' => 'Uganda',
-			'countries.US' => 'United States',
 			_ => null,
 		} ?? switch (path) {
+			'countries.US' => 'United States',
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Uzbekistan',
 			'countries.VE' => 'Venezuela, Bolivarian Rep. of',

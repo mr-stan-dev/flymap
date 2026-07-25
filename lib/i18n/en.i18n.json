@@ -55,6 +55,7 @@
     "failedDeleteFlight": "Failed to delete flight",
     "noOfflineMap": "No offline map",
     "placesCount": "$count places",
+    "regionsCount": "$count regions",
     "offlineArticlesCount": "$count articles",
     "savedTime": "Saved $time",
     "justNow": "Just now",

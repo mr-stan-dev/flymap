@@ -126,6 +126,7 @@ class _TranslationsHomeFr extends TranslationsHomeEn {
 	@override String get failedDeleteFlight => 'Échec de la suppression du vol';
 	@override String get noOfflineMap => 'Aucune carte hors ligne';
 	@override String placesCount({required Object count}) => '${count} lieux';
+	@override String regionsCount({required Object count}) => '${count} régions';
 	@override String offlineArticlesCount({required Object count}) => '${count} articles';
 	@override String savedTime({required Object time}) => 'Enregistré ${time}';
 	@override String get justNow => 'À l’instant';
@@ -1545,6 +1546,7 @@ extension on TranslationsFr {
 			'home.failedDeleteFlight' => 'Échec de la suppression du vol',
 			'home.noOfflineMap' => 'Aucune carte hors ligne',
 			'home.placesCount' => ({required Object count}) => '${count} lieux',
+			'home.regionsCount' => ({required Object count}) => '${count} régions',
 			'home.offlineArticlesCount' => ({required Object count}) => '${count} articles',
 			'home.savedTime' => ({required Object time}) => 'Enregistré ${time}',
 			'home.justNow' => 'À l’instant',
@@ -2003,9 +2005,9 @@ extension on TranslationsFr {
 			'createFlight.downloading.preparingPoi' => 'Préparation des résumés de lieux...',
 			'createFlight.downloading.poiProgress' => ({required Object completed, required Object total}) => 'Lieux : ${completed}/${total}',
 			'createFlight.downloading.poiProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Lieux : ${completed}/${total} (${failed} échecs)',
-			'createFlight.downloading.noArticlesSelected' => 'Aucun article sélectionné.',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.downloading.noArticlesSelected' => 'Aucun article sélectionné.',
 			'createFlight.downloading.preparingArticles' => 'Préparation des téléchargements d’articles...',
 			'createFlight.downloading.articlesProgress' => ({required Object completed, required Object total}) => 'Articles : ${completed}/${total}',
 			'createFlight.downloading.articlesProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Articles : ${completed}/${total} (${failed} échecs)',
@@ -2517,9 +2519,9 @@ extension on TranslationsFr {
 			'countries.TZ' => 'Tanzanie',
 			'countries.UA' => 'Ukraine',
 			'countries.UG' => 'Ouganda',
-			'countries.US' => 'États-Unis',
 			_ => null,
 		} ?? switch (path) {
+			'countries.US' => 'États-Unis',
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Ouzbékistan',
 			'countries.VE' => 'Venezuela',

@@ -126,6 +126,7 @@ class _TranslationsHomeEs extends TranslationsHomeEn {
 	@override String get failedDeleteFlight => 'No se pudo eliminar el vuelo';
 	@override String get noOfflineMap => 'Sin mapa offline';
 	@override String placesCount({required Object count}) => '${count} lugares';
+	@override String regionsCount({required Object count}) => '${count} regiones';
 	@override String offlineArticlesCount({required Object count}) => '${count} artículos';
 	@override String savedTime({required Object time}) => 'Guardado ${time}';
 	@override String get justNow => 'Ahora mismo';
@@ -1545,6 +1546,7 @@ extension on TranslationsEs {
 			'home.failedDeleteFlight' => 'No se pudo eliminar el vuelo',
 			'home.noOfflineMap' => 'Sin mapa offline',
 			'home.placesCount' => ({required Object count}) => '${count} lugares',
+			'home.regionsCount' => ({required Object count}) => '${count} regiones',
 			'home.offlineArticlesCount' => ({required Object count}) => '${count} artículos',
 			'home.savedTime' => ({required Object time}) => 'Guardado ${time}',
 			'home.justNow' => 'Ahora mismo',
@@ -2003,9 +2005,9 @@ extension on TranslationsEs {
 			'createFlight.downloading.preparingPoi' => 'Preparando resúmenes de lugares...',
 			'createFlight.downloading.poiProgress' => ({required Object completed, required Object total}) => 'Lugares: ${completed}/${total}',
 			'createFlight.downloading.poiProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Lugares: ${completed}/${total} (${failed} fallidos)',
-			'createFlight.downloading.noArticlesSelected' => 'No se seleccionaron artículos.',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.downloading.noArticlesSelected' => 'No se seleccionaron artículos.',
 			'createFlight.downloading.preparingArticles' => 'Preparando descargas de artículos...',
 			'createFlight.downloading.articlesProgress' => ({required Object completed, required Object total}) => 'Artículos: ${completed}/${total}',
 			'createFlight.downloading.articlesProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Artículos: ${completed}/${total} (${failed} fallidos)',
@@ -2517,9 +2519,9 @@ extension on TranslationsEs {
 			'countries.TZ' => 'Tanzania',
 			'countries.UA' => 'Ucrania',
 			'countries.UG' => 'Uganda',
-			'countries.US' => 'Estados Unidos',
 			_ => null,
 		} ?? switch (path) {
+			'countries.US' => 'Estados Unidos',
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Uzbekistan',
 			'countries.VE' => 'Venezuela',

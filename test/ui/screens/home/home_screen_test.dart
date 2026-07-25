@@ -495,7 +495,7 @@ void main() {
   });
 
   testWidgets(
-    'keeps summary header and shows in-progress section above upcoming flights',
+    'in-progress flight replaces the summary header as the hero',
     (tester) async {
       await GetIt.I.unregister<FlightRepository>();
       GetIt.I.registerSingleton<FlightRepository>(
@@ -512,7 +512,8 @@ void main() {
       await tester.pumpWidget(_testApp());
       await _pumpForInitialLoad(tester);
 
-      expect(find.text('Hi Stan, your flight is in progress'), findsOneWidget);
+      // The greeting/stats header yields to the in-progress hero card.
+      expect(find.text('Hi Stan, your flight is in progress'), findsNothing);
       expect(find.text('Flight in progress'), findsOneWidget);
       expect(find.text('Upcoming flights (1)'), findsOneWidget);
       expect(find.byType(HomeFlightCard), findsNWidgets(2));
