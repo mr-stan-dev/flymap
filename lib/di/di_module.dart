@@ -58,6 +58,7 @@ import 'package:flymap/repository/metric_units_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/poi_wiki_preview_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
+import 'package:flymap/repository/home_area_overview_repository.dart';
 import 'package:flymap/repository/route_overview_repository.dart';
 import 'package:flymap/repository/settings_repository.dart';
 import 'package:flymap/repository/sky_camera_media_repository.dart';
@@ -185,6 +186,9 @@ class DiModule {
     );
     i.registerLazySingleton<RouteOverviewRepository>(
       () => ApiRouteOverviewRepository(api: i.get(), mapper: i.get()),
+    );
+    i.registerLazySingleton<HomeAreaOverviewRepository>(
+      () => ApiHomeAreaOverviewRepository(api: i.get()),
     );
     i.registerLazySingleton<GetRouteOverviewUseCase>(
       () => GetRouteOverviewUseCase(repository: i.get()),

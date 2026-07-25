@@ -1,6 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flymap/domain/entity/airport.dart';
+import 'package:flymap/domain/entity/home_area_summary.dart';
 import 'package:flymap/domain/entity/user_profile.dart';
+
+/// Lifecycle of the home-area places summary prefetched for the payoff step.
+enum HomeAreaSummaryStatus { none, loading, ready, failed }
 
 class OnboardingProfileFormState extends Equatable {
   const OnboardingProfileFormState({
@@ -14,6 +18,8 @@ class OnboardingProfileFormState extends Equatable {
     required this.recentAirports,
     required this.popularAirports,
     required this.errorMessage,
+    this.homeAreaStatus = HomeAreaSummaryStatus.none,
+    this.homeAreaSummary,
   });
 
   const OnboardingProfileFormState.initial()
@@ -26,7 +32,9 @@ class OnboardingProfileFormState extends Equatable {
       favoriteAirports = const [],
       recentAirports = const [],
       popularAirports = const [],
-      errorMessage = null;
+      errorMessage = null,
+      homeAreaStatus = HomeAreaSummaryStatus.none,
+      homeAreaSummary = null;
 
   static const int maxInterests = 3;
 
@@ -40,6 +48,8 @@ class OnboardingProfileFormState extends Equatable {
   final List<Airport> recentAirports;
   final List<Airport> popularAirports;
   final String? errorMessage;
+  final HomeAreaSummaryStatus homeAreaStatus;
+  final HomeAreaSummary? homeAreaSummary;
 
   bool get hasReachedInterestLimit => profile.interests.length >= maxInterests;
 
@@ -56,6 +66,9 @@ class OnboardingProfileFormState extends Equatable {
     List<Airport>? popularAirports,
     String? errorMessage,
     bool clearErrorMessage = false,
+    HomeAreaSummaryStatus? homeAreaStatus,
+    HomeAreaSummary? homeAreaSummary,
+    bool clearHomeAreaSummary = false,
   }) {
     return OnboardingProfileFormState(
       isLoading: isLoading ?? this.isLoading,
@@ -71,6 +84,14 @@ class OnboardingProfileFormState extends Equatable {
       errorMessage: clearErrorMessage
           ? null
           : errorMessage ?? this.errorMessage,
+      homeAreaStatus:
+          homeAreaStatus ??
+          (clearHomeAreaSummary
+              ? HomeAreaSummaryStatus.none
+              : this.homeAreaStatus),
+      homeAreaSummary: clearHomeAreaSummary
+          ? null
+          : homeAreaSummary ?? this.homeAreaSummary,
     );
   }
 
@@ -86,5 +107,7 @@ class OnboardingProfileFormState extends Equatable {
     recentAirports,
     popularAirports,
     errorMessage,
+    homeAreaStatus,
+    homeAreaSummary,
   ];
 }

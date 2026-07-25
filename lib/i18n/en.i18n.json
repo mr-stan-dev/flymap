@@ -899,7 +899,7 @@
     "popularAirports": "Popular airports",
     "removeHomeAirport": "Remove home airport",
     "noHomeAirportFound": "No airports found for that search.",
-    "interestsTitle": "What places you want to see more on a map?",
+    "interestsTitle": "Which places do you want to see on your map?",
     "interestsSubtitle": "Choose up to 3 topics to see more relevant places and stories along your flight.",
     "interestsHelper": "Pick up to 3 topics.",
     "interestsSelected": "$count of $max selected",
@@ -909,20 +909,16 @@
     "interestIslands": "Islands & coastlines",
     "interestNationalParks": "National parks & reserves",
     "interestRivers": "Rivers & lakes",
-    "proTitle": "Get more from every flight",
-    "proStepSubtitle": "Unlock detailed maps, places and articles — even offline.",
-    "proFeatureMaps": "Detailed maps for your flight",
-    "proFeatureRoutes": "Most accurate flight routes",
-    "proFeaturePlaces": "10x more places along the route",
-    "proFeatureTimeline": "A detailed timeline of your entire flight",
-    "proFeatureArticles": "Complete pack of offline articles",
-    "unlockPro": "Upgrade to Pro",
-    "continueFree": "Continue Free",
-    "proActiveTitle": "Congratulations!",
-    "proActiveSubtitle": "You now have full access to detailed maps, all places, and article packs.",
     "planFirstFlight": "Start my first flight",
-    "planFirstFlightPro": "Plan my first detailed flight",
-    "failedLoadProfile": "Failed to load your profile."
+    "failedLoadProfile": "Failed to load your profile.",
+    "payoff": {
+      "title": "Places around $airport you shouldn't miss",
+      "subtitle": "You've been flying right over all this — spot them on your next flight:",
+      "scanning": "Scanning the skies around $airport…",
+      "moreNearby": "…and $count+ more to discover nearby:",
+      "fallbackTitle": "Stop missing what's below",
+      "fallbackSubtitle": "Every flight soars over volcanoes, mountains, islands and lakes most travelers never notice. Flymap shows you what's out your window."
+    }
   },
   "countries": {
     "AE": "United Arab Emirates",

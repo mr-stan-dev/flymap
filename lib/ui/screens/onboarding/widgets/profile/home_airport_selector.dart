@@ -99,7 +99,12 @@ class _HomeAirportSelectorState extends State<HomeAirportSelector> {
           ),
           const SizedBox(height: 12),
         ],
-        if (widget.isSearchLoading)
+        // A selected airport fills the field with its label and clears the
+        // search results — without this branch that state would fall through
+        // to the "no airports found" message below.
+        if (widget.selectedAirport != null)
+          const SizedBox.shrink()
+        else if (widget.isSearchLoading)
           const Center(child: CircularProgressIndicator())
         else if (hasQuery)
           if (widget.results.isNotEmpty)

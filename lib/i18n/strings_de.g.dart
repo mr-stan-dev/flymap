@@ -625,7 +625,7 @@ class _TranslationsOnboardingDe extends TranslationsOnboardingEn {
 	@override String get popularAirports => 'Beliebte Flughäfen';
 	@override String get removeHomeAirport => 'Heimatflughafen entfernen';
 	@override String get noHomeAirportFound => 'Für diese Suche wurden keine Flughäfen gefunden.';
-	@override String get interestsTitle => 'Welche Orte möchtest du auf der Karte häufiger sehen?';
+	@override String get interestsTitle => 'Welche Orte möchtest du auf deiner Karte sehen?';
 	@override String get interestsSubtitle => 'Wähle bis zu 3 Themen, um relevantere Orte und Geschichten entlang deines Flugs zu sehen.';
 	@override String get interestsHelper => 'Wähle bis zu 3 Themen.';
 	@override String interestsSelected({required Object count, required Object max}) => '${count} von ${max} ausgewählt';
@@ -635,20 +635,9 @@ class _TranslationsOnboardingDe extends TranslationsOnboardingEn {
 	@override String get interestIslands => 'Inseln & Küstenlinien';
 	@override String get interestNationalParks => 'Nationalparks & Reservate';
 	@override String get interestRivers => 'Flüsse & Seen';
-	@override String get proTitle => 'Hole mehr aus jedem Flug heraus';
-	@override String get proStepSubtitle => 'Schalte detaillierte Karten, Orte und Artikel frei — sogar offline.';
-	@override String get proFeatureMaps => 'Detaillierte Karten für deinen Flug';
-	@override String get proFeatureRoutes => 'Die genauesten Flugrouten';
-	@override String get proFeaturePlaces => '10x mehr Orte entlang der Route';
-	@override String get proFeatureTimeline => 'Eine detaillierte Zeitachse deines gesamten Flugs';
-	@override String get proFeatureArticles => 'Vollständiges Paket mit Offline-Artikeln';
-	@override String get unlockPro => 'Zu Pro upgraden';
-	@override String get continueFree => 'Kostenlos fortfahren';
-	@override String get proActiveTitle => 'Glückwunsch!';
-	@override String get proActiveSubtitle => 'Du hast jetzt vollen Zugriff auf detaillierte Karten, alle Orte und Artikelpakete.';
 	@override String get planFirstFlight => 'Meinen ersten Flug planen';
-	@override String get planFirstFlightPro => 'Meinen ersten detaillierten Flug planen';
 	@override String get failedLoadProfile => 'Dein Profil konnte nicht geladen werden.';
+	@override late final _TranslationsOnboardingPayoffDe payoff = _TranslationsOnboardingPayoffDe._(_root);
 }
 
 // Path: countries
@@ -1384,6 +1373,21 @@ class _TranslationsFlightRouteDe extends TranslationsFlightRouteEn {
 	@override String get premiumOfflineBody => 'Du bist gerade offline. Stelle eine Internetverbindung her, um upzugraden und die vollständige Routenansicht freizuschalten.';
 	@override String nextHintLabel({required Object region, required Object eta}) => 'Als Nächstes: ${region} (${eta})';
 	@override String get etaUnknownLabel => 'wird geschätzt...';
+}
+
+// Path: onboarding.payoff
+class _TranslationsOnboardingPayoffDe extends TranslationsOnboardingPayoffEn {
+	_TranslationsOnboardingPayoffDe._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object airport}) => 'Orte rund um ${airport}, die du nicht verpassen solltest';
+	@override String get subtitle => 'Du fliegst jedes Mal direkt darüber hinweg — halte auf deinem nächsten Flug Ausschau:';
+	@override String scanning({required Object airport}) => 'Wir scannen den Himmel rund um ${airport}…';
+	@override String moreNearby({required Object count}) => '…und ${count}+ weitere Orte in der Nähe:';
+	@override String get fallbackTitle => 'Verpasse nie wieder, was unter dir liegt';
+	@override String get fallbackSubtitle => 'Jeder Flug führt über Vulkane, Berge, Inseln und Seen, die die meisten Reisenden nie bemerken. Flymap zeigt dir, was vor deinem Fenster liegt.';
 }
 
 // Path: createFlight.overview.airportCard
@@ -2301,7 +2305,7 @@ extension on TranslationsDe {
 			'onboarding.popularAirports' => 'Beliebte Flughäfen',
 			'onboarding.removeHomeAirport' => 'Heimatflughafen entfernen',
 			'onboarding.noHomeAirportFound' => 'Für diese Suche wurden keine Flughäfen gefunden.',
-			'onboarding.interestsTitle' => 'Welche Orte möchtest du auf der Karte häufiger sehen?',
+			'onboarding.interestsTitle' => 'Welche Orte möchtest du auf deiner Karte sehen?',
 			'onboarding.interestsSubtitle' => 'Wähle bis zu 3 Themen, um relevantere Orte und Geschichten entlang deines Flugs zu sehen.',
 			'onboarding.interestsHelper' => 'Wähle bis zu 3 Themen.',
 			'onboarding.interestsSelected' => ({required Object count, required Object max}) => '${count} von ${max} ausgewählt',
@@ -2311,20 +2315,14 @@ extension on TranslationsDe {
 			'onboarding.interestIslands' => 'Inseln & Küstenlinien',
 			'onboarding.interestNationalParks' => 'Nationalparks & Reservate',
 			'onboarding.interestRivers' => 'Flüsse & Seen',
-			'onboarding.proTitle' => 'Hole mehr aus jedem Flug heraus',
-			'onboarding.proStepSubtitle' => 'Schalte detaillierte Karten, Orte und Artikel frei — sogar offline.',
-			'onboarding.proFeatureMaps' => 'Detaillierte Karten für deinen Flug',
-			'onboarding.proFeatureRoutes' => 'Die genauesten Flugrouten',
-			'onboarding.proFeaturePlaces' => '10x mehr Orte entlang der Route',
-			'onboarding.proFeatureTimeline' => 'Eine detaillierte Zeitachse deines gesamten Flugs',
-			'onboarding.proFeatureArticles' => 'Vollständiges Paket mit Offline-Artikeln',
-			'onboarding.unlockPro' => 'Zu Pro upgraden',
-			'onboarding.continueFree' => 'Kostenlos fortfahren',
-			'onboarding.proActiveTitle' => 'Glückwunsch!',
-			'onboarding.proActiveSubtitle' => 'Du hast jetzt vollen Zugriff auf detaillierte Karten, alle Orte und Artikelpakete.',
 			'onboarding.planFirstFlight' => 'Meinen ersten Flug planen',
-			'onboarding.planFirstFlightPro' => 'Meinen ersten detaillierten Flug planen',
 			'onboarding.failedLoadProfile' => 'Dein Profil konnte nicht geladen werden.',
+			'onboarding.payoff.title' => ({required Object airport}) => 'Orte rund um ${airport}, die du nicht verpassen solltest',
+			'onboarding.payoff.subtitle' => 'Du fliegst jedes Mal direkt darüber hinweg — halte auf deinem nächsten Flug Ausschau:',
+			'onboarding.payoff.scanning' => ({required Object airport}) => 'Wir scannen den Himmel rund um ${airport}…',
+			'onboarding.payoff.moreNearby' => ({required Object count}) => '…und ${count}+ weitere Orte in der Nähe:',
+			'onboarding.payoff.fallbackTitle' => 'Verpasse nie wieder, was unter dir liegt',
+			'onboarding.payoff.fallbackSubtitle' => 'Jeder Flug führt über Vulkane, Berge, Inseln und Seen, die die meisten Reisenden nie bemerken. Flymap zeigt dir, was vor deinem Fenster liegt.',
 			'countries.AE' => 'Vereinigte Arabische Emirate',
 			'countries.AF' => 'Afghanistan',
 			'countries.AG' => 'Antigua und Barbuda',
@@ -2500,14 +2498,14 @@ extension on TranslationsDe {
 			'countries.TW' => 'Taiwan, China',
 			'countries.TZ' => 'Tansania',
 			'countries.UA' => 'Ukraine',
-			_ => null,
-		} ?? switch (path) {
 			'countries.UG' => 'Uganda',
 			'countries.US' => 'Vereinigte Staaten',
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Usbekistan',
 			'countries.VE' => 'Venezuela',
 			'countries.VI' => 'Amerikanische Jungferninseln',
+			_ => null,
+		} ?? switch (path) {
 			'countries.VN' => 'Vietnam',
 			'countries.YE' => 'Jemen',
 			'countries.ZA' => 'Südafrika',

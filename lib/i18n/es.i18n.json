@@ -899,7 +899,7 @@
     "popularAirports": "Aeropuertos populares",
     "removeHomeAirport": "Eliminar aeropuerto base",
     "noHomeAirportFound": "No se encontraron aeropuertos para esa búsqueda.",
-    "interestsTitle": "¿Qué lugares quieres ver más en el mapa?",
+    "interestsTitle": "¿Qué lugares quieres ver en tu mapa?",
     "interestsSubtitle": "Elige hasta 3 temas para ver lugares e historias más relevantes a lo largo de tu vuelo.",
     "interestsHelper": "Elige hasta 3 temas.",
     "interestsSelected": "$count de $max seleccionados",
@@ -909,20 +909,16 @@
     "interestIslands": "Islas y costas",
     "interestNationalParks": "Parques nacionales y reservas",
     "interestRivers": "Ríos y lagos",
-    "proTitle": "Aprovecha más cada vuelo",
-    "proStepSubtitle": "Desbloquea mapas detallados, lugares y artículos, incluso offline.",
-    "proFeatureMaps": "Mapas detallados para tu vuelo",
-    "proFeatureRoutes": "Las rutas de vuelo más precisas",
-    "proFeaturePlaces": "10 veces más lugares a lo largo de la ruta",
-    "proFeatureTimeline": "Una cronología detallada de todo tu vuelo",
-    "proFeatureArticles": "Paquete completo de artículos offline",
-    "unlockPro": "Pasar a Pro",
-    "continueFree": "Seguir gratis",
-    "proActiveTitle": "¡Enhorabuena!",
-    "proActiveSubtitle": "Ahora tienes acceso completo a mapas detallados, todos los lugares y paquetes de artículos.",
     "planFirstFlight": "Empezar mi primer vuelo",
-    "planFirstFlightPro": "Planificar mi primer vuelo detallado",
-    "failedLoadProfile": "No se pudo cargar tu perfil."
+    "failedLoadProfile": "No se pudo cargar tu perfil.",
+    "payoff": {
+      "title": "Lugares alrededor de $airport que no deberías perderte",
+      "subtitle": "Llevas años sobrevolando todo esto — búscalos en tu próximo vuelo:",
+      "scanning": "Explorando el cielo alrededor de $airport…",
+      "moreNearby": "…y $count+ lugares más por descubrir cerca:",
+      "fallbackTitle": "Deja de perderte lo que hay debajo",
+      "fallbackSubtitle": "Cada vuelo sobrevuela volcanes, montañas, islas y lagos que la mayoría de los viajeros nunca nota. Flymap te muestra lo que hay tras tu ventanilla."
+    }
   },
   "countries": {
     "AE": "Emiratos Arabes Unidos",

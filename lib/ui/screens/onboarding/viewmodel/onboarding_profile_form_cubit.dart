@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/domain/entity/airport.dart';
@@ -6,6 +8,7 @@ import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/repository/feature_announcement_repository.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
+import 'package:flymap/repository/home_area_overview_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/ui/screens/create_flight/airports_search/popular_flights.dart';
@@ -18,12 +21,14 @@ class OnboardingProfileFormCubit extends Cubit<OnboardingProfileFormState> {
     required FavoriteAirportsRepository favoritesRepository,
     required RecentAirportsRepository recentAirportsRepository,
     FeatureAnnouncementRepository? featureAnnouncementRepository,
+    HomeAreaOverviewRepository? homeAreaRepository,
     bool autoLoad = true,
   }) : _repository = repository,
        _airportsDb = airportsDb,
        _favoritesRepository = favoritesRepository,
        _recentAirportsRepository = recentAirportsRepository,
        _featureAnnouncementRepository = featureAnnouncementRepository,
+       _homeAreaRepository = homeAreaRepository,
        super(const OnboardingProfileFormState.initial()) {
     if (autoLoad) {
       load();
@@ -35,7 +40,12 @@ class OnboardingProfileFormCubit extends Cubit<OnboardingProfileFormState> {
   final FavoriteAirportsRepository _favoritesRepository;
   final RecentAirportsRepository _recentAirportsRepository;
   final FeatureAnnouncementRepository? _featureAnnouncementRepository;
+  final HomeAreaOverviewRepository? _homeAreaRepository;
   final _logger = Logger('OnboardingProfileFormCubit');
+
+  /// Airport code of the in-flight (or last finished) area summary request,
+  /// used to drop stale responses after the user re-picks the airport.
+  String? _homeAreaRequestCode;
 
   Future<void> load() async {
     emit(state.copyWith(isLoading: true, clearErrorMessage: true));
@@ -62,6 +72,7 @@ class OnboardingProfileFormCubit extends Cubit<OnboardingProfileFormState> {
           clearErrorMessage: true,
         ),
       );
+      prefetchHomeAreaSummary();
     } catch (error) {
       _logger.error('Failed to load onboarding profile form: $error');
       emit(
@@ -156,18 +167,65 @@ class OnboardingProfileFormCubit extends Cubit<OnboardingProfileFormState> {
       airportQuery: '${airport.name} (${airport.displayCode})',
       airportSearchResults: const [],
     );
+    prefetchHomeAreaSummary();
     if (addToFavorites) {
       await _refreshReferenceAirports();
     }
   }
 
   Future<void> clearHomeAirport() async {
+    _homeAreaRequestCode = null;
     await _persistProfile(
       state.profile.copyWith(clearHomeAirportCode: true),
       clearHomeAirport: true,
       airportQuery: '',
       airportSearchResults: const [],
     );
+    emit(state.copyWith(clearHomeAreaSummary: true));
+  }
+
+  /// Kicks off (or re-uses) the home-area places summary fetch so the payoff
+  /// step has data ready by the time the user reaches it. Safe to call
+  /// repeatedly; a request already running or done for the current airport is
+  /// not repeated.
+  void prefetchHomeAreaSummary() {
+    final repository = _homeAreaRepository;
+    final airport = state.homeAirport;
+    if (repository == null || airport == null) return;
+    final code = _airportCode(airport);
+    final isRetry = state.homeAreaStatus == HomeAreaSummaryStatus.failed;
+    if (_homeAreaRequestCode == code && !isRetry) return;
+    _homeAreaRequestCode = code;
+    emit(
+      state.copyWith(
+        homeAreaStatus: HomeAreaSummaryStatus.loading,
+        clearHomeAreaSummary: true,
+      ),
+    );
+    unawaited(_fetchHomeAreaSummary(repository, airport, code));
+  }
+
+  Future<void> _fetchHomeAreaSummary(
+    HomeAreaOverviewRepository repository,
+    Airport airport,
+    String code,
+  ) async {
+    try {
+      final summary = await repository.getHomeAreaSummary(airport: airport);
+      if (isClosed || _homeAreaRequestCode != code) return;
+      emit(
+        state.copyWith(
+          homeAreaStatus: summary.isEmpty
+              ? HomeAreaSummaryStatus.failed
+              : HomeAreaSummaryStatus.ready,
+          homeAreaSummary: summary,
+        ),
+      );
+    } catch (error) {
+      _logger.error('Home area summary fetch failed for $code: $error');
+      if (isClosed || _homeAreaRequestCode != code) return;
+      emit(state.copyWith(homeAreaStatus: HomeAreaSummaryStatus.failed));
+    }
   }
 
   Future<void> completeOnboarding() async {

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/ui/screens/onboarding/viewmodel/onboarding_profile_form_cubit.dart';
 import 'package:flymap/ui/screens/onboarding/viewmodel/onboarding_profile_form_state.dart';
-import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart';
 
-enum OnboardingStepId { welcome, name, frequency, homeAirport, interests, pro }
+enum OnboardingStepId { welcome, interests, homeAirport, areaPayoff }
 
 typedef OnboardingStepWidgetBuilder =
     Widget Function(
@@ -18,17 +17,18 @@ class OnboardingStepDefinition {
     required this.stepBuilder,
     required this.primaryActionLabel,
     required this.canContinue,
+    this.isSkippable = true,
   });
 
   final OnboardingStepId id;
   final OnboardingStepWidgetBuilder stepBuilder;
-  final String Function(
-    BuildContext context,
-    OnboardingProfileFormState state,
-    SubscriptionState subscriptionState,
-  )
+  final String Function(BuildContext context, OnboardingProfileFormState state)
   primaryActionLabel;
   final bool Function(OnboardingProfileFormState state) canContinue;
+
+  /// Whether the header Skip button is offered for this step (never offered
+  /// on the last step regardless).
+  final bool isSkippable;
 
   Widget build(
     BuildContext context,

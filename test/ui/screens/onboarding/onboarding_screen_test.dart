@@ -71,38 +71,72 @@ void main() {
     expect(find.text('Discover what’s below'), findsOneWidget);
 
     await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
-    await _pumpUntilVisible(tester, find.text('How often do you fly?'));
+    await _pumpUntilVisible(
+      tester,
+      find.text('Which places do you want to see on your map?'),
+    );
 
-    expect(find.text('How often do you fly?'), findsOneWidget);
+    expect(
+      find.text('Which places do you want to see on your map?'),
+      findsOneWidget,
+    );
 
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getBool('onboarding.seen'), isNot(true));
   });
 
-  testWidgets('frequency step blocks continue until user selects a value', (
-    tester,
-  ) async {
-    await tester.pumpWidget(_buildTestApp());
-    await _pumpUntilVisible(tester, find.text('Discover what’s below'));
+  testWidgets(
+    'home airport step blocks continue and offers no skip',
+    (tester) async {
+      await tester.pumpWidget(_buildTestApp());
+      await _pumpUntilVisible(tester, find.text('Discover what’s below'));
 
-    await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
-    await _pumpUntilVisible(tester, find.text('How often do you fly?'));
+      await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
+      await _pumpUi(tester);
+      await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
+      await _pumpUntilVisible(tester, find.text('Set your home airport'));
 
-    expect(find.text('How often do you fly?'), findsOneWidget);
+      expect(find.text('Set your home airport'), findsOneWidget);
+      // The airport is required: no Skip on this step.
+      expect(find.widgetWithText(TertiaryButton, 'Skip'), findsNothing);
 
-    await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
-    await _pumpUntilVisible(tester, find.text('How often do you fly?'));
+      await tester.tap(
+        find.widgetWithText(PrimaryButton, 'Continue'),
+        warnIfMissed: false,
+      );
+      await _pumpUi(tester);
 
-    expect(find.text('How often do you fly?'), findsOneWidget);
+      expect(find.text('Set your home airport'), findsOneWidget);
+    },
+  );
 
-    await tester.tap(find.text('This is my first flight'));
-    await _pumpUi(tester);
+  testWidgets(
+    'selecting a popular airport shows no not-found message and unlocks continue',
+    (tester) async {
+      await tester.pumpWidget(_buildTestApp());
+      await _pumpUntilVisible(tester, find.text('Discover what’s below'));
 
-    await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
-    await _pumpUntilVisible(tester, find.text('Set your home airport'));
+      await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
+      await _pumpUi(tester);
+      await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
+      await _pumpUntilVisible(tester, find.text('Set your home airport'));
 
-    expect(find.text('Set your home airport'), findsOneWidget);
-  });
+      await tester.tap(find.textContaining('London Heathrow').first);
+      await _pumpUi(tester);
+
+      // Selection fills the query and clears results; this must not render
+      // as a failed search.
+      expect(find.text('No airports found for that search.'), findsNothing);
+
+      await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
+      await _pumpUntilVisible(tester, find.text("Stop missing what's below"));
+
+      expect(find.text("Stop missing what's below"), findsOneWidget);
+
+      // Let the payoff grace timer elapse so no timer is pending at teardown.
+      await tester.pump(const Duration(seconds: 4));
+    },
+  );
 
   testWidgets(
     'final CTA completes onboarding and route selector back returns home',
@@ -110,14 +144,24 @@ void main() {
       await tester.pumpWidget(_buildTestApp());
       await _pumpUntilVisible(tester, find.text('Discover what’s below'));
 
-      for (var i = 0; i < 5; i++) {
+      for (var i = 0; i < 2; i++) {
         await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
         await _pumpUi(tester);
       }
 
-      await _pumpUntilVisible(tester, find.text('Get more from every flight'));
+      // The home airport is mandatory now; select one to reach the payoff.
+      await _pumpUntilVisible(tester, find.text('Set your home airport'));
+      await tester.tap(find.textContaining('London Heathrow').first);
+      await _pumpUi(tester);
+      await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
 
-      await tester.tap(find.widgetWithText(TertiaryButton, 'Continue Free'));
+      // Payoff is the last step; its CTA presents the paywall (the fake
+      // repository reports it as cancelled) and finishes onboarding.
+      await _pumpUntilVisible(tester, find.text("Stop missing what's below"));
+
+      await tester.tap(
+        find.widgetWithText(PrimaryButton, 'Start my first flight'),
+      );
       await _pumpUntilVisible(tester, find.text('New flight'));
 
       expect(find.text('New flight'), findsOneWidget);

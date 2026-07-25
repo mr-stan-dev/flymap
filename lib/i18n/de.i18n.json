@@ -899,7 +899,7 @@
     "popularAirports": "Beliebte Flughäfen",
     "removeHomeAirport": "Heimatflughafen entfernen",
     "noHomeAirportFound": "Für diese Suche wurden keine Flughäfen gefunden.",
-    "interestsTitle": "Welche Orte möchtest du auf der Karte häufiger sehen?",
+    "interestsTitle": "Welche Orte möchtest du auf deiner Karte sehen?",
     "interestsSubtitle": "Wähle bis zu 3 Themen, um relevantere Orte und Geschichten entlang deines Flugs zu sehen.",
     "interestsHelper": "Wähle bis zu 3 Themen.",
     "interestsSelected": "$count von $max ausgewählt",
@@ -909,20 +909,16 @@
     "interestIslands": "Inseln & Küstenlinien",
     "interestNationalParks": "Nationalparks & Reservate",
     "interestRivers": "Flüsse & Seen",
-    "proTitle": "Hole mehr aus jedem Flug heraus",
-    "proStepSubtitle": "Schalte detaillierte Karten, Orte und Artikel frei — sogar offline.",
-    "proFeatureMaps": "Detaillierte Karten für deinen Flug",
-    "proFeatureRoutes": "Die genauesten Flugrouten",
-    "proFeaturePlaces": "10x mehr Orte entlang der Route",
-    "proFeatureTimeline": "Eine detaillierte Zeitachse deines gesamten Flugs",
-    "proFeatureArticles": "Vollständiges Paket mit Offline-Artikeln",
-    "unlockPro": "Zu Pro upgraden",
-    "continueFree": "Kostenlos fortfahren",
-    "proActiveTitle": "Glückwunsch!",
-    "proActiveSubtitle": "Du hast jetzt vollen Zugriff auf detaillierte Karten, alle Orte und Artikelpakete.",
     "planFirstFlight": "Meinen ersten Flug planen",
-    "planFirstFlightPro": "Meinen ersten detaillierten Flug planen",
-    "failedLoadProfile": "Dein Profil konnte nicht geladen werden."
+    "failedLoadProfile": "Dein Profil konnte nicht geladen werden.",
+    "payoff": {
+      "title": "Orte rund um $airport, die du nicht verpassen solltest",
+      "subtitle": "Du fliegst jedes Mal direkt darüber hinweg — halte auf deinem nächsten Flug Ausschau:",
+      "scanning": "Wir scannen den Himmel rund um $airport…",
+      "moreNearby": "…und $count+ weitere Orte in der Nähe:",
+      "fallbackTitle": "Verpasse nie wieder, was unter dir liegt",
+      "fallbackSubtitle": "Jeder Flug führt über Vulkane, Berge, Inseln und Seen, die die meisten Reisenden nie bemerken. Flymap zeigt dir, was vor deinem Fenster liegt."
+    }
   },
   "countries": {
     "AE": "Vereinigte Arabische Emirate",

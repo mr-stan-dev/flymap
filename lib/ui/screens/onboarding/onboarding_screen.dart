@@ -7,23 +7,21 @@ import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/repository/feature_announcement_repository.dart';
+import 'package:flymap/repository/home_area_overview_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/onboarding/model/onboarding_step_definition.dart';
-import 'package:flymap/ui/screens/onboarding/steps/onboarding_frequency_step.dart';
+import 'package:flymap/ui/screens/onboarding/steps/onboarding_area_payoff_step.dart';
 import 'package:flymap/ui/screens/onboarding/steps/onboarding_home_airport_step.dart';
 import 'package:flymap/ui/screens/onboarding/steps/onboarding_interests_step.dart';
-import 'package:flymap/ui/screens/onboarding/steps/onboarding_name_step.dart';
-import 'package:flymap/ui/screens/onboarding/steps/onboarding_pro_step.dart';
 import 'package:flymap/ui/screens/onboarding/steps/onboarding_welcome_step.dart';
 import 'package:flymap/ui/screens/onboarding/viewmodel/onboarding_profile_form_cubit.dart';
 import 'package:flymap/ui/screens/onboarding/viewmodel/onboarding_profile_form_state.dart';
 import 'package:flymap/ui/screens/onboarding/widgets/onboarding_progress_indicator.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
-import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart';
 import 'package:get_it/get_it.dart';
 
 class OnboardingScreen extends StatelessWidget {
@@ -41,6 +39,9 @@ class OnboardingScreen extends StatelessWidget {
             GetIt.I.isRegistered<FeatureAnnouncementRepository>()
             ? GetIt.I<FeatureAnnouncementRepository>()
             : null,
+        homeAreaRepository: GetIt.I.isRegistered<HomeAreaOverviewRepository>()
+            ? GetIt.I<HomeAreaOverviewRepository>()
+            : null,
       ),
       child: const _OnboardingFlowView(),
     );
@@ -55,7 +56,7 @@ class _OnboardingFlowView extends StatefulWidget {
 }
 
 class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
-  static const String _flowVersion = 'v2_profile';
+  static const String _flowVersion = 'v4_direct_paywall';
   static const String _entrySource = 'app_launch';
 
   final AppAnalytics _analytics = GetIt.I<AppAnalytics>();
@@ -67,25 +68,23 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
   String? _lastTrackedStepId;
   int? _lastTrackedStepIndex;
 
-  List<OnboardingStepDefinition> _steps(SubscriptionState subscriptionState) =>
-      [
+  List<OnboardingStepDefinition> _steps() => [
         OnboardingStepDefinition(
           id: OnboardingStepId.welcome,
           stepBuilder: (context, __, ___) => OnboardingWelcomeStep(),
-          primaryActionLabel: (context, _, __) =>
-              context.t.onboarding.letsStart,
+          primaryActionLabel: (context, _) => context.t.onboarding.letsStart,
           canContinue: (_) => true,
         ),
         OnboardingStepDefinition(
-          id: OnboardingStepId.frequency,
-          stepBuilder: (context, cubit, state) => OnboardingFrequencyStep(
-            title: context.t.onboarding.frequencyTitle,
-            subtitle: context.t.onboarding.frequencySubtitle,
-            selectedFrequency: state.profile.flyingFrequency,
-            onChanged: cubit.setFlyingFrequency,
+          id: OnboardingStepId.interests,
+          stepBuilder: (context, cubit, state) => OnboardingInterestsStep(
+            title: context.t.onboarding.interestsTitle,
+            subtitle: context.t.onboarding.interestsSubtitle,
+            selectedInterests: state.profile.interests,
+            onToggleInterest: cubit.toggleInterest,
           ),
-          primaryActionLabel: (context, _, __) => context.t.common.kContinue,
-          canContinue: (state) => state.profile.flyingFrequency != null,
+          primaryActionLabel: (context, _) => context.t.common.kContinue,
+          canContinue: (_) => true,
         ),
         OnboardingStepDefinition(
           id: OnboardingStepId.homeAirport,
@@ -103,40 +102,20 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
                 cubit.selectHomeAirport(airport, addToFavorites: false),
             onClearSelectedAirport: cubit.clearHomeAirport,
           ),
-          primaryActionLabel: (context, _, __) => context.t.common.kContinue,
+          primaryActionLabel: (context, _) => context.t.common.kContinue,
           canContinue: (state) => state.homeAirport != null,
+          // The payoff step depends on the home airport, so it can't be
+          // skipped.
+          isSkippable: false,
         ),
         OnboardingStepDefinition(
-          id: OnboardingStepId.interests,
-          stepBuilder: (context, cubit, state) => OnboardingInterestsStep(
-            title: context.t.onboarding.interestsTitle,
-            subtitle: context.t.onboarding.interestsSubtitle,
-            selectedInterests: state.profile.interests,
-            onToggleInterest: cubit.toggleInterest,
+          id: OnboardingStepId.areaPayoff,
+          stepBuilder: (context, _, state) => OnboardingAreaPayoffStep(
+            airport: state.homeAirport,
+            status: state.homeAreaStatus,
+            summary: state.homeAreaSummary,
           ),
-          primaryActionLabel: (context, _, __) => context.t.common.kContinue,
-          canContinue: (_) => true,
-        ),
-        OnboardingStepDefinition(
-          id: OnboardingStepId.name,
-          stepBuilder: (context, cubit, state) => OnboardingNameStep(
-            title: context.t.onboarding.nameTitle,
-            subtitle: context.t.onboarding.nameSubtitle,
-            initialValue: state.profile.displayName,
-            onChanged: cubit.setDisplayName,
-          ),
-          primaryActionLabel: (context, _, __) => context.t.common.kContinue,
-          canContinue: (state) => state.profile.displayName.trim().isNotEmpty,
-        ),
-        OnboardingStepDefinition(
-          id: OnboardingStepId.pro,
-          stepBuilder: (context, _, __) => OnboardingProStep(
-            title: subscriptionState.isPro
-                ? context.t.onboarding.proActiveTitle
-                : context.t.onboarding.proTitle,
-            isPro: subscriptionState.isPro,
-          ),
-          primaryActionLabel: (context, _, __) =>
+          primaryActionLabel: (context, _) =>
               context.t.onboarding.planFirstFlight,
           canContinue: (_) => true,
         ),
@@ -157,8 +136,7 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
 
   @override
   Widget build(BuildContext context) {
-    final subscriptionState = context.watch<SubscriptionCubit>().state;
-    final steps = _steps(subscriptionState);
+    final steps = _steps();
     final isLastStep = _stepIndex == steps.length - 1;
 
     return BlocBuilder<OnboardingProfileFormCubit, OnboardingProfileFormState>(
@@ -166,7 +144,8 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
         final currentStep = steps[_stepIndex];
         final canContinue =
             !_isFinishing && !state.isLoading && currentStep.canContinue(state);
-        _trackStepViewed(stepId: currentStep.id, isSkippable: !isLastStep);
+        final isSkippable = !isLastStep && currentStep.isSkippable;
+        _trackStepViewed(stepId: currentStep.id, isSkippable: isSkippable);
 
         return Scaffold(
           body: SafeArea(
@@ -206,7 +185,7 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
                         ),
                         Align(
                           alignment: Alignment.centerRight,
-                          child: !isLastStep
+                          child: isSkippable
                               ? TertiaryButton(
                                   label: context.t.onboarding.skip,
                                   onPressed: _isFinishing
@@ -245,7 +224,6 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
                     context,
                     currentStep: currentStep,
                     state: state,
-                    subscriptionState: subscriptionState,
                     canContinue: canContinue,
                     isLastStep: isLastStep,
                     stepsTotal: steps.length,
@@ -259,18 +237,10 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
     );
   }
 
-  bool _isSoftProStep(
-    OnboardingStepDefinition currentStep,
-    SubscriptionState subscriptionState,
-  ) {
-    return currentStep.id == OnboardingStepId.pro && !subscriptionState.isPro;
-  }
-
   Widget _buildBottomActions(
     BuildContext context, {
     required OnboardingStepDefinition currentStep,
     required OnboardingProfileFormState state,
-    required SubscriptionState subscriptionState,
     required bool canContinue,
     required bool isLastStep,
     required int stepsTotal,
@@ -286,27 +256,8 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
           )
         : null;
 
-    if (_isSoftProStep(currentStep, subscriptionState)) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          PremiumButton(
-            label: context.t.onboarding.unlockPro,
-            trailingIcon: Icons.arrow_forward_rounded,
-            onPressed: _isFinishing ? null : () => _tryPro(context),
-          ),
-          SizedBox(height: 12),
-          TertiaryButton(
-            label: context.t.onboarding.continueFree,
-            isLoading: _isFinishing,
-            onPressed: onContinuePressed,
-          ),
-        ],
-      );
-    }
-
     return PrimaryButton(
-      label: currentStep.primaryActionLabel(context, state, subscriptionState),
+      label: currentStep.primaryActionLabel(context, state),
       isLoading: _isFinishing,
       onPressed: onContinuePressed,
     );
@@ -332,6 +283,9 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
     });
   }
 
+  /// Finishes onboarding: presents the real paywall directly (no soft
+  /// pre-paywall step), then continues into first flight creation regardless
+  /// of the outcome — the paywall never blocks onboarding.
   Future<void> _finish(
     OnboardingProfileFormCubit cubit, {
     required int stepsTotal,
@@ -339,6 +293,11 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
     setState(() {
       _isFinishing = true;
     });
+    final subscriptionCubit = context.read<SubscriptionCubit>();
+    SubscriptionPaywallResult? paywallResult;
+    if (!subscriptionCubit.state.isPro) {
+      paywallResult = await subscriptionCubit.presentPaywallFromOnboarding();
+    }
     await cubit.completeOnboarding();
     final durationSec = DateTime.now().difference(_startedAt).inSeconds;
     unawaited(
@@ -352,6 +311,12 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
       ),
     );
     if (!mounted) return;
+    if (paywallResult == SubscriptionPaywallResult.purchased ||
+        paywallResult == SubscriptionPaywallResult.restored) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.t.settings.flymapProActivated)),
+      );
+    }
     AppRouter.goToRouteTypeSelectorFromOnboarding(context);
   }
 
@@ -371,38 +336,6 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
     setState(() {
       _stepIndex += 1;
     });
-  }
-
-  Future<void> _tryPro(BuildContext context) async {
-    final result = await context
-        .read<SubscriptionCubit>()
-        .presentPaywallFromOnboarding();
-    if (!context.mounted) return;
-
-    final messenger = ScaffoldMessenger.of(context);
-    switch (result) {
-      case SubscriptionPaywallResult.purchased:
-      case SubscriptionPaywallResult.restored:
-        messenger.showSnackBar(
-          SnackBar(content: Text(context.t.settings.flymapProActivated)),
-        );
-        return;
-      case SubscriptionPaywallResult.cancelled:
-        messenger.showSnackBar(
-          SnackBar(content: Text(context.t.settings.upgradeCancelled)),
-        );
-        return;
-      case SubscriptionPaywallResult.notPresented:
-        messenger.showSnackBar(
-          SnackBar(content: Text(context.t.settings.noPaywall)),
-        );
-        return;
-      case SubscriptionPaywallResult.error:
-        messenger.showSnackBar(
-          SnackBar(content: Text(context.t.settings.failedOpenPaywall)),
-        );
-        return;
-    }
   }
 
   void _trackStepViewed({
@@ -449,16 +382,17 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
   ) {
     return switch (stepId) {
       OnboardingStepId.welcome => 'none',
-      OnboardingStepId.frequency =>
-        state.profile.flyingFrequency == null ? 'empty' : 'selected',
       OnboardingStepId.homeAirport =>
         state.homeAirport == null ? 'empty' : 'selected',
       OnboardingStepId.interests =>
         'selected_${state.profile.interests.length}',
-      OnboardingStepId.name =>
-        state.profile.displayName.trim().isEmpty ? 'empty' : 'filled',
-      OnboardingStepId.pro =>
-        context.read<SubscriptionCubit>().state.isPro ? 'is_pro' : 'free',
+      OnboardingStepId.areaPayoff => switch (state.homeAreaStatus) {
+        HomeAreaSummaryStatus.ready =>
+          'ready_${state.homeAreaSummary?.totalPlaces ?? 0}',
+        HomeAreaSummaryStatus.loading => 'loading',
+        HomeAreaSummaryStatus.failed => 'failed',
+        HomeAreaSummaryStatus.none => 'fallback',
+      },
     };
   }
 }

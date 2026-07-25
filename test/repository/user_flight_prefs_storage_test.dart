@@ -36,21 +36,23 @@ void main() {
     ]);
   });
 
-  test('maps legacy interest names to new enum values', () async {
-    SharedPreferences.setMockInitialValues(<String, Object>{
-      'onboarding.profile.interests': <String>[
-        'landmarks',
-        'aviationHistory',
-        'engineering',
-      ],
-    });
-    storage = UserFlightPrefsStorage();
+  test(
+    'maps legacy interest names and drops retired topics without a match',
+    () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'onboarding.profile.interests': <String>[
+          'landmarks',
+          'aviationHistory',
+          'engineering',
+        ],
+      });
+      storage = UserFlightPrefsStorage();
 
-    final loaded = await storage.loadPrefs();
-    expect(loaded.interests, const [
-      UsersInterests.nationalParks,
-      UsersInterests.rivers,
-      UsersInterests.volcanoes,
-    ]);
-  });
+      final loaded = await storage.loadPrefs();
+      // 'aviationHistory' and 'engineering' come from a retired topic set
+      // with no meaningful successor; they are dropped instead of being
+      // force-mapped to unrelated topics.
+      expect(loaded.interests, const [UsersInterests.nationalParks]);
+    },
+  );
 }

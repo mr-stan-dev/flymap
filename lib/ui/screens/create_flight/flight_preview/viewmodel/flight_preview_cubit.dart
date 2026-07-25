@@ -17,6 +17,7 @@ import 'package:flymap/domain/entity/route_poi_summary.dart';
 import 'package:flymap/domain/entity/route_region.dart';
 import 'package:flymap/domain/entity/user_flight_prefs.dart';
 import 'package:flymap/domain/entity/wiki_article_candidate.dart';
+import 'package:flymap/domain/policy/poi_interest_ranking_policy.dart';
 import 'package:flymap/domain/policy/poi_limits_policy.dart';
 import 'package:flymap/domain/policy/route_region_premium_gate_policy.dart';
 import 'package:flymap/i18n/app_localization.dart';

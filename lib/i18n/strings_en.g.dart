@@ -1463,8 +1463,8 @@ class TranslationsOnboardingEn {
 	/// en: 'No airports found for that search.'
 	String get noHomeAirportFound => 'No airports found for that search.';
 
-	/// en: 'What places you want to see more on a map?'
-	String get interestsTitle => 'What places you want to see more on a map?';
+	/// en: 'Which places do you want to see on your map?'
+	String get interestsTitle => 'Which places do you want to see on your map?';
 
 	/// en: 'Choose up to 3 topics to see more relevant places and stories along your flight.'
 	String get interestsSubtitle => 'Choose up to 3 topics to see more relevant places and stories along your flight.';
@@ -1493,47 +1493,13 @@ class TranslationsOnboardingEn {
 	/// en: 'Rivers & lakes'
 	String get interestRivers => 'Rivers & lakes';
 
-	/// en: 'Get more from every flight'
-	String get proTitle => 'Get more from every flight';
-
-	/// en: 'Unlock detailed maps, places and articles — even offline.'
-	String get proStepSubtitle => 'Unlock detailed maps, places and articles — even offline.';
-
-	/// en: 'Detailed maps for your flight'
-	String get proFeatureMaps => 'Detailed maps for your flight';
-
-	/// en: 'Most accurate flight routes'
-	String get proFeatureRoutes => 'Most accurate flight routes';
-
-	/// en: '10x more places along the route'
-	String get proFeaturePlaces => '10x more places along the route';
-
-	/// en: 'A detailed timeline of your entire flight'
-	String get proFeatureTimeline => 'A detailed timeline of your entire flight';
-
-	/// en: 'Complete pack of offline articles'
-	String get proFeatureArticles => 'Complete pack of offline articles';
-
-	/// en: 'Upgrade to Pro'
-	String get unlockPro => 'Upgrade to Pro';
-
-	/// en: 'Continue Free'
-	String get continueFree => 'Continue Free';
-
-	/// en: 'Congratulations!'
-	String get proActiveTitle => 'Congratulations!';
-
-	/// en: 'You now have full access to detailed maps, all places, and article packs.'
-	String get proActiveSubtitle => 'You now have full access to detailed maps, all places, and article packs.';
-
 	/// en: 'Start my first flight'
 	String get planFirstFlight => 'Start my first flight';
 
-	/// en: 'Plan my first detailed flight'
-	String get planFirstFlightPro => 'Plan my first detailed flight';
-
 	/// en: 'Failed to load your profile.'
 	String get failedLoadProfile => 'Failed to load your profile.';
+
+	late final TranslationsOnboardingPayoffEn payoff = TranslationsOnboardingPayoffEn.internal(_root);
 }
 
 // Path: countries
@@ -3376,6 +3342,33 @@ class TranslationsFlightRouteEn {
 	String get etaUnknownLabel => 'estimating...';
 }
 
+// Path: onboarding.payoff
+class TranslationsOnboardingPayoffEn {
+	TranslationsOnboardingPayoffEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Places around $airport you shouldn't miss'
+	String title({required Object airport}) => 'Places around ${airport} you shouldn\'t miss';
+
+	/// en: 'You've been flying right over all this — spot them on your next flight:'
+	String get subtitle => 'You\'ve been flying right over all this — spot them on your next flight:';
+
+	/// en: 'Scanning the skies around $airport…'
+	String scanning({required Object airport}) => 'Scanning the skies around ${airport}…';
+
+	/// en: '…and $count+ more to discover nearby:'
+	String moreNearby({required Object count}) => '…and ${count}+ more to discover nearby:';
+
+	/// en: 'Stop missing what's below'
+	String get fallbackTitle => 'Stop missing what\'s below';
+
+	/// en: 'Every flight soars over volcanoes, mountains, islands and lakes most travelers never notice. Flymap shows you what's out your window.'
+	String get fallbackSubtitle => 'Every flight soars over volcanoes, mountains, islands and lakes most travelers never notice. Flymap shows you what\'s out your window.';
+}
+
 // Path: createFlight.overview.airportCard
 class TranslationsCreateFlightOverviewAirportCardEn {
 	TranslationsCreateFlightOverviewAirportCardEn.internal(this._root);
@@ -4378,7 +4371,7 @@ extension on Translations {
 			'onboarding.popularAirports' => 'Popular airports',
 			'onboarding.removeHomeAirport' => 'Remove home airport',
 			'onboarding.noHomeAirportFound' => 'No airports found for that search.',
-			'onboarding.interestsTitle' => 'What places you want to see more on a map?',
+			'onboarding.interestsTitle' => 'Which places do you want to see on your map?',
 			'onboarding.interestsSubtitle' => 'Choose up to 3 topics to see more relevant places and stories along your flight.',
 			'onboarding.interestsHelper' => 'Pick up to 3 topics.',
 			'onboarding.interestsSelected' => ({required Object count, required Object max}) => '${count} of ${max} selected',
@@ -4388,20 +4381,14 @@ extension on Translations {
 			'onboarding.interestIslands' => 'Islands & coastlines',
 			'onboarding.interestNationalParks' => 'National parks & reserves',
 			'onboarding.interestRivers' => 'Rivers & lakes',
-			'onboarding.proTitle' => 'Get more from every flight',
-			'onboarding.proStepSubtitle' => 'Unlock detailed maps, places and articles — even offline.',
-			'onboarding.proFeatureMaps' => 'Detailed maps for your flight',
-			'onboarding.proFeatureRoutes' => 'Most accurate flight routes',
-			'onboarding.proFeaturePlaces' => '10x more places along the route',
-			'onboarding.proFeatureTimeline' => 'A detailed timeline of your entire flight',
-			'onboarding.proFeatureArticles' => 'Complete pack of offline articles',
-			'onboarding.unlockPro' => 'Upgrade to Pro',
-			'onboarding.continueFree' => 'Continue Free',
-			'onboarding.proActiveTitle' => 'Congratulations!',
-			'onboarding.proActiveSubtitle' => 'You now have full access to detailed maps, all places, and article packs.',
 			'onboarding.planFirstFlight' => 'Start my first flight',
-			'onboarding.planFirstFlightPro' => 'Plan my first detailed flight',
 			'onboarding.failedLoadProfile' => 'Failed to load your profile.',
+			'onboarding.payoff.title' => ({required Object airport}) => 'Places around ${airport} you shouldn\'t miss',
+			'onboarding.payoff.subtitle' => 'You\'ve been flying right over all this — spot them on your next flight:',
+			'onboarding.payoff.scanning' => ({required Object airport}) => 'Scanning the skies around ${airport}…',
+			'onboarding.payoff.moreNearby' => ({required Object count}) => '…and ${count}+ more to discover nearby:',
+			'onboarding.payoff.fallbackTitle' => 'Stop missing what\'s below',
+			'onboarding.payoff.fallbackSubtitle' => 'Every flight soars over volcanoes, mountains, islands and lakes most travelers never notice. Flymap shows you what\'s out your window.',
 			'countries.AE' => 'United Arab Emirates',
 			'countries.AF' => 'Afghanistan',
 			'countries.AG' => 'Antigua and Barbuda',
@@ -4577,14 +4564,14 @@ extension on Translations {
 			'countries.TW' => 'Taiwan, China',
 			'countries.TZ' => 'Tanzania, United Republic of',
 			'countries.UA' => 'Ukraine',
-			_ => null,
-		} ?? switch (path) {
 			'countries.UG' => 'Uganda',
 			'countries.US' => 'United States',
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Uzbekistan',
 			'countries.VE' => 'Venezuela, Bolivarian Rep. of',
 			'countries.VI' => 'Virgin Islands (US)',
+			_ => null,
+		} ?? switch (path) {
 			'countries.VN' => 'Viet Nam',
 			'countries.YE' => 'Yemen',
 			'countries.ZA' => 'South Africa',

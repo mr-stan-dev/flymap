@@ -157,6 +157,7 @@ class PreviewPreparationDelegate {
           !route.isHistoricalTrack &&
           routeLength.minDistanceKm >= RouteLength.long.minDistanceKm;
 
+      final userPrefs = await _loadUserPrefs();
       _cubit._emitState(
         _cubit.state.copyWith(
           flightRoute: route,
@@ -168,13 +169,13 @@ class PreviewPreparationDelegate {
           isPreviewLoading: false,
           hasInternetForMapPreview: true,
           flightInfo: FlightInfo.empty.copyWith(
-            poi: overview.topPois
-                .take(
-                  PoiLimitsPolicy.maxPoisForTier(
-                    isProUser: _cubit.hasEffectiveProAccess,
-                  ),
-                )
-                .toList(growable: false),
+            // Interests influence which POIs make the tier cap, so a
+            // volcano lover's free 10 actually contains volcanoes.
+            poi: PoiInterestRankingPolicy.selectForTier(
+              overview.topPois,
+              isProUser: _cubit.hasEffectiveProAccess,
+              interests: userPrefs.interests,
+            ),
             routeRegions: timeline.regions,
             routeTotalMinutes: timeline.totalRouteMinutes,
             routeCruiseSpeedKmh: timeline.cruiseSpeedKmh,
@@ -197,7 +198,6 @@ class PreviewPreparationDelegate {
         ),
       );
 
-      final userPrefs = await _loadUserPrefs();
       unawaited(_prefetchWiki(route, userPrefs: userPrefs));
     } catch (e, stackTrace) {
       _cubit._logger.error('Failed to prepare map preview: $e');

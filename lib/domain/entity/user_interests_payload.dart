@@ -34,12 +34,9 @@ extension UsersInterestsPayload on UsersInterests {
           'rivers' ||
           'rivers_lakes' ||
           'riverslakes' ||
-          'rivers & lakes' ||
-          'aviationhistory' ||
-          'aviation_history' => UsersInterests.rivers,
+          'rivers & lakes' => UsersInterests.rivers,
           'volcanoesgeology' ||
-          'volcanoes_geology' ||
-          'engineering' => UsersInterests.volcanoes,
+          'volcanoes_geology' => UsersInterests.volcanoes,
           _ => null,
         } ??
         switch (compact) {

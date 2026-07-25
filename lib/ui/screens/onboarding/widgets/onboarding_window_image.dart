@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
-class OnboardingWindowImage extends StatelessWidget {
-  const OnboardingWindowImage({required this.assetPath, super.key});
+/// Airplane-window-shaped frame used by the onboarding welcome step.
+/// Renders [content] clipped to the window shape, with the glass gradient
+/// and rim border on top.
+class OnboardingWindow extends StatelessWidget {
+  const OnboardingWindow({required this.content, super.key});
 
-  final String assetPath;
+  final Widget content;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +32,7 @@ class OnboardingWindowImage extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(assetPath, fit: BoxFit.cover),
+                  content,
                   DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -65,6 +68,17 @@ class OnboardingWindowImage extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class OnboardingWindowImage extends StatelessWidget {
+  const OnboardingWindowImage({required this.assetPath, super.key});
+
+  final String assetPath;
+
+  @override
+  Widget build(BuildContext context) {
+    return OnboardingWindow(content: Image.asset(assetPath, fit: BoxFit.cover));
   }
 }
 

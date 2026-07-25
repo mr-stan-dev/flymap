@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -137,41 +139,26 @@ class _SettingsProfileContent extends StatelessWidget {
         initialName.length <= UserProfile.maxDisplayNameLength
         ? initialName
         : initialName.substring(0, UserProfile.maxDisplayNameLength);
-    final controller = TextEditingController(text: cappedInitialName);
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       showDragHandle: true,
-      builder: (sheetContext) {
-        return SettingsBottomSheet(
-          title: context.t.onboarding.nameTitle,
-          onConfirm: () async {
-            await cubit.setDisplayName(controller.text.trim());
-            if (sheetContext.mounted) {
-              Navigator.of(sheetContext).pop();
-            }
-          },
-          child: TextField(
-            controller: controller,
-            textCapitalization: TextCapitalization.words,
-            inputFormatters: [
-              LengthLimitingTextInputFormatter(
-                UserProfile.maxDisplayNameLength,
-              ),
-            ],
-            decoration: InputDecoration(
-              hintText: context.t.onboarding.nameExample,
-              prefixIcon: const Icon(Icons.person_outline_rounded),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-          ),
-        );
-      },
+      builder: (sheetContext) => _NameSheetForm(
+        title: context.t.onboarding.nameTitle,
+        hint: context.t.onboarding.nameExample,
+        initialName: cappedInitialName,
+        onConfirm: (name) {
+          // Unfocus and pop synchronously, persisting without blocking the
+          // pop: popping after an async gap with the field still focused
+          // lets hardware key events race the sheet's teardown and trip a
+          // framework focus-highlight assertion.
+          FocusManager.instance.primaryFocus?.unfocus();
+          Navigator.of(sheetContext).pop();
+          unawaited(cubit.setDisplayName(name));
+        },
+      ),
     );
-    controller.dispose();
   }
 
   Future<void> _openFrequencySheet(
@@ -360,6 +347,59 @@ class _ProfileHeader extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Owns the name field's [TextEditingController] for the sheet's full
+/// lifetime — including the exit animation — so it is never used after
+/// dispose (the `showModalBottomSheet` future resolves when the pop starts,
+/// while the sheet keeps rendering until the transition finishes).
+class _NameSheetForm extends StatefulWidget {
+  const _NameSheetForm({
+    required this.title,
+    required this.hint,
+    required this.initialName,
+    required this.onConfirm,
+  });
+
+  final String title;
+  final String hint;
+  final String initialName;
+  final ValueChanged<String> onConfirm;
+
+  @override
+  State<_NameSheetForm> createState() => _NameSheetFormState();
+}
+
+class _NameSheetFormState extends State<_NameSheetForm> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initialName,
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsBottomSheet(
+      title: widget.title,
+      onConfirm: () => widget.onConfirm(_controller.text.trim()),
+      child: TextField(
+        controller: _controller,
+        textCapitalization: TextCapitalization.words,
+        inputFormatters: [
+          LengthLimitingTextInputFormatter(UserProfile.maxDisplayNameLength),
+        ],
+        decoration: InputDecoration(
+          hintText: widget.hint,
+          prefixIcon: const Icon(Icons.person_outline_rounded),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+        ),
       ),
     );
   }
