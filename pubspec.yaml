@@ -73,6 +73,12 @@ dev_dependencies:
   slang_build_runner: ^4.8.0
 
 flutter:
+  # Stay on CocoaPods for iOS plugins: the SwiftPM migration breaks the
+  # FlutterFire release build (firebase_auth can't find firebase_core
+  # headers), and flutter_quick_video_encoder has no SwiftPM support anyway.
+  config:
+    enable-swift-package-manager: false
+
   uses-material-design: true
 
   assets:
