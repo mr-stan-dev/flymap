@@ -105,7 +105,11 @@ class ApiHomeAreaOverviewRepository implements HomeAreaOverviewRepository {
         if (_mundaneTypes.contains(type)) continue;
         final sitelinks = props['sitelinks'];
         ranked.add((
-          place: HomeAreaPlace(name: name, type: type),
+          place: HomeAreaPlace(
+            name: name,
+            type: type,
+            qid: (props['qid'] ?? '').toString().trim(),
+          ),
           sitelinks: sitelinks is num ? sitelinks.toInt() : 0,
         ));
       }

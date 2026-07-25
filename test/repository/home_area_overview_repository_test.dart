@@ -69,10 +69,22 @@ void main() {
     // prefer type variety (Schneeberg over the higher-ranked second lake)
     // before backfilling by rank.
     expect(summary.topPlaces, const [
-      HomeAreaPlace(name: 'Neusiedler See', type: FlightPoiType.lake),
-      HomeAreaPlace(name: 'Schneeberg', type: FlightPoiType.mountain),
-      HomeAreaPlace(name: 'Attersee', type: FlightPoiType.lake),
-      HomeAreaPlace(name: 'Rax', type: FlightPoiType.mountain),
+      HomeAreaPlace(
+        name: 'Neusiedler See',
+        type: FlightPoiType.lake,
+        qid: 'Q_Neusiedler See',
+      ),
+      HomeAreaPlace(
+        name: 'Schneeberg',
+        type: FlightPoiType.mountain,
+        qid: 'Q_Schneeberg',
+      ),
+      HomeAreaPlace(
+        name: 'Attersee',
+        type: FlightPoiType.lake,
+        qid: 'Q_Attersee',
+      ),
+      HomeAreaPlace(name: 'Rax', type: FlightPoiType.mountain, qid: 'Q_Rax'),
     ]);
     expect(summary.regionNames, ['Alps', 'Pannonian Basin']);
     expect(summary.isEmpty, isFalse);
@@ -120,7 +132,11 @@ void main() {
     expect(summary.countsByType.containsKey(FlightPoiType.reserve), isFalse);
     expect(summary.totalPlaces, 1);
     expect(summary.topPlaces, const [
-      HomeAreaPlace(name: 'Schneeberg', type: FlightPoiType.mountain),
+      HomeAreaPlace(
+        name: 'Schneeberg',
+        type: FlightPoiType.mountain,
+        qid: 'Q_Schneeberg',
+      ),
     ]);
   });
 

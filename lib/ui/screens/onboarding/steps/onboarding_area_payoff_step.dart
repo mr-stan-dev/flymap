@@ -7,6 +7,7 @@ import 'package:flymap/domain/entity/user_interests_poi_types.dart';
 import 'package:flymap/domain/entity/user_profile.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/poi_preview_bottom_sheet.dart';
 import 'package:flymap/ui/screens/onboarding/model/onboarding_profile_ui.dart';
 import 'package:flymap/ui/screens/onboarding/viewmodel/onboarding_profile_form_state.dart';
 import 'package:flymap/ui/screens/onboarding/widgets/onboarding_step_scaffold.dart';
@@ -210,33 +211,48 @@ class _PlaceChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: BorderRadius.circular(DsRadii.pill),
-        border: Border.all(color: scheme.outlineVariant),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(
-            PoiTypeMarkerAsset.iconPathFor(place.type),
-            width: 18,
-            height: 18,
-            fit: BoxFit.contain,
-            errorBuilder: (_, _, _) =>
-                Icon(Icons.place_rounded, size: 16, color: scheme.primary),
+    return Material(
+      color: scheme.surface,
+      shape: StadiumBorder(side: BorderSide(color: scheme.outlineVariant)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        // The regular place preview sheet needs a wikidata id to load its
+        // description; chips without one stay static.
+        onTap: place.qid.isEmpty ? null : () => _openPreview(context),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                PoiTypeMarkerAsset.iconPathFor(place.type),
+                width: 18,
+                height: 18,
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) =>
+                    Icon(Icons.place_rounded, size: 16, color: scheme.primary),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                place.name,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 6),
-          Text(
-            place.name,
-            style: theme.textTheme.labelLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
+        ),
       ),
+    );
+  }
+
+  Future<void> _openPreview(BuildContext context) {
+    return showPoiPreviewDialog(
+      context: context,
+      name: place.name,
+      typeRaw: place.type.rawValue,
+      qid: place.qid,
+      actionMode: PoiPreviewActionMode.openOnly,
     );
   }
 }

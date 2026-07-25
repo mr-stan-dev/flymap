@@ -3,13 +3,17 @@ import 'package:flymap/domain/entity/flight_poi_type.dart';
 
 /// A notable named place surfaced as proof on the onboarding payoff step.
 class HomeAreaPlace extends Equatable {
-  const HomeAreaPlace({required this.name, required this.type});
+  const HomeAreaPlace({required this.name, required this.type, this.qid = ''});
 
   final String name;
   final FlightPoiType type;
 
+  /// Wikidata id, used to load the place's description preview; may be
+  /// empty for malformed payload entries.
+  final String qid;
+
   @override
-  List<Object?> get props => [name, type];
+  List<Object?> get props => [name, type, qid];
 }
 
 /// Aggregated view of the places we have mapped around the user's home
