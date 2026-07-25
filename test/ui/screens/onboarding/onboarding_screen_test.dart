@@ -73,11 +73,11 @@ void main() {
     await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
     await _pumpUntilVisible(
       tester,
-      find.text('Which places do you want to see on your map?'),
+      find.text('Which places do you want to see more of on your map?'),
     );
 
     expect(
-      find.text('Which places do you want to see on your map?'),
+      find.text('Which places do you want to see more of on your map?'),
       findsOneWidget,
     );
 

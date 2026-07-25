@@ -1467,8 +1467,8 @@ class TranslationsOnboardingEn {
 	/// en: 'No airports found for that search.'
 	String get noHomeAirportFound => 'No airports found for that search.';
 
-	/// en: 'Which places do you want to see on your map?'
-	String get interestsTitle => 'Which places do you want to see on your map?';
+	/// en: 'Which places do you want to see more of on your map?'
+	String get interestsTitle => 'Which places do you want to see more of on your map?';
 
 	/// en: 'Choose up to 3 topics to see more relevant places and stories along your flight.'
 	String get interestsSubtitle => 'Choose up to 3 topics to see more relevant places and stories along your flight.';
@@ -4401,7 +4401,7 @@ extension on Translations {
 			'onboarding.popularAirports' => 'Popular airports',
 			'onboarding.removeHomeAirport' => 'Remove home airport',
 			'onboarding.noHomeAirportFound' => 'No airports found for that search.',
-			'onboarding.interestsTitle' => 'Which places do you want to see on your map?',
+			'onboarding.interestsTitle' => 'Which places do you want to see more of on your map?',
 			'onboarding.interestsSubtitle' => 'Choose up to 3 topics to see more relevant places and stories along your flight.',
 			'onboarding.interestsHelper' => 'Pick up to 3 topics.',
 			'onboarding.interestsSelected' => ({required Object count, required Object max}) => '${count} of ${max} selected',

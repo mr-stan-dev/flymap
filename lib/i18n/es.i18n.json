@@ -906,7 +906,7 @@
     "popularAirports": "Aeropuertos populares",
     "removeHomeAirport": "Eliminar aeropuerto base",
     "noHomeAirportFound": "No se encontraron aeropuertos para esa búsqueda.",
-    "interestsTitle": "¿Qué lugares quieres ver en tu mapa?",
+    "interestsTitle": "¿Qué lugares quieres ver más en tu mapa?",
     "interestsSubtitle": "Elige hasta 3 temas para ver lugares e historias más relevantes a lo largo de tu vuelo.",
     "interestsHelper": "Elige hasta 3 temas.",
     "interestsSelected": "$count de $max seleccionados",

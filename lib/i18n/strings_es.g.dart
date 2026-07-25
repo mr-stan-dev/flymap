@@ -627,7 +627,7 @@ class _TranslationsOnboardingEs extends TranslationsOnboardingEn {
 	@override String get popularAirports => 'Aeropuertos populares';
 	@override String get removeHomeAirport => 'Eliminar aeropuerto base';
 	@override String get noHomeAirportFound => 'No se encontraron aeropuertos para esa búsqueda.';
-	@override String get interestsTitle => '¿Qué lugares quieres ver en tu mapa?';
+	@override String get interestsTitle => '¿Qué lugares quieres ver más en tu mapa?';
 	@override String get interestsSubtitle => 'Elige hasta 3 temas para ver lugares e historias más relevantes a lo largo de tu vuelo.';
 	@override String get interestsHelper => 'Elige hasta 3 temas.';
 	@override String interestsSelected({required Object count, required Object max}) => '${count} de ${max} seleccionados';
@@ -2325,7 +2325,7 @@ extension on TranslationsEs {
 			'onboarding.popularAirports' => 'Aeropuertos populares',
 			'onboarding.removeHomeAirport' => 'Eliminar aeropuerto base',
 			'onboarding.noHomeAirportFound' => 'No se encontraron aeropuertos para esa búsqueda.',
-			'onboarding.interestsTitle' => '¿Qué lugares quieres ver en tu mapa?',
+			'onboarding.interestsTitle' => '¿Qué lugares quieres ver más en tu mapa?',
 			'onboarding.interestsSubtitle' => 'Elige hasta 3 temas para ver lugares e historias más relevantes a lo largo de tu vuelo.',
 			'onboarding.interestsHelper' => 'Elige hasta 3 temas.',
 			'onboarding.interestsSelected' => ({required Object count, required Object max}) => '${count} de ${max} seleccionados',

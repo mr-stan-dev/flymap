@@ -32,6 +32,7 @@ class _OnboardingWelcomeVideoState extends State<OnboardingWelcomeVideo> {
 
   VideoPlayerController? _controller;
   bool _isReady = false;
+  bool _isFailed = false;
 
   @override
   void initState() {
@@ -50,8 +51,10 @@ class _OnboardingWelcomeVideoState extends State<OnboardingWelcomeVideo> {
       if (!mounted) return;
       setState(() => _isReady = true);
     } catch (error) {
-      // Asset missing or platform playback failure: keep the poster image.
+      // Asset missing or platform playback failure: fall back to the poster.
       _logger.log('Welcome video unavailable, using poster: $error');
+      if (!mounted) return;
+      setState(() => _isFailed = true);
     }
   }
 
@@ -64,18 +67,46 @@ class _OnboardingWelcomeVideoState extends State<OnboardingWelcomeVideo> {
   @override
   Widget build(BuildContext context) {
     final controller = _controller;
-    final poster = Image.asset(widget.posterAssetPath, fit: BoxFit.cover);
+
+    // Loading: a quiet placeholder in the scaffold color (the gradients
+    // above/below fade into the same color, so the area reads as intentional
+    // negative space) — flashing the old static poster before the video
+    // looked like a broken frame. The poster remains only as the permanent
+    // fallback when playback is impossible.
+    final Widget child;
+    if (_isReady && controller != null) {
+      child = _CoverVideo(key: const ValueKey('video'), controller: controller);
+    } else if (_isFailed) {
+      child = KeyedSubtree(
+        key: const ValueKey('poster'),
+        child: Image.asset(widget.posterAssetPath, fit: BoxFit.cover),
+      );
+    } else {
+      child = Container(
+        key: const ValueKey('loading'),
+        color: Theme.of(context).scaffoldBackgroundColor,
+        alignment: Alignment.center,
+        child: SizedBox(
+          width: 28,
+          height: 28,
+          child: CircularProgressIndicator(
+            strokeWidth: 2.5,
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+          ),
+        ),
+      );
+    }
 
     return AnimatedSwitcher(
       duration: DsMotion.normal,
-      // Expand children so both poster and video fill the available space.
+      // Expand children so every state fills the available space.
       layoutBuilder: (currentChild, previousChildren) => Stack(
         fit: StackFit.expand,
         children: [...previousChildren, if (currentChild != null) currentChild],
       ),
-      child: (_isReady && controller != null)
-          ? _CoverVideo(key: const ValueKey('video'), controller: controller)
-          : KeyedSubtree(key: const ValueKey('poster'), child: poster),
+      child: child,
     );
   }
 }
