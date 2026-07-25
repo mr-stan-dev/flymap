@@ -33,8 +33,19 @@ class VideoToolsDelegate(private val context: Context) {
     private const val progressPollMs = 400L
   }
 
-  // Transformers must stay referenced until their listener fires.
-  private val activeTransformers = mutableSetOf<Transformer>()
+  /**
+   * In-flight burns. Entries must stay referenced until their listener
+   * fires; kept with their pending results so cancelBurn can complete them
+   * (Transformer.cancel() fires no listener callback).
+   */
+  private class ActiveBurn(
+    val transformer: Transformer,
+    val overlay: TimelineBitmapOverlay,
+    val result: MethodChannel.Result,
+    val outputPath: String,
+  )
+
+  private val activeBurns = mutableListOf<ActiveBurn>()
   private var channel: MethodChannel? = null
 
   fun register(flutterEngine: FlutterEngine) {
@@ -47,6 +58,7 @@ class VideoToolsDelegate(private val context: Context) {
         "extractPoster" -> handleExtractPoster(call, result)
         "getVideoInfo" -> handleGetVideoInfo(call, result)
         "burnOverlay" -> handleBurnOverlay(call, result)
+        "cancelBurn" -> handleCancelBurn(result)
         else -> result.notImplemented()
       }
     }
@@ -155,9 +167,9 @@ class VideoToolsDelegate(private val context: Context) {
     transformer = Transformer.Builder(context)
       .addListener(object : Transformer.Listener {
         override fun onCompleted(composition: Composition, exportResult: ExportResult) {
-          overlay.releaseBitmaps()
-          activeTransformers.remove(transformer)
-          result.success(null)
+          val burn = finishBurn(transformer) ?: return
+          burn.overlay.releaseBitmaps()
+          burn.result.success(null)
         }
 
         override fun onError(
@@ -165,21 +177,43 @@ class VideoToolsDelegate(private val context: Context) {
           exportResult: ExportResult,
           exportException: ExportException,
         ) {
-          overlay.releaseBitmaps()
-          activeTransformers.remove(transformer)
-          result.error("burn_failed", exportException.message, null)
+          val burn = finishBurn(transformer) ?: return
+          burn.overlay.releaseBitmaps()
+          File(outputPath).delete()
+          burn.result.error("burn_failed", exportException.message, null)
         }
       })
       .build()
-    activeTransformers.add(transformer)
+    activeBurns.add(ActiveBurn(transformer, overlay, result, outputPath))
     try {
       transformer.start(editedItem, outputPath)
       pollBurnProgress(transformer)
     } catch (error: Exception) {
-      overlay.releaseBitmaps()
-      activeTransformers.remove(transformer)
-      result.error("burn_failed", error.message, null)
+      finishBurn(transformer)?.let { burn ->
+        burn.overlay.releaseBitmaps()
+        burn.result.error("burn_failed", error.message, null)
+      }
     }
+  }
+
+  /** Removes and returns the burn for [transformer]; null when already finished/cancelled. */
+  private fun finishBurn(transformer: Transformer): ActiveBurn? {
+    val index = activeBurns.indexOfFirst { it.transformer === transformer }
+    if (index < 0) return null
+    return activeBurns.removeAt(index)
+  }
+
+  /** Cancels all in-flight burns, reporting burn_cancelled to their pending calls. */
+  private fun handleCancelBurn(result: MethodChannel.Result) {
+    val burns = activeBurns.toList()
+    activeBurns.clear()
+    for (burn in burns) {
+      burn.transformer.cancel()
+      burn.overlay.releaseBitmaps()
+      File(burn.outputPath).delete()
+      burn.result.error("burn_cancelled", "Burn cancelled", null)
+    }
+    result.success(null)
   }
 
   /// Pushes 0..1 transcode progress to Dart while [transformer] is active.
@@ -188,7 +222,7 @@ class VideoToolsDelegate(private val context: Context) {
     val holder = androidx.media3.transformer.ProgressHolder()
     lateinit var poll: Runnable
     poll = Runnable {
-      if (!activeTransformers.contains(transformer)) return@Runnable
+      if (activeBurns.none { it.transformer === transformer }) return@Runnable
       val state = transformer.getProgress(holder)
       if (state == Transformer.PROGRESS_STATE_AVAILABLE) {
         channel?.invokeMethod("burnProgress", holder.progress / 100.0)

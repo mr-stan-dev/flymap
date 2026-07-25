@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flymap/data/video_tools/video_tools_channel.dart';
 import 'package:flymap/domain/entity/sky_camera_media_item.dart';
 import 'package:flymap/logger.dart';
@@ -8,6 +9,21 @@ import 'package:flymap/ui/screens/sky_camera/sky_camera_video_overlay_timeline.d
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sky_camera/sky_camera.dart';
+
+/// Thrown when the user cancels an overlay burn; callers dismiss quietly
+/// instead of surfacing an error.
+class SkyCameraRenditionCancelled implements Exception {
+  const SkyCameraRenditionCancelled();
+}
+
+/// Cooperative cancellation for [SkyCameraVideoRenditionService]: the frame
+/// rasterization loop polls it, and the native transcode is cancelled
+/// through the video tools channel.
+class SkyCameraRenditionCancellation {
+  bool _cancelled = false;
+  bool get isCancelled => _cancelled;
+  void cancel() => _cancelled = true;
+}
 
 /// Creates (and caches) the overlay-burned rendition of a sky-camera video.
 ///
@@ -43,6 +59,7 @@ class SkyCameraVideoRenditionService {
     SkyCameraMediaItem item, {
     required SkyCameraStrings strings,
     void Function(double fraction)? onProgress,
+    SkyCameraRenditionCancellation? cancellation,
   }) async {
     if (item.mediaType != SkyCameraMediaType.video) return item;
     final selectedRendition = item.selectedRendition;
@@ -56,7 +73,7 @@ class SkyCameraVideoRenditionService {
     final info = await _videoTools.getVideoInfo(videoPath: item.sourcePath);
     final frameCount = (info.durationMs / _frameDurationMs).ceil().clamp(
       1,
-      120,
+      SkyCameraMediaFormat.maxVideoDuration.inSeconds,
     );
     final timeline = SkyCameraVideoOverlayTimeline(item);
 
@@ -69,6 +86,9 @@ class SkyCameraVideoRenditionService {
     try {
       final framePaths = <String>[];
       for (var index = 0; index < frameCount; index++) {
+        if (cancellation?.isCancelled ?? false) {
+          throw const SkyCameraRenditionCancelled();
+        }
         final bytes = await _composer.composeOverlayFrame(
           width: info.width,
           height: info.height,
@@ -86,14 +106,29 @@ class SkyCameraVideoRenditionService {
         p.dirname(item.sourcePath),
         '${item.id}_overlay.mp4',
       );
-      await _videoTools.burnOverlay(
-        videoPath: item.sourcePath,
-        overlayFramePaths: framePaths,
-        frameDurationMs: _frameDurationMs,
-        outputPath: renditionPath,
-        onProgress: (fraction) =>
-            onProgress?.call(rasterWeight + (1 - rasterWeight) * fraction),
-      );
+      if (cancellation?.isCancelled ?? false) {
+        throw const SkyCameraRenditionCancelled();
+      }
+      try {
+        await _videoTools.burnOverlay(
+          videoPath: item.sourcePath,
+          overlayFramePaths: framePaths,
+          frameDurationMs: _frameDurationMs,
+          outputPath: renditionPath,
+          onProgress: (fraction) =>
+              onProgress?.call(rasterWeight + (1 - rasterWeight) * fraction),
+        );
+      } on PlatformException catch (error) {
+        // The native sides delete their partial output; this keeps legacy
+        // behavior safe if that ever fails.
+        try {
+          await File(renditionPath).delete();
+        } catch (_) {}
+        if (error.code == VideoToolsChannel.burnCancelledCode) {
+          throw const SkyCameraRenditionCancelled();
+        }
+        rethrow;
+      }
       onProgress?.call(1);
 
       final updated = item.copyWith(
@@ -112,6 +147,8 @@ class SkyCameraVideoRenditionService {
       // addCapture is an upsert on the item id.
       await _repository.addCapture(updated);
       return updated;
+    } on SkyCameraRenditionCancelled {
+      rethrow;
     } catch (error) {
       _logger.error('Overlay rendition failed for ${item.id}: $error');
       rethrow;
@@ -123,4 +160,8 @@ class SkyCameraVideoRenditionService {
       }
     }
   }
+
+  /// Cancels the in-flight native transcode, if any. Pair with
+  /// [SkyCameraRenditionCancellation.cancel] to stop the raster loop too.
+  Future<void> cancelActiveBurn() => _videoTools.cancelBurn();
 }

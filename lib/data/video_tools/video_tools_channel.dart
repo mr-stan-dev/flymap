@@ -24,6 +24,10 @@ class VideoToolsChannel {
   static const _methodExtractPoster = 'extractPoster';
   static const _methodGetVideoInfo = 'getVideoInfo';
   static const _methodBurnOverlay = 'burnOverlay';
+  static const _methodCancelBurn = 'cancelBurn';
+
+  /// Error code reported by both platforms when a burn is cancelled.
+  static const burnCancelledCode = 'burn_cancelled';
 
   /// Receives 0..1 transcode progress pushed by the native side while a
   /// burn runs. Burns are UI-gated to one at a time, so a single static
@@ -107,5 +111,11 @@ class VideoToolsChannel {
     } finally {
       _burnProgressListener = null;
     }
+  }
+
+  /// Cancels any in-flight [burnOverlay]; its pending future fails with a
+  /// [PlatformException] whose code is [burnCancelledCode].
+  Future<void> cancelBurn() {
+    return _channel.invokeMethod<void>(_methodCancelBurn);
   }
 }

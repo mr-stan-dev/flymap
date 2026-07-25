@@ -30,6 +30,10 @@ Future<List<SkyCameraMediaItem>?> prepareSkyCameraMediaForSharing(
   if (!context.mounted) return null;
 
   final progress = ValueNotifier<double>(0);
+  final cancelLabel = context.t.common.cancel;
+  final service =
+      renditionService ?? GetIt.I<SkyCameraVideoRenditionService>();
+  final cancellation = SkyCameraRenditionCancellation();
   unawaited(
     showDialog<void>(
       context: context,
@@ -37,6 +41,17 @@ Future<List<SkyCameraMediaItem>?> prepareSkyCameraMediaForSharing(
       builder: (_) => PopScope(
         canPop: false,
         child: AlertDialog(
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Stops the raster loop cooperatively and aborts the native
+                // transcode; the pending burn future fails as cancelled.
+                cancellation.cancel();
+                unawaited(service.cancelActiveBurn());
+              },
+              child: Text(cancelLabel),
+            ),
+          ],
           content: ValueListenableBuilder<double>(
             valueListenable: progress,
             builder: (context, fraction, _) => Column(
@@ -72,14 +87,13 @@ Future<List<SkyCameraMediaItem>?> prepareSkyCameraMediaForSharing(
   final prepared = List<SkyCameraMediaItem>.of(captures);
   var completedVideos = 0;
   try {
-    final service =
-        renditionService ?? GetIt.I<SkyCameraVideoRenditionService>();
     for (var index = 0; index < prepared.length; index++) {
       final capture = prepared[index];
       if (!pendingVideoIds.contains(capture.id)) continue;
       prepared[index] = await service.ensureOverlayRendition(
         capture,
         strings: strings,
+        cancellation: cancellation,
         onProgress: (fraction) {
           progress.value =
               (completedVideos + fraction.clamp(0.0, 1.0)) /
@@ -92,6 +106,10 @@ Future<List<SkyCameraMediaItem>?> prepareSkyCameraMediaForSharing(
     if (!context.mounted) return null;
     Navigator.of(context, rootNavigator: true).pop();
     return prepared;
+  } on SkyCameraRenditionCancelled {
+    if (!context.mounted) return null;
+    Navigator.of(context, rootNavigator: true).pop();
+    return null;
   } catch (_) {
     if (!context.mounted) return null;
     Navigator.of(context, rootNavigator: true).pop();

@@ -128,6 +128,7 @@ class _FakeRenditionService extends SkyCameraVideoRenditionService {
     SkyCameraMediaItem item, {
     required SkyCameraStrings strings,
     void Function(double fraction)? onProgress,
+    SkyCameraRenditionCancellation? cancellation,
   }) async {
     preparedIds.add(item.id);
     onProgress?.call(1);

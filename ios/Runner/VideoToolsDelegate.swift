@@ -1,4 +1,5 @@
 import AVFoundation
+import CoreImage
 import Flutter
 import UIKit
 
@@ -29,6 +30,8 @@ final class VideoToolsDelegate {
       getVideoInfo(call: call, result: result)
     case "burnOverlay":
       burnOverlay(call: call, result: result)
+    case "cancelBurn":
+      cancelBurn(result: result)
     default:
       result(FlutterMethodNotImplemented)
     }
@@ -106,106 +109,52 @@ final class VideoToolsDelegate {
     }
 
     let asset = AVURLAsset(url: URL(fileURLWithPath: videoPath))
-    guard let assetVideoTrack = asset.tracks(withMediaType: .video).first else {
+    guard asset.tracks(withMediaType: .video).first != nil else {
       result(FlutterError(code: "burn_failed", message: "No video track", details: nil))
       return
     }
 
-    let composition = AVMutableComposition()
-    guard
-      let compositionVideoTrack = composition.addMutableTrack(
-        withMediaType: .video,
-        preferredTrackID: kCMPersistentTrackID_Invalid
-      )
-    else {
-      result(FlutterError(code: "burn_failed", message: "Could not build composition", details: nil))
-      return
-    }
-    let fullRange = CMTimeRange(start: .zero, duration: asset.duration)
-    do {
-      try compositionVideoTrack.insertTimeRange(fullRange, of: assetVideoTrack, at: .zero)
-      if let assetAudioTrack = asset.tracks(withMediaType: .audio).first,
-        let compositionAudioTrack = composition.addMutableTrack(
-          withMediaType: .audio,
-          preferredTrackID: kCMPersistentTrackID_Invalid
-        )
-      {
-        try compositionAudioTrack.insertTimeRange(fullRange, of: assetAudioTrack, at: .zero)
-      }
-    } catch {
-      result(FlutterError(code: "burn_failed", message: error.localizedDescription, details: nil))
-      return
-    }
-
-    let transformedSize = assetVideoTrack.naturalSize.applying(assetVideoTrack.preferredTransform)
-    let renderSize = CGSize(width: abs(transformedSize.width), height: abs(transformedSize.height))
-
-    // Layer tree: the video renders into videoLayer; the overlay layer above
-    // it steps through one pre-rendered PNG per second (discrete keyframes).
-    let renderFrame = CGRect(origin: .zero, size: renderSize)
-    let videoLayer = CALayer()
-    videoLayer.frame = renderFrame
-    let overlayLayer = CALayer()
-    overlayLayer.frame = renderFrame
-    overlayLayer.contentsGravity = .resize
-    overlayLayer.isGeometryFlipped = true
-
-    var overlayImages: [CGImage] = []
-    for path in framePaths {
-      guard let image = UIImage(contentsOfFile: path)?.cgImage else {
-        result(FlutterError(code: "burn_failed", message: "Could not load overlay frame \(path)", details: nil))
+    // Streaming compositor: each output frame composites ONE lazily-loaded
+    // overlay PNG over the source frame via Core Image. Unlike the previous
+    // AVVideoCompositionCoreAnimationTool approach this
+    //  - keeps memory flat regardless of clip length (frames load on demand
+    //    through a small cache instead of all up-front),
+    //  - renders HDR (Dolby Vision) sources correctly — the CA tool
+    //    silently produces black frames for 10-bit HDR input,
+    //  - also works on the iOS simulator.
+    let frameCache = OverlayFrameCache(paths: framePaths)
+    let frameSeconds = frameDurationMs / 1000.0
+    let videoComposition = AVMutableVideoComposition(asset: asset) { request in
+      let seconds = request.compositionTime.seconds
+      let index = max(0, min(framePaths.count - 1, Int(seconds / frameSeconds)))
+      guard let overlay = frameCache.image(at: index) else {
+        request.finish(with: request.sourceImage, context: nil)
         return
       }
-      overlayImages.append(image)
-    }
-
-    let durationSeconds = CMTimeGetSeconds(asset.duration)
-    if overlayImages.count == 1 {
-      overlayLayer.contents = overlayImages[0]
-    } else {
-      let animation = CAKeyframeAnimation(keyPath: "contents")
-      animation.calculationMode = .discrete
-      animation.values = overlayImages
-      // Discrete mode: keyTimes has one more entry than values; frame N shows
-      // for [N, N+1) seconds, the last frame covers the tail.
-      var keyTimes: [NSNumber] = []
-      let frameSeconds = frameDurationMs / 1000.0
-      for index in 0...overlayImages.count {
-        let time = min(Double(index) * frameSeconds / durationSeconds, 1.0)
-        keyTimes.append(NSNumber(value: time))
+      let renderSize = request.renderSize
+      let extent = overlay.extent
+      var output = request.sourceImage
+      if extent.width > 0 && extent.height > 0 {
+        let scaled = overlay.transformed(
+          by: CGAffineTransform(
+            scaleX: renderSize.width / extent.width,
+            y: renderSize.height / extent.height
+          )
+        )
+        output = scaled.composited(over: request.sourceImage)
       }
-      keyTimes[keyTimes.count - 1] = 1.0
-      animation.keyTimes = keyTimes
-      animation.duration = durationSeconds
-      animation.beginTime = AVCoreAnimationBeginTimeAtZero
-      animation.isRemovedOnCompletion = false
-      animation.fillMode = .forwards
-      overlayLayer.add(animation, forKey: "overlayTimeline")
+      request.finish(with: output, context: nil)
     }
-
-    let parentLayer = CALayer()
-    parentLayer.frame = renderFrame
-    parentLayer.addSublayer(videoLayer)
-    parentLayer.addSublayer(overlayLayer)
-
-    let videoComposition = AVMutableVideoComposition()
-    videoComposition.renderSize = renderSize
-    videoComposition.frameDuration = CMTime(value: 1, timescale: 30)
-    videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
-      postProcessingAsVideoLayer: videoLayer,
-      in: parentLayer
-    )
-    let instruction = AVMutableVideoCompositionInstruction()
-    instruction.timeRange = fullRange
-    let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: compositionVideoTrack)
-    layerInstruction.setTransform(assetVideoTrack.preferredTransform, at: .zero)
-    instruction.layerInstructions = [layerInstruction]
-    videoComposition.instructions = [instruction]
+    // Force an SDR (BT.709) output so HDR sources are tone-mapped instead of
+    // exported as black frames.
+    videoComposition.colorPrimaries = AVVideoColorPrimaries_ITU_R_709_2
+    videoComposition.colorTransferFunction = AVVideoTransferFunction_ITU_R_709_2
+    videoComposition.colorYCbCrMatrix = AVVideoYCbCrMatrix_ITU_R_709_2
 
     try? FileManager.default.removeItem(atPath: outputPath)
     guard
       let exporter = AVAssetExportSession(
-        asset: composition,
+        asset: asset,
         presetName: AVAssetExportPresetHighestQuality
       )
     else {
@@ -219,6 +168,20 @@ final class VideoToolsDelegate {
     let exportId = UUID()
     activeExports[exportId] = exporter
 
+    // Keep the export alive across brief app backgrounding (long clips take
+    // minutes; without this the export dies when the user switches apps).
+    var backgroundTask = UIBackgroundTaskIdentifier.invalid
+    backgroundTask = UIApplication.shared.beginBackgroundTask {
+      UIApplication.shared.endBackgroundTask(backgroundTask)
+      backgroundTask = .invalid
+    }
+    func endBackgroundTask() {
+      if backgroundTask != .invalid {
+        UIApplication.shared.endBackgroundTask(backgroundTask)
+        backgroundTask = .invalid
+      }
+    }
+
     // Push 0..1 transcode progress to Dart while the export runs.
     let progressTimer = Timer.scheduledTimer(withTimeInterval: 0.4, repeats: true) {
       [weak self] _ in
@@ -231,11 +194,18 @@ final class VideoToolsDelegate {
     exporter.exportAsynchronously { [weak self] in
       DispatchQueue.main.async {
         progressTimer.invalidate()
+        endBackgroundTask()
         self?.activeExports.removeValue(forKey: exportId)
         switch exporter.status {
         case .completed:
           result(nil)
+        case .cancelled:
+          try? FileManager.default.removeItem(atPath: outputPath)
+          result(
+            FlutterError(code: "burn_cancelled", message: "Burn cancelled", details: nil)
+          )
         default:
+          try? FileManager.default.removeItem(atPath: outputPath)
           result(
             FlutterError(
               code: "burn_failed",
@@ -246,5 +216,45 @@ final class VideoToolsDelegate {
         }
       }
     }
+  }
+
+  /// Cancels every in-flight burn export; their completion handlers report
+  /// `burn_cancelled` to the pending Dart calls.
+  private func cancelBurn(result: @escaping FlutterResult) {
+    for exporter in activeExports.values {
+      exporter.cancelExport()
+    }
+    result(nil)
+  }
+}
+
+/// Lazily decodes overlay frames, holding only a small sliding window in
+/// memory. The CI request handler may be invoked concurrently, hence the
+/// lock.
+private final class OverlayFrameCache {
+  private let paths: [String]
+  private var cache: [Int: CIImage] = [:]
+  private let lock = NSLock()
+  private let maxEntries = 4
+
+  init(paths: [String]) {
+    self.paths = paths
+  }
+
+  func image(at index: Int) -> CIImage? {
+    guard index >= 0 && index < paths.count else { return nil }
+    lock.lock()
+    defer { lock.unlock() }
+    if let cached = cache[index] {
+      return cached
+    }
+    guard let image = CIImage(contentsOf: URL(fileURLWithPath: paths[index])) else {
+      return nil
+    }
+    if cache.count >= maxEntries, let oldest = cache.keys.min() {
+      cache.removeValue(forKey: oldest)
+    }
+    cache[index] = image
+    return image
   }
 }
