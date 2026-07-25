@@ -341,13 +341,14 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   }
 
   Future<void> _handleAppLifecycleStateChanged(AppLifecycleState state) async {
-    if (state == AppLifecycleState.inactive) {
-      // If startup is in flight, let it settle before mirroring the driver's
-      // discard. The driver's lifecycle queue guarantees its cleanup follows
-      // the pending start.
+    if (state == AppLifecycleState.paused) {
+      // Backgrounding kills the capture session — stop and SAVE what was
+      // recorded instead of discarding it. Let an in-flight start settle
+      // first; the driver's lifecycle queue guarantees its dispose runs
+      // after the stop below.
       await _startingVideoOperation;
       if (_isRecordingVideo) {
-        _resetRecordingState();
+        await _stopVideoRecording();
       }
     }
     try {
@@ -526,16 +527,6 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
     } finally {
       _isStoppingVideo = false;
     }
-  }
-
-  void _resetRecordingState() {
-    _recordingTicker?.cancel();
-    _recordingAutoStop?.cancel();
-    _trackRecorder.stop();
-    if (!mounted) return;
-    setState(() {
-      _isRecordingVideo = false;
-    });
   }
 
   Future<void> _openSettings() async {

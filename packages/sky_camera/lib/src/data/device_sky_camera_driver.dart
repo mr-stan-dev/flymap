@@ -99,7 +99,12 @@ class DeviceSkyCameraDriver implements SkyCameraDriver {
 
   @override
   Future<void> onAppLifecycleStateChanged(AppLifecycleState state) async {
-    if (state == AppLifecycleState.inactive) {
+    // Deliberately ignore `inactive`: on iOS it fires for transient events
+    // that are not backgrounding (incoming-call banner, Control Center,
+    // Face ID prompt, app-switcher peek) — tearing the camera down there
+    // destroys an active recording for no reason. `paused` is the reliable
+    // "actually backgrounded" signal on both platforms.
+    if (state == AppLifecycleState.paused) {
       await dispose();
       return;
     }
@@ -170,8 +175,11 @@ class DeviceSkyCameraDriver implements SkyCameraDriver {
     });
   }
 
-  /// Backgrounding kills the capture session; drop the partial file so the
-  /// controller can be disposed cleanly.
+  /// Safety net for dispose-with-active-recording: the screen stops and
+  /// SAVES the recording before backgrounding disposes the driver, so under
+  /// normal flow this is a no-op. It only discards when dispose is reached
+  /// with a recording still running (e.g. audio toggle re-init edge cases),
+  /// where the capture session is already doomed.
   Future<void> _discardActiveRecording() async {
     if (!isRecordingVideo) return;
     try {
