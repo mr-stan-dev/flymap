@@ -190,6 +190,32 @@ void main() {
     expect(find.text('Open'), findsOneWidget);
   });
 
+  testWidgets('videoCaptureEnabled=false hides the mode strip', (tester) async {
+    final driver = _FakeSkyCameraDriver();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SkyCameraScreen(
+          driver: driver,
+          snapshotSource: const _FakeSnapshotSource(),
+          exportService: _FakeExportService(),
+          observer: const _FakeObserver(),
+          photoCropper: const _FakePhotoCropper(),
+          openCapturePreview: _openFakeCapturePreview,
+          overlayComposer: const _FakeOverlayComposer(),
+          strings: _strings,
+          videoCaptureEnabled: false,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Photo-only: no mode selector, and the shutter takes a photo.
+    expect(find.byKey(const Key('sky_camera.mode_selector')), findsNothing);
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.pump();
+    expect(driver.didStartVideo, isFalse);
+  });
+
   testWidgets('swiping the mode strip left enters video mode', (tester) async {
     final driver = _FakeSkyCameraDriver();
     await tester.pumpWidget(

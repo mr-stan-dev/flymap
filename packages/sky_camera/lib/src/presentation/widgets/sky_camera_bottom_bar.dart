@@ -94,18 +94,21 @@ class SkyCameraBottomBar extends StatelessWidget {
               ],
             ),
           ),
-          Positioned(
-            top: 146,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: _SkyCameraModeSelector(
-                captureMode: captureMode,
-                enabled: !isRecording && !isCapturing && !isTransitioning,
-                onChanged: onCaptureModeChanged,
+          // No mode callback means photo-only (feature-gated): hide the
+          // selector instead of rendering it inert.
+          if (onCaptureModeChanged != null)
+            Positioned(
+              top: 146,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: _SkyCameraModeSelector(
+                  captureMode: captureMode,
+                  enabled: !isRecording && !isCapturing && !isTransitioning,
+                  onChanged: onCaptureModeChanged,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

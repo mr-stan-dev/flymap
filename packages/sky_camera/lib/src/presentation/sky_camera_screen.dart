@@ -36,6 +36,7 @@ class SkyCameraScreen extends StatefulWidget {
     required this.photoCropper,
     required this.openCapturePreview,
     this.onRecordAudioChanged,
+    this.videoCaptureEnabled = true,
     super.key,
   });
 
@@ -55,6 +56,10 @@ class SkyCameraScreen extends StatefulWidget {
 
   /// Persists the record-audio preference after the driver applied it.
   final ValueChanged<bool>? onRecordAudioChanged;
+
+  /// When false the camera is photo-only: the capture-mode switch is hidden
+  /// and video recording can never start (release feature gate).
+  final bool videoCaptureEnabled;
 
   @override
   State<SkyCameraScreen> createState() => _SkyCameraScreenState();
@@ -156,15 +161,17 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
                           : null,
                       maxRecordingDuration:
                           SkyCameraMediaFormat.maxVideoDuration,
-                      onCaptureModeChanged: (mode) {
-                        if (_isStartingVideo ||
-                            _isRecordingVideo ||
-                            _isCapturing ||
-                            _isClosing) {
-                          return;
-                        }
-                        setState(() => _captureMode = mode);
-                      },
+                      onCaptureModeChanged: !widget.videoCaptureEnabled
+                          ? null
+                          : (mode) {
+                              if (_isStartingVideo ||
+                                  _isRecordingVideo ||
+                                  _isCapturing ||
+                                  _isClosing) {
+                                return;
+                              }
+                              setState(() => _captureMode = mode);
+                            },
                       onCapture:
                           _isCameraLoading ||
                               _isStartingVideo ||

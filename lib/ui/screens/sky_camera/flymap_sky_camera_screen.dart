@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flymap/app/feature_flags.dart';
 import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/entity/flight_status.dart';
 import 'package:flymap/domain/entity/units.dart';
@@ -61,6 +62,7 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
       snapshotSource: session.snapshotSource,
       exportService: session.exportService,
       observer: session.observer,
+      videoCaptureEnabled: FeatureFlags.skyCameraVideoCapture,
       overlayComposer: const SkyCameraOverlayComposer(),
       photoCropper: const SkyCameraPhotoCropper(),
       openCapturePreview: _openCapturePreview,
