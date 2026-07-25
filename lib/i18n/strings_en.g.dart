@@ -964,6 +964,7 @@ class TranslationsCreateFlightEn {
 	late final TranslationsCreateFlightDownloadingEn downloading = TranslationsCreateFlightDownloadingEn.internal(_root);
 	late final TranslationsCreateFlightErrorsEn errors = TranslationsCreateFlightErrorsEn.internal(_root);
 	late final TranslationsCreateFlightPaywallEn paywall = TranslationsCreateFlightPaywallEn.internal(_root);
+	late final TranslationsCreateFlightRealRouteChoiceEn realRouteChoice = TranslationsCreateFlightRealRouteChoiceEn.internal(_root);
 }
 
 // Path: preview
@@ -2850,6 +2851,27 @@ class TranslationsCreateFlightPaywallEn {
 	String get failedOpenPaywall => 'Failed to open paywall.';
 }
 
+// Path: createFlight.realRouteChoice
+class TranslationsCreateFlightRealRouteChoiceEn {
+	TranslationsCreateFlightRealRouteChoiceEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Get the real flight route?'
+	String get title => 'Get the real flight route?';
+
+	/// en: 'Everything on this flight is unlocked. It still uses an approximate route — enter your flight number and we'll rebuild it from the real flight track.'
+	String get body => 'Everything on this flight is unlocked. It still uses an approximate route — enter your flight number and we\'ll rebuild it from the real flight track.';
+
+	/// en: 'Enter my flight number'
+	String get ctaEnterFlightNumber => 'Enter my flight number';
+
+	/// en: 'Keep approximate route'
+	String get ctaKeepRoute => 'Keep approximate route';
+}
+
 // Path: flight.map
 class TranslationsFlightMapEn {
 	TranslationsFlightMapEn.internal(this._root);
@@ -4079,6 +4101,10 @@ extension on Translations {
 			'createFlight.paywall.upgradeCancelled' => 'Upgrade cancelled.',
 			'createFlight.paywall.noPaywall' => 'No paywall available right now.',
 			'createFlight.paywall.failedOpenPaywall' => 'Failed to open paywall.',
+			'createFlight.realRouteChoice.title' => 'Get the real flight route?',
+			'createFlight.realRouteChoice.body' => 'Everything on this flight is unlocked. It still uses an approximate route — enter your flight number and we\'ll rebuild it from the real flight track.',
+			'createFlight.realRouteChoice.ctaEnterFlightNumber' => 'Enter my flight number',
+			'createFlight.realRouteChoice.ctaKeepRoute' => 'Keep approximate route',
 			'preview.calculatingRoute' => 'Calculating flight route...',
 			'preview.errorTitle' => 'Error',
 			'preview.errorSomethingWrong' => 'Something went wrong',
@@ -4566,12 +4592,12 @@ extension on Translations {
 			'countries.UA' => 'Ukraine',
 			'countries.UG' => 'Uganda',
 			'countries.US' => 'United States',
+			_ => null,
+		} ?? switch (path) {
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Uzbekistan',
 			'countries.VE' => 'Venezuela, Bolivarian Rep. of',
 			'countries.VI' => 'Virgin Islands (US)',
-			_ => null,
-		} ?? switch (path) {
 			'countries.VN' => 'Viet Nam',
 			'countries.YE' => 'Yemen',
 			'countries.ZA' => 'South Africa',

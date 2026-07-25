@@ -414,6 +414,7 @@ class _TranslationsCreateFlightDe extends TranslationsCreateFlightEn {
 	@override late final _TranslationsCreateFlightDownloadingDe downloading = _TranslationsCreateFlightDownloadingDe._(_root);
 	@override late final _TranslationsCreateFlightErrorsDe errors = _TranslationsCreateFlightErrorsDe._(_root);
 	@override late final _TranslationsCreateFlightPaywallDe paywall = _TranslationsCreateFlightPaywallDe._(_root);
+	@override late final _TranslationsCreateFlightRealRouteChoiceDe realRouteChoice = _TranslationsCreateFlightRealRouteChoiceDe._(_root);
 }
 
 // Path: preview
@@ -1179,6 +1180,19 @@ class _TranslationsCreateFlightPaywallDe extends TranslationsCreateFlightPaywall
 	@override String get upgradeCancelled => 'Upgrade abgebrochen.';
 	@override String get noPaywall => 'Derzeit keine Bezahlschranke verfügbar.';
 	@override String get failedOpenPaywall => 'Paywall konnte nicht geöffnet werden.';
+}
+
+// Path: createFlight.realRouteChoice
+class _TranslationsCreateFlightRealRouteChoiceDe extends TranslationsCreateFlightRealRouteChoiceEn {
+	_TranslationsCreateFlightRealRouteChoiceDe._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Echte Flugroute holen?';
+	@override String get body => 'Auf diesem Flug ist jetzt alles freigeschaltet. Er nutzt aber noch eine ungefähre Route — gib deine Flugnummer ein und wir bauen ihn aus dem echten Flugverlauf neu auf.';
+	@override String get ctaEnterFlightNumber => 'Meine Flugnummer eingeben';
+	@override String get ctaKeepRoute => 'Ungefähre Route behalten';
 }
 
 // Path: flight.map
@@ -2013,6 +2027,10 @@ extension on TranslationsDe {
 			'createFlight.paywall.upgradeCancelled' => 'Upgrade abgebrochen.',
 			'createFlight.paywall.noPaywall' => 'Derzeit keine Bezahlschranke verfügbar.',
 			'createFlight.paywall.failedOpenPaywall' => 'Paywall konnte nicht geöffnet werden.',
+			'createFlight.realRouteChoice.title' => 'Echte Flugroute holen?',
+			'createFlight.realRouteChoice.body' => 'Auf diesem Flug ist jetzt alles freigeschaltet. Er nutzt aber noch eine ungefähre Route — gib deine Flugnummer ein und wir bauen ihn aus dem echten Flugverlauf neu auf.',
+			'createFlight.realRouteChoice.ctaEnterFlightNumber' => 'Meine Flugnummer eingeben',
+			'createFlight.realRouteChoice.ctaKeepRoute' => 'Ungefähre Route behalten',
 			'preview.calculatingRoute' => 'Flugroute wird berechnet...',
 			'preview.errorTitle' => 'Fehler',
 			'preview.errorSomethingWrong' => 'Etwas ist schiefgelaufen',
@@ -2500,12 +2518,12 @@ extension on TranslationsDe {
 			'countries.UA' => 'Ukraine',
 			'countries.UG' => 'Uganda',
 			'countries.US' => 'Vereinigte Staaten',
+			_ => null,
+		} ?? switch (path) {
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Usbekistan',
 			'countries.VE' => 'Venezuela',
 			'countries.VI' => 'Amerikanische Jungferninseln',
-			_ => null,
-		} ?? switch (path) {
 			'countries.VN' => 'Vietnam',
 			'countries.YE' => 'Jemen',
 			'countries.ZA' => 'Südafrika',

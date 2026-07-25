@@ -11,6 +11,7 @@ export 'package:flymap/analytics/events/flight/flight_number_lookup_result_event
 export 'package:flymap/analytics/events/flight/flight_opened_event.dart';
 export 'package:flymap/analytics/events/subscription/flight_unlock_action_event.dart';
 export 'package:flymap/analytics/events/subscription/flight_unlock_purchase_result_event.dart';
+export 'package:flymap/analytics/events/subscription/real_route_choice_event.dart';
 export 'package:flymap/analytics/events/subscription/flight_unlock_sheet_opened_event.dart';
 export 'package:flymap/analytics/events/learn/geo_quiz_completed_event.dart';
 export 'package:flymap/analytics/events/learn/geo_quiz_list_opened_event.dart';

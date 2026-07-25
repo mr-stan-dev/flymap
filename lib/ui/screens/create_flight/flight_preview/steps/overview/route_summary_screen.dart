@@ -9,6 +9,7 @@ import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/common/route/route_places_by_type.dart';
 import 'package:flymap/ui/screens/common/route/route_regions_by_type.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_unlock_gate_sheet.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/route_upgrade_choice_sheet.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/overview/region_info_screen.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_cubit.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
@@ -125,16 +126,11 @@ class RouteSummaryScreen extends StatelessWidget {
                 hiddenRegionsCount: gateDecision.premiumRegions.length,
                 onOpenRegion: (region) => _openRegionInfo(context, region),
                 onPremiumGateTap: gateDecision.isGated
-                    ? () => showFlightUnlockGateSheet(
+                    ? () => _showTimelineGateSheet(
                         context: context,
                         subscriptionCubit: subscriptionCubit,
-                        source: PaywallSource.routeTimelineGate,
-                        onUnlockActivated:
-                            flightPreviewCubit.enablePendingFlightUnlock,
-                        onProActivated: flightPreviewCubit.refreshPoisForPro,
+                        flightPreviewCubit: flightPreviewCubit,
                         routePreview: routePreview,
-                        presentProPaywall: subscriptionCubit
-                            .presentPaywallFromRouteTimelineGate,
                       )
                     : null,
               ),
@@ -153,15 +149,11 @@ class RouteSummaryScreen extends StatelessWidget {
               isProUser: isProUser,
               cruiseSpeedKmh: cruiseSpeedKmh,
               totalRouteMinutes: totalRouteMinutes,
-              onPremiumGateTap: () => showFlightUnlockGateSheet(
+              onPremiumGateTap: () => _showTimelineGateSheet(
                 context: context,
                 subscriptionCubit: subscriptionCubit,
-                source: PaywallSource.routeTimelineGate,
-                onUnlockActivated: flightPreviewCubit.enablePendingFlightUnlock,
-                onProActivated: flightPreviewCubit.refreshPoisForPro,
+                flightPreviewCubit: flightPreviewCubit,
                 routePreview: routePreview,
-                presentProPaywall:
-                    subscriptionCubit.presentPaywallFromRouteTimelineGate,
               ),
               onOpenRegion: (region) => _openRegionInfo(context, region),
             ),
@@ -178,6 +170,41 @@ class RouteSummaryScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showTimelineGateSheet({
+    required BuildContext context,
+    required SubscriptionCubit subscriptionCubit,
+    required FlightPreviewCubit flightPreviewCubit,
+    required String? routePreview,
+  }) async {
+    await showFlightUnlockGateSheet(
+      context: context,
+      subscriptionCubit: subscriptionCubit,
+      source: PaywallSource.routeTimelineGate,
+      onUnlockActivated: () async {
+        await flightPreviewCubit.enablePendingFlightUnlock();
+        if (context.mounted) {
+          await maybeShowRouteUpgradeChoiceSheet(
+            context: context,
+            cubit: flightPreviewCubit,
+            source: PaywallSource.routeTimelineGate,
+          );
+        }
+      },
+      onProActivated: () async {
+        await flightPreviewCubit.refreshPoisForPro();
+        if (context.mounted) {
+          await maybeShowRouteUpgradeChoiceSheet(
+            context: context,
+            cubit: flightPreviewCubit,
+            source: PaywallSource.routeTimelineGate,
+          );
+        }
+      },
+      routePreview: routePreview,
+      presentProPaywall: subscriptionCubit.presentPaywallFromRouteTimelineGate,
     );
   }
 

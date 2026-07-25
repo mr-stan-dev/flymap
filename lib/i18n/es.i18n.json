@@ -582,6 +582,12 @@
       "upgradeCancelled": "Actualización cancelada.",
       "noPaywall": "No hay pantalla de pago disponible en este momento.",
       "failedOpenPaywall": "No se pudo abrir la pantalla de pago."
+    },
+    "realRouteChoice": {
+      "title": "¿Obtener la ruta real del vuelo?",
+      "body": "Todo en este vuelo está desbloqueado. Aún usa una ruta aproximada — introduce tu número de vuelo y lo reconstruiremos con la trayectoria real.",
+      "ctaEnterFlightNumber": "Introducir mi número de vuelo",
+      "ctaKeepRoute": "Mantener ruta aproximada"
     }
   },
   "preview": {

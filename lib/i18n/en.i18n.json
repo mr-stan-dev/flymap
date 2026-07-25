@@ -582,6 +582,12 @@
       "upgradeCancelled": "Upgrade cancelled.",
       "noPaywall": "No paywall available right now.",
       "failedOpenPaywall": "Failed to open paywall."
+    },
+    "realRouteChoice": {
+      "title": "Get the real flight route?",
+      "body": "Everything on this flight is unlocked. It still uses an approximate route — enter your flight number and we'll rebuild it from the real flight track.",
+      "ctaEnterFlightNumber": "Enter my flight number",
+      "ctaKeepRoute": "Keep approximate route"
     }
   },
   "preview": {

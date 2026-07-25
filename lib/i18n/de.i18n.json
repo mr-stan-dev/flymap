@@ -582,6 +582,12 @@
       "upgradeCancelled": "Upgrade abgebrochen.",
       "noPaywall": "Derzeit keine Bezahlschranke verfügbar.",
       "failedOpenPaywall": "Paywall konnte nicht geöffnet werden."
+    },
+    "realRouteChoice": {
+      "title": "Echte Flugroute holen?",
+      "body": "Auf diesem Flug ist jetzt alles freigeschaltet. Er nutzt aber noch eine ungefähre Route — gib deine Flugnummer ein und wir bauen ihn aus dem echten Flugverlauf neu auf.",
+      "ctaEnterFlightNumber": "Meine Flugnummer eingeben",
+      "ctaKeepRoute": "Ungefähre Route behalten"
     }
   },
   "preview": {

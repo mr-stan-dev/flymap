@@ -414,6 +414,7 @@ class _TranslationsCreateFlightEs extends TranslationsCreateFlightEn {
 	@override late final _TranslationsCreateFlightDownloadingEs downloading = _TranslationsCreateFlightDownloadingEs._(_root);
 	@override late final _TranslationsCreateFlightErrorsEs errors = _TranslationsCreateFlightErrorsEs._(_root);
 	@override late final _TranslationsCreateFlightPaywallEs paywall = _TranslationsCreateFlightPaywallEs._(_root);
+	@override late final _TranslationsCreateFlightRealRouteChoiceEs realRouteChoice = _TranslationsCreateFlightRealRouteChoiceEs._(_root);
 }
 
 // Path: preview
@@ -1179,6 +1180,19 @@ class _TranslationsCreateFlightPaywallEs extends TranslationsCreateFlightPaywall
 	@override String get upgradeCancelled => 'Actualización cancelada.';
 	@override String get noPaywall => 'No hay pantalla de pago disponible en este momento.';
 	@override String get failedOpenPaywall => 'No se pudo abrir la pantalla de pago.';
+}
+
+// Path: createFlight.realRouteChoice
+class _TranslationsCreateFlightRealRouteChoiceEs extends TranslationsCreateFlightRealRouteChoiceEn {
+	_TranslationsCreateFlightRealRouteChoiceEs._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '¿Obtener la ruta real del vuelo?';
+	@override String get body => 'Todo en este vuelo está desbloqueado. Aún usa una ruta aproximada — introduce tu número de vuelo y lo reconstruiremos con la trayectoria real.';
+	@override String get ctaEnterFlightNumber => 'Introducir mi número de vuelo';
+	@override String get ctaKeepRoute => 'Mantener ruta aproximada';
 }
 
 // Path: flight.map
@@ -2013,6 +2027,10 @@ extension on TranslationsEs {
 			'createFlight.paywall.upgradeCancelled' => 'Actualización cancelada.',
 			'createFlight.paywall.noPaywall' => 'No hay pantalla de pago disponible en este momento.',
 			'createFlight.paywall.failedOpenPaywall' => 'No se pudo abrir la pantalla de pago.',
+			'createFlight.realRouteChoice.title' => '¿Obtener la ruta real del vuelo?',
+			'createFlight.realRouteChoice.body' => 'Todo en este vuelo está desbloqueado. Aún usa una ruta aproximada — introduce tu número de vuelo y lo reconstruiremos con la trayectoria real.',
+			'createFlight.realRouteChoice.ctaEnterFlightNumber' => 'Introducir mi número de vuelo',
+			'createFlight.realRouteChoice.ctaKeepRoute' => 'Mantener ruta aproximada',
 			'preview.calculatingRoute' => 'Calculando la ruta del vuelo...',
 			'preview.errorTitle' => 'Error',
 			'preview.errorSomethingWrong' => 'Algo salió mal',
@@ -2500,12 +2518,12 @@ extension on TranslationsEs {
 			'countries.UA' => 'Ucrania',
 			'countries.UG' => 'Uganda',
 			'countries.US' => 'Estados Unidos',
+			_ => null,
+		} ?? switch (path) {
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Uzbekistan',
 			'countries.VE' => 'Venezuela',
 			'countries.VI' => 'Islas Virgenes de EE. UU.',
-			_ => null,
-		} ?? switch (path) {
 			'countries.VN' => 'Vietnam',
 			'countries.YE' => 'Yemen',
 			'countries.ZA' => 'Sudafrica',

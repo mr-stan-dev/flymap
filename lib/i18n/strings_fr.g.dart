@@ -414,6 +414,7 @@ class _TranslationsCreateFlightFr extends TranslationsCreateFlightEn {
 	@override late final _TranslationsCreateFlightDownloadingFr downloading = _TranslationsCreateFlightDownloadingFr._(_root);
 	@override late final _TranslationsCreateFlightErrorsFr errors = _TranslationsCreateFlightErrorsFr._(_root);
 	@override late final _TranslationsCreateFlightPaywallFr paywall = _TranslationsCreateFlightPaywallFr._(_root);
+	@override late final _TranslationsCreateFlightRealRouteChoiceFr realRouteChoice = _TranslationsCreateFlightRealRouteChoiceFr._(_root);
 }
 
 // Path: preview
@@ -1179,6 +1180,19 @@ class _TranslationsCreateFlightPaywallFr extends TranslationsCreateFlightPaywall
 	@override String get upgradeCancelled => 'Mise à niveau annulée.';
 	@override String get noPaywall => 'Aucun écran de paiement disponible pour le moment.';
 	@override String get failedOpenPaywall => 'Impossible d’ouvrir l’écran de paiement.';
+}
+
+// Path: createFlight.realRouteChoice
+class _TranslationsCreateFlightRealRouteChoiceFr extends TranslationsCreateFlightRealRouteChoiceEn {
+	_TranslationsCreateFlightRealRouteChoiceFr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Obtenir le vrai tracé du vol ?';
+	@override String get body => 'Tout est désormais débloqué sur ce vol. Il utilise encore un tracé approximatif — saisissez votre numéro de vol et nous le reconstruirons à partir du tracé réel.';
+	@override String get ctaEnterFlightNumber => 'Saisir mon numéro de vol';
+	@override String get ctaKeepRoute => 'Garder le tracé approximatif';
 }
 
 // Path: flight.map
@@ -2013,6 +2027,10 @@ extension on TranslationsFr {
 			'createFlight.paywall.upgradeCancelled' => 'Mise à niveau annulée.',
 			'createFlight.paywall.noPaywall' => 'Aucun écran de paiement disponible pour le moment.',
 			'createFlight.paywall.failedOpenPaywall' => 'Impossible d’ouvrir l’écran de paiement.',
+			'createFlight.realRouteChoice.title' => 'Obtenir le vrai tracé du vol ?',
+			'createFlight.realRouteChoice.body' => 'Tout est désormais débloqué sur ce vol. Il utilise encore un tracé approximatif — saisissez votre numéro de vol et nous le reconstruirons à partir du tracé réel.',
+			'createFlight.realRouteChoice.ctaEnterFlightNumber' => 'Saisir mon numéro de vol',
+			'createFlight.realRouteChoice.ctaKeepRoute' => 'Garder le tracé approximatif',
 			'preview.calculatingRoute' => 'Calcul de l’itinéraire du vol...',
 			'preview.errorTitle' => 'Erreur',
 			'preview.errorSomethingWrong' => 'Un problème est survenu',
@@ -2500,12 +2518,12 @@ extension on TranslationsFr {
 			'countries.UA' => 'Ukraine',
 			'countries.UG' => 'Ouganda',
 			'countries.US' => 'États-Unis',
+			_ => null,
+		} ?? switch (path) {
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Ouzbékistan',
 			'countries.VE' => 'Venezuela',
 			'countries.VI' => 'Îles Vierges américaines',
-			_ => null,
-		} ?? switch (path) {
 			'countries.VN' => 'Viêt Nam',
 			'countries.YE' => 'Yémen',
 			'countries.ZA' => 'Afrique du Sud',

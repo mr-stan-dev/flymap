@@ -16,6 +16,7 @@ import 'package:flymap/repository/user_flight_prefs_repository.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/subscription/pro_limits.dart';
 import 'package:flymap/subscription/paywall_source.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/route_upgrade_choice_sheet.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_args.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_unlock_gate_sheet.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/downloading/flight_search_downloading_view.dart';
@@ -346,8 +347,24 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
       source: PaywallSource.routeOverviewGate,
       onUnlockActivated: () async {
         await cubit.enablePendingFlightUnlock();
+        if (context.mounted) {
+          await maybeShowRouteUpgradeChoiceSheet(
+            context: context,
+            cubit: cubit,
+            source: PaywallSource.routeOverviewGate,
+          );
+        }
       },
-      onProActivated: cubit.refreshPoisForPro,
+      onProActivated: () async {
+        await cubit.refreshPoisForPro();
+        if (context.mounted) {
+          await maybeShowRouteUpgradeChoiceSheet(
+            context: context,
+            cubit: cubit,
+            source: PaywallSource.routeOverviewGate,
+          );
+        }
+      },
       routePreview: _routePreviewText(state),
       presentProPaywall: subscriptionCubit.presentPaywallFromRouteOverviewGate,
     );

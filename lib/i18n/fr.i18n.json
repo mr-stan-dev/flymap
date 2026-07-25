@@ -582,6 +582,12 @@
       "upgradeCancelled": "Mise à niveau annulée.",
       "noPaywall": "Aucun écran de paiement disponible pour le moment.",
       "failedOpenPaywall": "Impossible d’ouvrir l’écran de paiement."
+    },
+    "realRouteChoice": {
+      "title": "Obtenir le vrai tracé du vol ?",
+      "body": "Tout est désormais débloqué sur ce vol. Il utilise encore un tracé approximatif — saisissez votre numéro de vol et nous le reconstruirons à partir du tracé réel.",
+      "ctaEnterFlightNumber": "Saisir mon numéro de vol",
+      "ctaKeepRoute": "Garder le tracé approximatif"
     }
   },
   "preview": {
