@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/home_area_summary.dart';
+import 'package:flymap/domain/entity/poi_wiki_preview.dart';
 import 'package:flymap/domain/entity/user_interests_poi_types.dart';
 import 'package:flymap/domain/entity/user_profile.dart';
 import 'package:flymap/i18n/strings.g.dart';
@@ -216,9 +217,10 @@ class _PlaceChip extends StatelessWidget {
       shape: StadiumBorder(side: BorderSide(color: scheme.outlineVariant)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        // The regular place preview sheet needs a wikidata id to load its
-        // description; chips without one stay static.
-        onTap: place.qid.isEmpty ? null : () => _openPreview(context),
+        // The preview sheet renders only what we hand it — it does not fetch.
+        // Chips without a payload description stay static rather than
+        // opening an empty sheet.
+        onTap: place.description.isEmpty ? null : () => _openPreview(context),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           child: Row(
@@ -252,7 +254,17 @@ class _PlaceChip extends StatelessWidget {
       name: place.name,
       typeRaw: place.type.rawValue,
       qid: place.qid,
-      actionMode: PoiPreviewActionMode.openOnly,
+      // No wikipedia URL in the area payload, so no open action; the sheet
+      // shows the offline description that came with the places response.
+      actionMode: PoiPreviewActionMode.none,
+      preloadedPreview: PoiWikiPreview(
+        qid: place.qid,
+        title: place.name,
+        summary: place.description,
+        htmlContent: '',
+        sourceUrl: '',
+        languageCode: '',
+      ),
     );
   }
 }

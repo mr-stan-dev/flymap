@@ -33,6 +33,7 @@ void main() {
       'name': name,
       'placeType': type,
       'sitelinks': sitelinks,
+      'description': 'About $name',
     },
   };
 
@@ -73,18 +74,26 @@ void main() {
         name: 'Neusiedler See',
         type: FlightPoiType.lake,
         qid: 'Q_Neusiedler See',
+        description: 'About Neusiedler See',
       ),
       HomeAreaPlace(
         name: 'Schneeberg',
         type: FlightPoiType.mountain,
         qid: 'Q_Schneeberg',
+        description: 'About Schneeberg',
       ),
       HomeAreaPlace(
         name: 'Attersee',
         type: FlightPoiType.lake,
         qid: 'Q_Attersee',
+        description: 'About Attersee',
       ),
-      HomeAreaPlace(name: 'Rax', type: FlightPoiType.mountain, qid: 'Q_Rax'),
+      HomeAreaPlace(
+        name: 'Rax',
+        type: FlightPoiType.mountain,
+        qid: 'Q_Rax',
+        description: 'About Rax',
+      ),
     ]);
     expect(summary.regionNames, ['Alps', 'Pannonian Basin']);
     expect(summary.isEmpty, isFalse);
@@ -136,6 +145,7 @@ void main() {
         name: 'Schneeberg',
         type: FlightPoiType.mountain,
         qid: 'Q_Schneeberg',
+        description: 'About Schneeberg',
       ),
     ]);
   });

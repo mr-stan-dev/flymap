@@ -109,6 +109,7 @@ class ApiHomeAreaOverviewRepository implements HomeAreaOverviewRepository {
             name: name,
             type: type,
             qid: (props['qid'] ?? '').toString().trim(),
+            description: (props['description'] ?? '').toString().trim(),
           ),
           sitelinks: sitelinks is num ? sitelinks.toInt() : 0,
         ));
