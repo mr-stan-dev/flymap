@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
+import 'package:flymap/data/local/route_map_image_store.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight.dart';
@@ -65,6 +66,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     required DeleteFlightUseCase deleteFlightUseCase,
     required AppAnalytics analytics,
     required AppCrashlytics crashlytics,
+    RouteMapImageStore? routeMapImageStore,
     bool autoPrepare = true,
   }) : _analytics = analytics,
        _crashlytics = crashlytics,
@@ -93,6 +95,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
       subscriptionRepository: subscriptionRepository,
       flightUnlockRepository: flightUnlockRepository,
       deleteFlightUseCase: deleteFlightUseCase,
+      routeMapImageStore: routeMapImageStore,
     );
     if (autoPrepare) {
       unawaited(preparePreview());

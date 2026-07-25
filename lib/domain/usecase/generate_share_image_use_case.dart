@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flymap/data/api/mapbox_static_image_api.dart';
+import 'package:flymap/data/local/route_map_image_store.dart';
 import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/ui/screens/share_flight/utils/static_route_map.dart';
@@ -21,17 +22,24 @@ import 'package:path_provider/path_provider.dart';
 /// 4. Composite flight data overlays on top using [ShareImagePainter]
 /// 5. Export the final composited image as PNG to a temp file
 class GenerateShareImageUseCase {
-  GenerateShareImageUseCase({required MapboxStaticImageApi mapboxApi})
-    : _mapboxApi = mapboxApi;
+  GenerateShareImageUseCase({
+    required MapboxStaticImageApi mapboxApi,
+    RouteMapImageStore? imageStore,
+  }) : _mapboxApi = mapboxApi,
+       _imageStore = imageStore;
 
   final MapboxStaticImageApi _mapboxApi;
+
+  /// Optional disk cache for the base map. Fetch parameters are identical to
+  /// the direct API call, so the composited output does not change — the
+  /// cache only removes repeat downloads (and enables offline shares).
+  final RouteMapImageStore? _imageStore;
   final Logger _logger = const Logger('GenerateShareImageUseCase');
 
   /// The logical pixel dimensions of the share card.
   /// The actual output is @2x (1080×1600 physical pixels).
   static final int canvasWidth = ShareImageCardConfig.width.toInt();
   static final int canvasHeight = ShareImageCardConfig.height.toInt();
-  static const String _planeAssetPath = 'assets/images/icons/plane_teal.png';
   static const EdgeInsets _overlaySafePadding =
       ShareImageCardConfig.overlaySafePadding;
 
@@ -50,17 +58,26 @@ class GenerateShareImageUseCase {
         padding: _overlaySafePadding,
       );
 
-      // 2. Fetch satellite map background
+      // 2. Fetch satellite map background (disk cache first when available;
+      // parameters are identical either way, so the output stays the same).
       _logger.log(
         'Fetching static map for ${flight.routeName} (zoom: ${viewport.zoom})',
       );
-      final mapBytes = await _mapboxApi.fetchStaticMapImage(
-        center: viewport.center,
-        zoom: viewport.zoom,
+      final cachedBase = await _imageStore?.getOrFetchShareBase(
+        flightId: flight.id,
+        viewport: viewport,
         width: canvasWidth,
         height: canvasHeight,
-        retina: true,
       );
+      final mapBytes = cachedBase != null
+          ? await cachedBase.readAsBytes()
+          : await _mapboxApi.fetchStaticMapImage(
+              center: viewport.center,
+              zoom: viewport.zoom,
+              width: canvasWidth,
+              height: canvasHeight,
+              retina: true,
+            );
 
       if (mapBytes == null || mapBytes.isEmpty) {
         _logger.error('Failed to fetch static map image');
@@ -80,7 +97,9 @@ class GenerateShareImageUseCase {
         viewport: viewport,
       ).map((p) => p.toOffset()).toList();
 
-      final planeImage = await _decodeAssetImage(_planeAssetPath);
+      final planeImage = await _decodeAssetImage(
+        ShareImagePainter.planeAssetPath,
+      );
 
       // 5. Composite overlays
       final composited = await _compositeImage(

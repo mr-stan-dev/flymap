@@ -11,6 +11,7 @@ import 'app_database.dart';
 import 'mappers/flight_article_db_mapper.dart';
 import 'mappers/flight_db_mapper.dart';
 import 'mappers/flight_info_db_mapper.dart';
+import 'route_map_image_store.dart';
 
 class FlightsDBService {
   static const String _assetTypeWikiArticle = 'wiki_article';
@@ -160,6 +161,7 @@ class FlightsDBService {
         null;
     if (!exists) return false;
     await _deleteArticleAssets(flightId);
+    await RouteMapImageStore.deleteFilesForFlight(flightId);
     await _database.flightsStore.record(flightId).delete(_database.database);
     return true;
   }

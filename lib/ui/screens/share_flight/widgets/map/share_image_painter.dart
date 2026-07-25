@@ -17,10 +17,17 @@ class ShareImagePainter {
   final List<Offset>? projectedPoints;
   final ui.Image? planeImage;
 
-  static const Color _cyan = Color(0xFF47EFFF);
-  static const double _planeGapLength = 80.0;
-  static const double _planeGapCenterForwardBias = 6.0;
-  static const double _routeStrokeWidth = 5.0;
+  /// Route styling shared with the home flight card's thumbnail overlay so
+  /// both surfaces draw the route identically.
+  static const Color routeColor = Color(0xFF47EFFF);
+  static const double routeDashLength = 17.0;
+  static const double routeDashGap = 13.0;
+  static const double endpointOuterRadius = 12.0;
+  static const double endpointInnerRadius = 10.0;
+  static const String planeAssetPath = 'assets/images/icons/plane_teal.png';
+  static const double planeGapLength = 80.0;
+  static const double planeGapCenterForwardBias = 6.0;
+  static const double routeStrokeWidth = 5.0;
 
   void paint(Canvas canvas, Size size) {
     _drawRoute(canvas, size);
@@ -36,8 +43,8 @@ class ShareImagePainter {
     final path = _buildArcPath(start, end);
 
     final routePaint = Paint()
-      ..color = _cyan
-      ..strokeWidth = _routeStrokeWidth
+      ..color = routeColor
+      ..strokeWidth = routeStrokeWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
@@ -47,12 +54,12 @@ class ShareImagePainter {
       final midOffset = metric.length * 0.5;
       // Plane icon is visually nose-heavy, so move the dashed-gap center
       // a bit forward to balance front/back visible spacing around the plane.
-      final gapCenter = (midOffset + _planeGapCenterForwardBias).clamp(
+      final gapCenter = (midOffset + planeGapCenterForwardBias).clamp(
         0.0,
         metric.length,
       );
-      final gapStart = max(0.0, gapCenter - (_planeGapLength / 2));
-      final gapEnd = min(metric.length, gapCenter + (_planeGapLength / 2));
+      final gapStart = max(0.0, gapCenter - (planeGapLength / 2));
+      final gapEnd = min(metric.length, gapCenter + (planeGapLength / 2));
 
       if (gapStart > 0) {
         final segment = metric.extractPath(0, gapStart);
@@ -77,6 +84,20 @@ class ShareImagePainter {
   }
 
   Path _buildArcPath(Offset start, Offset end) {
+    return buildArcPath(
+      start,
+      end,
+      routeKm: flight.route.displayDistanceKm.toDouble(),
+    );
+  }
+
+  /// The stylized route arc, exposed so the home card thumbnail can draw
+  /// the identical curve.
+  static Path buildArcPath(
+    Offset start,
+    Offset end, {
+    required double routeKm,
+  }) {
     final dx = end.dx - start.dx;
     final dy = end.dy - start.dy;
     final length = sqrt((dx * dx) + (dy * dy));
@@ -91,7 +112,6 @@ class ShareImagePainter {
     final perpB = Offset(dir.dy, -dir.dx);
     final perp = perpA.dy <= perpB.dy ? perpA : perpB;
 
-    final routeKm = flight.route.displayDistanceKm.toDouble();
     final strength = (routeKm / 6000).clamp(0.10, 0.22);
     final arcHeight = (length * strength).clamp(14.0, 120.0);
     final mid = Offset((start.dx + end.dx) / 2, (start.dy + end.dy) / 2);
@@ -103,8 +123,8 @@ class ShareImagePainter {
   }
 
   void _drawDashedPath(Canvas canvas, Path source, Paint paint) {
-    const dashLength = 17.0;
-    const dashGap = 13.0;
+    const dashLength = routeDashLength;
+    const dashGap = routeDashGap;
 
     for (final metric in source.computeMetrics()) {
       var distance = 0.0;
@@ -159,8 +179,16 @@ class ShareImagePainter {
   }
 
   void _drawDot(Canvas canvas, Offset position) {
-    canvas.drawCircle(position, 12, Paint()..color = Colors.white);
-    canvas.drawCircle(position, 10, Paint()..color = _cyan);
+    canvas.drawCircle(
+      position,
+      endpointOuterRadius,
+      Paint()..color = Colors.white,
+    );
+    canvas.drawCircle(
+      position,
+      endpointInnerRadius,
+      Paint()..color = routeColor,
+    );
   }
 
   void _drawAirportCodeLabels(

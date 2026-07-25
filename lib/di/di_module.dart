@@ -26,6 +26,7 @@ import 'package:flymap/data/map_asset_cache_service.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/local/airlines_database.dart';
 import 'package:flymap/data/local/app_database.dart';
+import 'package:flymap/data/local/route_map_image_store.dart';
 import 'package:flymap/data/local/flights_db_service.dart';
 import 'package:flymap/data/local/learn_pack_local_db.dart';
 import 'package:flymap/data/location/app_location_client.dart';
@@ -223,8 +224,11 @@ class DiModule {
         accessToken: i.get<MapboxEnvConfig>().trimmedAccessToken,
       ),
     );
+    i.registerLazySingleton<RouteMapImageStore>(
+      () => RouteMapImageStore(api: i.get()),
+    );
     i.registerLazySingleton<GenerateShareImageUseCase>(
-      () => GenerateShareImageUseCase(mapboxApi: i.get()),
+      () => GenerateShareImageUseCase(mapboxApi: i.get(), imageStore: i.get()),
     );
     i.registerLazySingleton<MapboxRasterTileApi>(
       () => MapboxRasterTileApi(

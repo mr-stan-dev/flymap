@@ -9,6 +9,7 @@ import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/widgets/complete_flight_confirmation_dialog.dart';
 import 'package:flymap/ui/screens/flight/widgets/delete_flight_confirmation_dialog.dart';
 import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_cubit.dart';
+import 'package:flymap/ui/screens/home/tabs/home/widgets/flights_list/home_flight_card_map_header.dart';
 import 'package:flymap/ui/screens/home/tabs/home/widgets/flights_list/home_route_preview_strip.dart';
 import 'package:flymap/ui/theme/app_colours.dart';
 import 'package:flymap/utils/route_utils.dart';
@@ -81,54 +82,13 @@ class HomeFlightCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          RouteUtils.routeCities(route),
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (subtitle.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              if (showProStyling) ...[
-                                const Icon(
-                                  Icons.workspace_premium_rounded,
-                                  size: 12,
-                                  color: DsBrandColors.proAmber,
-                                ),
-                                const SizedBox(width: 4),
-                              ],
-                              Expanded(
-                                child: Text(
-                                  subtitle,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  _buildMenuButton(context),
-                ],
-              ),
+            HomeFlightCardMapHeader(
+              flight: flight,
+              cardColor: cardColor,
+              title: RouteUtils.routeCities(route),
+              subtitle: subtitle,
+              showProCrown: showProStyling,
+              menuButton: _buildMenuButton(context),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),

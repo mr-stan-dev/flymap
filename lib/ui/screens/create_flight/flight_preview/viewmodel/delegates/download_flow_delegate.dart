@@ -16,19 +16,40 @@ class DownloadFlowDelegate {
     required SubscriptionRepository subscriptionRepository,
     required FlightUnlockRepository flightUnlockRepository,
     required DeleteFlightUseCase deleteFlightUseCase,
+    RouteMapImageStore? routeMapImageStore,
   }) : _downloadMapUseCase = downloadMapUseCase,
        _downloadRegionWikiArticlesUseCase = downloadRegionWikiArticlesUseCase,
        _downloadWikipediaArticlesUseCase = downloadWikipediaArticlesUseCase,
        _flightRepository = flightRepository,
        _subscriptionRepository = subscriptionRepository,
        _flightUnlockRepository = flightUnlockRepository,
-       _deleteFlightUseCase = deleteFlightUseCase;
+       _deleteFlightUseCase = deleteFlightUseCase,
+       _routeMapImageStore = routeMapImageStore;
 
   final FlightPreviewCubit _cubit;
   final DownloadMapUseCase _downloadMapUseCase;
   final DownloadRegionWikiArticlesUseCase _downloadRegionWikiArticlesUseCase;
   final DownloadWikipediaArticlesUseCase _downloadWikipediaArticlesUseCase;
   final FlightRepository _flightRepository;
+  final RouteMapImageStore? _routeMapImageStore;
+
+  /// Best-effort, fire-and-forget: fetch the home card's map thumbnail while
+  /// the flight is being created (network is guaranteed here). Only flights
+  /// created after this feature get a thumbnail — there is no backfill.
+  void _prefetchCardMapImage({
+    required String flightId,
+    required FlightRoute route,
+  }) {
+    final store = _routeMapImageStore;
+    if (store == null) return;
+    final waypoints = route.waypointLatLngs;
+    final points = waypoints.length >= 2
+        ? waypoints
+        : [route.departure.latLon, route.arrival.latLon];
+    unawaited(
+      store.getOrFetchCardImage(flightId: flightId, routePoints: points),
+    );
+  }
   final SubscriptionRepository _subscriptionRepository;
   final FlightUnlockRepository _flightUnlockRepository;
   final DeleteFlightUseCase _deleteFlightUseCase;
@@ -198,6 +219,7 @@ class DownloadFlowDelegate {
     final regionsToDownloadCount = _downloadRegionWikiArticlesUseCase
         .downloadTargetCount(regionsToDownload);
     final flightId = DownloadMapUseCase.newFlightId();
+    _prefetchCardMapImage(flightId: flightId, route: route);
     final articleBundleId = _articleBundleId(route, flightId);
     _activeArticleBundleId = articleBundleId;
     final initialHasArticlePhase = selectedUrls.isNotEmpty;

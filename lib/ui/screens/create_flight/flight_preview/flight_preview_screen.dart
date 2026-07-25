@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
+import 'package:flymap/data/local/route_map_image_store.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/domain/usecase/build_flight_route_preview_use_case.dart';
 import 'package:flymap/i18n/strings.g.dart';
@@ -66,6 +67,9 @@ class FlightPreviewScreen extends StatelessWidget {
         deleteFlightUseCase: GetIt.I.get<DeleteFlightUseCase>(),
         analytics: GetIt.I.get<AppAnalytics>(),
         crashlytics: GetIt.I.get<AppCrashlytics>(),
+        routeMapImageStore: GetIt.I.isRegistered<RouteMapImageStore>()
+            ? GetIt.I.get<RouteMapImageStore>()
+            : null,
       ),
       child: const _FlightPreviewBody(),
     );
