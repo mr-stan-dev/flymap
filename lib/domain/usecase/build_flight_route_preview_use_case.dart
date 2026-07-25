@@ -20,7 +20,10 @@ class BuildFlightRoutePreviewUseCase {
 
   final FlightSearchRepository _repository;
 
-  static const int placesLimit = 200;
+  // The backend clamps this callable to 200 today; requesting 400 keeps the
+  // client aligned with GetRouteOverviewUseCase and picks up any future
+  // server-side cap raise automatically.
+  static const int placesLimit = 400;
   static const int regionsLimit = 50;
 
   Future<FlightRoutePreviewResult> call({

@@ -58,9 +58,11 @@ void main() {
   });
 
   test('interest boost pulls matching POIs into the free cut', () {
-    // 10 famous cities followed by a volcano that would miss the plain cut.
+    const free = PoiLimitsPolicy.freeMaxPois;
+    // Enough famous cities to fill the free cut, followed by a volcano that
+    // would miss the plain cut.
     final pois = _rankedPois([
-      for (var i = 0; i < 10; i++) ('city$i', FlightPoiType.city, 200 - i),
+      for (var i = 0; i < free; i++) ('city$i', FlightPoiType.city, 200 - i),
       ('Stromboli', FlightPoiType.volcano, 120),
       ('city_tail', FlightPoiType.city, 110),
     ]);
@@ -81,9 +83,10 @@ void main() {
   });
 
   test('boost does not let obscure matches beat world-famous places', () {
+    const free = PoiLimitsPolicy.freeMaxPois;
     final pois = _rankedPois([
       ('Grand Canyon', FlightPoiType.park, 300),
-      for (var i = 0; i < 10; i++) ('peak$i', FlightPoiType.mountain, 50 - i),
+      for (var i = 0; i < free; i++) ('peak$i', FlightPoiType.mountain, 50 - i),
       ('pond', FlightPoiType.lake, 2),
     ]);
 
@@ -99,8 +102,10 @@ void main() {
   });
 
   test('selection preserves the backend popularity order', () {
+    const overCap = PoiLimitsPolicy.freeMaxPois + 5;
     final pois = _rankedPois([
-      for (var i = 0; i < 15; i++) ('city$i', FlightPoiType.city, 200 - i),
+      for (var i = 0; i < overCap; i++)
+        ('city$i', FlightPoiType.city, 200 - i),
       ('Vesuvius', FlightPoiType.volcano, 150),
     ]);
 

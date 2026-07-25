@@ -323,7 +323,8 @@ void main() {
     });
 
     test('preparePreview with pending unlock applies pro POI slice', () async {
-      final pois = _routePoiSummaries(120);
+      // More candidates than the pro cap so the tier slice actually binds.
+      final pois = _routePoiSummaries(PoiLimitsPolicy.proMaxPois + 50);
       routeOverviewUseCase.routeOverview = _routeOverviewFor(
         _route(),
         topPois: pois,

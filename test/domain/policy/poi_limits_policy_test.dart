@@ -8,7 +8,7 @@ void main() {
         PoiLimitsPolicy.maxPoisForTier(isProUser: false),
         PoiLimitsPolicy.freeMaxPois,
       );
-      expect(PoiLimitsPolicy.freeMaxPois, 10);
+      expect(PoiLimitsPolicy.freeMaxPois, 20);
     });
 
     test('returns pro limit for pro users', () {
@@ -16,7 +16,7 @@ void main() {
         PoiLimitsPolicy.maxPoisForTier(isProUser: true),
         PoiLimitsPolicy.proMaxPois,
       );
-      expect(PoiLimitsPolicy.proMaxPois, 100);
+      expect(PoiLimitsPolicy.proMaxPois, 200);
     });
   });
 }

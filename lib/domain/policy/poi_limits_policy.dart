@@ -1,6 +1,6 @@
 class PoiLimitsPolicy {
-  static const int freeMaxPois = 10;
-  static const int proMaxPois = 100;
+  static const int freeMaxPois = 20;
+  static const int proMaxPois = 200;
 
   const PoiLimitsPolicy._();
 

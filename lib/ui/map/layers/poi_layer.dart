@@ -40,8 +40,12 @@ class PoiLayer extends MapLayer {
     }
     _logger.log('Rendering POIs count=${poi.length} typeCounts=$typeCounts');
 
-    // Build a GeoJSON FeatureCollection for points
-    final features = poi.map((p) {
+    // Build a GeoJSON FeatureCollection for points. The incoming list is
+    // importance-ordered (backend popularity rank preserved by the tier
+    // selection), so the index doubles as a collision priority: lower rank
+    // wins when symbols compete for space.
+    final features = poi.indexed.map((entry) {
+      final (index, p) = entry;
       final hasIcon = iconTypes.contains(p.type);
       return {
         'id': p.qid.trim().isNotEmpty ? p.qid : p.name,
@@ -58,6 +62,7 @@ class PoiLayer extends MapLayer {
           'qid': p.qid,
           'sitelinks': p.sitelinks,
           'route_progress': p.routeProgress,
+          'rank': index,
         },
       };
     });
@@ -108,26 +113,18 @@ class PoiLayer extends MapLayer {
         circleStrokeColor: Colors.white.toHexStringRGB(),
         // iOS requires ["zoom"] to be used only as input to top-level
         // "step"/"interpolate" expressions.
-        circleOpacity: <dynamic>[
-          'step',
-          ['zoom'],
-          0.95,
-          7,
-          [
-            'case',
-            [
-              '==',
-              ['get', 'has_icon'],
-              true,
-            ],
-            0.0,
-            0.95,
-          ],
-        ],
+        circleOpacity: _circleOpacityExpression(),
+        // Must mirror the fill: a hidden or dimmed fill with a full-strength
+        // white stroke reads as a stray white ring.
+        circleStrokeOpacity: _circleOpacityExpression(),
       ),
     );
 
-    // Add icon layer visible from zoom 7+.
+    // Icon + label as ONE symbol per place (icons visible from zoom 7+,
+    // labels from 8+ via size expressions). Keeping them in a single layer
+    // is what makes collision behave: a symbol never collides with its own
+    // text, and textOptional drops the label while keeping the icon when
+    // space is tight. The sort key makes the more important place win.
     await controller.addLayer(
       sourceId,
       iconsLayerId,
@@ -144,8 +141,26 @@ class PoiLayer extends MapLayer {
           12,
           0.42,
         ],
-        iconAllowOverlap: true,
-        iconIgnorePlacement: true,
+        iconAllowOverlap: false,
+        iconIgnorePlacement: false,
+        textField: ['get', 'name'],
+        textSize: [
+          'step',
+          ['zoom'],
+          0.0,
+          8,
+          12.0,
+        ],
+        textColor: _buildTypeTextColorExpression(),
+        textHaloColor: PoiStyleConfig.textHaloColor.toHexStringRGB(),
+        textHaloWidth: 3.0,
+        textHaloBlur: 0.5,
+        textOffset: [0, 1.5],
+        textAllowOverlap: false,
+        textIgnorePlacement: false,
+        textOptional: true,
+        textFont: ['Noto Sans Regular'],
+        symbolSortKey: ['get', 'rank'],
       ),
       filter: [
         '==',
@@ -154,7 +169,8 @@ class PoiLayer extends MapLayer {
       ],
     );
 
-    // Add labels layer (visible from zoom 8+ via size expression).
+    // Label-only layer for the rare POI types without a registered icon
+    // (their circle stays visible at all zooms).
     await controller.addLayer(
       sourceId,
       labelsLayerId,
@@ -172,11 +188,41 @@ class PoiLayer extends MapLayer {
         textHaloWidth: 3.0,
         textHaloBlur: 0.5,
         textOffset: [0, 1.5],
-        textAllowOverlap: true,
-        textIgnorePlacement: true,
+        textAllowOverlap: false,
+        textIgnorePlacement: false,
+        symbolSortKey: ['get', 'rank'],
         textFont: ['Noto Sans Regular'],
       ),
+      filter: [
+        '==',
+        ['get', 'has_icon'],
+        false,
+      ],
     );
+  }
+
+  /// Shared by fill and stroke. At cruise zooms the long tail (rank >= 40)
+  /// renders as a faint texture so top places read clearly. Circles stay
+  /// visible at ALL zooms: they are the guaranteed baseline for every place,
+  /// so a POI whose icon loses the collision contest degrades to its dot
+  /// instead of disappearing (winning icons simply draw on top).
+  List<dynamic> _circleOpacityExpression() {
+    return <dynamic>[
+      'step',
+      ['zoom'],
+      [
+        'case',
+        [
+          '<',
+          ['get', 'rank'],
+          40,
+        ],
+        0.95,
+        0.4,
+      ],
+      6,
+      0.95,
+    ];
   }
 
   List<dynamic> _buildTypeColorExpression() {

@@ -6,7 +6,9 @@ class GetRouteOverviewUseCase {
   GetRouteOverviewUseCase({required RouteOverviewRepository repository})
     : _repository = repository;
 
-  static const int placesLimit = 200;
+  // Request a surplus over PoiLimitsPolicy.proMaxPois so the interest-aware
+  // tier selection still has candidates to rank.
+  static const int placesLimit = 400;
   static const int regionsLimit = 50;
 
   final RouteOverviewRepository _repository;
