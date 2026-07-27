@@ -519,6 +519,27 @@ void main() {
       expect(find.byType(HomeFlightCard), findsNWidgets(2));
     },
   );
+
+  testWidgets(
+    'flight card shows gate-to-gate duration estimate, not cruise-only time',
+    (tester) async {
+      await GetIt.I.unregister<FlightRepository>();
+      GetIt.I.registerSingleton<FlightRepository>(
+        _FakeFlightRepository(
+          flights: [
+            _buildFlight(id: 'upcoming', status: FlightStatus.upcoming),
+          ],
+        ),
+      );
+
+      await tester.pumpWidget(_testApp());
+      await _pumpForInitialLoad(tester);
+
+      // 1487.5 km: 105m cruise at 850 km/h + 55m taxi/climb/descent overhead.
+      expect(find.text('~2h 40m'), findsOneWidget);
+      expect(find.text('~1h 45m'), findsNothing);
+    },
+  );
 }
 
 Widget _testApp({HomeRootTab initialTab = HomeRootTab.flights}) {

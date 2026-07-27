@@ -41,7 +41,7 @@ class HomeFlightCard extends StatelessWidget {
       route.displayDistanceKm.toDouble(),
       distanceUnit,
     );
-    final duration = _approxDuration(context, flight.info.routeTotalMinutes);
+    final duration = _approxDuration(context, route.displayDurationMinutes);
     final flightNumber = flight.operationalData?.flightNumber.trim();
     final regionCount = flight.info.routeRegions.length;
     final poiCount = flight.info.poi.length;
@@ -206,7 +206,7 @@ class HomeFlightCard extends StatelessWidget {
   double? _estimatedRouteProgress() {
     if (!highlightInProgress) return null;
     final startedAt = flight.inProgressAt;
-    final totalMinutes = flight.info.routeTotalMinutes;
+    final totalMinutes = flight.route.displayDurationMinutes;
     if (startedAt == null || totalMinutes <= 0) return 0.5;
     final elapsedMinutes = DateTime.now().difference(startedAt).inMinutes;
     return (elapsedMinutes / totalMinutes).clamp(0.04, 0.96).toDouble();
