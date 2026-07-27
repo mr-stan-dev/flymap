@@ -93,7 +93,7 @@ void main() {
       expect(restored.route.waypoints.first.timestamp, 0);
       expect(restored.route.corridorPolygons, hasLength(1));
       expect(restored.info.overview, 'Legacy overview');
-      expect(restored.info.routeTotalMinutes, 125);
+      expect(restored.info.routeCruiseMinutes, 125);
       expect(restored.route.greatCircleDistanceKm, greaterThan(0));
     });
   });

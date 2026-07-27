@@ -81,17 +81,11 @@ class _LoadedRouteTab extends StatelessWidget {
     final routeRegions = state.routeRegions;
     final route = state.flight.route;
     final routeCruiseSpeedKmh =
-        route.metrics.effectiveAverageSpeedKmh?.round() ??
-        info.routeCruiseSpeedKmh;
-    final routeTotalMinutes =
-        (route.isHistoricalTrack
-                ? route.displayPrimaryDurationMinutes
-                : route.primaryDurationMinutes) >
-            0
-        ? (route.isHistoricalTrack
-              ? route.displayPrimaryDurationMinutes
-              : route.primaryDurationMinutes)
-        : info.routeTotalMinutes;
+        route.metrics.cruiseSpeedKmh?.round() ?? info.routeCruiseSpeedKmh;
+    final displayBlockMinutes = route.durations.displayBlockMinutes;
+    final routeBlockMinutes = displayBlockMinutes > 0
+        ? displayBlockMinutes
+        : info.routeCruiseMinutes;
     final hasRegionTimeline = routeRegions.isNotEmpty;
     final hasOverview = info.overview.trim().isNotEmpty;
 
@@ -106,17 +100,17 @@ class _LoadedRouteTab extends StatelessWidget {
     final groups = RouteTimelineGrouping.groupByTimeline(
       routeRegions,
       cruiseSpeedKmh: routeCruiseSpeedKmh,
-      maxTimelineMinutes: route.isHistoricalTrack ? routeTotalMinutes : null,
+      maxTimelineMinutes: route.isHistoricalTrack ? routeBlockMinutes : null,
       routeDistanceKm: route.distanceInKm,
-      totalRouteMinutes: routeTotalMinutes,
+      blockMinutes: routeBlockMinutes,
       useTotalDurationProportion: !route.isHistoricalTrack,
     );
     final timelineTotalMinutes = RouteTimelineGrouping.arrivalMinutes(
       routeDistanceKm: route.distanceInKm,
-      totalRouteMinutes: routeTotalMinutes,
+      blockMinutes: routeBlockMinutes,
       cruiseSpeedKmh: routeCruiseSpeedKmh,
       groups: groups,
-      totalRouteMinutesIsAuthoritative: route.isHistoricalTrack,
+      blockMinutesIsAuthoritative: route.isHistoricalTrack,
     );
 
     final isUpcoming = state.flight.status == FlightStatus.upcoming;
@@ -158,7 +152,7 @@ class _LoadedRouteTab extends StatelessWidget {
               regions: routeRegions,
               isProUser: isProUser,
               cruiseSpeedKmh: routeCruiseSpeedKmh,
-              totalRouteMinutes: timelineTotalMinutes,
+              blockMinutes: timelineTotalMinutes,
               lastVisitedRegionId: state.lastVisitedRegionId,
               onPremiumGateTap: () => RoutePremiumGateInteractions.onGateTap(
                 context: context,

@@ -19,7 +19,7 @@ class RouteRegionsApiMapper {
     final metrics = _parseRouteMetrics(payload);
 
     final cruiseSpeedKmh =
-        metrics.effectiveAverageSpeedKmh?.round() ??
+        metrics.cruiseSpeedKmh?.round() ??
         _toInt(metaRaw is Map ? metaRaw['cruiseSpeedKmh'] : null) ??
         FlightRouteMetrics.defaultCruiseSpeedKmh;
 
@@ -32,11 +32,12 @@ class RouteRegionsApiMapper {
     }
 
     final estimatedRouteDistanceKm = _estimateRouteDistanceKm(regions);
-    final totalRouteMinutes =
-        _primaryDurationMinutes(metrics, routeSource: routeSource) > 0
-        ? _primaryDurationMinutes(metrics, routeSource: routeSource)
-        : FlightDurationEstimatePolicy.normalizeTotalMinutes(
-            apiTotalMinutes: _toInt(
+    final blockMinutes = _blockMinutes(metrics, routeSource: routeSource) > 0
+        ? _blockMinutes(metrics, routeSource: routeSource)
+        : FlightDurationEstimatePolicy.normalizeBlockMinutes(
+            // The backend meta value is cruise-only; normalize lifts it to
+            // at least the policy's block estimate.
+            apiBlockMinutes: _toInt(
               metaRaw is Map ? metaRaw['totalRouteMinutes'] : null,
             ),
             distanceKm: estimatedRouteDistanceKm,
@@ -46,28 +47,27 @@ class RouteRegionsApiMapper {
 
     return RouteTimeline(
       regions: regions,
-      totalRouteMinutes: totalRouteMinutes,
+      blockMinutes: blockMinutes,
       cruiseSpeedKmh: cruiseSpeedKmh,
     );
   }
 
-  int _primaryDurationMinutes(
+  int _blockMinutes(
     FlightRouteMetrics metrics, {
     required FlightRouteSource routeSource,
   }) {
     if (routeSource == FlightRouteSource.fr24Historical) {
-      final rawMinutes =
-          metrics.actualDurationMinutes ?? metrics.approxDurationMinutes;
+      final rawMinutes = metrics.actualBlockMinutes ?? metrics.cruiseMinutes;
       if (rawMinutes <= 0) return 0;
       return FlightRouteMetrics.roundDurationMinutesForDisplay(
         rawMinutes,
-        isActual: metrics.actualDurationMinutes != null,
+        isActual: metrics.actualBlockMinutes != null,
       );
     }
     final cruiseSpeedKmh =
-        metrics.effectiveAverageSpeedKmh?.round() ??
+        metrics.cruiseSpeedKmh?.round() ??
         FlightRouteMetrics.defaultCruiseSpeedKmh;
-    return FlightDurationEstimatePolicy.estimateTotalMinutes(
+    return FlightDurationEstimatePolicy.estimateBlockMinutes(
       distanceKm: metrics.greatCircleDistanceKm,
       cruiseSpeedKmh: cruiseSpeedKmh,
       roundToMinutes: 5,
@@ -79,7 +79,7 @@ class RouteRegionsApiMapper {
     if (routeRaw is! Map) {
       return const FlightRouteMetrics(
         greatCircleDistanceKm: 0,
-        approxDurationMinutes: 0,
+        cruiseMinutes: 0,
       );
     }
     final route = routeRaw.cast<String, dynamic>();
@@ -95,15 +95,13 @@ class RouteRegionsApiMapper {
         _toFiniteDouble(metrics['greatCircleDistanceKm']) ?? 0;
     return FlightRouteMetrics(
       greatCircleDistanceKm: greatCircleDistanceKm,
-      approxDurationMinutes:
+      cruiseMinutes:
           _toInt(metrics['approxDurationMinutes']) ??
-          FlightRouteMetrics.estimateApproxDurationMinutes(
-            greatCircleDistanceKm,
-          ),
+          FlightRouteMetrics.estimateCruiseMinutes(greatCircleDistanceKm),
       actualDistanceKm:
           _toFiniteDouble(metrics['actualDistanceKm']) ??
           _toFiniteDouble(flightInfo['actualDistanceKm']),
-      actualDurationMinutes:
+      actualBlockMinutes:
           _toInt(metrics['actualDurationMinutes']) ??
           _toInt(flightInfo['actualDurationMinutes']),
     );

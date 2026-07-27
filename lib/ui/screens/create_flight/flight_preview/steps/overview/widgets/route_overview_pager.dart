@@ -16,7 +16,7 @@ class RouteOverviewPager extends StatefulWidget {
   const RouteOverviewPager({
     required this.entries,
     required this.route,
-    required this.totalRouteMinutes,
+    required this.blockMinutes,
     required this.totalRegionCount,
     required this.onRouteSummaryRequested,
     this.initialPage = 0,
@@ -28,7 +28,7 @@ class RouteOverviewPager extends StatefulWidget {
 
   final List<RouteOverviewPageEntry> entries;
   final FlightRoute route;
-  final int totalRouteMinutes;
+  final int blockMinutes;
   final int totalRegionCount;
   final VoidCallback onRouteSummaryRequested;
   final int initialPage;
@@ -87,10 +87,7 @@ class _RouteOverviewPagerState extends State<RouteOverviewPager> {
       case RouteOverviewPageKind.summary:
         final route = widget.route;
         final distance = _formatDistanceKm(route);
-        final duration = _formatMinutesCompact(
-          context,
-          widget.totalRouteMinutes,
-        );
+        final duration = _formatMinutesCompact(context, widget.blockMinutes);
         return OverviewTitleCard(
           routeCodeLine:
               '${route.departure.displayCode} → ${route.arrival.displayCode}',

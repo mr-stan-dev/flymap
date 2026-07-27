@@ -16,7 +16,7 @@ class RouteTimelineWidget extends StatelessWidget {
     required this.regions,
     required this.isProUser,
     required this.cruiseSpeedKmh,
-    required this.totalRouteMinutes,
+    required this.blockMinutes,
     required this.onPremiumGateTap,
     this.currentRegionId,
     this.lastVisitedRegionId,
@@ -28,7 +28,7 @@ class RouteTimelineWidget extends StatelessWidget {
   final List<RouteRegion> regions;
   final bool isProUser;
   final int cruiseSpeedKmh;
-  final int totalRouteMinutes;
+  final int blockMinutes;
   final VoidCallback onPremiumGateTap;
   final String? currentRegionId;
   final String? lastVisitedRegionId;
@@ -46,9 +46,9 @@ class RouteTimelineWidget extends StatelessWidget {
     final groups = RouteTimelineGrouping.groupByTimeline(
       regions,
       cruiseSpeedKmh: cruiseSpeedKmh,
-      maxTimelineMinutes: route.isHistoricalTrack ? totalRouteMinutes : null,
+      maxTimelineMinutes: route.isHistoricalTrack ? blockMinutes : null,
       routeDistanceKm: route.distanceInKm,
-      totalRouteMinutes: totalRouteMinutes,
+      blockMinutes: blockMinutes,
       useTotalDurationProportion: !route.isHistoricalTrack,
     );
     final entriesBuild = _buildEntries(groups, gateDecision: gateDecision);
@@ -105,10 +105,10 @@ class RouteTimelineWidget extends StatelessWidget {
   }) {
     final arrivalMinutes = RouteTimelineGrouping.arrivalMinutes(
       routeDistanceKm: route.distanceInKm,
-      totalRouteMinutes: totalRouteMinutes,
+      blockMinutes: blockMinutes,
       cruiseSpeedKmh: cruiseSpeedKmh,
       groups: groups,
-      totalRouteMinutesIsAuthoritative: route.isHistoricalTrack,
+      blockMinutesIsAuthoritative: route.isHistoricalTrack,
     );
 
     if (!gateDecision.isGated) {

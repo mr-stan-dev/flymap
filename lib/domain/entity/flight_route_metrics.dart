@@ -1,82 +1,86 @@
 import 'package:equatable/equatable.dart';
 
+/// Raw route measurements as they arrive from the backend / DB.
+///
+/// [cruiseMinutes] is airborne-at-cruise time (distance / cruise speed) — a
+/// math intermediate, not a gate-to-gate duration. On the wire and in the DB
+/// it is carried under the legacy key `approxDurationMinutes`; only mappers
+/// should touch that name. For anything user-facing use
+/// FlightRoute.durations.
 class FlightRouteMetrics extends Equatable {
   static const int defaultCruiseSpeedKmh = 850;
 
   const FlightRouteMetrics({
     required this.greatCircleDistanceKm,
-    required this.approxDurationMinutes,
+    required this.cruiseMinutes,
     this.actualDistanceKm,
-    this.actualDurationMinutes,
+    this.actualBlockMinutes,
   });
 
   factory FlightRouteMetrics.fromLegacyDistance(double distanceKm) {
     return FlightRouteMetrics(
       greatCircleDistanceKm: distanceKm,
-      approxDurationMinutes: estimateApproxDurationMinutes(distanceKm),
+      cruiseMinutes: estimateCruiseMinutes(distanceKm),
     );
   }
 
   final double greatCircleDistanceKm;
-  final int approxDurationMinutes;
+  final int cruiseMinutes;
   final double? actualDistanceKm;
-  final int? actualDurationMinutes;
+
+  /// Recorded gate-to-gate minutes for historical (FR24) flights.
+  final int? actualBlockMinutes;
 
   bool get isEmpty =>
       (!greatCircleDistanceKm.isFinite || greatCircleDistanceKm <= 0) &&
-      approxDurationMinutes <= 0 &&
+      cruiseMinutes <= 0 &&
       actualDistanceKm == null &&
-      actualDurationMinutes == null;
+      actualBlockMinutes == null;
 
   bool get hasActualTrack =>
-      actualDistanceKm != null && actualDurationMinutes != null;
+      actualDistanceKm != null && actualBlockMinutes != null;
 
   double get effectiveDistanceKm =>
       _positiveFinite(actualDistanceKm) ?? greatCircleDistanceKm;
-
-  int get effectiveDurationMinutes =>
-      _positiveInt(actualDurationMinutes) ?? approxDurationMinutes;
 
   int get displayDistanceKm => roundDistanceKmForDisplay(
     effectiveDistanceKm,
     isActual: _positiveFinite(actualDistanceKm) != null,
   );
 
-  int get displayDurationMinutes => roundDurationMinutesForDisplay(
-    effectiveDurationMinutes,
-    isActual: _positiveInt(actualDurationMinutes) != null,
-  );
-
-  double? get effectiveAverageSpeedKmh {
-    final duration = effectiveDurationMinutes;
-    final distance = effectiveDistanceKm;
-    if (!distance.isFinite || distance <= 0 || duration <= 0) return null;
-    return distance / (duration / 60.0);
+  /// True cruise speed backed out of the cruise-only minutes. Never a block
+  /// average — safe to feed into FlightDurationEstimatePolicy, which adds
+  /// the ground/climb overhead itself.
+  double? get cruiseSpeedKmh {
+    if (cruiseMinutes <= 0) return null;
+    if (!greatCircleDistanceKm.isFinite || greatCircleDistanceKm <= 0) {
+      return null;
+    }
+    return greatCircleDistanceKm / (cruiseMinutes / 60.0);
   }
 
   FlightRouteMetrics copyWith({
     double? greatCircleDistanceKm,
-    int? approxDurationMinutes,
+    int? cruiseMinutes,
     double? actualDistanceKm,
     bool clearActualDistanceKm = false,
-    int? actualDurationMinutes,
-    bool clearActualDurationMinutes = false,
+    int? actualBlockMinutes,
+    bool clearActualBlockMinutes = false,
   }) {
     return FlightRouteMetrics(
       greatCircleDistanceKm:
           greatCircleDistanceKm ?? this.greatCircleDistanceKm,
-      approxDurationMinutes:
-          approxDurationMinutes ?? this.approxDurationMinutes,
+      cruiseMinutes: cruiseMinutes ?? this.cruiseMinutes,
       actualDistanceKm: clearActualDistanceKm
           ? null
           : actualDistanceKm ?? this.actualDistanceKm,
-      actualDurationMinutes: clearActualDurationMinutes
+      actualBlockMinutes: clearActualBlockMinutes
           ? null
-          : actualDurationMinutes ?? this.actualDurationMinutes,
+          : actualBlockMinutes ?? this.actualBlockMinutes,
     );
   }
 
-  static int estimateApproxDurationMinutes(double distanceKm) {
+  static int estimateCruiseMinutes(double distanceKm) {
     if (!distanceKm.isFinite || distanceKm <= 0) return 0;
     final cruiseMinutes = (distanceKm * 60) / defaultCruiseSpeedKmh;
     return (cruiseMinutes / 5).round() * 5;
@@ -105,16 +109,11 @@ class FlightRouteMetrics extends Equatable {
     return value;
   }
 
-  static int? _positiveInt(int? value) {
-    if (value == null || value <= 0) return null;
-    return value;
-  }
-
   @override
   List<Object?> get props => [
     greatCircleDistanceKm,
-    approxDurationMinutes,
+    cruiseMinutes,
     actualDistanceKm,
-    actualDurationMinutes,
+    actualBlockMinutes,
   ];
 }

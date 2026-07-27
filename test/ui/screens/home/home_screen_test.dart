@@ -494,31 +494,30 @@ void main() {
     expect(_findAppBarTitle('Settings'), findsOneWidget);
   });
 
-  testWidgets(
-    'in-progress flight replaces the summary header as the hero',
-    (tester) async {
-      await GetIt.I.unregister<FlightRepository>();
-      GetIt.I.registerSingleton<FlightRepository>(
-        _FakeFlightRepository(
-          flights: [
-            _buildFlight(id: 'in-progress', status: FlightStatus.inProgress),
-            _buildFlight(id: 'upcoming', status: FlightStatus.upcoming),
-          ],
-        ),
-      );
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('onboarding.profile.display_name', 'Stan');
+  testWidgets('in-progress flight replaces the summary header as the hero', (
+    tester,
+  ) async {
+    await GetIt.I.unregister<FlightRepository>();
+    GetIt.I.registerSingleton<FlightRepository>(
+      _FakeFlightRepository(
+        flights: [
+          _buildFlight(id: 'in-progress', status: FlightStatus.inProgress),
+          _buildFlight(id: 'upcoming', status: FlightStatus.upcoming),
+        ],
+      ),
+    );
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('onboarding.profile.display_name', 'Stan');
 
-      await tester.pumpWidget(_testApp());
-      await _pumpForInitialLoad(tester);
+    await tester.pumpWidget(_testApp());
+    await _pumpForInitialLoad(tester);
 
-      // The greeting/stats header yields to the in-progress hero card.
-      expect(find.text('Hi Stan, your flight is in progress'), findsNothing);
-      expect(find.text('Flight in progress'), findsOneWidget);
-      expect(find.text('Upcoming flights (1)'), findsOneWidget);
-      expect(find.byType(HomeFlightCard), findsNWidgets(2));
-    },
-  );
+    // The greeting/stats header yields to the in-progress hero card.
+    expect(find.text('Hi Stan, your flight is in progress'), findsNothing);
+    expect(find.text('Flight in progress'), findsOneWidget);
+    expect(find.text('Upcoming flights (1)'), findsOneWidget);
+    expect(find.byType(HomeFlightCard), findsNWidgets(2));
+  });
 
   testWidgets(
     'flight card shows gate-to-gate duration estimate, not cruise-only time',
@@ -690,7 +689,7 @@ Flight _buildFlight({required String id, required FlightStatus status}) {
     ],
     metrics: FlightRouteMetrics(
       greatCircleDistanceKm: 1487.5,
-      approxDurationMinutes: 105,
+      cruiseMinutes: 105,
     ),
   );
 

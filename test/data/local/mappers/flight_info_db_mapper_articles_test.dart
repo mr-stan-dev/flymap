@@ -76,7 +76,7 @@ void main() {
 
       expect(restored.overview, 'legacy');
       expect(restored.articles, isEmpty);
-      expect(restored.routeTotalMinutes, 125);
+      expect(restored.routeCruiseMinutes, 125);
       expect(restored.routeCruiseSpeedKmh, 760);
     });
 

@@ -505,7 +505,7 @@ FlightRoute _route() {
     corridor: _corridorBetween(departure.latLon, arrival.latLon),
     metrics: FlightRouteMetrics(
       greatCircleDistanceKm: 1500,
-      approxDurationMinutes: 105,
+      cruiseMinutes: 105,
     ),
   );
 }
@@ -539,7 +539,7 @@ FlightRoute _longRoute() {
     corridor: _corridorBetween(departure.latLon, arrival.latLon),
     metrics: FlightRouteMetrics(
       greatCircleDistanceKm: 3500,
-      approxDurationMinutes: 245,
+      cruiseMinutes: 245,
     ),
   );
 }
@@ -573,7 +573,7 @@ FlightRoute _warningThresholdRoute() {
     corridor: _corridorBetween(departure.latLon, arrival.latLon),
     metrics: FlightRouteMetrics(
       greatCircleDistanceKm: 8600,
-      approxDurationMinutes: 605,
+      cruiseMinutes: 605,
     ),
   );
 }
@@ -607,7 +607,7 @@ FlightRoute _unsupportedThresholdRoute() {
     corridor: _corridorBetween(departure.latLon, arrival.latLon),
     metrics: FlightRouteMetrics(
       greatCircleDistanceKm: 11000,
-      approxDurationMinutes: 775,
+      cruiseMinutes: 775,
     ),
   );
 }
@@ -656,7 +656,7 @@ RouteOverview _routeOverviewFor(
           ),
         ),
       ],
-      totalRouteMinutes: 95,
+      blockMinutes: 95,
       cruiseSpeedKmh: 850,
     ),
   );

@@ -186,7 +186,7 @@ Flight _buildFlight({required FlightStatus status}) {
     ],
     metrics: FlightRouteMetrics(
       greatCircleDistanceKm: 1487.5,
-      approxDurationMinutes: 105,
+      cruiseMinutes: 105,
     ),
   );
 

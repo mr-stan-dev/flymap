@@ -130,7 +130,7 @@ class RoutePreviewState extends Equatable {
     required this.flightOperationalData,
     required this.allRoutePois,
     required this.routeRegions,
-    required this.routeTotalMinutes,
+    required this.routeBlockMinutes,
     required this.routeCruiseSpeedKmh,
     required this.flightInfo,
     required this.proPoiCount,
@@ -143,7 +143,7 @@ class RoutePreviewState extends Equatable {
       flightOperationalData = null,
       allRoutePois = const [],
       routeRegions = const [],
-      routeTotalMinutes = 0,
+      routeBlockMinutes = 0,
       routeCruiseSpeedKmh = 850,
       flightInfo = FlightInfo.empty,
       proPoiCount = null,
@@ -154,7 +154,7 @@ class RoutePreviewState extends Equatable {
   final FlightOperationalData? flightOperationalData;
   final List<RoutePoiSummary> allRoutePois;
   final List<RouteRegion> routeRegions;
-  final int routeTotalMinutes;
+  final int routeBlockMinutes;
   final int routeCruiseSpeedKmh;
   final FlightInfo flightInfo;
   final int? proPoiCount;
@@ -170,7 +170,7 @@ class RoutePreviewState extends Equatable {
     bool clearAllRoutePois = false,
     List<RouteRegion>? routeRegions,
     bool clearRouteRegions = false,
-    int? routeTotalMinutes,
+    int? routeBlockMinutes,
     int? routeCruiseSpeedKmh,
     FlightInfo? flightInfo,
     int? proPoiCount,
@@ -190,7 +190,7 @@ class RoutePreviewState extends Equatable {
       routeRegions: clearRouteRegions
           ? const []
           : routeRegions ?? this.routeRegions,
-      routeTotalMinutes: routeTotalMinutes ?? this.routeTotalMinutes,
+      routeBlockMinutes: routeBlockMinutes ?? this.routeBlockMinutes,
       routeCruiseSpeedKmh: routeCruiseSpeedKmh ?? this.routeCruiseSpeedKmh,
       flightInfo: flightInfo ?? this.flightInfo,
       proPoiCount: clearProPoiCount ? null : proPoiCount ?? this.proPoiCount,
@@ -207,7 +207,7 @@ class RoutePreviewState extends Equatable {
     flightOperationalData,
     allRoutePois,
     routeRegions,
-    routeTotalMinutes,
+    routeBlockMinutes,
     routeCruiseSpeedKmh,
     flightInfo,
     proPoiCount,
@@ -475,7 +475,7 @@ class FlightPreviewState extends Equatable {
       routeState.flightOperationalData;
   List<RoutePoiSummary> get allRoutePois => routeState.allRoutePois;
   List<RouteRegion> get routeRegions => routeState.routeRegions;
-  int get routeTotalMinutes => routeState.routeTotalMinutes;
+  int get routeBlockMinutes => routeState.routeBlockMinutes;
   int get routeCruiseSpeedKmh => routeState.routeCruiseSpeedKmh;
   FlightInfo get flightInfo => routeState.flightInfo;
   int? get proPoiCount => routeState.proPoiCount;
@@ -523,7 +523,7 @@ class FlightPreviewState extends Equatable {
     bool clearAllRoutePois = false,
     List<RouteRegion>? routeRegions,
     bool clearRouteRegions = false,
-    int? routeTotalMinutes,
+    int? routeBlockMinutes,
     int? routeCruiseSpeedKmh,
     FlightInfo? flightInfo,
     int? proPoiCount,
@@ -576,7 +576,7 @@ class FlightPreviewState extends Equatable {
         clearAllRoutePois: clearAllRoutePois,
         routeRegions: routeRegions,
         clearRouteRegions: clearRouteRegions,
-        routeTotalMinutes: routeTotalMinutes,
+        routeBlockMinutes: routeBlockMinutes,
         routeCruiseSpeedKmh: routeCruiseSpeedKmh,
         flightInfo: flightInfo,
         proPoiCount: proPoiCount,
@@ -644,7 +644,7 @@ class FlightPreviewState extends Equatable {
         'step:${step.name}, '
         'route:${flightRoute?.routeCode ?? 'none'}, '
         'poi:${flightInfo.poi.length}/${allRoutePois.length}, '
-        'regions:${routeRegions.length}@${routeTotalMinutes}m, '
+        'regions:${routeRegions.length}@${routeBlockMinutes}m, '
         'articlesSel:${selectedArticleUrls.length}, '
         'unlock:${hasPendingFlightUnlock ? 1 : 0}, '
         'loading(p:${isPreviewLoading ? 1 : 0},o:${isOverviewLoading ? 1 : 0},w:${isWikiSuggestionsLoading ? 1 : 0}), '

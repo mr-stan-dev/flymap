@@ -155,7 +155,7 @@ Flight _buildFlight(String storedPath) {
     ],
     metrics: FlightRouteMetrics(
       greatCircleDistanceKm: 1487.5,
-      approxDurationMinutes: 105,
+      cruiseMinutes: 105,
     ),
   );
 

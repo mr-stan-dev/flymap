@@ -123,17 +123,17 @@ class RoutePlacesApiMapper {
     final greatCircleDistanceKm =
         _toFiniteDouble(metricsMap['greatCircleDistanceKm']) ?? 0;
     final actualDistanceKm = _toFiniteDouble(metricsMap['actualDistanceKm']);
-    final approxDurationMinutes =
+    final cruiseMinutes =
         _toInt(metricsMap['approxDurationMinutes']) ??
-        FlightRouteMetrics.estimateApproxDurationMinutes(greatCircleDistanceKm);
-    final actualDurationMinutes =
+        FlightRouteMetrics.estimateCruiseMinutes(greatCircleDistanceKm);
+    final actualBlockMinutes =
         _toInt(metricsMap['actualDurationMinutes']) ??
         _toInt(flightInfo['actualDurationMinutes']);
     return FlightRouteMetrics(
       greatCircleDistanceKm: greatCircleDistanceKm,
-      approxDurationMinutes: approxDurationMinutes,
+      cruiseMinutes: cruiseMinutes,
       actualDistanceKm: actualDistanceKm,
-      actualDurationMinutes: actualDurationMinutes,
+      actualBlockMinutes: actualBlockMinutes,
     );
   }
 

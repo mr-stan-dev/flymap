@@ -60,22 +60,28 @@ void main() {
 
       await deleter.deleteAssets(flightA);
 
-      expect(file.existsSync(), isTrue,
-          reason: "flight B still needs this map — deleting flight A must not remove it");
+      expect(
+        file.existsSync(),
+        isTrue,
+        reason:
+            "flight B still needs this map — deleting flight A must not remove it",
+      );
     });
 
-    test('deletes the map file and sidecars when it is the last reference',
-        () async {
-      final file = mbtilesFile('EGLL_EDDM_base.mbtiles')..createSync();
-      final wal = mbtilesFile('EGLL_EDDM_base.mbtiles-wal')..createSync();
-      final flightA = _flight(id: 'a', mapFile: 'EGLL_EDDM_base.mbtiles');
-      allFlights = [flightA];
+    test(
+      'deletes the map file and sidecars when it is the last reference',
+      () async {
+        final file = mbtilesFile('EGLL_EDDM_base.mbtiles')..createSync();
+        final wal = mbtilesFile('EGLL_EDDM_base.mbtiles-wal')..createSync();
+        final flightA = _flight(id: 'a', mapFile: 'EGLL_EDDM_base.mbtiles');
+        allFlights = [flightA];
 
-      await deleter.deleteAssets(flightA);
+        await deleter.deleteAssets(flightA);
 
-      expect(file.existsSync(), isFalse);
-      expect(wal.existsSync(), isFalse);
-    });
+        expect(file.existsSync(), isFalse);
+        expect(wal.existsSync(), isFalse);
+      },
+    );
 
     test('a different route\'s file is never touched', () async {
       final other = mbtilesFile('KJFK_KLAX_base.mbtiles')..createSync();
@@ -87,33 +93,41 @@ void main() {
       expect(other.existsSync(), isTrue);
     });
 
-    test('keeps shared article images, deletes unshared ones and prunes dirs',
-        () async {
-      const sharedPath = 'article_media/EGLL_EDDM/munich_1/lead.jpg';
-      const soloPath = 'article_media/EGLL_EDDM/london_2/inline_0.jpg';
-      final shared = articleImage(sharedPath);
-      final solo = articleImage(soloPath);
+    test(
+      'keeps shared article images, deletes unshared ones and prunes dirs',
+      () async {
+        const sharedPath = 'article_media/EGLL_EDDM/munich_1/lead.jpg';
+        const soloPath = 'article_media/EGLL_EDDM/london_2/inline_0.jpg';
+        final shared = articleImage(sharedPath);
+        final solo = articleImage(soloPath);
 
-      final flightA = _flight(
-        id: 'a',
-        articleImages: const [sharedPath, soloPath],
-      );
-      final flightB = _flight(id: 'b', articleImages: const [sharedPath]);
-      allFlights = [flightA, flightB];
+        final flightA = _flight(
+          id: 'a',
+          articleImages: const [sharedPath, soloPath],
+        );
+        final flightB = _flight(id: 'b', articleImages: const [sharedPath]);
+        allFlights = [flightA, flightB];
 
-      await deleter.deleteAssets(flightA);
+        await deleter.deleteAssets(flightA);
 
-      expect(shared.existsSync(), isTrue,
-          reason: 'flight B still references the shared image');
-      expect(solo.existsSync(), isFalse);
-      expect(solo.parent.existsSync(), isFalse,
-          reason: 'emptied article dir should be pruned');
-      expect(
-        Directory(p.join(docsDir.path, 'article_media')).existsSync(),
-        isTrue,
-        reason: 'the article_media root itself must survive',
-      );
-    });
+        expect(
+          shared.existsSync(),
+          isTrue,
+          reason: 'flight B still references the shared image',
+        );
+        expect(solo.existsSync(), isFalse);
+        expect(
+          solo.parent.existsSync(),
+          isFalse,
+          reason: 'emptied article dir should be pruned',
+        );
+        expect(
+          Directory(p.join(docsDir.path, 'article_media')).existsSync(),
+          isTrue,
+          reason: 'the article_media root itself must survive',
+        );
+      },
+    );
 
     test('deleting both flights in sequence removes the shared file', () async {
       final file = mbtilesFile('EGLL_EDDM_base.mbtiles')..createSync();
@@ -169,7 +183,7 @@ Flight _flight({
     ],
     metrics: FlightRouteMetrics(
       greatCircleDistanceKm: 1487.5,
-      approxDurationMinutes: 105,
+      cruiseMinutes: 105,
     ),
   );
 

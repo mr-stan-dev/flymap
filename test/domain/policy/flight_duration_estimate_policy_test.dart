@@ -13,8 +13,8 @@ void main() {
       expect(minutes, 65);
     });
 
-    test('estimateTotalMinutes includes non-cruise overhead', () {
-      final minutes = FlightDurationEstimatePolicy.estimateTotalMinutes(
+    test('estimateBlockMinutes includes non-cruise overhead', () {
+      final minutes = FlightDurationEstimatePolicy.estimateBlockMinutes(
         distanceKm: 920,
         cruiseSpeedKmh: 850,
         roundToMinutes: 5,
@@ -23,9 +23,9 @@ void main() {
       expect(minutes, 110);
     });
 
-    test('normalizeTotalMinutes floors low API values by estimate', () {
-      final minutes = FlightDurationEstimatePolicy.normalizeTotalMinutes(
-        apiTotalMinutes: 65,
+    test('normalizeBlockMinutes floors low API values by estimate', () {
+      final minutes = FlightDurationEstimatePolicy.normalizeBlockMinutes(
+        apiBlockMinutes: 65,
         distanceKm: 920,
         cruiseSpeedKmh: 850,
         roundToMinutes: 5,
@@ -34,9 +34,9 @@ void main() {
       expect(minutes, 110);
     });
 
-    test('normalizeTotalMinutes keeps higher API values', () {
-      final minutes = FlightDurationEstimatePolicy.normalizeTotalMinutes(
-        apiTotalMinutes: 140,
+    test('normalizeBlockMinutes keeps higher API values', () {
+      final minutes = FlightDurationEstimatePolicy.normalizeBlockMinutes(
+        apiBlockMinutes: 140,
         distanceKm: 920,
         cruiseSpeedKmh: 850,
         roundToMinutes: 5,
@@ -45,8 +45,8 @@ void main() {
       expect(minutes, 140);
     });
 
-    test('estimateTotalMinutes for long-haul reaches around 8h', () {
-      final minutes = FlightDurationEstimatePolicy.estimateTotalMinutes(
+    test('estimateBlockMinutes for long-haul reaches around 8h', () {
+      final minutes = FlightDurationEstimatePolicy.estimateBlockMinutes(
         distanceKm: 5540,
         cruiseSpeedKmh: 850,
         roundToMinutes: 5,

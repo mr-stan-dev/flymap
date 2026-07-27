@@ -106,28 +106,31 @@ void main() {
     );
   });
 
-  test('route forecast returns null when event is more than 60 minutes away', () {
-    final service = RouteSunEventForecastService();
-    final route = _buildEquatorialRoute(
-      startLongitude: 0,
-      endLongitude: 150,
-      speedKmh: 900,
-    );
+  test(
+    'route forecast returns null when event is more than 60 minutes away',
+    () {
+      final service = RouteSunEventForecastService();
+      final route = _buildEquatorialRoute(
+        startLongitude: 0,
+        endLongitude: 150,
+        speedKmh: 900,
+      );
 
-    final forecast = service.compute(
-      route: route,
-      gpsData: const GpsData(
-        latitude: 0,
-        longitude: 30,
-        course: 90,
-        accuracy: 8.0,
-      ),
-      speedKmhOverride: 900,
-      nowUtc: DateTime.utc(2026, 3, 20, 0),
-    );
+      final forecast = service.compute(
+        route: route,
+        gpsData: const GpsData(
+          latitude: 0,
+          longitude: 30,
+          course: 90,
+          accuracy: 8.0,
+        ),
+        speedKmhOverride: 900,
+        nowUtc: DateTime.utc(2026, 3, 20, 0),
+      );
 
-    expect(forecast, isNull);
-  });
+      expect(forecast, isNull);
+    },
+  );
 
   test('route forecast returns null without live course', () {
     final service = RouteSunEventForecastService();
@@ -223,7 +226,7 @@ FlightRoute _buildEquatorialRoute({
     departure: departure.latLon,
     arrival: arrival.latLon,
   );
-  final approxDurationMinutes = ((distanceKm / speedKmh) * 60).round();
+  final cruiseMinutes = ((distanceKm / speedKmh) * 60).round();
 
   return FlightRoute(
     departure: departure,
@@ -235,7 +238,7 @@ FlightRoute _buildEquatorialRoute({
     corridor: [LatLng(0, startLongitude), LatLng(0, endLongitude)],
     metrics: FlightRouteMetrics(
       greatCircleDistanceKm: distanceKm,
-      approxDurationMinutes: approxDurationMinutes,
+      cruiseMinutes: cruiseMinutes,
     ),
   );
 }

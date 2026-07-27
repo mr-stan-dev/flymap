@@ -522,9 +522,9 @@ void main() {
       ],
       metrics: FlightRouteMetrics(
         greatCircleDistanceKm: 11121,
-        approxDurationMinutes: 780,
+        cruiseMinutes: 780,
         actualDistanceKm: 12570,
-        actualDurationMinutes: 823,
+        actualBlockMinutes: 823,
       ),
     );
 
@@ -880,7 +880,7 @@ FlightRoute _testRoute() {
     ],
     metrics: FlightRouteMetrics(
       greatCircleDistanceKm: 1487.5,
-      approxDurationMinutes: 105,
+      cruiseMinutes: 105,
     ),
   );
 
@@ -917,7 +917,7 @@ FlightRoute _linearTestRoute() {
     corridor: [LatLng(0, 0), LatLng(0, 10)],
     metrics: FlightRouteMetrics(
       greatCircleDistanceKm: 1111.95,
-      approxDurationMinutes: 111,
+      cruiseMinutes: 111,
     ),
   );
 }

@@ -50,16 +50,16 @@ class FlightInfoDbMapper {
         .whereType<RouteRegion>()
         .toList();
     final overview = map.getString(FlightInfoDBKeys.overview);
-    final routeTotalMinutesRaw = map[FlightInfoDBKeys.routeTotalMinutes];
-    final routeTotalMinutes = routeTotalMinutesRaw == null
+    // The legacy 'routeTotalMinutes' key holds cruise-only minutes.
+    final cruiseMinutesRaw = map[FlightInfoDBKeys.routeTotalMinutes];
+    final cruiseMinutes = cruiseMinutesRaw == null
         ? null
         : map.getInt(FlightInfoDBKeys.routeTotalMinutes);
     final routeCruiseSpeedKmh = map.getInt(
       FlightInfoDBKeys.routeCruiseSpeedKmh,
     );
-    final inferredDistanceKm =
-        routeTotalMinutes != null && routeCruiseSpeedKmh > 0
-        ? routeCruiseSpeedKmh * (routeTotalMinutes / 60.0)
+    final inferredDistanceKm = cruiseMinutes != null && routeCruiseSpeedKmh > 0
+        ? routeCruiseSpeedKmh * (cruiseMinutes / 60.0)
         : 0.0;
     return FlightInfo(
       FlightRouteInsights(
@@ -70,7 +70,7 @@ class FlightInfoDbMapper {
       FlightOfflineContent(articles: articles),
       FlightRouteMetrics(
         greatCircleDistanceKm: inferredDistanceKm,
-        approxDurationMinutes: routeTotalMinutes ?? 0,
+        cruiseMinutes: cruiseMinutes ?? 0,
       ),
     );
   }
@@ -82,8 +82,8 @@ class FlightInfoDbMapper {
     FlightInfoDBKeys.routeRegions: info.routeRegions
         .map(_routeRegionMapper.toDb)
         .toList(),
-    if (info.routeTotalMinutes > 0)
-      FlightInfoDBKeys.routeTotalMinutes: info.routeTotalMinutes,
+    if (info.routeCruiseMinutes > 0)
+      FlightInfoDBKeys.routeTotalMinutes: info.routeCruiseMinutes,
     FlightInfoDBKeys.routeCruiseSpeedKmh: info.routeCruiseSpeedKmh,
   };
 }

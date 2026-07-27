@@ -34,7 +34,7 @@ void main() {
     corridor: [LatLng(51.47, -0.45), LatLng(48.35, 11.79)],
     metrics: FlightRouteMetrics(
       greatCircleDistanceKm: 1487.5,
-      approxDurationMinutes: 105,
+      cruiseMinutes: 105,
     ),
   );
 

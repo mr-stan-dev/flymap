@@ -33,7 +33,7 @@ class ShareImageCardMetricsRow extends StatelessWidget {
       ),
       (
         Icons.schedule_rounded,
-        shareCardFormatDuration(t, flight.route.displayDurationMinutes),
+        shareCardFormatDuration(t, flight.route.durations.displayBlockMinutes),
       ),
       (
         Icons.public_rounded,

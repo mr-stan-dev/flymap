@@ -21,14 +21,14 @@ import 'package:flymap/utils/route_utils.dart';
 class RouteSummaryScreen extends StatelessWidget {
   const RouteSummaryScreen({
     required this.route,
-    required this.totalRouteMinutes,
+    required this.blockMinutes,
     required this.cruiseSpeedKmh,
     required this.onContinue,
     super.key,
   });
 
   final FlightRoute route;
-  final int totalRouteMinutes;
+  final int blockMinutes;
   final int cruiseSpeedKmh;
   final VoidCallback onContinue;
   static const _typeMapper = RouteTimelineRegionTypeMapper();
@@ -53,7 +53,7 @@ class RouteSummaryScreen extends StatelessWidget {
     final flightPreviewCubit = context.read<FlightPreviewCubit>();
     final subscriptionCubit = context.read<SubscriptionCubit>();
     final distance = _formatDistanceKm(route);
-    final duration = _formatMinutesCompact(context, totalRouteMinutes);
+    final duration = _formatMinutesCompact(context, blockMinutes);
     final routeTitle =
         '${route.departure.displayCode} → ${route.arrival.displayCode}';
     final routeSubtitle =
@@ -148,7 +148,7 @@ class RouteSummaryScreen extends StatelessWidget {
               regions: liveRegions,
               isProUser: isProUser,
               cruiseSpeedKmh: cruiseSpeedKmh,
-              totalRouteMinutes: totalRouteMinutes,
+              blockMinutes: blockMinutes,
               onPremiumGateTap: () => _showTimelineGateSheet(
                 context: context,
                 subscriptionCubit: subscriptionCubit,

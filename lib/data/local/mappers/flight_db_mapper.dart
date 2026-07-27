@@ -102,16 +102,16 @@ class FlightDbMapper {
       FlightDBKeys.articles:
           legacyInfo[FlightDBKeys.articles] ?? const <dynamic>[],
     };
+    // plannedDurationMinutes carries block minutes and plannedCruiseSpeedKmh
+    // the matching average speed, so legacy readers that reconstruct distance
+    // as speed * minutes stay consistent.
+    final blockMinutes = flight.route.durations.blockMinutes;
+    final routeDistanceKm = flight.route.distanceInKm;
     out[FlightDBKeys.routePlan] = <String, dynamic>{
-      if (flight.route.primaryDurationMinutes > 0)
-        FlightDBKeys.plannedDurationMinutes:
-            flight.route.primaryDurationMinutes,
-      if (flight.route.metrics.effectiveAverageSpeedKmh != null)
-        FlightDBKeys.plannedCruiseSpeedKmh: flight
-            .route
-            .metrics
-            .effectiveAverageSpeedKmh!
-            .round(),
+      if (blockMinutes > 0) FlightDBKeys.plannedDurationMinutes: blockMinutes,
+      if (blockMinutes > 0 && routeDistanceKm > 0)
+        FlightDBKeys.plannedCruiseSpeedKmh:
+            (routeDistanceKm / (blockMinutes / 60.0)).round(),
     };
 
     out[FlightDBKeys.departure] = _airportMapper.toDb(flight.route.departure);
@@ -268,11 +268,11 @@ class FlightDbMapper {
   Map<String, dynamic> _toRouteMetricsDb(FlightRouteMetrics metrics) {
     return <String, dynamic>{
       FlightDBKeys.greatCircleDistanceKm: metrics.greatCircleDistanceKm,
-      FlightDBKeys.approxDurationMinutes: metrics.approxDurationMinutes,
+      FlightDBKeys.approxDurationMinutes: metrics.cruiseMinutes,
       if (metrics.actualDistanceKm != null)
         FlightDBKeys.actualDistanceKm: metrics.actualDistanceKm,
-      if (metrics.actualDurationMinutes != null)
-        FlightDBKeys.actualDurationMinutes: metrics.actualDurationMinutes,
+      if (metrics.actualBlockMinutes != null)
+        FlightDBKeys.actualDurationMinutes: metrics.actualBlockMinutes,
     };
   }
 
@@ -285,37 +285,34 @@ class FlightDbMapper {
     final metricsMap = metricsRaw is Map
         ? metricsRaw.cast<String, dynamic>()
         : const <String, dynamic>{};
-    final planRaw = map[FlightDBKeys.routePlan];
-    final planMap = planRaw is Map
-        ? planRaw.cast<String, dynamic>()
-        : const <String, dynamic>{};
-    final legacyInfoRaw = map[FlightDBKeys.flightInfo];
-    final legacyInfoMap = legacyInfoRaw is Map
-        ? legacyInfoRaw.cast<String, dynamic>()
-        : const <String, dynamic>{};
     final legacyDistanceKm =
         _toFiniteDouble(map[FlightDBKeys.distanceInKm]) ??
         MapUtils.distance(departure: departure, arrival: arrival);
     final greatCircleDistanceKm =
         _toFiniteDouble(metricsMap[FlightDBKeys.greatCircleDistanceKm]) ??
         legacyDistanceKm;
-    final approxDurationMinutes =
+    // v2.0.2 flightInfo.routeTotalMinutes is cruise-only, so it may fill the
+    // cruise slot. routePlan.plannedDurationMinutes is a block value and must
+    // NOT — records with only a plan fall through to the distance estimate.
+    final legacyInfoRaw = map[FlightDBKeys.flightInfo];
+    final legacyInfoMap = legacyInfoRaw is Map
+        ? legacyInfoRaw.cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final cruiseMinutes =
         _toInt(metricsMap[FlightDBKeys.approxDurationMinutes]) ??
-        _toInt(planMap[FlightDBKeys.plannedDurationMinutes]) ??
-        _toInt(planMap[FlightDBKeys.legacyPlannedDurationMin]) ??
         _toInt(legacyInfoMap[FlightInfoDBKeys.routeTotalMinutes]) ??
-        FlightRouteMetrics.estimateApproxDurationMinutes(greatCircleDistanceKm);
+        FlightRouteMetrics.estimateCruiseMinutes(greatCircleDistanceKm);
     final actualDistanceKm = _toFiniteDouble(
       metricsMap[FlightDBKeys.actualDistanceKm],
     );
-    final actualDurationMinutes = _toInt(
+    final actualBlockMinutes = _toInt(
       metricsMap[FlightDBKeys.actualDurationMinutes],
     );
     return FlightRouteMetrics(
       greatCircleDistanceKm: greatCircleDistanceKm,
-      approxDurationMinutes: approxDurationMinutes,
+      cruiseMinutes: cruiseMinutes,
       actualDistanceKm: actualDistanceKm,
-      actualDurationMinutes: actualDurationMinutes,
+      actualBlockMinutes: actualBlockMinutes,
     );
   }
 

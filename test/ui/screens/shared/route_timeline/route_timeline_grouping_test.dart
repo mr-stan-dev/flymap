@@ -11,7 +11,7 @@ void main() {
         [_region(pathFirstEncounterKm: 744, pathFirstEncounterMinutes: -1)],
         cruiseSpeedKmh: 850,
         routeDistanceKm: 1487.5,
-        totalRouteMinutes: 160,
+        blockMinutes: 160,
         useTotalDurationProportion: true,
       );
 
@@ -27,7 +27,7 @@ void main() {
     expect(
       RouteTimelineGrouping.arrivalMinutes(
         routeDistanceKm: 1487.5,
-        totalRouteMinutes: 105,
+        blockMinutes: 105,
         cruiseSpeedKmh: 850,
         groups: groups,
       ),
@@ -46,10 +46,10 @@ void main() {
     expect(
       RouteTimelineGrouping.arrivalMinutes(
         routeDistanceKm: 6401.9,
-        totalRouteMinutes: 480,
+        blockMinutes: 480,
         cruiseSpeedKmh: 800,
         groups: groups,
-        totalRouteMinutesIsAuthoritative: true,
+        blockMinutesIsAuthoritative: true,
       ),
       480,
     );

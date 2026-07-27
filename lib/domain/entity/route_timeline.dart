@@ -4,19 +4,19 @@ import 'package:flymap/domain/entity/route_region.dart';
 class RouteTimeline extends Equatable {
   const RouteTimeline({
     required this.regions,
-    required this.totalRouteMinutes,
+    required this.blockMinutes,
     required this.cruiseSpeedKmh,
   });
 
   final List<RouteRegion> regions;
-  final int totalRouteMinutes;
+  final int blockMinutes;
   final int cruiseSpeedKmh;
 
   const RouteTimeline.empty()
     : regions = const [],
-      totalRouteMinutes = 0,
+      blockMinutes = 0,
       cruiseSpeedKmh = 850;
 
   @override
-  List<Object?> get props => [regions, totalRouteMinutes, cruiseSpeedKmh];
+  List<Object?> get props => [regions, blockMinutes, cruiseSpeedKmh];
 }

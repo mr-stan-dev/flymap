@@ -16,23 +16,23 @@ class FlightInfo extends Equatable {
     this.offlineContent, [
     this.routeMetrics = const FlightRouteMetrics(
       greatCircleDistanceKm: 0,
-      approxDurationMinutes: 0,
+      cruiseMinutes: 0,
     ),
   ]);
 
   static const FlightInfo empty = FlightInfo(
     FlightRouteInsights.empty,
     FlightOfflineContent.empty,
-    FlightRouteMetrics(greatCircleDistanceKm: 0, approxDurationMinutes: 0),
+    FlightRouteMetrics(greatCircleDistanceKm: 0, cruiseMinutes: 0),
   );
 
   String get overview => routeInsights.overview ?? '';
   List<RoutePoiSummary> get poi => routeInsights.poiHighlights;
   List<FlightArticle> get articles => offlineContent.articles;
   List<RouteRegion> get routeRegions => routeInsights.regions;
-  int get routeTotalMinutes => routeMetrics.approxDurationMinutes;
+  int get routeCruiseMinutes => routeMetrics.cruiseMinutes;
   int get routeCruiseSpeedKmh =>
-      routeMetrics.effectiveAverageSpeedKmh?.round() ??
+      routeMetrics.cruiseSpeedKmh?.round() ??
       FlightRouteMetrics.defaultCruiseSpeedKmh;
 
   bool get isEmpty =>
@@ -46,8 +46,6 @@ class FlightInfo extends Equatable {
     List<RoutePoiSummary>? poi,
     List<FlightArticle>? articles,
     List<RouteRegion>? routeRegions,
-    int? routeTotalMinutes,
-    int? routeCruiseSpeedKmh,
   }) {
     final nextRouteInsights =
         routeInsights ??
@@ -58,32 +56,10 @@ class FlightInfo extends Equatable {
         );
     final nextOfflineContent =
         offlineContent ?? this.offlineContent.copyWith(articles: articles);
-    final nextRouteMetrics =
-        routeMetrics ??
-        _copyRouteMetrics(
-          routeTotalMinutes: routeTotalMinutes,
-          routeCruiseSpeedKmh: routeCruiseSpeedKmh,
-        );
-    return FlightInfo(nextRouteInsights, nextOfflineContent, nextRouteMetrics);
-  }
-
-  FlightRouteMetrics _copyRouteMetrics({
-    int? routeTotalMinutes,
-    int? routeCruiseSpeedKmh,
-  }) {
-    final nextDuration =
-        routeTotalMinutes ?? routeMetrics.approxDurationMinutes;
-    var nextDistance = routeMetrics.greatCircleDistanceKm;
-    final speed = routeCruiseSpeedKmh;
-    if (speed != null &&
-        speed > 0 &&
-        nextDuration > 0 &&
-        (!nextDistance.isFinite || nextDistance <= 0)) {
-      nextDistance = speed * (nextDuration / 60.0);
-    }
-    return routeMetrics.copyWith(
-      greatCircleDistanceKm: nextDistance,
-      approxDurationMinutes: routeTotalMinutes,
+    return FlightInfo(
+      nextRouteInsights,
+      nextOfflineContent,
+      routeMetrics ?? this.routeMetrics,
     );
   }
 

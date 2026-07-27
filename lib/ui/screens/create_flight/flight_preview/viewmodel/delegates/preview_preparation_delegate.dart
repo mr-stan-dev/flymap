@@ -164,7 +164,7 @@ class PreviewPreparationDelegate {
           flightOperationalData: operationalData,
           allRoutePois: overview.topPois,
           routeRegions: timeline.regions,
-          routeTotalMinutes: timeline.totalRouteMinutes,
+          routeBlockMinutes: timeline.blockMinutes,
           routeCruiseSpeedKmh: timeline.cruiseSpeedKmh,
           isPreviewLoading: false,
           hasInternetForMapPreview: true,
@@ -177,8 +177,7 @@ class PreviewPreparationDelegate {
               interests: userPrefs.interests,
             ),
             routeRegions: timeline.regions,
-            routeTotalMinutes: timeline.totalRouteMinutes,
-            routeCruiseSpeedKmh: timeline.cruiseSpeedKmh,
+            routeMetrics: route.metrics,
           ),
           proPoiCount: overview.topPois.length < PoiLimitsPolicy.proMaxPois
               ? overview.topPois.length

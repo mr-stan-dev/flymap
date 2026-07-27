@@ -193,7 +193,7 @@ FlightRoute _buildRoute() {
     corridor: [LatLng(0, 0), LatLng(0, 10)],
     metrics: FlightRouteMetrics(
       greatCircleDistanceKm: 1111.95,
-      approxDurationMinutes: 111,
+      cruiseMinutes: 111,
     ),
   );
 }

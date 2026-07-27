@@ -346,7 +346,9 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
       return;
     }
 
-    emit(state.copyWith(status: FlightVideoStatus.exporting, exportProgress: 0));
+    emit(
+      state.copyWith(status: FlightVideoStatus.exporting, exportProgress: 0),
+    );
     final cancel = FlightVideoCancelToken();
     _cancelToken = cancel;
     final stopwatch = Stopwatch()..start();
@@ -459,7 +461,7 @@ class FlightVideoCubit extends Cubit<FlightVideoState> {
       ),
       duration: shareCardFormatDuration(
         t,
-        flight.route.effectiveDurationMinutes,
+        flight.route.durations.displayBlockMinutes,
       ),
       brand: t.shareImage.brand,
       madeWith: t.flightVideo.madeWith,

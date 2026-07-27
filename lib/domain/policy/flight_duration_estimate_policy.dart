@@ -1,5 +1,13 @@
 import 'dart:math' as math;
 
+/// Converts distance into the two duration quantities used in the app:
+/// cruise minutes (airborne at cruise speed — timeline math only) and block
+/// minutes (gate-to-gate: cruise plus taxi/climb/descent overhead — the only
+/// number to show users as flight duration).
+///
+/// [cruiseSpeedKmh] parameters expect a true cruise speed (e.g.
+/// FlightRouteMetrics.cruiseSpeedKmh). Passing a block-average speed
+/// (distance / gate-to-gate time) double-counts the overhead.
 class FlightDurationEstimatePolicy {
   const FlightDurationEstimatePolicy._();
 
@@ -8,7 +16,7 @@ class FlightDurationEstimatePolicy {
   static const int _maxOverheadMinutes = 90;
   static const double _distanceOverheadMinutesPerKm = 0.02;
 
-  static int estimateTotalMinutes({
+  static int estimateBlockMinutes({
     required double distanceKm,
     required int cruiseSpeedKmh,
     int roundToMinutes = 1,
@@ -53,18 +61,18 @@ class FlightDurationEstimatePolicy {
     return ((raw / roundToMinutes).round()) * roundToMinutes;
   }
 
-  static int normalizeTotalMinutes({
-    required int? apiTotalMinutes,
+  static int normalizeBlockMinutes({
+    required int? apiBlockMinutes,
     required double distanceKm,
     required int cruiseSpeedKmh,
     int roundToMinutes = 1,
   }) {
-    final estimated = estimateTotalMinutes(
+    final estimated = estimateBlockMinutes(
       distanceKm: distanceKm,
       cruiseSpeedKmh: cruiseSpeedKmh,
       roundToMinutes: roundToMinutes,
     );
-    final fromApi = (apiTotalMinutes ?? 0).clamp(0, 99999);
+    final fromApi = (apiBlockMinutes ?? 0).clamp(0, 99999);
     return math.max(fromApi, estimated);
   }
 }
