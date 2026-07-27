@@ -10,13 +10,16 @@ class RouteRegionsByTypeSection extends StatelessWidget {
   const RouteRegionsByTypeSection({
     super.key,
     required this.regions,
-    this.hiddenRegionsCount = 0,
+    this.hiddenRegions = const [],
     this.onOpenRegion,
     this.onPremiumGateTap,
   });
 
   final List<RouteRegion> regions;
-  final int hiddenRegionsCount;
+
+  /// Premium-gated regions: shown as locked teaser chips (type only, names
+  /// stay hidden) so free users see the shape of what Pro unlocks.
+  final List<RouteRegion> hiddenRegions;
   final ValueChanged<RouteRegion>? onOpenRegion;
   final VoidCallback? onPremiumGateTap;
 
@@ -25,8 +28,8 @@ class RouteRegionsByTypeSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groups = _groupRegionsByType(regions);
-    final totalRegionsCount = regions.length + hiddenRegionsCount;
-    if (groups.isEmpty && hiddenRegionsCount <= 0) {
+    final totalRegionsCount = regions.length + hiddenRegions.length;
+    if (groups.isEmpty && hiddenRegions.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -47,17 +50,39 @@ class RouteRegionsByTypeSection extends StatelessWidget {
               regions: groups[i].regions,
               onOpenRegion: onOpenRegion,
             ),
-            if (i != groups.length - 1 || hiddenRegionsCount > 0)
+            if (i != groups.length - 1 || hiddenRegions.isNotEmpty)
               const SizedBox(height: 10),
           ],
-          if (hiddenRegionsCount > 0) ...[
-            InfoBanner(
-              message: t.createFlight.overview.premiumGateBodyWithCount(
-                count: hiddenRegionsCount,
+          if (hiddenRegions.isNotEmpty) ...[
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final region in hiddenRegions)
+                  SelectionChip(
+                    label: _typeMapper.mapLabel(context, region.regionType),
+                    leading: Icon(
+                      Icons.lock_rounded,
+                      size: 14,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    onPressed: onPremiumGateTap,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              // "Unlock all N regions" — N is the route total, matching the
+              // section title, not just the locked remainder.
+              t.createFlight.overview.premiumGateBodyWithCount(
+                count: totalRegionsCount,
+              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             if (onPremiumGateTap != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               PremiumButton(
                 label: t.createFlight.overview.premiumGateCta,
                 onPressed: onPremiumGateTap,

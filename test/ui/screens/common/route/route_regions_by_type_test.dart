@@ -44,14 +44,15 @@ void main() {
     );
 
     expect(find.text("You'll fly over 3 regions"), findsOneWidget);
-    expect(find.text('Seas 2'), findsOneWidget);
-    expect(find.text('Country 1'), findsOneWidget);
+    // Plural groups show a count; a single item is just its type label.
+    expect(find.text('Seas · 2'), findsOneWidget);
+    expect(find.text('Country'), findsOneWidget);
     expect(find.text('North Sea'), findsOneWidget);
     expect(find.text('Baltic Sea'), findsOneWidget);
     expect(find.text('France'), findsOneWidget);
 
-    final seaTitleTop = tester.getTopLeft(find.text('Seas 2')).dy;
-    final countryTitleTop = tester.getTopLeft(find.text('Country 1')).dy;
+    final seaTitleTop = tester.getTopLeft(find.text('Seas · 2')).dy;
+    final countryTitleTop = tester.getTopLeft(find.text('Country')).dy;
     expect(seaTitleTop, lessThan(countryTitleTop));
   });
 
@@ -69,17 +70,38 @@ void main() {
               pathKm: 40,
             ),
           ],
-          hiddenRegionsCount: 5,
+          hiddenRegions: [
+            for (var i = 0; i < 4; i++)
+              _region(
+                qid: 'locked-country-$i',
+                name: 'Hidden $i',
+                type: RouteRegionType.country,
+                pathKm: 100 + i * 10,
+              ),
+            _region(
+              qid: 'locked-sea',
+              name: 'Hidden Sea',
+              type: RouteRegionType.sea,
+              pathKm: 150,
+            ),
+          ],
           onPremiumGateTap: () {},
         ),
       ),
     );
 
     expect(find.text("You'll fly over 6 regions"), findsOneWidget);
-    expect(find.text('Country 1'), findsOneWidget);
+    // 1 visible group header + 4 locked country teaser chips.
+    expect(find.text('Country'), findsNWidgets(5));
     expect(find.text('Upgrade to Pro'), findsOneWidget);
+    // Locked regions tease their type but never their name.
+    expect(find.text('Sea'), findsOneWidget);
+    expect(find.text('Hidden Sea'), findsNothing);
+    expect(find.byIcon(Icons.lock_rounded), findsNWidgets(5));
+    // Banner count matches the section title's route total, not just the
+    // locked remainder.
     expect(
-      find.text('Unlock all 5 regions on this route with Pro.'),
+      find.text('Unlock all 6 regions on this route with Pro.'),
       findsOneWidget,
     );
   });

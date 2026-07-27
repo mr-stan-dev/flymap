@@ -111,16 +111,8 @@ class RouteSummaryScreen extends StatelessWidget {
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _MetaChip(
-                        icon: Icons.route_rounded,
-                        label:
-                            '${t.createFlight.overview.routeSummaryDistanceLabel}: $distance',
-                      ),
-                      _MetaChip(
-                        icon: Icons.schedule_rounded,
-                        label:
-                            '${t.createFlight.overview.routeSummaryDurationLabel}: $duration',
-                      ),
+                      _MetaChip(icon: Icons.route_rounded, label: distance),
+                      _MetaChip(icon: Icons.schedule_rounded, label: duration),
                     ],
                   ),
                 ],
@@ -131,7 +123,7 @@ class RouteSummaryScreen extends StatelessWidget {
                 gateDecision.premiumRegions.isNotEmpty) ...[
               RouteRegionsByTypeSection(
                 regions: gateDecision.freeRegions,
-                hiddenRegionsCount: gateDecision.premiumRegions.length,
+                hiddenRegions: gateDecision.premiumRegions,
                 onOpenRegion: (region) => _openRegionInfo(context, region),
                 onPremiumGateTap: gateDecision.isGated
                     ? () => _showTimelineGateSheet(
@@ -167,15 +159,26 @@ class RouteSummaryScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             RoutePlacesByTypeSection(places: livePois),
-            const SizedBox(height: 16),
-            PrimaryButton(
-              label: t.common.kContinue,
-              onPressed: () {
-                Navigator.of(context).pop();
-                onContinue();
-              },
-            ),
           ],
+        ),
+      ),
+      // Pinned so the primary flow action never hides below the fold; the
+      // inline Upgrade CTA stays secondary. viewPadding, not SafeArea: an
+      // ancestor SafeArea zeroes MediaQuery.padding, and the home-indicator
+      // inset should add to the margin rather than replace it.
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.fromLTRB(
+          16,
+          8,
+          16,
+          16 + MediaQuery.viewPaddingOf(context).bottom,
+        ),
+        child: PrimaryButton(
+          label: t.common.kContinue,
+          onPressed: () {
+            Navigator.of(context).pop();
+            onContinue();
+          },
         ),
       ),
     );

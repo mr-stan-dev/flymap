@@ -75,14 +75,16 @@ class RouteTimelineRegionTypeMapper {
 
   String mapCountLabel(BuildContext context, RouteRegionType type, int count) {
     final singular = mapLabel(context, type);
-    if (count == 1) return '$singular $count';
+    // "Country 1" reads like a ranking; a single item needs no count and
+    // plurals separate the count visually ("Countries · 3").
+    if (count == 1) return singular;
 
     final languageCode = Localizations.localeOf(context).languageCode;
     final plural = switch (languageCode) {
       'en' => _pluralizeEnglish(singular),
       _ => singular,
     };
-    return '$plural $count';
+    return '$plural · $count';
   }
 
   IconData mapIcon(RouteRegionType type) {

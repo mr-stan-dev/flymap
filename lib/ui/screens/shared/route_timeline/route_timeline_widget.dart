@@ -281,7 +281,29 @@ class RouteTimelineWidget extends StatelessWidget {
     BuildContext context,
     _RouteTimelineEntry entry,
   ) {
-    return _formatTimingLabel(context, entry.minuteFromDeparture);
+    // Airports get words ("Take off" / "Land") instead of raw minutes — "0m"
+    // says nothing, and the total duration already lives in the header.
+    final timelineT = context.t.createFlight.overview.timeline;
+    switch (entry.kind) {
+      case _RouteTimelineEntryKind.departure:
+        return _wordLabel(timelineT.takeOffTimeline);
+      case _RouteTimelineEntryKind.arrival:
+        return _wordLabel(timelineT.land);
+      case _RouteTimelineEntryKind.group:
+      case _RouteTimelineEntryKind.premiumGate:
+        return _formatTimingLabel(context, entry.minuteFromDeparture);
+    }
+  }
+
+  _TimingLabel _wordLabel(String word) {
+    final lines = word.split('\n');
+    if (lines.length > 1) {
+      return _TimingLabel.twoLines(
+        firstLine: _TimingLine(unit: lines[0]),
+        secondLine: _TimingLine(unit: lines[1]),
+      );
+    }
+    return _TimingLabel.single(_TimingLine(unit: word));
   }
 
   _TimingLabel _formatTimingLabel(BuildContext context, int? minutesRaw) {
