@@ -44,6 +44,10 @@ should be requested in context (when the user sets a date), never during onboard
 
 ## 4. Weather / cloud-cover preview (v3, user idea from July 2026)
 
+> **Superseded July 2026:** this section grew into a full spec of its own —
+> see [flight_weather_feature.md](flight_weather_feature.md) (cloud grid +
+> timelapse, provider decision, date/time acquisition incl. FR24 findings).
+
 With a travel date we can fetch, close to the date:
 
 - **Airport weather** for departure and arrival (forecast at the airports on the day).
