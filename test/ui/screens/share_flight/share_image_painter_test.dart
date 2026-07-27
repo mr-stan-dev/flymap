@@ -62,5 +62,37 @@ void main() {
       // of jitter.
       expect(metric.length, lessThan(115));
     });
+
+    test('landing maneuver: final segment aims into the airport dot center',
+        () {
+      // Straight cruise, then a hook just short of the arrival dot — the kind
+      // of turn that used to make the line graze the dot from the side.
+      final points = [
+        const Offset(0, 0),
+        const Offset(100, 0),
+        const Offset(200, 0),
+        const Offset(280, 25),
+        const Offset(292, 15),
+        const Offset(296, 8),
+        const Offset(300, 0),
+      ];
+
+      final path = ShareImagePainter.buildRoutePath(
+        points,
+        routeKm: 1850,
+        endpointClearance: 24,
+      );
+
+      final metric = path.computeMetrics().single;
+      final tangent = metric.getTangentForOffset(metric.length)!;
+      expect(tangent.position, const Offset(300, 0));
+      // The hook points inside the 24px clearance are dropped, so the path
+      // finishes on the straight (280,25) -> (300,0) heading — into the dot
+      // center, not sideways past it.
+      final direction = tangent.vector / tangent.vector.distance;
+      final expected = const Offset(20, -25) / const Offset(20, -25).distance;
+      expect(direction.dx, closeTo(expected.dx, 0.01));
+      expect(direction.dy, closeTo(expected.dy, 0.01));
+    });
   });
 }

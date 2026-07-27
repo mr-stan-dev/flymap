@@ -318,6 +318,7 @@ class _RouteOverlayPainter extends CustomPainter {
       offsets,
       routeKm: routeKm,
       minPointSpacing: 8.0 * k,
+      endpointClearance: ShareImagePainter.defaultEndpointClearance * k,
     );
     final routePaint = Paint()
       ..color = ShareImagePainter.routeColor

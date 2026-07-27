@@ -90,16 +90,25 @@ class ShareImagePainter {
   /// corner-smoothed so GPS tracks read as one clean line. Endpoint-only
   /// routes (legacy flights without waypoints) fall back to the stylized arc.
   /// Shared with the home card thumbnail so both surfaces draw identically.
+  /// Clearance around each airport dot with no interior track points, so the
+  /// line's first/last visible segment aims into the dot's center instead of
+  /// grazing its edge mid-maneuver. Twice [endpointOuterRadius].
+  static const double defaultEndpointClearance = 24.0;
+
   static Path buildRoutePath(
     List<Offset> points, {
     required double routeKm,
     double minPointSpacing = 8.0,
+    double endpointClearance = defaultEndpointClearance,
   }) {
     if (points.length < 2) return Path();
     if (points.length == 2) {
       return buildArcPath(points.first, points.last, routeKm: routeKm);
     }
-    final simplified = _simplifyForDisplay(points, minPointSpacing);
+    final simplified = _clearEndpointApproach(
+      _simplifyForDisplay(points, minPointSpacing),
+      endpointClearance,
+    );
     if (simplified.length == 2) {
       return Path()
         ..moveTo(simplified.first.dx, simplified.first.dy)
@@ -121,6 +130,31 @@ class ShareImagePainter {
       }
     }
     result.add(points.last);
+    return result;
+  }
+
+  /// Removes interior points within [clearance] of either endpoint. Approach
+  /// and departure maneuvers (turns, holding loops) otherwise make the line
+  /// enter the airport dot at a tangent; with the zone cleared, the final
+  /// segment runs straight into the dot's center from whichever direction the
+  /// track last left the zone.
+  static List<Offset> _clearEndpointApproach(
+    List<Offset> points,
+    double clearance,
+  ) {
+    if (clearance <= 0 || points.length <= 2) return points;
+    final start = points.first;
+    final end = points.last;
+    final result = <Offset>[start];
+    for (var i = 1; i < points.length - 1; i++) {
+      final point = points[i];
+      if ((point - start).distance < clearance ||
+          (point - end).distance < clearance) {
+        continue;
+      }
+      result.add(point);
+    }
+    result.add(end);
     return result;
   }
 
