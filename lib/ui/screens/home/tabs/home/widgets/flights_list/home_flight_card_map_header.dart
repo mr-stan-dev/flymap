@@ -312,17 +312,13 @@ class _RouteOverlayPainter extends CustomPainter {
     // card reads as a miniature of the share card.
     final k = size.width / ShareImageCardConfig.width;
 
-    // Real route geometry when waypoints exist; the share card's stylized
-    // arc only as fallback for endpoint-only routes.
-    final Path path;
-    if (offsets.length > 2) {
-      path = Path()..moveTo(start.dx, start.dy);
-      for (final offset in offsets.skip(1)) {
-        path.lineTo(offset.dx, offset.dy);
-      }
-    } else {
-      path = ShareImagePainter.buildArcPath(start, end, routeKm: routeKm);
-    }
+    // Same smoothed real-geometry path as the share card (stylized arc only
+    // for endpoint-only routes); spacing scales with the thumbnail size.
+    final path = ShareImagePainter.buildRoutePath(
+      offsets,
+      routeKm: routeKm,
+      minPointSpacing: 8.0 * k,
+    );
     final routePaint = Paint()
       ..color = ShareImagePainter.routeColor
       ..strokeWidth = ShareImagePainter.routeStrokeWidth * k

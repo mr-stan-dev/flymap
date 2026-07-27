@@ -40,7 +40,10 @@ class ShareImagePainter {
 
     final start = points.first;
     final end = points.last;
-    final path = _buildArcPath(start, end);
+    final path = buildRoutePath(
+      points,
+      routeKm: flight.route.displayDistanceKm.toDouble(),
+    );
 
     final routePaint = Paint()
       ..color = routeColor
@@ -83,16 +86,62 @@ class ShareImagePainter {
     _drawAirportCodeLabels(canvas, size, path, start, end);
   }
 
-  Path _buildArcPath(Offset start, Offset end) {
-    return buildArcPath(
-      start,
-      end,
-      routeKm: flight.route.displayDistanceKm.toDouble(),
-    );
+  /// Builds the drawn route: the real geometry, lightly simplified and
+  /// corner-smoothed so GPS tracks read as one clean line. Endpoint-only
+  /// routes (legacy flights without waypoints) fall back to the stylized arc.
+  /// Shared with the home card thumbnail so both surfaces draw identically.
+  static Path buildRoutePath(
+    List<Offset> points, {
+    required double routeKm,
+    double minPointSpacing = 8.0,
+  }) {
+    if (points.length < 2) return Path();
+    if (points.length == 2) {
+      return buildArcPath(points.first, points.last, routeKm: routeKm);
+    }
+    final simplified = _simplifyForDisplay(points, minPointSpacing);
+    if (simplified.length == 2) {
+      return Path()
+        ..moveTo(simplified.first.dx, simplified.first.dy)
+        ..lineTo(simplified.last.dx, simplified.last.dy);
+    }
+    return _smoothThroughMidpoints(simplified);
   }
 
-  /// The stylized route arc, exposed so the home card thumbnail can draw
-  /// the identical curve.
+  /// Drops points closer together than [minSpacing] px (keeping endpoints):
+  /// dense GPS tracks otherwise turn corner smoothing into visible jitter.
+  static List<Offset> _simplifyForDisplay(
+    List<Offset> points,
+    double minSpacing,
+  ) {
+    final result = <Offset>[points.first];
+    for (var i = 1; i < points.length - 1; i++) {
+      if ((points[i] - result.last).distance >= minSpacing) {
+        result.add(points[i]);
+      }
+    }
+    result.add(points.last);
+    return result;
+  }
+
+  /// Midpoint quadratic smoothing: each interior point becomes a bezier
+  /// control, so turns round off while the line stays inside the hull of the
+  /// original track and the endpoints stay exact.
+  static Path _smoothThroughMidpoints(List<Offset> points) {
+    final path = Path()..moveTo(points.first.dx, points.first.dy);
+    for (var i = 1; i < points.length - 1; i++) {
+      final next = points[i + 1];
+      final mid = Offset(
+        (points[i].dx + next.dx) / 2,
+        (points[i].dy + next.dy) / 2,
+      );
+      path.quadraticBezierTo(points[i].dx, points[i].dy, mid.dx, mid.dy);
+    }
+    path.lineTo(points.last.dx, points.last.dy);
+    return path;
+  }
+
+  /// The stylized route arc — fallback for endpoint-only routes.
   static Path buildArcPath(
     Offset start,
     Offset end, {
