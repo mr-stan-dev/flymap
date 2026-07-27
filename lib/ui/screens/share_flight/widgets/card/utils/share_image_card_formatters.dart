@@ -63,10 +63,7 @@ String shareCardFormatDuration(Translations t, int minutes) {
 }
 
 String shareCardFormatThousands(int value) {
-  return value.toString().replaceAllMapped(
-    RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
-    (match) => '${match[1]},',
-  );
+  return UnitFormatUtils.formatThousands(value);
 }
 
 String shareCardCityName(Translations t, String value) {
