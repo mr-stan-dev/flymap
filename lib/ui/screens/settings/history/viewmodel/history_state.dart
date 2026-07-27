@@ -43,7 +43,7 @@ final class HistorySuccess extends HistoryState {
   final DateDisplayFormat dateDisplayFormat;
 
   String get formattedTotalDistance =>
-      UnitFormatUtils.formatDistance(totalDistanceKm, distanceUnit);
+      UnitFormatUtils.formatDistanceApprox(totalDistanceKm, distanceUnit);
 
   HistorySuccess copyWith({
     List<HistoryItem>? items,

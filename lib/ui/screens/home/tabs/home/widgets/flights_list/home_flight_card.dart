@@ -12,6 +12,7 @@ import 'package:flymap/ui/screens/home/tabs/home/viewmodel/home_tab_cubit.dart';
 import 'package:flymap/ui/screens/home/tabs/home/widgets/flights_list/home_flight_card_map_header.dart';
 import 'package:flymap/ui/screens/home/tabs/home/widgets/flights_list/home_route_preview_strip.dart';
 import 'package:flymap/ui/theme/app_colours.dart';
+import 'package:flymap/utils/duration_format_utils.dart';
 import 'package:flymap/utils/route_utils.dart';
 import 'package:flymap/utils/unit_format_utils.dart';
 
@@ -41,7 +42,7 @@ class HomeFlightCard extends StatelessWidget {
       route.displayDistanceKm.toDouble(),
       distanceUnit,
     );
-    final duration = _approxDuration(
+    final duration = DurationFormatUtils.formatApprox(
       context,
       route.durations.displayBlockMinutes,
     );
@@ -189,19 +190,6 @@ class HomeFlightCard extends StatelessWidget {
   int _mapSizeBytes(Flight flight) {
     if (flight.maps.isEmpty) return 0;
     return flight.maps.fold<int>(0, (sum, map) => sum + map.sizeBytes);
-  }
-
-  /// Approximate flight time rounded to 5 minutes ("~2h 35m"), or null when
-  /// the route has no duration estimate.
-  String? _approxDuration(BuildContext context, int minutes) {
-    if (minutes <= 0) return null;
-    final rounded = (minutes / 5).round() * 5;
-    final timelineT = context.t.createFlight.overview.timeline;
-    if (rounded < 60) return '~$rounded ${timelineT.minuteUnit}';
-    final h = rounded ~/ 60;
-    final m = rounded % 60;
-    if (m == 0) return '~$h${timelineT.hourCompactUnit}';
-    return '~$h${timelineT.hourCompactUnit} $m${timelineT.minuteCompactUnit}';
   }
 
   /// Time-based estimate of how far along the route an in-progress flight is

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/route_region.dart';
+import 'package:flymap/domain/entity/units.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/overview/route_overview_page_entry.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/overview/region_info_screen.dart';
@@ -9,8 +10,11 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/steps/overview/wi
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/overview/widgets/overview_region_card.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/overview/widgets/overview_summary_card.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/overview/widgets/overview_title_card.dart';
+import 'package:flymap/ui/screens/settings/distance_unit_context.dart';
 import 'package:flymap/ui/screens/shared/route_timeline/route_timeline_region_type_mapper.dart';
+import 'package:flymap/utils/duration_format_utils.dart';
 import 'package:flymap/utils/route_utils.dart';
+import 'package:flymap/utils/unit_format_utils.dart';
 
 class RouteOverviewPager extends StatefulWidget {
   const RouteOverviewPager({
@@ -61,6 +65,9 @@ class _RouteOverviewPagerState extends State<RouteOverviewPager> {
 
   @override
   Widget build(BuildContext context) {
+    // Resolved here, not in itemBuilder: provider forbids select/watch inside
+    // a sliver list's item build (it would rebuild the whole list anyway).
+    final distanceUnit = context.distanceUnit;
     return PageView.builder(
       controller: _controller,
       padEnds: false,
@@ -75,19 +82,30 @@ class _RouteOverviewPagerState extends State<RouteOverviewPager> {
             top: 4,
             bottom: 8,
           ),
-          child: _buildCard(context, entry),
+          child: _buildCard(context, entry, distanceUnit),
         );
       },
     );
   }
 
-  Widget _buildCard(BuildContext context, RouteOverviewPageEntry entry) {
+  Widget _buildCard(
+    BuildContext context,
+    RouteOverviewPageEntry entry,
+    DistanceUnit distanceUnit,
+  ) {
     final t = context.t;
     switch (entry.kind) {
       case RouteOverviewPageKind.summary:
         final route = widget.route;
-        final distance = _formatDistanceKm(route);
-        final duration = _formatMinutesCompact(context, widget.blockMinutes);
+        // Approximate style ("~1850 km" / "~3h 10m") matching the home card,
+        // including the user's distance unit.
+        final distance = UnitFormatUtils.formatDistanceApprox(
+          route.displayDistanceKm.toDouble(),
+          distanceUnit,
+        );
+        final duration =
+            DurationFormatUtils.formatApprox(context, widget.blockMinutes) ??
+            _formatMinutesCompact(context, widget.blockMinutes);
         return OverviewTitleCard(
           routeCodeLine:
               '${route.departure.displayCode} → ${route.arrival.displayCode}',
@@ -188,12 +206,6 @@ class _RouteOverviewPagerState extends State<RouteOverviewPager> {
       return '$h${timelineT.hourCompactUnit}';
     }
     return '$h${timelineT.hourCompactUnit} $m${timelineT.minuteCompactUnit}';
-  }
-
-  String _formatDistanceKm(FlightRoute route) {
-    final distanceKm = route.displayDistanceKm;
-    if (distanceKm <= 0) return '0km';
-    return '${distanceKm}km';
   }
 
   void _animateToNextCard() {

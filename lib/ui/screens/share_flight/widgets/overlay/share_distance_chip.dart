@@ -14,7 +14,7 @@ class ShareDistanceChip extends StatelessWidget {
     final t = context.t;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final distanceLabel = UnitFormatUtils.formatDistance(
+    final distanceLabel = UnitFormatUtils.formatDistanceApprox(
       distanceKm,
       context.distanceUnit,
     );

@@ -144,9 +144,10 @@ class FlightStatistics extends Equatable {
   /// Format total map size as string
   String get formattedTotalMapSize => SizeUtils.formatBytes(totalMapSize);
 
-  /// Format total distance as integer km string.
+  /// Approximate total distance ("~24320 km") — sums of estimates stay
+  /// estimates.
   String get formattedTotalDistance =>
-      UnitFormatUtils.formatDistance(totalDistanceKm, distanceUnit);
+      UnitFormatUtils.formatDistanceApprox(totalDistanceKm, distanceUnit);
 
   @override
   List<Object?> get props => [

@@ -9,7 +9,7 @@ class RouteCopyBuilder {
   static String build(FlightRoute route) {
     final departure = route.departure;
     final arrival = route.arrival;
-    final distanceKm = route.displayDistanceKm.toString();
+    final distanceKm = '${(route.displayDistanceKm / 10).round() * 10}';
 
     return [
       t.flight.info.copyRouteTitle,

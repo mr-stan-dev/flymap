@@ -12,11 +12,14 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/flight_unlock_gat
 import 'package:flymap/ui/screens/create_flight/flight_preview/route_upgrade_choice_sheet.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/overview/region_info_screen.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_cubit.dart';
+import 'package:flymap/ui/screens/settings/distance_unit_context.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/screens/shared/route_timeline/route_timeline_region_type_mapper.dart';
 import 'package:flymap/ui/screens/shared/route_timeline/route_timeline_widget.dart';
 import 'package:flymap/ui/widgets/pro_widgets.dart';
+import 'package:flymap/utils/duration_format_utils.dart';
 import 'package:flymap/utils/route_utils.dart';
+import 'package:flymap/utils/unit_format_utils.dart';
 
 class RouteSummaryScreen extends StatelessWidget {
   const RouteSummaryScreen({
@@ -52,8 +55,13 @@ class RouteSummaryScreen extends StatelessWidget {
     );
     final flightPreviewCubit = context.read<FlightPreviewCubit>();
     final subscriptionCubit = context.read<SubscriptionCubit>();
-    final distance = _formatDistanceKm(route);
-    final duration = _formatMinutesCompact(context, blockMinutes);
+    final distance = UnitFormatUtils.formatDistanceApprox(
+      route.displayDistanceKm.toDouble(),
+      context.distanceUnit,
+    );
+    final duration =
+        DurationFormatUtils.formatApprox(context, blockMinutes) ??
+        '0 ${t.createFlight.overview.timeline.minuteUnit}';
     final routeTitle =
         '${route.departure.displayCode} → ${route.arrival.displayCode}';
     final routeSubtitle =
@@ -208,22 +216,6 @@ class RouteSummaryScreen extends StatelessWidget {
     );
   }
 
-  String _formatMinutesCompact(BuildContext context, int minutes) {
-    final timelineT = context.t.createFlight.overview.timeline;
-    if (minutes <= 0) {
-      return '0 ${timelineT.minuteUnit}';
-    }
-    if (minutes < 60) {
-      return '$minutes ${timelineT.minuteUnit}';
-    }
-    final h = minutes ~/ 60;
-    final m = minutes % 60;
-    if (m == 0) {
-      return '$h${timelineT.hourCompactUnit}';
-    }
-    return '$h${timelineT.hourCompactUnit} $m${timelineT.minuteCompactUnit}';
-  }
-
   Future<void> _openRegionInfo(BuildContext context, RouteRegion region) async {
     final typeLabel = _typeMapper.mapLabel(context, region.regionType);
     await Navigator.of(context).push(
@@ -233,11 +225,6 @@ class RouteSummaryScreen extends StatelessWidget {
     );
   }
 
-  String _formatDistanceKm(FlightRoute route) {
-    final distanceKm = route.displayDistanceKm;
-    if (distanceKm <= 0) return '0km';
-    return '${distanceKm}km';
-  }
 }
 
 class _MetaChip extends StatelessWidget {

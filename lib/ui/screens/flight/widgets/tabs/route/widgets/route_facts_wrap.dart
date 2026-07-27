@@ -16,7 +16,7 @@ class RouteFactsWrap extends StatelessWidget {
       children: [
         _FactChip(
           icon: Icons.route,
-          label: UnitFormatUtils.formatDistance(
+          label: UnitFormatUtils.formatDistanceApprox(
             route.displayDistanceKm.toDouble(),
             context.distanceUnit,
           ),

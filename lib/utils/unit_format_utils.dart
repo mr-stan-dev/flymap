@@ -30,13 +30,14 @@ class UnitFormatUtils {
   }
 
   /// Approximate distance for glanceable UI: rounded to the nearest 10 of
-  /// the display unit and prefixed with "~" (e.g. "~1230 km").
+  /// the display unit (e.g. "1230 km"). No "~" prefix — at small sizes it
+  /// reads as a minus; the round number alone signals an estimate.
   static String formatDistanceApprox(double distanceKm, DistanceUnit unit) {
     final value = unit == DistanceUnit.mile
         ? distanceKm * 0.621371
         : distanceKm;
     final rounded = (value / 10).round() * 10;
-    return '~$rounded ${formatDistanceUnit(unit)}';
+    return '$rounded ${formatDistanceUnit(unit)}';
   }
 
   static String formatDate(DateTime date, {required DateDisplayFormat format}) {

@@ -535,8 +535,8 @@ void main() {
       await _pumpForInitialLoad(tester);
 
       // 1487.5 km: 105m cruise at 850 km/h + 55m taxi/climb/descent overhead.
-      expect(find.text('~2h 40m'), findsOneWidget);
-      expect(find.text('~1h 45m'), findsNothing);
+      expect(find.text('2h 40m'), findsOneWidget);
+      expect(find.text('1h 45m'), findsNothing);
     },
   );
 }

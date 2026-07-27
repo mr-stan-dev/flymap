@@ -65,7 +65,7 @@ class TemperatureInstrument extends StatelessWidget {
           ] else ...[
             const SizedBox(height: 8),
             Text(
-              '~${displayTemp.value}°${displayTemp.unitLabel}',
+              '${displayTemp.value}°${displayTemp.unitLabel}',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: temperatureColor,
                 fontWeight: FontWeight.w700,

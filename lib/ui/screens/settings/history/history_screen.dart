@@ -399,7 +399,7 @@ class _HistoryTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final route = item.flight.route;
-    final distanceLabel = UnitFormatUtils.formatDistance(
+    final distanceLabel = UnitFormatUtils.formatDistanceApprox(
       route.displayDistanceKm.toDouble(),
       distanceUnit,
     );

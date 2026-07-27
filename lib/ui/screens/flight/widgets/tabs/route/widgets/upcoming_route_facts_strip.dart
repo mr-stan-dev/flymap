@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/settings/distance_unit_context.dart';
+import 'package:flymap/utils/duration_format_utils.dart';
 import 'package:flymap/utils/unit_format_utils.dart';
 
 class UpcomingRouteFactsStrip extends StatelessWidget {
@@ -16,11 +17,13 @@ class UpcomingRouteFactsStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final distanceLabel = UnitFormatUtils.formatDistance(
+    final distanceLabel = UnitFormatUtils.formatDistanceApprox(
       route.displayDistanceKm.toDouble(),
       context.distanceUnit,
     );
-    final durationLabel = _formatMinutesCompact(context, totalMinutes);
+    final durationLabel =
+        DurationFormatUtils.formatApprox(context, totalMinutes) ??
+        '0 ${context.t.createFlight.overview.timeline.minuteUnit}';
     final routeLabel =
         '${route.departure.displayCode} → ${route.arrival.displayCode}';
 
@@ -70,21 +73,6 @@ class UpcomingRouteFactsStrip extends StatelessWidget {
     );
   }
 
-  String _formatMinutesCompact(BuildContext context, int minutes) {
-    final timelineT = context.t.createFlight.overview.timeline;
-    if (minutes <= 0) {
-      return '0 ${timelineT.minuteUnit}';
-    }
-    if (minutes < 60) {
-      return '$minutes ${timelineT.minuteUnit}';
-    }
-    final h = minutes ~/ 60;
-    final m = minutes % 60;
-    if (m == 0) {
-      return '$h${timelineT.hourCompactUnit}';
-    }
-    return '$h${timelineT.hourCompactUnit} $m${timelineT.minuteCompactUnit}';
-  }
 }
 
 class _FactChip extends StatelessWidget {
