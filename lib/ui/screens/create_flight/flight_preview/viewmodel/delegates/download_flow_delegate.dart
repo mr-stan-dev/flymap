@@ -50,6 +50,7 @@ class DownloadFlowDelegate {
       store.getOrFetchCardImage(flightId: flightId, routePoints: points),
     );
   }
+
   final SubscriptionRepository _subscriptionRepository;
   final FlightUnlockRepository _flightUnlockRepository;
   final DeleteFlightUseCase _deleteFlightUseCase;

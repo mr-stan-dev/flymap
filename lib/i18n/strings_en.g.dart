@@ -2351,6 +2351,9 @@ class TranslationsCreateFlightFlightNumberSearchEn {
 	/// en: 'Searching your flight'
 	String get loading => 'Searching your flight';
 
+	/// en: 'This can take a few seconds while we check recent flights.'
+	String get loadingHint => 'This can take a few seconds while we check recent flights.';
+
 	/// en: 'Enter a valid flight number like BA117.'
 	String get invalidFormatError => 'Enter a valid flight number like BA117.';
 
@@ -2413,6 +2416,9 @@ class TranslationsCreateFlightRealRouteAirportSearchEn {
 
 	/// en: 'Make sure you selected the same departure and arrival airports as on your flight ticket.'
 	String get emptyResults => 'Make sure you selected the same departure and arrival airports as on your flight ticket.';
+
+	/// en: 'Try the reverse direction'
+	String get searchReverse => 'Try the reverse direction';
 
 	/// en: 'Too many flight searches right now. Please try again in a moment.'
 	String get rateLimitedError => 'Too many flight searches right now. Please try again in a moment.';
@@ -2587,6 +2593,9 @@ class TranslationsCreateFlightOverviewEn {
 
 	/// en: 'Upgrade to Pro'
 	String get premiumGateCta => 'Upgrade to Pro';
+
+	/// en: 'This can take a few seconds on longer routes…'
+	String get buildingHint => 'This can take a few seconds on longer routes…';
 
 	/// en: 'Route reviewed'
 	String get routeReviewedTitle => 'Route reviewed';
@@ -3918,6 +3927,7 @@ extension on Translations {
 			'createFlight.flightNumberSearch.subtitle' => 'Enter a flight number (for example BA117).',
 			'createFlight.flightNumberSearch.hint' => 'e.g. BA117',
 			'createFlight.flightNumberSearch.loading' => 'Searching your flight',
+			'createFlight.flightNumberSearch.loadingHint' => 'This can take a few seconds while we check recent flights.',
 			'createFlight.flightNumberSearch.invalidFormatError' => 'Enter a valid flight number like BA117.',
 			'createFlight.flightNumberSearch.notFoundError' => 'We couldn\'t find that flight number. Make sure it is the same as on your tickets and try again, or find by airports.',
 			'createFlight.flightNumberSearch.rateLimitedError' => 'Too many flight lookups right now. Please try again in a moment, or find by airports.',
@@ -3936,6 +3946,7 @@ extension on Translations {
 			'createFlight.realRouteAirportSearch.sorryNoFlightFromTo' => ({required Object departure, required Object arrival}) => 'Sorry, we couldn\'t find any flights from ${departure} to ${arrival}.',
 			'createFlight.realRouteAirportSearch.emptyTitle' => 'We couldn\'t find recent flights between these airports',
 			'createFlight.realRouteAirportSearch.emptyResults' => 'Make sure you selected the same departure and arrival airports as on your flight ticket.',
+			'createFlight.realRouteAirportSearch.searchReverse' => 'Try the reverse direction',
 			'createFlight.realRouteAirportSearch.rateLimitedError' => 'Too many flight searches right now. Please try again in a moment.',
 			'createFlight.realRouteAirportSearch.providerUnavailableError' => 'Real-flight data is temporarily unavailable. Please try again in a moment.',
 			'createFlight.realRouteAirportSearch.unexpectedError' => 'Something went wrong while searching this route. Please try again.',
@@ -3985,6 +3996,7 @@ extension on Translations {
 			'createFlight.overview.premiumGateBody' => 'Free plan includes a limited route preview. Upgrade to Pro to view every region on this route.',
 			'createFlight.overview.premiumGateBodyWithCount' => ({required Object count}) => 'Unlock all ${count} regions on this route with Pro.',
 			'createFlight.overview.premiumGateCta' => 'Upgrade to Pro',
+			'createFlight.overview.buildingHint' => 'This can take a few seconds on longer routes…',
 			'createFlight.overview.routeReviewedTitle' => 'Route reviewed',
 			'createFlight.overview.routeReviewedSubtitle' => ({required Object regions, required Object departure, required Object arrival}) => 'You will fly over ${regions} from ${departure} to ${arrival}.',
 			'createFlight.overview.fullSummary' => 'Full summary',
@@ -4078,11 +4090,11 @@ extension on Translations {
 			'createFlight.downloading.waitingForMap' => 'Waiting for map download...',
 			'createFlight.downloading.mapFailed' => 'Map download failed.',
 			'createFlight.downloading.noPoiSelected' => 'No place summaries selected.',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.downloading.preparingPoi' => 'Preparing place summaries...',
 			'createFlight.downloading.poiProgress' => ({required Object completed, required Object total}) => 'Places: ${completed}/${total}',
 			'createFlight.downloading.poiProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Places: ${completed}/${total} (${failed} failed)',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.downloading.noArticlesSelected' => 'No articles selected.',
 			'createFlight.downloading.preparingArticles' => 'Preparing article downloads...',
 			'createFlight.downloading.articlesProgress' => ({required Object completed, required Object total}) => 'Articles: ${completed}/${total}',
@@ -4592,11 +4604,11 @@ extension on Translations {
 			'countries.TR' => 'Turkey',
 			'countries.TT' => 'Trinidad and Tobago',
 			'countries.TW' => 'Taiwan, China',
+			_ => null,
+		} ?? switch (path) {
 			'countries.TZ' => 'Tanzania, United Republic of',
 			'countries.UA' => 'Ukraine',
 			'countries.UG' => 'Uganda',
-			_ => null,
-		} ?? switch (path) {
 			'countries.US' => 'United States',
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Uzbekistan',

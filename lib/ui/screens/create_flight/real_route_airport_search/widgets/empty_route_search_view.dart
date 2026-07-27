@@ -36,11 +36,10 @@ class _EmptyRouteSearchView extends StatelessWidget {
             selectedAirport: state.selectedArrival,
             selectedAirportIsFavorite: state.selectedAirportIsFavorite,
             homeAirportCode: homeAirportCode,
-            onSearchChanged: (value) =>
-                cubit.reopenArrivalSelection(
-                  query: value,
-                  clearSelectedAirport: true,
-                ),
+            onSearchChanged: (value) => cubit.reopenArrivalSelection(
+              query: value,
+              clearSelectedAirport: true,
+            ),
             onClearSearch: cubit.reopenArrivalSelection,
             onClearSelectedAirport: () =>
                 cubit.reopenArrivalSelection(clearSelectedAirport: true),
@@ -48,6 +47,7 @@ class _EmptyRouteSearchView extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           SearchFallbackAction(
+            icon: Icons.travel_explore_rounded,
             title: title,
             message: message,
             actionLabel: searchT.findByFlightNumber,
@@ -55,6 +55,9 @@ class _EmptyRouteSearchView extends StatelessWidget {
               context,
               hasPendingFlightUnlock: hasPendingFlightUnlock,
             ),
+            // A mixed-up direction is a common cause of empty results.
+            secondaryActionLabel: searchT.searchReverse,
+            onSecondaryPressed: () => unawaited(cubit.searchReverseDirection()),
           ),
         ],
       ),

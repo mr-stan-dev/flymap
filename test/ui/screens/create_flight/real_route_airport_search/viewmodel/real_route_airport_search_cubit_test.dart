@@ -86,7 +86,7 @@ void main() {
       },
     );
 
-    test('does not preselect when multiple matched flights are returned', () async {
+    test('preselects the first of multiple matched flights', () async {
       searchUseCase.flights = <FlightSummary>[
         FlightSummary(
           flightNumber: 'BA117',
@@ -109,7 +109,10 @@ void main() {
       await cubit.continueFromAirportStep();
 
       expect(cubit.state.matchedFlights, hasLength(2));
-      expect(cubit.state.selectedMatchedFlight, isNull);
+      expect(
+        cubit.state.selectedMatchedFlight,
+        cubit.state.matchedFlights.first,
+      );
     });
 
     test('maps not-found failures to empty-results copy', () async {

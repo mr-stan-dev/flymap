@@ -8,6 +8,7 @@ import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
 import 'package:get_it/get_it.dart';
 
+import '../widgets/flight_search_loading_view.dart';
 import 'viewmodel/flight_number_search_cubit.dart';
 import 'viewmodel/flight_number_search_state.dart';
 import 'viewmodel/flight_number_validator.dart';
@@ -30,6 +31,10 @@ class FlightNumberSearchScreen extends StatefulWidget {
 class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
   final TextEditingController _controller = TextEditingController();
 
+  /// Validation feedback only appears after a search attempt — flagging
+  /// "LH1114" as invalid while the user is still on "LH1" is just noise.
+  bool _hasAttemptedSearch = false;
+
   void _goToAirportSearch() {
     AppRouter.goToRealRouteAirportSearch(
       context,
@@ -47,7 +52,8 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => FlightNumberSearchCubit(
-        searchFlightsByNumberUseCase: GetIt.I.get<SearchFlightsByNumberUseCase>(),
+        searchFlightsByNumberUseCase: GetIt.I
+            .get<SearchFlightsByNumberUseCase>(),
         analytics: GetIt.I.get(),
         crashlytics: GetIt.I.get(),
       ),
@@ -72,48 +78,70 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
               : null;
           final errorState = state is FlightNumberSearchError ? state : null;
           final isError = errorState != null;
-          final candidates = resultsState?.candidates ??
+          final candidates =
+              resultsState?.candidates ??
               errorState?.candidates ??
               const <FlightSummary>[];
           final selectedCandidate =
               resultsState?.selectedCandidate ?? errorState?.selectedCandidate;
-          final singleCandidate =
-              candidates.length == 1 ? candidates.single : null;
+          final singleCandidate = candidates.length == 1
+              ? candidates.single
+              : null;
           final showInitialFindByAirports =
               state is FlightNumberSearchInitial && !isLoading;
 
           final flightNumber = _controller.text.trim();
           final hasInput = flightNumber.isNotEmpty;
-          final isFlightNumberValid =
-              FlightNumberValidator.isValid(flightNumber);
-          final canSearch = isFlightNumberValid && !isLoading;
+          final isFlightNumberValid = FlightNumberValidator.isValid(
+            flightNumber,
+          );
+          final canSearch = hasInput && !isLoading;
           final canContinue =
               candidates.isNotEmpty && selectedCandidate != null && !isLoading;
           final showValidationError =
-              hasInput && !isFlightNumberValid && candidates.isEmpty && !isError;
+              _hasAttemptedSearch &&
+              hasInput &&
+              !isFlightNumberValid &&
+              candidates.isEmpty &&
+              !isError;
+
+          void attemptSearch() {
+            if (!canSearch) return;
+            if (!isFlightNumberValid) {
+              setState(() => _hasAttemptedSearch = true);
+              return;
+            }
+            cubit.loadFlightSummary(flightNumber);
+          }
 
           final t = context.t.createFlight.flightNumberSearch;
 
           Widget? feedback;
           if (isLoading) {
-            feedback = Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 16),
-                  Text(t.loading, style: Theme.of(context).textTheme.bodyLarge),
-                ],
-              ),
+            feedback = FlightSearchLoadingView(
+              stages: [t.loading, t.loadingHint],
+              cardCount: 2,
             );
           } else if (isError) {
+            // Transient failures lead with Retry; not-found leads with the
+            // airports fallback (retrying the same number cannot help).
             feedback = Padding(
               padding: const EdgeInsets.only(top: 16),
-              child: SearchFallbackAction(
-                message: errorState.message,
-                actionLabel: t.airportsFallbackButton,
-                onPressed: _goToAirportSearch,
-              ),
+              child: errorState.isRetryable
+                  ? SearchFallbackAction(
+                      icon: Icons.cloud_off_rounded,
+                      message: errorState.message,
+                      actionLabel: context.t.common.retry,
+                      onPressed: () => cubit.loadFlightSummary(flightNumber),
+                      secondaryActionLabel: t.airportsFallbackButton,
+                      onSecondaryPressed: _goToAirportSearch,
+                    )
+                  : SearchFallbackAction(
+                      icon: Icons.travel_explore_rounded,
+                      message: errorState.message,
+                      actionLabel: t.airportsFallbackButton,
+                      onPressed: _goToAirportSearch,
+                    ),
             );
           }
 
@@ -134,6 +162,7 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
                   errorText: showValidationError ? t.invalidFormatError : null,
                 ),
                 onChanged: (_) {
+                  _hasAttemptedSearch = false;
                   if (candidates.isNotEmpty || isError) {
                     cubit.clearSummary();
                   } else {
@@ -142,9 +171,7 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
                 },
                 onSubmitted: (_) {
                   if (candidates.isEmpty) {
-                    if (canSearch) {
-                      cubit.loadFlightSummary(flightNumber);
-                    }
+                    attemptSearch();
                     return;
                   }
                   if (canContinue) {
@@ -214,11 +241,7 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: content,
-                      ),
-                    ),
+                    Expanded(child: SingleChildScrollView(child: content)),
                     if (!isLoading && !isError)
                       SizedBox(
                         width: double.infinity,
@@ -227,14 +250,11 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
                               ? context.t.common.search
                               : context.t.common.kContinue,
                           onPressed: candidates.isEmpty
-                              ? (canSearch
-                                    ? () =>
-                                          cubit.loadFlightSummary(flightNumber)
-                                    : null)
+                              ? (canSearch ? attemptSearch : null)
                               : (canContinue
                                     ? () => cubit.confirmSummaryAndLoadRoute(
-                                          flightNumber: flightNumber,
-                                        )
+                                        flightNumber: flightNumber,
+                                      )
                                     : null),
                         ),
                       ),
@@ -279,7 +299,9 @@ class _SelectableFlightSummaryCard extends StatelessWidget {
         summary: summary,
         showBorder: false,
         trailing: Icon(
-          isSelected ? Icons.check_circle : Icons.radio_button_unchecked_rounded,
+          isSelected
+              ? Icons.check_circle
+              : Icons.radio_button_unchecked_rounded,
           size: 20,
           color: isSelected
               ? colorScheme.primary

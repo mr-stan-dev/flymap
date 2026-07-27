@@ -39,25 +39,35 @@ void main() {
     expect(find.text('Or enter Airports'), findsOneWidget);
   });
 
-  testWidgets('shows local validation copy and keeps search disabled for invalid input', (
-    tester,
-  ) async {
-    final repository = _FakeFlightSearchRepository();
-    await _registerScreenDependencies(repository: repository);
+  testWidgets(
+    'shows validation copy only after a search attempt with invalid input',
+    (tester) async {
+      final repository = _FakeFlightSearchRepository();
+      await _registerScreenDependencies(repository: repository);
 
-    await tester.pumpWidget(_testApp());
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(_testApp());
+      await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField), '5746');
-    await tester.pump();
+      await tester.enterText(find.byType(TextField), '5746');
+      await tester.pump();
 
-    expect(find.text('Enter a valid flight number like BA117.'), findsOneWidget);
+      // No nagging while typing.
+      expect(
+        find.text('Enter a valid flight number like BA117.'),
+        findsNothing,
+      );
 
-    await tester.tap(find.text('Search'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Search'));
+      await tester.pumpAndSettle();
 
-    expect(repository.searchCallCount, 0);
-  });
+      // The attempt surfaces the validation error and no lookup happens.
+      expect(
+        find.text('Enter a valid flight number like BA117.'),
+        findsOneWidget,
+      );
+      expect(repository.searchCallCount, 0);
+    },
+  );
 
   testWidgets('shows find-by-airports action after lookup error', (
     tester,

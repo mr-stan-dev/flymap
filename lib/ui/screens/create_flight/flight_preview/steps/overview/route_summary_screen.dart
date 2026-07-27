@@ -227,7 +227,6 @@ class RouteSummaryScreen extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _MetaChip extends StatelessWidget {

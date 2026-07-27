@@ -36,11 +36,10 @@ class _ErrorRouteSearchView extends StatelessWidget {
             selectedAirport: state.selectedArrival,
             selectedAirportIsFavorite: state.selectedAirportIsFavorite,
             homeAirportCode: homeAirportCode,
-            onSearchChanged: (value) =>
-                cubit.reopenArrivalSelection(
-                  query: value,
-                  clearSelectedAirport: true,
-                ),
+            onSearchChanged: (value) => cubit.reopenArrivalSelection(
+              query: value,
+              clearSelectedAirport: true,
+            ),
             onClearSearch: cubit.reopenArrivalSelection,
             onClearSelectedAirport: () =>
                 cubit.reopenArrivalSelection(clearSelectedAirport: true),
@@ -48,10 +47,15 @@ class _ErrorRouteSearchView extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           SearchFallbackAction(
+            icon: Icons.cloud_off_rounded,
             title: title,
             message: message,
-            actionLabel: searchT.findByFlightNumber,
-            onPressed: () => AppRouter.replaceWithFlightNumberSelector(
+            // Route-search errors are transient (rate limit, provider down),
+            // so lead with Retry; not-found renders the empty view instead.
+            actionLabel: context.t.common.retry,
+            onPressed: () => unawaited(cubit.searchFlights()),
+            secondaryActionLabel: searchT.findByFlightNumber,
+            onSecondaryPressed: () => AppRouter.replaceWithFlightNumberSelector(
               context,
               hasPendingFlightUnlock: hasPendingFlightUnlock,
             ),

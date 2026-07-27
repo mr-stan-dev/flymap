@@ -964,6 +964,7 @@ class _TranslationsCreateFlightFlightNumberSearchFr extends TranslationsCreateFl
 	@override String get subtitle => 'Saisissez un numéro de vol (par exemple BA117).';
 	@override String get hint => 'ex. BA117';
 	@override String get loading => 'Recherche de votre vol';
+	@override String get loadingHint => 'Cela peut prendre quelques secondes pendant que nous vérifions les vols récents.';
 	@override String get invalidFormatError => 'Saisissez un numéro de vol valide, comme BA117.';
 	@override String get notFoundError => 'Nous n’avons pas trouvé ce numéro de vol. Vérifiez-le et réessayez, ou recherchez par aéroports.';
 	@override String get rateLimitedError => 'Il y a trop de recherches de vols en ce moment. Réessayez dans un instant, ou recherchez par aéroports.';
@@ -991,6 +992,7 @@ class _TranslationsCreateFlightRealRouteAirportSearchFr extends TranslationsCrea
 	@override String sorryNoFlightFromTo({required Object departure, required Object arrival}) => 'Désolé, nous n’avons trouvé aucun vol de ${departure} à ${arrival}.';
 	@override String get emptyTitle => 'Nous n’avons trouvé aucun vol récent entre ces aéroports';
 	@override String get emptyResults => 'Assurez-vous d’avoir sélectionné les mêmes aéroports de départ et d’arrivée que sur votre billet d’avion.';
+	@override String get searchReverse => 'Essayer le sens inverse';
 	@override String get rateLimitedError => 'Il y a trop de recherches de vols en ce moment. Réessayez dans un instant.';
 	@override String get providerUnavailableError => 'Les données de vols réels sont temporairement indisponibles. Réessayez dans un instant.';
 	@override String get unexpectedError => 'Une erreur s’est produite lors de la recherche de cet itinéraire. Réessayez.';
@@ -1067,6 +1069,7 @@ class _TranslationsCreateFlightOverviewFr extends TranslationsCreateFlightOvervi
 	@override String get premiumGateBody => 'Le forfait Gratuit inclut un aperçu limité de l’itinéraire. Passez à Pro pour voir chaque région de cet itinéraire.';
 	@override String premiumGateBodyWithCount({required Object count}) => 'Débloquez les ${count} régions de cet itinéraire avec Pro.';
 	@override String get premiumGateCta => 'Passer à Pro';
+	@override String get buildingHint => 'Sur les longs itinéraires, cela peut prendre quelques secondes…';
 	@override String get routeReviewedTitle => 'Itinéraire revu';
 	@override String routeReviewedSubtitle({required Object regions, required Object departure, required Object arrival}) => 'Vous survolerez ${regions} de ${departure} à ${arrival}.';
 	@override String get fullSummary => 'Résumé complet';
@@ -1842,6 +1845,7 @@ extension on TranslationsFr {
 			'createFlight.flightNumberSearch.subtitle' => 'Saisissez un numéro de vol (par exemple BA117).',
 			'createFlight.flightNumberSearch.hint' => 'ex. BA117',
 			'createFlight.flightNumberSearch.loading' => 'Recherche de votre vol',
+			'createFlight.flightNumberSearch.loadingHint' => 'Cela peut prendre quelques secondes pendant que nous vérifions les vols récents.',
 			'createFlight.flightNumberSearch.invalidFormatError' => 'Saisissez un numéro de vol valide, comme BA117.',
 			'createFlight.flightNumberSearch.notFoundError' => 'Nous n’avons pas trouvé ce numéro de vol. Vérifiez-le et réessayez, ou recherchez par aéroports.',
 			'createFlight.flightNumberSearch.rateLimitedError' => 'Il y a trop de recherches de vols en ce moment. Réessayez dans un instant, ou recherchez par aéroports.',
@@ -1860,6 +1864,7 @@ extension on TranslationsFr {
 			'createFlight.realRouteAirportSearch.sorryNoFlightFromTo' => ({required Object departure, required Object arrival}) => 'Désolé, nous n’avons trouvé aucun vol de ${departure} à ${arrival}.',
 			'createFlight.realRouteAirportSearch.emptyTitle' => 'Nous n’avons trouvé aucun vol récent entre ces aéroports',
 			'createFlight.realRouteAirportSearch.emptyResults' => 'Assurez-vous d’avoir sélectionné les mêmes aéroports de départ et d’arrivée que sur votre billet d’avion.',
+			'createFlight.realRouteAirportSearch.searchReverse' => 'Essayer le sens inverse',
 			'createFlight.realRouteAirportSearch.rateLimitedError' => 'Il y a trop de recherches de vols en ce moment. Réessayez dans un instant.',
 			'createFlight.realRouteAirportSearch.providerUnavailableError' => 'Les données de vols réels sont temporairement indisponibles. Réessayez dans un instant.',
 			'createFlight.realRouteAirportSearch.unexpectedError' => 'Une erreur s’est produite lors de la recherche de cet itinéraire. Réessayez.',
@@ -1909,6 +1914,7 @@ extension on TranslationsFr {
 			'createFlight.overview.premiumGateBody' => 'Le forfait Gratuit inclut un aperçu limité de l’itinéraire. Passez à Pro pour voir chaque région de cet itinéraire.',
 			'createFlight.overview.premiumGateBodyWithCount' => ({required Object count}) => 'Débloquez les ${count} régions de cet itinéraire avec Pro.',
 			'createFlight.overview.premiumGateCta' => 'Passer à Pro',
+			'createFlight.overview.buildingHint' => 'Sur les longs itinéraires, cela peut prendre quelques secondes…',
 			'createFlight.overview.routeReviewedTitle' => 'Itinéraire revu',
 			'createFlight.overview.routeReviewedSubtitle' => ({required Object regions, required Object departure, required Object arrival}) => 'Vous survolerez ${regions} de ${departure} à ${arrival}.',
 			'createFlight.overview.fullSummary' => 'Résumé complet',
@@ -2002,11 +2008,11 @@ extension on TranslationsFr {
 			'createFlight.downloading.waitingForMap' => 'En attente du téléchargement de la carte...',
 			'createFlight.downloading.mapFailed' => 'Le téléchargement de la carte a échoué.',
 			'createFlight.downloading.noPoiSelected' => 'Aucun résumé de lieu sélectionné.',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.downloading.preparingPoi' => 'Préparation des résumés de lieux...',
 			'createFlight.downloading.poiProgress' => ({required Object completed, required Object total}) => 'Lieux : ${completed}/${total}',
 			'createFlight.downloading.poiProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Lieux : ${completed}/${total} (${failed} échecs)',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.downloading.noArticlesSelected' => 'Aucun article sélectionné.',
 			'createFlight.downloading.preparingArticles' => 'Préparation des téléchargements d’articles...',
 			'createFlight.downloading.articlesProgress' => ({required Object completed, required Object total}) => 'Articles : ${completed}/${total}',
@@ -2516,11 +2522,11 @@ extension on TranslationsFr {
 			'countries.TR' => 'Turquie',
 			'countries.TT' => 'Trinité-et-Tobago',
 			'countries.TW' => 'Taïwan, Chine',
+			_ => null,
+		} ?? switch (path) {
 			'countries.TZ' => 'Tanzanie',
 			'countries.UA' => 'Ukraine',
 			'countries.UG' => 'Ouganda',
-			_ => null,
-		} ?? switch (path) {
 			'countries.US' => 'États-Unis',
 			'countries.UY' => 'Uruguay',
 			'countries.UZ' => 'Ouzbékistan',

@@ -13,6 +13,7 @@ class FlightSummary extends Equatable {
     this.historicalFlightDate,
     this.actualDistanceKm,
     this.actualDurationMinutes,
+    this.aircraftType,
     this.departure,
     this.arrival,
   });
@@ -26,6 +27,9 @@ class FlightSummary extends Equatable {
   final DateTime? historicalFlightDate;
   final double? actualDistanceKm;
   final int? actualDurationMinutes;
+
+  /// ICAO aircraft type from the recorded flight (e.g. "A320", "B738").
+  final String? aircraftType;
   final Airport? departure;
   final Airport? arrival;
 
@@ -62,6 +66,7 @@ class FlightSummary extends Equatable {
       historicalFlightDate: _toDate(map['historicalFlightDate']),
       actualDistanceKm: _toFiniteDouble(map['actualDistanceKm']),
       actualDurationMinutes: _toInt(map['actualDurationMinutes']),
+      aircraftType: _toNonEmptyString(map['aircraftType']),
     );
   }
 
@@ -75,6 +80,7 @@ class FlightSummary extends Equatable {
     DateTime? historicalFlightDate,
     double? actualDistanceKm,
     int? actualDurationMinutes,
+    String? aircraftType,
     Airport? departure,
     Airport? arrival,
   }) {
@@ -89,6 +95,7 @@ class FlightSummary extends Equatable {
       actualDistanceKm: actualDistanceKm ?? this.actualDistanceKm,
       actualDurationMinutes:
           actualDurationMinutes ?? this.actualDurationMinutes,
+      aircraftType: aircraftType ?? this.aircraftType,
       departure: departure ?? this.departure,
       arrival: arrival ?? this.arrival,
     );
@@ -155,6 +162,7 @@ class FlightSummary extends Equatable {
     historicalFlightDate,
     actualDistanceKm,
     actualDurationMinutes,
+    aircraftType,
     departure,
     arrival,
   ];

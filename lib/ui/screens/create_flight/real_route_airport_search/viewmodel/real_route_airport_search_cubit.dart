@@ -261,8 +261,10 @@ class RealRouteAirportSearchCubit extends Cubit<RealRouteAirportSearchState> {
           view: RealRouteAirportSearchView.results,
           isRouteSearchLoading: false,
           matchedFlights: flights,
-          selectedMatchedFlight: flights.length == 1 ? flights.single : null,
-          clearSelectedMatchedFlight: flights.length != 1,
+          // Preselect the top (most recent) candidate so a single tap on
+          // Continue works; users can still switch.
+          selectedMatchedFlight: flights.isEmpty ? null : flights.first,
+          clearSelectedMatchedFlight: flights.isEmpty,
           clearRouteSearchErrorMessage: true,
         ),
       );
@@ -281,6 +283,18 @@ class RealRouteAirportSearchCubit extends Cubit<RealRouteAirportSearchState> {
 
   void selectFlight(FlightSummary flight) {
     emit(state.copyWith(selectedMatchedFlight: flight));
+  }
+
+  /// Re-runs the route search with departure and arrival swapped — offered on
+  /// empty results, where a mixed-up direction is a common cause.
+  Future<void> searchReverseDirection() async {
+    final departure = state.selectedDeparture;
+    final arrival = state.selectedArrival;
+    if (departure == null || arrival == null) return;
+    emit(
+      state.copyWith(selectedDeparture: arrival, selectedArrival: departure),
+    );
+    await searchFlights();
   }
 
   void confirmSelectedFlight() {
@@ -329,7 +343,8 @@ class RealRouteAirportSearchCubit extends Cubit<RealRouteAirportSearchState> {
     final arrivalIsFavorite = clearSelectedAirport
         ? false
         : await _isFavorite(state.selectedArrival);
-    final arrivalSearchLabel = clearSelectedAirport || state.selectedArrival == null
+    final arrivalSearchLabel =
+        clearSelectedAirport || state.selectedArrival == null
         ? ''
         : _airportSearchLabel(state.selectedArrival!);
 
@@ -337,7 +352,9 @@ class RealRouteAirportSearchCubit extends Cubit<RealRouteAirportSearchState> {
       state.copyWith(
         view: RealRouteAirportSearchView.airportSelection,
         airportStep: AirportSelectionStep.arrival,
-        searchQuery: normalizedQuery.isNotEmpty ? normalizedQuery : arrivalSearchLabel,
+        searchQuery: normalizedQuery.isNotEmpty
+            ? normalizedQuery
+            : arrivalSearchLabel,
         searchResults: const <Airport>[],
         isSearchLoading: false,
         isRouteSearchLoading: false,

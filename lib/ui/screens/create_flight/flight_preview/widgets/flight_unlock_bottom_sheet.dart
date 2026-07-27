@@ -78,8 +78,7 @@ class FlightUnlockBottomSheet extends StatelessWidget {
                     onPressed: () => onViewProPlans(context),
                   ),
                   if (showUnlockOption &&
-                      state.flightUnlockErrorMessage?.trim().isNotEmpty ==
-                          true)
+                      state.flightUnlockErrorMessage?.trim().isNotEmpty == true)
                     Padding(
                       padding: const EdgeInsets.only(top: 12),
                       child: InlineMessage(

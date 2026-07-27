@@ -1,9 +1,7 @@
 part of '../real_route_airport_search_screen.dart';
 
 class _FoundRouteSearchView extends StatelessWidget {
-  const _FoundRouteSearchView({
-    required this.state,
-  });
+  const _FoundRouteSearchView({required this.state});
 
   final RealRouteAirportSearchState state;
 
@@ -27,16 +25,10 @@ class _FoundRouteSearchView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (departure != null && arrival != null) ...[
-                _RouteResultsHeader(
-                  departure: departure,
-                  arrival: arrival,
-                ),
+                _RouteResultsHeader(departure: departure, arrival: arrival),
                 const SizedBox(height: 24),
               ],
-              Text(
-                resultsTitle,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              Text(resultsTitle, style: Theme.of(context).textTheme.titleLarge),
             ],
           ),
         ),
@@ -76,27 +68,19 @@ class _FoundRouteSearchView extends StatelessWidget {
 }
 
 class _SelectableFlightCard extends StatelessWidget {
-  const _SelectableFlightCard({
-    required this.flight,
-    required this.isSelected,
-  });
+  const _SelectableFlightCard({required this.flight, required this.isSelected});
 
   final FlightSummary flight;
   final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final airlineLabel = (flight.airlineName?.isNotEmpty == true)
-        ? flight.airlineName!
-        : (flight.airlineCode?.isNotEmpty == true
-              ? flight.airlineCode!
-              : flight.flightNumber ?? '-');
+    final colorScheme = Theme.of(context).colorScheme;
 
+    // Same card as the flight-number flow, minus the airport pair (all
+    // candidates here share the route shown once in the header above).
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
@@ -109,53 +93,26 @@ class _SelectableFlightCard extends StatelessWidget {
             ? colorScheme.primary.withValues(alpha: 0.05)
             : colorScheme.surface,
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              airlineLabel,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              flight.flightNumber ?? '',
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: colorScheme.onPrimaryContainer,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Icon(
-            isSelected ? Icons.check_circle : Icons.radio_button_unchecked_rounded,
-            size: 20,
-            color: isSelected
-                ? colorScheme.primary
-                : colorScheme.onSurfaceVariant,
-          ),
-        ],
+      child: FlightSummaryCard(
+        summary: flight,
+        showBorder: false,
+        showAirports: false,
+        trailing: Icon(
+          isSelected
+              ? Icons.check_circle
+              : Icons.radio_button_unchecked_rounded,
+          size: 20,
+          color: isSelected
+              ? colorScheme.primary
+              : colorScheme.onSurfaceVariant,
+        ),
       ),
     );
   }
 }
 
 class _RouteResultsHeader extends StatelessWidget {
-  const _RouteResultsHeader({
-    required this.departure,
-    required this.arrival,
-  });
+  const _RouteResultsHeader({required this.departure, required this.arrival});
 
   final Airport departure;
   final Airport arrival;

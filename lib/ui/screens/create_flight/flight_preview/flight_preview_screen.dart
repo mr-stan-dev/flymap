@@ -17,6 +17,7 @@ import 'package:flymap/repository/user_flight_prefs_repository.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/subscription/pro_limits.dart';
 import 'package:flymap/subscription/paywall_source.dart';
+import 'package:flymap/ui/screens/create_flight/widgets/route_overview_loading_view.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/route_upgrade_choice_sheet.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_args.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_unlock_gate_sheet.dart';
@@ -242,17 +243,14 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
       case CreateFlightStep.overview:
         if (state.isPreviewLoading) {
           return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircularProgressIndicator(),
-                const SizedBox(height: 12),
-                Text(
-                  context.t.flight.info.overviewLoading,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: RouteOverviewLoadingView(
+                departureCode: cubit.departure.displayCode,
+                arrivalCode: cubit.arrival.displayCode,
+                statusText: context.t.flight.info.overviewLoading,
+                hintText: context.t.createFlight.overview.buildingHint,
+              ),
             ),
           );
         }

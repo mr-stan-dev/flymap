@@ -1,15 +1,25 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/flight_summary.dart';
+import 'package:flymap/ui/screens/settings/distance_unit_context.dart';
+import 'package:flymap/utils/duration_format_utils.dart';
+import 'package:flymap/utils/unit_format_utils.dart';
 
 class FlightSummaryCard extends StatelessWidget {
   final FlightSummary summary;
   final bool showBorder;
+
+  /// The airport pair row. Off in the airport-pair search results, where all
+  /// candidates share the same route shown once in the header.
+  final bool showAirports;
   final Widget? trailing;
 
   const FlightSummaryCard({
     super.key,
     required this.summary,
     this.showBorder = true,
+    this.showAirports = true,
     this.trailing,
   });
 
@@ -23,7 +33,10 @@ class FlightSummaryCard extends StatelessWidget {
     final arrival = summary.arrival;
     final airlineLabel = (summary.airlineName?.isNotEmpty == true)
         ? summary.airlineName!
-        : (summary.airlineCode?.isNotEmpty == true ? summary.airlineCode! : null);
+        : (summary.airlineCode?.isNotEmpty == true
+              ? summary.airlineCode!
+              : null);
+    final facts = _buildFacts(context);
 
     return Card(
       margin: EdgeInsets.zero,
@@ -85,42 +98,158 @@ class FlightSummaryCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: _AirportInfo(
-                    code: departure?.displayCode ?? '-',
-                    name: departure?.nameShort,
-                    city: departure?.city,
-                    country: departure?.countryCode,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            if (showAirports) ...[
+              const SizedBox(height: 20),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: _AirportInfo(
+                      code: departure?.displayCode ?? '-',
+                      name: departure?.nameShort,
+                      city: departure?.city,
+                      country: departure?.countryCode,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Icon(
-                    Icons.arrow_forward,
-                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                    size: 20,
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: SizedBox(
+                      width: 56,
+                      height: 30,
+                      child: _RouteArcDivider(),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: _AirportInfo(
-                    code: arrival?.displayCode ?? '-',
-                    name: arrival?.nameShort,
-                    city: arrival?.city,
-                    country: arrival?.countryCode,
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                  Expanded(
+                    child: _AirportInfo(
+                      code: arrival?.displayCode ?? '-',
+                      name: arrival?.nameShort,
+                      city: arrival?.city,
+                      country: arrival?.countryCode,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
+            if (facts.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              _FactsRow(facts: facts),
+            ],
           ],
         ),
       ),
     );
   }
+
+  /// Recorded-flight facts: duration, distance, aircraft type. The flight
+  /// date is deliberately NOT shown — the server caches summaries for up to
+  /// 30 days, so it can be stale enough to confuse.
+  List<String> _buildFacts(BuildContext context) {
+    final durationMinutes = summary.displayActualDurationMinutes;
+    final duration = durationMinutes == null
+        ? null
+        : DurationFormatUtils.formatApprox(context, durationMinutes);
+    final distanceKm = summary.displayActualDistanceKm;
+    final aircraftType = summary.aircraftType;
+    return [
+      if (duration != null) duration,
+      if (distanceKm != null)
+        UnitFormatUtils.formatDistanceApprox(
+          distanceKm.toDouble(),
+          context.distanceUnit,
+        ),
+      if (aircraftType != null && aircraftType.isNotEmpty) aircraftType,
+    ];
+  }
+}
+
+class _FactsRow extends StatelessWidget {
+  const _FactsRow({required this.facts});
+
+  final List<String> facts;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    return Text(
+      facts.join('  ·  '),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: textTheme.bodyMedium?.copyWith(
+        color: colorScheme.onSurfaceVariant,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+}
+
+/// Small dashed arc with a plane at its apex, connecting the airport pair —
+/// a miniature of the share/home card route styling.
+class _RouteArcDivider extends StatelessWidget {
+  const _RouteArcDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.primary;
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        CustomPaint(size: Size.infinite, painter: _RouteArcPainter(color)),
+        Transform.rotate(
+          angle: math.pi / 2,
+          child: Icon(Icons.flight, size: 16, color: color),
+        ),
+      ],
+    );
+  }
+}
+
+class _RouteArcPainter extends CustomPainter {
+  const _RouteArcPainter(this.color);
+
+  final Color color;
+
+  static const double _dashLength = 4.0;
+  static const double _dashGap = 3.5;
+  static const double _planeGap = 18.0;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final start = Offset(0, size.height * 0.85);
+    final end = Offset(size.width, size.height * 0.85);
+    final control = Offset(size.width / 2, -size.height * 0.35);
+    final path = Path()
+      ..moveTo(start.dx, start.dy)
+      ..quadraticBezierTo(control.dx, control.dy, end.dx, end.dy);
+
+    final paint = Paint()
+      ..color = color.withValues(alpha: 0.75)
+      ..strokeWidth = 1.6
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    for (final metric in path.computeMetrics()) {
+      final gapStart = (metric.length - _planeGap) / 2;
+      final gapEnd = gapStart + _planeGap;
+      var distance = 0.0;
+      while (distance < metric.length) {
+        final dashEnd = math.min(distance + _dashLength, metric.length);
+        if (dashEnd <= gapStart || distance >= gapEnd) {
+          canvas.drawPath(metric.extractPath(distance, dashEnd), paint);
+        }
+        distance += _dashLength + _dashGap;
+      }
+    }
+
+    canvas.drawCircle(start, 2.2, Paint()..color = color);
+    canvas.drawCircle(end, 2.2, Paint()..color = color);
+  }
+
+  @override
+  bool shouldRepaint(_RouteArcPainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 class _AirportInfo extends StatelessWidget {

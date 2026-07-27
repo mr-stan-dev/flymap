@@ -37,7 +37,9 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
       emit(
         FlightNumberSearchResultsLoaded(
           candidates: candidates,
-          selectedCandidate: candidates.length == 1 ? candidates.single : null,
+          // Preselect the top (most recent) candidate so a single tap on
+          // Continue works; users can still switch.
+          selectedCandidate: candidates.isEmpty ? null : candidates.first,
         ),
       );
     } catch (error) {
@@ -50,7 +52,10 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
         ),
       );
       emit(
-        FlightNumberSearchError(message: _lookupFailureMessage(failureResult)),
+        FlightNumberSearchError(
+          message: _lookupFailureMessage(failureResult),
+          isRetryable: _isRetryableFailure(failureResult),
+        ),
       );
     }
   }
@@ -72,7 +77,8 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
   }) async {
     final normalized = _normalize(flightNumber);
     final currentState = state;
-    if (normalized == null || currentState is! FlightNumberSearchResultsLoaded) {
+    if (normalized == null ||
+        currentState is! FlightNumberSearchResultsLoaded) {
       return;
     }
 
@@ -156,6 +162,15 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
       FlightNumberLookupResult.providerInvalidResponse =>
         lookupT.providerUnavailableError,
       _ => lookupT.unexpectedError,
+    };
+  }
+
+  bool _isRetryableFailure(FlightNumberLookupResult result) {
+    return switch (result) {
+      FlightNumberLookupResult.notFound ||
+      FlightNumberLookupResult.invalidArgument ||
+      FlightNumberLookupResult.permissionDenied => false,
+      _ => true,
     };
   }
 
