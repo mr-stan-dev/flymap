@@ -58,9 +58,15 @@ void main() {
         (state as FlightNumberSearchError).message,
         'We couldn\'t find that flight number. Make sure it is the same as on your tickets and try again, or find by airports.',
       );
-      final event = analytics.logged.single as FirebaseAnalyticsEvent;
-      expect(event.firebaseEventName, 'flight_number_lookup_result');
+      final event = _eventNamed(analytics, 'flight_number_lookup_result');
       expect(event.firebaseParameters, <String, Object>{'result': 'not_found'});
+      // The empty upcoming window is reported separately, so schedule
+      // failures aren't masked by the historical fallback.
+      final scheduleEvent = _eventNamed(analytics, 'schedule_lookup_result');
+      expect(scheduleEvent.firebaseParameters, <String, Object>{
+        'result': 'not_found',
+        'source': 'number_search',
+      });
       expect(crashlytics.lastFlightNumber, 'BA117');
     });
 
@@ -93,7 +99,7 @@ void main() {
           'Flight data is temporarily unavailable. Please try again in a moment, or find by airports.',
         );
         expect(
-          (analytics.logged.single as FirebaseAnalyticsEvent)
+          _eventNamed(analytics, 'flight_number_lookup_result')
               .firebaseParameters,
           <String, Object>{'result': 'provider_invalid_response'},
         );
@@ -116,7 +122,8 @@ void main() {
         'Something went wrong while looking up this flight. Please try again, or find by airports.',
       );
       expect(
-        (analytics.logged.single as FirebaseAnalyticsEvent).firebaseParameters,
+        _eventNamed(analytics, 'flight_number_lookup_result')
+            .firebaseParameters,
         <String, Object>{'result': 'internal'},
       );
     });
@@ -137,7 +144,8 @@ void main() {
         'Enter a valid flight number like BA117.',
       );
       expect(
-        (analytics.logged.single as FirebaseAnalyticsEvent).firebaseParameters,
+        _eventNamed(analytics, 'flight_number_lookup_result')
+            .firebaseParameters,
         <String, Object>{'result': 'invalid_argument'},
       );
     });
@@ -158,11 +166,18 @@ void main() {
         'Too many flight lookups right now. Please try again in a moment, or find by airports.',
       );
       expect(
-        (analytics.logged.single as FirebaseAnalyticsEvent).firebaseParameters,
+        _eventNamed(analytics, 'flight_number_lookup_result')
+            .firebaseParameters,
         <String, Object>{'result': 'resource_exhausted'},
       );
     });
   });
+}
+
+FirebaseAnalyticsEvent _eventNamed(_FakeAppAnalytics analytics, String name) {
+  return analytics.logged.whereType<FirebaseAnalyticsEvent>().firstWhere(
+    (event) => event.firebaseEventName == name,
+  );
 }
 
 class _FakeFlightSearchRepository implements FlightSearchRepository {

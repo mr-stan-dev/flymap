@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_summary.dart';
@@ -89,8 +93,26 @@ class _TravelDatePickScreenState extends State<TravelDatePickScreen> {
       upcoming = await GetIt.I
           .get<SearchUpcomingFlightsByNumberUseCase>()
           .call(widget.args.flightNumber!);
-    } catch (_) {
-      // Schedule unavailable — the generic day list below still works.
+      _logScheduleLookup(
+        upcoming.isEmpty
+            ? FlightNumberLookupResult.notFound
+            : FlightNumberLookupResult.success,
+      );
+    } catch (error, stackTrace) {
+      // Schedule unavailable — the generic day list below still works, but
+      // keep the failure visible: rate limiting etc. would otherwise be
+      // masked by a successful (dateless) flight creation.
+      final result = flightNumberLookupResultFromError(error);
+      _logScheduleLookup(result);
+      if (result.isProviderFailure) {
+        unawaited(
+          GetIt.I.get<AppCrashlytics>().recordError(
+            error,
+            stackTrace,
+            reason: 'schedule_lookup_${result.analyticsValue}',
+          ),
+        );
+      }
     }
     if (!mounted) return;
     final options = _buildOptions(_filterToRoute(upcoming));
@@ -98,6 +120,17 @@ class _TravelDatePickScreenState extends State<TravelDatePickScreen> {
       _isLoading = false;
       _options = options.isNotEmpty ? options : _buildOptions(const []);
     });
+  }
+
+  void _logScheduleLookup(FlightNumberLookupResult result) {
+    unawaited(
+      GetIt.I.get<AppAnalytics>().log(
+        ScheduleLookupResultEvent(
+          result: result,
+          source: ScheduleLookupSource.travelDateStep,
+        ),
+      ),
+    );
   }
 
   /// Scheduled departures when available; otherwise a plain Today..+6 list.

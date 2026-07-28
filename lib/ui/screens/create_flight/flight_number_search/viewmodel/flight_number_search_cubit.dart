@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
@@ -56,6 +55,7 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
         final representatives = groups.values
             .map((group) => group.first)
             .toList(growable: false);
+        _logScheduleLookup(FlightNumberLookupResult.success);
         _logLookupResult(result: FlightNumberLookupResult.success);
         emit(
           FlightNumberSearchResultsLoaded(
@@ -68,8 +68,12 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
         );
         return;
       }
-    } catch (_) {
-      // Fall through to the historical search below.
+      _logScheduleLookup(FlightNumberLookupResult.notFound);
+    } catch (error, stackTrace) {
+      // Fall through to the historical search below, but keep the schedule
+      // failure visible: rate limiting etc. would otherwise be masked by a
+      // successful dateless fallback.
+      _reportScheduleFailure(error, stackTrace);
     }
 
     try {
@@ -84,7 +88,7 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
         ),
       );
     } catch (error) {
-      final failureResult = _lookupFailureResult(error);
+      final failureResult = flightNumberLookupResultFromError(error);
       _logLookupResult(result: failureResult);
       unawaited(
         _crashlytics.setContext(
@@ -186,26 +190,27 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
     _analytics.log(FlightNumberLookupResultEvent(result: result));
   }
 
-  FlightNumberLookupResult _lookupFailureResult(Object error) {
-    if (error is FirebaseFunctionsException) {
-      final reason = _lookupFailureReason(error.details);
-      return switch (error.code) {
-        'not-found' => FlightNumberLookupResult.notFound,
-        'unavailable' => switch (reason) {
-          'provider_timeout' => FlightNumberLookupResult.providerTimeout,
-          'provider_invalid_response' =>
-            FlightNumberLookupResult.providerInvalidResponse,
-          _ => FlightNumberLookupResult.providerUnavailable,
-        },
-        'invalid-argument' => FlightNumberLookupResult.invalidArgument,
-        'permission-denied' => FlightNumberLookupResult.permissionDenied,
-        'resource-exhausted' => FlightNumberLookupResult.resourceExhausted,
-        'deadline-exceeded' => FlightNumberLookupResult.deadlineExceeded,
-        'internal' => FlightNumberLookupResult.internal,
-        _ => FlightNumberLookupResult.failed,
-      };
+  void _logScheduleLookup(FlightNumberLookupResult result) {
+    _analytics.log(
+      ScheduleLookupResultEvent(
+        result: result,
+        source: ScheduleLookupSource.numberSearch,
+      ),
+    );
+  }
+
+  void _reportScheduleFailure(Object error, StackTrace stackTrace) {
+    final result = flightNumberLookupResultFromError(error);
+    _logScheduleLookup(result);
+    if (result.isProviderFailure) {
+      unawaited(
+        _crashlytics.recordError(
+          error,
+          stackTrace,
+          reason: 'schedule_lookup_${result.analyticsValue}',
+        ),
+      );
     }
-    return FlightNumberLookupResult.failed;
   }
 
   String _lookupFailureMessage(FlightNumberLookupResult result) {
@@ -231,13 +236,4 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
     };
   }
 
-  String? _lookupFailureReason(Object? details) {
-    if (details is Map) {
-      final dynamic reason = details['reason'];
-      if (reason is String && reason.isNotEmpty) {
-        return reason;
-      }
-    }
-    return null;
-  }
 }
