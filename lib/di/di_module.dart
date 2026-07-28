@@ -24,6 +24,7 @@ import 'package:flymap/data/api/route_overview_api.dart';
 import 'package:flymap/data/api/flight_info_api_mapper.dart';
 import 'package:flymap/data/gps_data_provider.dart';
 import 'package:flymap/data/map_asset_cache_service.dart';
+import 'package:flymap/data/local/airport_timezone_service.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/local/airlines_database.dart';
 import 'package:flymap/data/local/app_database.dart';
@@ -186,8 +187,11 @@ class DiModule {
     );
     i.registerLazySingleton<FlightRouteSearchApi>(() => FlightRouteSearchApi());
     i.registerLazySingleton<MetNorwayApi>(() => MetNorwayApi());
+    i.registerLazySingleton<AirportTimezoneService>(
+      () => AirportTimezoneService(airportsDatabase: i.get()),
+    );
     i.registerLazySingleton<FetchFlightWeatherUseCase>(
-      () => FetchFlightWeatherUseCase(api: i.get()),
+      () => FetchFlightWeatherUseCase(api: i.get(), timezoneService: i.get()),
     );
     i.registerLazySingleton<FlightRoutePreviewApi>(
       () => FlightRoutePreviewApi(),

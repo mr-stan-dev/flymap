@@ -36,7 +36,7 @@ class TravelDateFormatUtils {
     final today = DateTime(now.year, now.month, now.day);
     final daysAway = schedule.travelDate.difference(today).inDays;
     if (daysAway == 0) {
-      final departureLocal = schedule.scheduledDepartureLocal;
+      final departureLocal = schedule.departureLocal;
       return departureLocal == null
           ? dateT.today
           : '${dateT.today} · ${formatTime(departureLocal)}';

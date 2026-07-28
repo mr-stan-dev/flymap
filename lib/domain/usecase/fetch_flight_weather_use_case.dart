@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' show Offset;
 
 import 'package:flymap/data/api/met_norway_api.dart';
+import 'package:flymap/data/local/airport_timezone_service.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
@@ -18,7 +19,11 @@ import 'package:latlong2/latlong.dart' show LatLng;
 /// that no cache is needed (decision 2026-07-28); requests run with limited
 /// concurrency to stay polite.
 class FetchFlightWeatherUseCase {
-  FetchFlightWeatherUseCase({required MetNorwayApi api}) : _api = api;
+  FetchFlightWeatherUseCase({
+    required MetNorwayApi api,
+    AirportTimezoneService? timezoneService,
+  }) : _api = api,
+       _timezoneService = timezoneService;
 
   /// One sample roughly every this many km along the route.
   static const double sampleSpacingKm = 75;
@@ -31,19 +36,40 @@ class FetchFlightWeatherUseCase {
   static const int _maxConcurrentRequests = 6;
 
   final MetNorwayApi _api;
+  final AirportTimezoneService? _timezoneService;
   final _logger = const Logger('FetchFlightWeatherUseCase');
 
   Future<FlightWeather> call({
     required FlightRoute route,
     FlightSchedule? schedule,
   }) async {
-    final (departureUtc, isTimeEstimated) = _departureUtc(schedule);
-    final blockMinutes = math.max(30, route.durations.blockMinutes);
-    final arrivalUtc = departureUtc.add(Duration(minutes: blockMinutes));
+    // Airport-timezone fallback needs the airports CSV loaded.
+    await _timezoneService?.ensureReady();
+    final (departureUtc, isTimeEstimated) = _departureUtc(route, schedule);
+    // Real STA when the schedule pick provided one; block-time estimate
+    // otherwise.
+    final scheduledArrivalUtc = schedule?.arrival?.utc;
+    final arrivalUtc =
+        scheduledArrivalUtc != null && scheduledArrivalUtc.isAfter(departureUtc)
+        ? scheduledArrivalUtc
+        : departureUtc.add(
+            Duration(minutes: math.max(30, route.durations.blockMinutes)),
+          );
+    final blockMinutes = arrivalUtc.difference(departureUtc).inMinutes;
     final points = _samplePoints(route);
     final areaPoints = _areaGridPoints(route, points);
 
-    final departureOffset = schedule?.departureUtcOffsetMinutes ?? 0;
+    // Offset precedence: schedule provider (authoritative for the exact
+    // flight) -> airport timezone lookup (offline, DST-correct) -> zero /
+    // departure offset as the last honest fallback.
+    final departureOffset =
+        schedule?.departure?.offsetMinutes ??
+        _timezoneService?.utcOffsetMinutes(route.departure, departureUtc) ??
+        0;
+    final arrivalOffset =
+        schedule?.arrival?.offsetMinutes ??
+        _timezoneService?.utcOffsetMinutes(route.arrival, arrivalUtc) ??
+        departureOffset;
     // Timeline window: the whole flight ±1 h, for animating cloud
     // evolution — the provider response contains it anyway.
     final windowStart = departureUtc.subtract(const Duration(hours: 1));
@@ -110,13 +136,7 @@ class FetchFlightWeatherUseCase {
         departureUtc,
         departureOffset,
       ),
-      arrival: _airportWeather(
-        arrivalForecast,
-        arrivalUtc,
-        // Arrival offset is unknown for schedule-less flights; the
-        // departure offset is the closest honest guess for display.
-        departureOffset,
-      ),
+      arrival: _airportWeather(arrivalForecast, arrivalUtc, arrivalOffset),
       samples: samples,
       areaSamples: areaSamples,
       fetchedAt: DateTime.now(),
@@ -182,11 +202,18 @@ class FetchFlightWeatherUseCase {
 
   /// STD when a schedule pick provided one; otherwise midday on the travel
   /// date (or "in two hours" for dateless flights) flagged as an estimate.
-  (DateTime, bool) _departureUtc(FlightSchedule? schedule) {
-    final scheduled = schedule?.scheduledDepartureUtc;
-    if (scheduled != null) return (scheduled.toUtc(), false);
+  /// "Midday" is true departure-airport noon when its timezone is known,
+  /// else device-local noon.
+  (DateTime, bool) _departureUtc(FlightRoute route, FlightSchedule? schedule) {
+    final scheduled = schedule?.departure?.utc;
+    if (scheduled != null) return (scheduled, false);
     final travelDate = schedule?.travelDate;
     if (travelDate != null) {
+      final airportNoon = _timezoneService?.localTimeToUtc(
+        route.departure,
+        travelDate,
+      );
+      if (airportNoon != null) return (airportNoon, true);
       final localNoon = DateTime(
         travelDate.year,
         travelDate.month,

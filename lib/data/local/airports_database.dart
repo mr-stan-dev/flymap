@@ -8,12 +8,22 @@ class AirportsDatabase {
   static AirportsDatabase? _instance;
   final _logger = Logger('AirportsDatabase');
   final List<Airport> _airports = [];
+
+  /// IANA timezone id per airport code (ICAO and IATA keys), from the
+  /// build-time-enriched `timezone` CSV column.
+  final Map<String, String> _timezoneByCode = {};
   bool _isInitialized = false;
   Future<void>? _initializing;
 
   AirportsDatabase._();
-  AirportsDatabase.test({Iterable<Airport> seedAirports = const []}) {
+  AirportsDatabase.test({
+    Iterable<Airport> seedAirports = const [],
+    Map<String, String> seedTimezones = const {},
+  }) {
     _airports.addAll(seedAirports);
+    _timezoneByCode.addAll(
+      seedTimezones.map((k, v) => MapEntry(k.toUpperCase(), v)),
+    );
     _isInitialized = true;
   }
 
@@ -69,7 +79,8 @@ class AirportsDatabase {
       // [0:id, 1:ident, 2:type, 3:name, 4:latitude_deg, 5:longitude_deg,
       //  6:elevation_ft, 7:continent, 8:iso_country, 9:iso_region,
       // 10:municipality, 11:scheduled_service, 12:icao_code, 13:iata_code,
-      // 14:gps_code, 15:local_code, 16:home_link, 17:wikipedia_link, 18:keywords]
+      // 14:gps_code, 15:local_code, 16:home_link, 17:wikipedia_link,
+      // 18:keywords, 19:timezone (IANA id, tools/airport_timezones)]
       for (int i = 1; i < rows.length; i++) {
         final parts = rows[i].map((e) => (e ?? '').toString().trim()).toList();
 
@@ -110,6 +121,12 @@ class AirportsDatabase {
         );
 
         loadedAirports.add(airport);
+
+        final timezoneId = parts.length > 19 ? parts[19] : '';
+        if (timezoneId.isNotEmpty) {
+          if (icao.isNotEmpty) _timezoneByCode[icao] = timezoneId;
+          if (iata.isNotEmpty) _timezoneByCode[iata] = timezoneId;
+        }
       }
 
       _airports
@@ -179,6 +196,18 @@ class AirportsDatabase {
 
     _logger.log('Search for "$query" returned ${results.length} results');
     return results;
+  }
+
+  /// IANA timezone id for an airport, looked up by ICAO first, then IATA;
+  /// null when unknown (DB not loaded, or airport missing from the CSV).
+  String? timezoneIdFor({String? icaoCode, String? iataCode}) {
+    for (final code in [icaoCode, iataCode]) {
+      final key = code?.trim().toUpperCase();
+      if (key == null || key.isEmpty) continue;
+      final timezoneId = _timezoneByCode[key];
+      if (timezoneId != null) return timezoneId;
+    }
+    return null;
   }
 
   Airport? findByCode(String code) {

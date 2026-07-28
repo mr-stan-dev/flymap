@@ -6,6 +6,7 @@ import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_route_metrics.dart';
 import 'package:flymap/domain/entity/flight_route_source.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
+import 'package:flymap/domain/entity/zoned_instant.dart';
 import 'package:flymap/domain/entity/flight_status.dart';
 import 'package:flymap/domain/entity/flight_timestamp.dart';
 import 'package:flymap/domain/entity/flight_waypoint.dart';
@@ -61,8 +62,13 @@ class FlightDBKeys {
   static const observedAt = 'observedAt';
   static const schedule = 'schedule';
   static const travelDate = 'travelDate';
-  static const scheduledDepartureUtc = 'scheduledDepartureUtc';
-  static const departureUtcOffsetMinutes = 'departureUtcOffsetMinutes';
+  /// ISO-8601 with offset ("2026-08-03T09:15:00.000+02:00").
+  static const scheduledDeparture = 'scheduledDeparture';
+  static const scheduledArrival = 'scheduledArrival';
+
+  // Legacy pre-release schedule keys (dev builds only) — read, never written.
+  static const legacyScheduledDepartureUtc = 'scheduledDepartureUtc';
+  static const legacyDepartureUtcOffsetMinutes = 'departureUtcOffsetMinutes';
 }
 
 class FlightDbMapper {
@@ -456,13 +462,11 @@ class FlightDbMapper {
     return <String, dynamic>{
       // Date-only on purpose: no time component to mis-parse across zones.
       FlightDBKeys.travelDate: '$yyyy-$mm-$dd',
-      if (schedule.scheduledDepartureUtc != null)
-        FlightDBKeys.scheduledDepartureUtc: schedule.scheduledDepartureUtc!
-            .toUtc()
-            .toIso8601String(),
-      if (schedule.departureUtcOffsetMinutes != null)
-        FlightDBKeys.departureUtcOffsetMinutes:
-            schedule.departureUtcOffsetMinutes,
+      if (schedule.departure != null)
+        FlightDBKeys.scheduledDeparture:
+            schedule.departure!.toIso8601String(),
+      if (schedule.arrival != null)
+        FlightDBKeys.scheduledArrival: schedule.arrival!.toIso8601String(),
     };
   }
 
@@ -474,15 +478,24 @@ class FlightDbMapper {
         ? null
         : DateTime.tryParse(travelDateRaw);
     if (travelDate == null) return null;
-    final scheduledDepartureUtc = _toDateTime(
-      map[FlightDBKeys.scheduledDepartureUtc],
-    )?.toUtc();
     return FlightSchedule(
       travelDate: DateTime(travelDate.year, travelDate.month, travelDate.day),
-      scheduledDepartureUtc: scheduledDepartureUtc,
-      departureUtcOffsetMinutes: _toInt(
-        map[FlightDBKeys.departureUtcOffsetMinutes],
-      ),
+      departure: ZonedInstant.tryParse(map[FlightDBKeys.scheduledDeparture]) ??
+          _legacyDeparture(map),
+      arrival: ZonedInstant.tryParse(map[FlightDBKeys.scheduledArrival]),
+    );
+  }
+
+  /// Pre-release dev builds stored the departure as separate UTC + offset
+  /// fields; translate on read so those flights keep their schedule.
+  ZonedInstant? _legacyDeparture(Map<String, dynamic> map) {
+    final utc = _toDateTime(
+      map[FlightDBKeys.legacyScheduledDepartureUtc],
+    )?.toUtc();
+    if (utc == null) return null;
+    return ZonedInstant(
+      utc: utc,
+      offsetMinutes: _toInt(map[FlightDBKeys.legacyDepartureUtcOffsetMinutes]),
     );
   }
 }

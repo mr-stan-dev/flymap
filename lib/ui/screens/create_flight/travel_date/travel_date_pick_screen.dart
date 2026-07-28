@@ -199,7 +199,7 @@ class _TravelDatePickScreenState extends State<TravelDatePickScreen> {
       1 => dateT.tomorrow,
       _ => TravelDateFormatUtils.formatShortDate(schedule.travelDate),
     };
-    final departureLocal = schedule.scheduledDepartureLocal;
+    final departureLocal = schedule.departureLocal;
     if (departureLocal == null) return dayLabel;
     return '$dayLabel · ${TravelDateFormatUtils.formatTime(departureLocal)}';
   }

@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/data/api/met_norway_api.dart';
+import 'package:flymap/data/local/airport_timezone_service.dart';
+import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
+import 'package:flymap/domain/entity/zoned_instant.dart';
 import 'package:flymap/domain/usecase/fetch_flight_weather_use_case.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -88,14 +91,23 @@ void main() {
       route: _route(),
       schedule: FlightSchedule(
         travelDate: DateTime(2026, 8, 3),
-        scheduledDepartureUtc: DateTime.utc(2026, 8, 3, 8),
-        departureUtcOffsetMinutes: 120,
+        departure: ZonedInstant(
+          utc: DateTime.utc(2026, 8, 3, 8),
+          offsetMinutes: 120,
+        ),
+        arrival: ZonedInstant(
+          utc: DateTime.utc(2026, 8, 3, 10, 40),
+          offsetMinutes: 180,
+        ),
       ),
     );
 
     expect(weather.isTimeEstimated, isFalse);
     expect(weather.departure.temperatureC, 20.0);
     expect(weather.departure.utcOffsetMinutes, 120);
+    // Real STA and the arrival airport's own offset flow through.
+    expect(weather.arrival.timeUtc, DateTime.utc(2026, 8, 3, 10, 40));
+    expect(weather.arrival.utcOffsetMinutes, 180);
     expect(weather.samples.length, greaterThanOrEqualTo(5));
     expect(weather.samples.length, lessThanOrEqualTo(20));
     // Airports + corridor + the full-card area grid, each one request.
@@ -161,6 +173,30 @@ void main() {
     );
 
     expect(weather.isTimeEstimated, isTrue);
+  });
+
+  test('date-only schedules use airport timezones for noon and offsets',
+      () async {
+    final useCase = FetchFlightWeatherUseCase(
+      api: MetNorwayApi(httpClient: _fakeMetNorway(requestLog: [])),
+      timezoneService: AirportTimezoneService(
+        airportsDatabase: AirportsDatabase.test(
+          seedTimezones: {'AAAA': 'Europe/Berlin', 'BBBB': 'Asia/Tokyo'},
+        ),
+      ),
+    );
+
+    final weather = await useCase.call(
+      route: _route(),
+      schedule: FlightSchedule.dateOnly(DateTime(2026, 8, 3)),
+    );
+
+    expect(weather.isTimeEstimated, isTrue);
+    // True local noon at the departure airport (Berlin, CEST): 10:00 UTC.
+    expect(weather.departure.timeUtc, DateTime.utc(2026, 8, 3, 10));
+    expect(weather.departure.utcOffsetMinutes, 120);
+    // Arrival offset from ITS airport timezone, not the departure's.
+    expect(weather.arrival.utcOffsetMinutes, 540);
   });
 
   test('throws when both airport forecasts are unavailable', () async {

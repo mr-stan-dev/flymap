@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight_route_metrics.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
+import 'package:flymap/domain/entity/zoned_instant.dart';
 
 class FlightSummary extends Equatable {
   const FlightSummary({
@@ -18,9 +19,8 @@ class FlightSummary extends Equatable {
     this.departure,
     this.arrival,
     this.travelDateLocal,
-    this.scheduledDepartureUtc,
-    this.scheduledArrivalUtc,
-    this.departureUtcOffsetMinutes,
+    this.scheduledDeparture,
+    this.scheduledArrival,
   });
 
   final String? flightNumber;
@@ -41,18 +41,13 @@ class FlightSummary extends Equatable {
   /// Upcoming-schedule fields — set only by the upcoming-flights search,
   /// null for historical candidates.
   final DateTime? travelDateLocal;
-  final DateTime? scheduledDepartureUtc;
-  final DateTime? scheduledArrivalUtc;
-  final int? departureUtcOffsetMinutes;
+  final ZonedInstant? scheduledDeparture;
+  final ZonedInstant? scheduledArrival;
 
   bool get isUpcoming => travelDateLocal != null;
 
   /// Scheduled departure as wall-clock time at the departure airport.
-  DateTime? get scheduledDepartureLocal {
-    final utc = scheduledDepartureUtc;
-    if (utc == null) return null;
-    return utc.add(Duration(minutes: departureUtcOffsetMinutes ?? 0));
-  }
+  DateTime? get scheduledDepartureLocal => scheduledDeparture?.local;
 
   /// The persisted schedule for this candidate, or null when dateless.
   FlightSchedule? get schedule {
@@ -60,8 +55,8 @@ class FlightSummary extends Equatable {
     if (travelDate == null) return null;
     return FlightSchedule(
       travelDate: DateTime(travelDate.year, travelDate.month, travelDate.day),
-      scheduledDepartureUtc: scheduledDepartureUtc,
-      departureUtcOffsetMinutes: departureUtcOffsetMinutes,
+      departure: scheduledDeparture,
+      arrival: scheduledArrival,
     );
   }
 
@@ -101,10 +96,21 @@ class FlightSummary extends Equatable {
       aircraftType: _toNonEmptyString(map['aircraftType']),
       // Present only in search_upcoming_flights_by_number payloads.
       travelDateLocal: _toLocalDate(map['dateLocal']),
-      scheduledDepartureUtc: _toUtcInstant(map['stdUtc']),
-      scheduledArrivalUtc: _toUtcInstant(map['staUtc']),
-      departureUtcOffsetMinutes: _toInt(map['utcOffsetMinutes']),
+      scheduledDeparture: _toZonedInstant(
+        map['stdUtc'],
+        map['utcOffsetMinutes'],
+      ),
+      scheduledArrival: _toZonedInstant(
+        map['staUtc'],
+        map['arrivalUtcOffsetMinutes'],
+      ),
     );
+  }
+
+  static ZonedInstant? _toZonedInstant(dynamic utcRaw, dynamic offsetRaw) {
+    final utc = _toUtcInstant(utcRaw);
+    if (utc == null) return null;
+    return ZonedInstant(utc: utc, offsetMinutes: _toInt(offsetRaw));
   }
 
   FlightSummary copyWith({
@@ -121,9 +127,8 @@ class FlightSummary extends Equatable {
     Airport? departure,
     Airport? arrival,
     DateTime? travelDateLocal,
-    DateTime? scheduledDepartureUtc,
-    DateTime? scheduledArrivalUtc,
-    int? departureUtcOffsetMinutes,
+    ZonedInstant? scheduledDeparture,
+    ZonedInstant? scheduledArrival,
   }) {
     return FlightSummary(
       flightNumber: flightNumber ?? this.flightNumber,
@@ -140,11 +145,8 @@ class FlightSummary extends Equatable {
       departure: departure ?? this.departure,
       arrival: arrival ?? this.arrival,
       travelDateLocal: travelDateLocal ?? this.travelDateLocal,
-      scheduledDepartureUtc:
-          scheduledDepartureUtc ?? this.scheduledDepartureUtc,
-      scheduledArrivalUtc: scheduledArrivalUtc ?? this.scheduledArrivalUtc,
-      departureUtcOffsetMinutes:
-          departureUtcOffsetMinutes ?? this.departureUtcOffsetMinutes,
+      scheduledDeparture: scheduledDeparture ?? this.scheduledDeparture,
+      scheduledArrival: scheduledArrival ?? this.scheduledArrival,
     );
   }
 
@@ -229,8 +231,7 @@ class FlightSummary extends Equatable {
     departure,
     arrival,
     travelDateLocal,
-    scheduledDepartureUtc,
-    scheduledArrivalUtc,
-    departureUtcOffsetMinutes,
+    scheduledDeparture,
+    scheduledArrival,
   ];
 }

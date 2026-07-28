@@ -5,6 +5,7 @@ import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/entity/flight_info.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
+import 'package:flymap/domain/entity/zoned_instant.dart';
 import 'package:flymap/domain/entity/flight_timestamp.dart';
 import 'package:flymap/domain/entity/flight_waypoint.dart';
 import 'package:latlong2/latlong.dart';
@@ -105,22 +106,41 @@ void main() {
       final flight = _flight(id: 'flight-scheduled').copyWith(
         schedule: FlightSchedule(
           travelDate: DateTime(2026, 8, 3),
-          scheduledDepartureUtc: DateTime.utc(2026, 8, 3, 7, 15),
-          departureUtcOffsetMinutes: 120,
+          departure: ZonedInstant(
+            utc: DateTime.utc(2026, 8, 3, 7, 15),
+            offsetMinutes: 120,
+          ),
+          arrival: ZonedInstant(
+            utc: DateTime.utc(2026, 8, 3, 16, 50),
+            offsetMinutes: 540,
+          ),
         ),
       );
 
-      final restored = mapper.fromDb(mapper.toDb(flight));
+      final db = mapper.toDb(flight);
+      // Stored as universal ISO-8601 with the offset preserved.
+      expect(
+        (db['schedule'] as Map)['scheduledDeparture'],
+        '2026-08-03T09:15:00.000+02:00',
+      );
+      final restored = mapper.fromDb(db);
 
       expect(restored.schedule, isNotNull);
       expect(restored.schedule!.travelDate, DateTime(2026, 8, 3));
       expect(
-        restored.schedule!.scheduledDepartureUtc,
-        DateTime.utc(2026, 8, 3, 7, 15),
+        restored.schedule!.departure,
+        ZonedInstant(utc: DateTime.utc(2026, 8, 3, 7, 15), offsetMinutes: 120),
       );
-      expect(restored.schedule!.departureUtcOffsetMinutes, 120);
       expect(
-        restored.schedule!.scheduledDepartureLocal,
+        restored.schedule!.arrival,
+        ZonedInstant(utc: DateTime.utc(2026, 8, 3, 16, 50), offsetMinutes: 540),
+      );
+      expect(
+        restored.schedule!.arrival!.local,
+        DateTime.utc(2026, 8, 4, 1, 50),
+      );
+      expect(
+        restored.schedule!.departureLocal,
         DateTime.utc(2026, 8, 3, 9, 15),
       );
     });
@@ -134,8 +154,25 @@ void main() {
       final restored = mapper.fromDb(mapper.toDb(flight));
 
       expect(restored.schedule!.travelDate, DateTime(2026, 8, 3));
-      expect(restored.schedule!.scheduledDepartureUtc, isNull);
+      expect(restored.schedule!.departure, isNull);
       expect(restored.schedule!.hasScheduledTime, isFalse);
+    });
+
+    test('reads pre-release schedules stored as separate UTC + offset', () {
+      final mapper = FlightDbMapper();
+      final raw = mapper.toDb(_flight(id: 'flight-legacy-schedule'));
+      raw[FlightDBKeys.schedule] = <String, dynamic>{
+        FlightDBKeys.travelDate: '2026-08-03',
+        FlightDBKeys.legacyScheduledDepartureUtc: '2026-08-03T07:15:00.000Z',
+        FlightDBKeys.legacyDepartureUtcOffsetMinutes: 120,
+      };
+
+      final schedule = mapper.fromDb(raw).schedule;
+
+      expect(
+        schedule!.departure,
+        ZonedInstant(utc: DateTime.utc(2026, 8, 3, 7, 15), offsetMinutes: 120),
+      );
     });
 
     test('legacy records without schedule read back as null', () {

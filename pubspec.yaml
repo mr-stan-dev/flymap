@@ -63,6 +63,7 @@ dependencies:
   country_flags: ^3.0.1
   jovial_svg: ^1.1.19
   zo_animated_border: ^1.0.7
+  timezone: ^0.11.1
 
 dev_dependencies:
   flutter_test:
