@@ -12,6 +12,7 @@ import 'package:flymap/domain/entity/flight_info.dart';
 import 'package:flymap/domain/entity/flight_map.dart';
 import 'package:flymap/domain/entity/flight_operational_data.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_timestamp.dart';
 import 'package:flymap/map_download_config.dart';
 import 'package:uuid/uuid.dart';
@@ -124,6 +125,7 @@ class DownloadMapUseCase {
     required FlightRoute flightRoute,
     required FlightInfo flightInfo,
     FlightOperationalData? flightOperationalData,
+    FlightSchedule? flightSchedule,
     required String flightAccessTier,
     required int maxZoom,
   }) async* {
@@ -165,6 +167,7 @@ class DownloadMapUseCase {
             flightRoute: flightRoute,
             flightInfo: flightInfo,
             flightOperationalData: flightOperationalData,
+            flightSchedule: flightSchedule,
             flightAccessTier: flightAccessTier,
           );
 
@@ -189,6 +192,7 @@ class DownloadMapUseCase {
     required FlightRoute flightRoute,
     required FlightInfo flightInfo,
     FlightOperationalData? flightOperationalData,
+    FlightSchedule? flightSchedule,
     required String flightAccessTier,
   }) async {
     _logger.log(
@@ -204,6 +208,7 @@ class DownloadMapUseCase {
         timestamp: FlightTimestamp(createdAt: DateTime.now()),
         flightAccessTier: flightAccessTier,
         operationalData: flightOperationalData,
+        schedule: flightSchedule,
       );
       _logger.log('Inserting flight into DB: id=${flight.id}');
       await _flightsService.saveOrUpdateFlight(flight);

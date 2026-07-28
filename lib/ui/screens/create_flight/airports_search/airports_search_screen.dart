@@ -8,6 +8,7 @@ import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/ui/screens/create_flight/travel_date/travel_date_pick_screen.dart';
 import 'package:flymap/ui/screens/create_flight/airports_search/widgets/flight_search_airport_selection_step.dart';
 import 'package:flymap/ui/screens/create_flight/airports_search/viewmodel/airport_selection_screen_cubit.dart';
 import 'package:flymap/ui/screens/create_flight/airports_search/viewmodel/airport_selection_screen_state.dart';
@@ -179,10 +180,9 @@ class _AirportsSearchScreenState extends State<AirportsSearchScreen> {
     if (departure == null || arrival == null) return;
     await cubit.saveSelectedAirportsAsRecent();
     if (!context.mounted) return;
-    AppRouter.goToFlightOverview(
+    AppRouter.goToTravelDatePick(
       context,
-      departure: departure,
-      arrival: arrival,
+      args: TravelDatePickArgs(departure: departure, arrival: arrival),
     );
   }
 

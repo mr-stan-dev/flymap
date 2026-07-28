@@ -185,8 +185,42 @@ So the choice is: (a) migrate everything to AeroAPI for one-provider purity at
 $200/mo minimum + track-quality migration risk, or (b) keep FR24 for
 routes/tracks and bolt on a **schedule-only lookup** (one endpoint: number +
 date → STD/STA) behind the same callable. The schedule surface is tiny and
-isolated — trivially swappable — which makes (b) the pragmatic default; provider
-choice (AeroDataBox vs alternatives) still being explored by Stan.
+isolated — trivially swappable — which makes (b) the pragmatic default.
+
+**Decision 2026-07-27: AeroDataBox it is.** Stan has an account (free tier).
+Verified 2026-07-27: the **date-range endpoint**
+(`/flights/number/{num}/{dateFrom}/{dateTo}`) covers the whole 7-day window in
+ONE call (max range is plan-dependent, 7–30 days; 7 on lower plans — exact
+fit). Pricing (RapidAPI): Free 600 units/mo → Pro $5.35/mo 6,000 → Ultra
+$32/mo 60,000; endpoints cost 1/2/6 units by tier — the flights-by-number
+range endpoint is **Tier 2 (2 units/call, confirmed 2026-07-27)**.
+**Every path costs a flat 2 units** (decision 2026-07-27, Stan's
+simplification): airport-pair search keeps today's two-step UX — FR24
+candidates first (0 ADB units), user picks a flight number, THEN one range
+call for that number's 7-day schedule. No per-number fan-out; a route-search
+fan-out callable was built and deliberately deleted. Free ≈ 300 selections/mo
+(plenty for dev), Pro ≈ 3,000. Abandoned searches cost zero.
+**Caching: deliberately light** — cross-user same-number+date hits are rare at
+this app's scale (long-tail flight numbers), so only a short-TTL (~1h)
+retry-absorber cache + a unit-usage log; revisit only if telemetry says so.
+The provider client stays behind its own backend module boundary (like
+`fr24/`) so a later provider swap touches one file.
+
+**Release decision 2026-07-27: no partial releases.** The flight-date feature
+ships as ONE release: date + upcoming-flight search + lifecycle payoffs —
+WITHOUT weather. Weather remains the follow-up that reuses the schema
+(`scheduledDepartureUtc` + `departureUtcOffsetMinutes` stored from day one).
+
+**Flow decision 2026-07-27 (revised same day): pick number first, then date.**
+For real flights the user reaches a dated 7-day schedule list ("Tue 4 Aug ·
+09:15") via `search_upcoming_flights_by_number` — soft-gated beyond 7 days
+with a dateless escape hatch. Flight-number search: number → dated list
+directly. Airport-pair search: KEEPS today's candidate step (FR24, 0 ADB
+units) — the user picks the flight number exactly as now, and only then the
+schedule call runs for that one number. Backend stitches each upcoming
+departure to the most recent RECORDED FR24 leg of the same number+pair, so
+the track/corridor pipeline is unchanged. Approximate flights get an optional
+manual date-only chip row instead (see flight_date_feature.md).
 
 ## 7. Turbulence / severe weather — dropped (July 2026 decision)
 

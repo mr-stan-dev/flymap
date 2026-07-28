@@ -6,6 +6,7 @@ import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight_summary.dart';
 import 'package:flymap/domain/usecase/search_flights_by_number_use_case.dart';
+import 'package:flymap/domain/usecase/search_upcoming_flights_by_number_use_case.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/flight_search_repository.dart';
 import 'package:flymap/router/app_router.dart';
@@ -129,6 +130,9 @@ Future<void> _registerScreenDependencies({
   GetIt.I.registerSingleton<SearchFlightsByNumberUseCase>(
     SearchFlightsByNumberUseCase(repository: searchRepository),
   );
+  GetIt.I.registerSingleton<SearchUpcomingFlightsByNumberUseCase>(
+    SearchUpcomingFlightsByNumberUseCase(repository: searchRepository),
+  );
   GetIt.I.registerSingleton<AppAnalytics>(_FakeAppAnalytics());
   GetIt.I.registerSingleton<AppCrashlytics>(_FakeAppCrashlytics());
 }
@@ -193,6 +197,15 @@ class _FakeFlightSearchRepository implements FlightSearchRepository {
         destIcao: 'KJFK',
       ),
     ];
+  }
+
+  // Empty upcoming window: the cubit falls through to the historical search,
+  // which is what these tests exercise.
+  @override
+  Future<List<FlightSummary>> searchUpcomingFlightsByNumber(
+    String flightNumber,
+  ) async {
+    return const <FlightSummary>[];
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flymap/domain/entity/airport.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 
 class FlightPreviewArgs {
   const FlightPreviewArgs({
@@ -6,6 +7,7 @@ class FlightPreviewArgs {
     required this.arrival,
     this.flightNumber,
     this.fr24Id,
+    this.schedule,
     this.hasPendingFlightUnlock = false,
   });
 
@@ -13,5 +15,9 @@ class FlightPreviewArgs {
   final Airport arrival;
   final String? flightNumber;
   final String? fr24Id;
+
+  /// Schedule picked in the search step; null for dateless flights (a date
+  /// can still be added manually on the download step).
+  final FlightSchedule? schedule;
   final bool hasPendingFlightUnlock;
 }

@@ -12,6 +12,7 @@ import 'package:flymap/domain/entity/flight_info.dart';
 import 'package:flymap/domain/entity/flight_operational_data.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_route_source.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/map_detail_level.dart';
 import 'package:flymap/domain/entity/route_overview.dart';
 import 'package:flymap/domain/entity/route_poi_summary.dart';
@@ -50,6 +51,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     required this.arrival,
     this.flightNumber,
     this.fr24Id,
+    FlightSchedule? schedule,
     bool hasPendingFlightUnlock = false,
     required ConnectivityChecker connectivityChecker,
     required GetRouteOverviewUseCase getRouteOverviewUseCase,
@@ -74,6 +76,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
        super(
          FlightPreviewState.initial().copyWith(
            hasPendingFlightUnlock: hasPendingFlightUnlock,
+           flightSchedule: schedule,
          ),
        ) {
     _previewPreparationDelegate = PreviewPreparationDelegate(

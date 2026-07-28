@@ -369,6 +369,14 @@
       "unlockedFlightBody": "All Pro features are enabled for this flight.",
       "tooltip": "Pro access info"
     },
+    "travelDate": {
+      "inDays": "In $count days",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "stepTitle": "When are you flying?",
+      "customDate": "Pick another date",
+      "skipDate": "Continue without a date"
+    },
     "flightNumberSearch": {
       "title": "Flight number",
       "subtitle": "Enter a flight number (for example BA117).",
@@ -384,6 +392,7 @@
       "airportsFallbackButton": "Find by airports",
       "confirmTitle": "Confirm flight",
       "foundTitle": "We found your flight",
+      "beyondWindowHint": "Flying later? For the freshest and most accurate flight map, we recommend downloading within 7 days of your flight.",
       "basedOnSameFlightOn": "* Based on the most recent recorded route for the same flight"
     },
     "realRouteAirportSearch": {

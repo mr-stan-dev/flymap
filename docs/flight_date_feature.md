@@ -1,9 +1,51 @@
 # Flight date — optional travel date on flights (feature spec)
 
-Status: **planned, not implemented.** Decision made July 2026: we will add an optional
-travel date to flights, but not in the current iteration. This documents the agreed
-motivation, design constraints, and the future features the date unlocks, so it can be
-built later without re-litigating the "why".
+Status: **implemented 2026-07-27 (uncommitted), pending device verification.**
+Backend `search_upcoming_flights_by_number` is deployed to production (create-only
+deploy, existing functions untouched; smoke-tested live with LH1114). App side built:
+`FlightSchedule` on `Flight` (+ `Flight.copyWith`, all rebuild sites converted),
+DB persistence under the `schedule` key (no migration, legacy reads null), a dedicated
+"When are you flying?" step (`TravelDatePickScreen`, route `/travel-date`) that
+EVERY create-flight flow passes through before the route overview — the user
+picks the flight/route first (one card per distinct flight, dates deduplicated
+away), then the date on this step: real flights list the number's actual
+scheduled departure days with times (7-day window; airport-pair flow fetches
+them on this step, number flow passes them along from the search), approximate
+and schedule-less flights get a generic Today..+6 list; both end with a
+custom-date row (up to a year ahead, date-only) and a "continue without a
+date" escape hatch, with the beyond-7-days freshness hint for real flights.
+The travel-date step is the ONLY place a date is picked — the download
+(Wikipedia articles) screen has no date UI. Home-card countdown pill
+("Today · 09:15" / "Tomorrow" / "In X days") and date-aware sorting (dated
+upcoming first, soonest on top). NOT built: past-date archive prompt, day-of
+notification. The rest of this doc records the agreed motivation and design
+constraints.
+
+> **Update 2026-07-27 — release shape decided (supersedes entry-point details
+> below):** ships as ONE release, not in parts, WITHOUT weather. Final flow:
+>
+> - **Real flights: the search results ARE the date picker.** Searching by
+>   flight number or airport pair shows actual UPCOMING departures for the
+>   next 7 days ("LH1114 · Tue 4 Aug 09:15"), via AeroDataBox (account exists,
+>   free tier for dev). Picking one sets number + route + date + time in a
+>   single tap — no separate date step. Beyond 7 days: soft gate — a polite
+>   note that maps are most accurate within 7 days of the flight, plus a
+>   "save without a date" escape hatch (today's dateless flow). Schedule miss
+>   (charters, seasonal): fall back to the current historical-candidate flow,
+>   dateless.
+> - **Approximate flights: optional manual date.** A skippable
+>   `[Today] [Tomorrow] [📅 Pick date]` chip row on the download step,
+>   date-only, no time. Rationale for including them: the day-before
+>   notification, countdown, sorting and archive are date-only and
+>   flight-type-blind — free users are the biggest population and the
+>   conversion pool, and a half-sorted home list would read as a bug.
+> - **Schema stored from day one (weather-ready):** `travelDate` (date-only,
+>   always optional) on every flight; `scheduledDepartureUtc` +
+>   `departureUtcOffsetMinutes` only from schedule picks. Never prefill from
+>   FR24 `historicalFlightDate` (stale cache).
+> - Corridor/track still builds from the most recent RECORDED FR24 leg; the
+>   schedule pick is stitched to it by flight number + airport pair behind
+>   the scenes (see flight_weather_feature.md §6 for the backend shape).
 
 Context for the decision: the date buys **nothing for data fetching today** — flights
 download the most recent route/track regardless of date, and there is no per-date

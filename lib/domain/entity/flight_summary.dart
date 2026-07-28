@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight_route_metrics.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 
 class FlightSummary extends Equatable {
   const FlightSummary({
@@ -16,6 +17,10 @@ class FlightSummary extends Equatable {
     this.aircraftType,
     this.departure,
     this.arrival,
+    this.travelDateLocal,
+    this.scheduledDepartureUtc,
+    this.scheduledArrivalUtc,
+    this.departureUtcOffsetMinutes,
   });
 
   final String? flightNumber;
@@ -32,6 +37,33 @@ class FlightSummary extends Equatable {
   final String? aircraftType;
   final Airport? departure;
   final Airport? arrival;
+
+  /// Upcoming-schedule fields — set only by the upcoming-flights search,
+  /// null for historical candidates.
+  final DateTime? travelDateLocal;
+  final DateTime? scheduledDepartureUtc;
+  final DateTime? scheduledArrivalUtc;
+  final int? departureUtcOffsetMinutes;
+
+  bool get isUpcoming => travelDateLocal != null;
+
+  /// Scheduled departure as wall-clock time at the departure airport.
+  DateTime? get scheduledDepartureLocal {
+    final utc = scheduledDepartureUtc;
+    if (utc == null) return null;
+    return utc.add(Duration(minutes: departureUtcOffsetMinutes ?? 0));
+  }
+
+  /// The persisted schedule for this candidate, or null when dateless.
+  FlightSchedule? get schedule {
+    final travelDate = travelDateLocal;
+    if (travelDate == null) return null;
+    return FlightSchedule(
+      travelDate: DateTime(travelDate.year, travelDate.month, travelDate.day),
+      scheduledDepartureUtc: scheduledDepartureUtc,
+      departureUtcOffsetMinutes: departureUtcOffsetMinutes,
+    );
+  }
 
   int? get displayActualDistanceKm {
     final distanceKm = _toFiniteDouble(actualDistanceKm);
@@ -67,6 +99,11 @@ class FlightSummary extends Equatable {
       actualDistanceKm: _toFiniteDouble(map['actualDistanceKm']),
       actualDurationMinutes: _toInt(map['actualDurationMinutes']),
       aircraftType: _toNonEmptyString(map['aircraftType']),
+      // Present only in search_upcoming_flights_by_number payloads.
+      travelDateLocal: _toLocalDate(map['dateLocal']),
+      scheduledDepartureUtc: _toUtcInstant(map['stdUtc']),
+      scheduledArrivalUtc: _toUtcInstant(map['staUtc']),
+      departureUtcOffsetMinutes: _toInt(map['utcOffsetMinutes']),
     );
   }
 
@@ -83,6 +120,10 @@ class FlightSummary extends Equatable {
     String? aircraftType,
     Airport? departure,
     Airport? arrival,
+    DateTime? travelDateLocal,
+    DateTime? scheduledDepartureUtc,
+    DateTime? scheduledArrivalUtc,
+    int? departureUtcOffsetMinutes,
   }) {
     return FlightSummary(
       flightNumber: flightNumber ?? this.flightNumber,
@@ -98,6 +139,12 @@ class FlightSummary extends Equatable {
       aircraftType: aircraftType ?? this.aircraftType,
       departure: departure ?? this.departure,
       arrival: arrival ?? this.arrival,
+      travelDateLocal: travelDateLocal ?? this.travelDateLocal,
+      scheduledDepartureUtc:
+          scheduledDepartureUtc ?? this.scheduledDepartureUtc,
+      scheduledArrivalUtc: scheduledArrivalUtc ?? this.scheduledArrivalUtc,
+      departureUtcOffsetMinutes:
+          departureUtcOffsetMinutes ?? this.departureUtcOffsetMinutes,
     );
   }
 
@@ -151,6 +198,22 @@ class FlightSummary extends Equatable {
     return null;
   }
 
+  /// "2026-08-03" -> local-zone date-only DateTime (calendar day at the
+  /// departure airport; no instant semantics).
+  static DateTime? _toLocalDate(dynamic raw) {
+    final value = _toNonEmptyString(raw);
+    if (value == null) return null;
+    final parsed = DateTime.tryParse(value);
+    if (parsed == null) return null;
+    return DateTime(parsed.year, parsed.month, parsed.day);
+  }
+
+  static DateTime? _toUtcInstant(dynamic raw) {
+    final value = _toNonEmptyString(raw);
+    if (value == null) return null;
+    return DateTime.tryParse(value)?.toUtc();
+  }
+
   @override
   List<Object?> get props => [
     flightNumber,
@@ -165,5 +228,9 @@ class FlightSummary extends Equatable {
     aircraftType,
     departure,
     arrival,
+    travelDateLocal,
+    scheduledDepartureUtc,
+    scheduledArrivalUtc,
+    departureUtcOffsetMinutes,
   ];
 }

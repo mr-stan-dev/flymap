@@ -369,6 +369,14 @@
       "unlockedFlightBody": "Toutes les fonctionnalités Pro sont activées pour ce vol.",
       "tooltip": "Infos d’accès Pro"
     },
+    "travelDate": {
+      "inDays": "Dans $count jours",
+      "today": "Aujourd'hui",
+      "tomorrow": "Demain",
+      "stepTitle": "Quand partez-vous ?",
+      "customDate": "Choisir une autre date",
+      "skipDate": "Continuer sans date"
+    },
     "flightNumberSearch": {
       "title": "Numéro de vol",
       "subtitle": "Saisissez un numéro de vol (par exemple BA117).",
@@ -384,6 +392,7 @@
       "airportsFallbackButton": "Trouver par aéroports",
       "confirmTitle": "Confirmer le vol",
       "foundTitle": "Nous avons trouvé votre vol",
+      "beyondWindowHint": "Vous volez plus tard ? Pour une carte de vol la plus récente et précise, nous recommandons de la télécharger dans les 7 jours précédant votre vol.",
       "basedOnSameFlightOn": "* Basé sur l’itinéraire enregistré le plus récent pour ce même vol"
     },
     "realRouteAirportSearch": {

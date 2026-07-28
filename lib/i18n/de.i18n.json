@@ -369,6 +369,14 @@
       "unlockedFlightBody": "Alle Pro-Funktionen sind für diesen Flug aktiviert.",
       "tooltip": "Infos zum Pro-Zugriff"
     },
+    "travelDate": {
+      "inDays": "In $count Tagen",
+      "today": "Heute",
+      "tomorrow": "Morgen",
+      "stepTitle": "Wann fliegst du?",
+      "customDate": "Anderes Datum wählen",
+      "skipDate": "Ohne Datum fortfahren"
+    },
     "flightNumberSearch": {
       "title": "Flugnummer",
       "subtitle": "Gib eine Flugnummer ein (zum Beispiel BA117).",
@@ -384,6 +392,7 @@
       "airportsFallbackButton": "Nach Flughäfen suchen",
       "confirmTitle": "Flug bestätigen",
       "foundTitle": "Wir haben deinen Flug gefunden",
+      "beyondWindowHint": "Fliegst du später? Für die aktuellste und genaueste Flugkarte empfehlen wir den Download innerhalb von 7 Tagen vor deinem Flug.",
       "basedOnSameFlightOn": "* Basierend auf der zuletzt aufgezeichneten Route für denselben Flug"
     },
     "realRouteAirportSearch": {

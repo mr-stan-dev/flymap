@@ -2,6 +2,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/learn_article_content.dart';
 import 'package:flymap/ui/screens/create_flight/download_completed/download_completed_args.dart';
 import 'package:flymap/ui/screens/create_flight/download_completed/download_completed_screen.dart';
@@ -11,6 +12,7 @@ import 'package:flymap/ui/screens/create_flight/flight_number_search/flight_numb
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_args.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_preview_screen.dart';
 import 'package:flymap/ui/screens/create_flight/real_route_airport_search/real_route_airport_search_screen.dart';
+import 'package:flymap/ui/screens/create_flight/travel_date/travel_date_pick_screen.dart';
 import 'package:flymap/ui/screens/create_flight/route_type_selector/route_type_selector_screen.dart';
 import 'package:flymap/ui/screens/feedback/feedback_screen.dart';
 import 'package:flymap/ui/screens/feedback/feedback_screen_args.dart';
@@ -37,6 +39,7 @@ class AppRouter {
   static const String realRouteAirportSearchRoute =
       '/real-route-airport-search';
   static const String flightPreviewRoute = '/flight-preview';
+  static const String travelDatePickRoute = '/travel-date';
   static const String flightRoute = '/flight';
   static const String shareImageRoute = '/share-image';
   static const String flightVideoRoute = '/flight-video';
@@ -113,6 +116,18 @@ class AppRouter {
         ),
 
         GoRoute(
+          path: travelDatePickRoute,
+          name: 'travel-date',
+          builder: (context, state) {
+            final args = state.extra as TravelDatePickArgs?;
+            if (args == null) {
+              return const AirportsSearchScreen();
+            }
+            return TravelDatePickScreen(args: args);
+          },
+        ),
+
+        GoRoute(
           path: flightPreviewRoute,
           name: 'flight-preview',
           builder: (context, state) {
@@ -121,6 +136,7 @@ class AppRouter {
             final arrival = extra?['arrival'] as Airport?;
             final flightNumber = extra?['flightNumber'] as String?;
             final fr24Id = extra?['fr24Id'] as String?;
+            final schedule = extra?['schedule'] as FlightSchedule?;
             final hasPendingFlightUnlock =
                 extra?['hasPendingFlightUnlock'] as bool? ?? false;
             if (departure == null || arrival == null) {
@@ -132,6 +148,7 @@ class AppRouter {
                 arrival: arrival,
                 flightNumber: flightNumber,
                 fr24Id: fr24Id,
+                schedule: schedule,
                 hasPendingFlightUnlock: hasPendingFlightUnlock,
               ),
             );
@@ -312,12 +329,22 @@ class AppRouter {
   }
 
   /// Navigate to flight overview with selected airports
+  /// Navigate to the dedicated "When are you flying?" step. Every
+  /// create-flight flow goes through it before the route overview.
+  static void goToTravelDatePick(
+    BuildContext context, {
+    required TravelDatePickArgs args,
+  }) {
+    context.push(travelDatePickRoute, extra: args);
+  }
+
   static void goToFlightOverview(
     BuildContext context, {
     required Airport departure,
     required Airport arrival,
     String? flightNumber,
     String? fr24Id,
+    FlightSchedule? schedule,
     bool hasPendingFlightUnlock = false,
   }) {
     final extra = <String, dynamic>{
@@ -330,6 +357,9 @@ class AppRouter {
     }
     if (fr24Id != null && fr24Id.trim().isNotEmpty) {
       extra['fr24Id'] = fr24Id;
+    }
+    if (schedule != null) {
+      extra['schedule'] = schedule;
     }
     context.push(flightPreviewRoute, extra: extra);
   }

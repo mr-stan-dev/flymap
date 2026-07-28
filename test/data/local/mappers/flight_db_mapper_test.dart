@@ -4,6 +4,7 @@ import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/entity/flight_info.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_timestamp.dart';
 import 'package:flymap/domain/entity/flight_waypoint.dart';
 import 'package:latlong2/latlong.dart';
@@ -95,6 +96,64 @@ void main() {
       expect(restored.info.overview, 'Legacy overview');
       expect(restored.info.routeCruiseMinutes, 125);
       expect(restored.route.greatCircleDistanceKm, greaterThan(0));
+    });
+  });
+
+  group('FlightDbMapper schedule', () {
+    test('round-trips a full schedule pick', () {
+      final mapper = FlightDbMapper();
+      final flight = _flight(id: 'flight-scheduled').copyWith(
+        schedule: FlightSchedule(
+          travelDate: DateTime(2026, 8, 3),
+          scheduledDepartureUtc: DateTime.utc(2026, 8, 3, 7, 15),
+          departureUtcOffsetMinutes: 120,
+        ),
+      );
+
+      final restored = mapper.fromDb(mapper.toDb(flight));
+
+      expect(restored.schedule, isNotNull);
+      expect(restored.schedule!.travelDate, DateTime(2026, 8, 3));
+      expect(
+        restored.schedule!.scheduledDepartureUtc,
+        DateTime.utc(2026, 8, 3, 7, 15),
+      );
+      expect(restored.schedule!.departureUtcOffsetMinutes, 120);
+      expect(
+        restored.schedule!.scheduledDepartureLocal,
+        DateTime.utc(2026, 8, 3, 9, 15),
+      );
+    });
+
+    test('round-trips a date-only schedule and normalizes the time away', () {
+      final mapper = FlightDbMapper();
+      final flight = _flight(id: 'flight-dated').copyWith(
+        schedule: FlightSchedule.dateOnly(DateTime(2026, 8, 3, 17, 42)),
+      );
+
+      final restored = mapper.fromDb(mapper.toDb(flight));
+
+      expect(restored.schedule!.travelDate, DateTime(2026, 8, 3));
+      expect(restored.schedule!.scheduledDepartureUtc, isNull);
+      expect(restored.schedule!.hasScheduledTime, isFalse);
+    });
+
+    test('legacy records without schedule read back as null', () {
+      final mapper = FlightDbMapper();
+      final raw = mapper.toDb(_flight(id: 'flight-legacy'));
+
+      expect(raw.containsKey(FlightDBKeys.schedule), isFalse);
+      expect(mapper.fromDb(raw).schedule, isNull);
+    });
+
+    test('corrupt schedule map degrades to null, not a crash', () {
+      final mapper = FlightDbMapper();
+      final raw = mapper.toDb(_flight(id: 'flight-corrupt'));
+      raw[FlightDBKeys.schedule] = <String, dynamic>{
+        FlightDBKeys.travelDate: 'not-a-date',
+      };
+
+      expect(mapper.fromDb(raw).schedule, isNull);
     });
   });
 }

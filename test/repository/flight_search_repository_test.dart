@@ -4,6 +4,7 @@ import 'package:flymap/data/api/flight_lookup_api.dart';
 import 'package:flymap/data/api/flight_number_search_api.dart';
 import 'package:flymap/data/api/flight_route_preview_api.dart';
 import 'package:flymap/data/api/flight_route_search_api.dart';
+import 'package:flymap/data/api/upcoming_flight_search_api.dart';
 import 'package:flymap/data/local/airlines_database.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/domain/entity/airport.dart';
@@ -20,6 +21,7 @@ void main() {
       repository = ApiFlightSearchRepository(
         lookupApi: _FakeFlightLookupApi(),
         numberSearchApi: _FakeFlightNumberSearchApi(),
+        upcomingSearchApi: _FakeUpcomingFlightSearchApi(),
         routeSearchApi: routeSearchApi,
         routePreviewApi: _FakeFlightRoutePreviewApi(),
         airportsDb: AirportsDatabase.test(
@@ -172,6 +174,17 @@ class _FakeFlightNumberSearchApi extends FlightNumberSearchApi {
 
   @override
   Future<List<Map<String, dynamic>>> searchFlightsByNumber(String flightNumber) {
+    throw UnimplementedError();
+  }
+}
+
+class _FakeUpcomingFlightSearchApi extends UpcomingFlightSearchApi {
+  _FakeUpcomingFlightSearchApi() : super();
+
+  @override
+  Future<List<Map<String, dynamic>>> searchUpcomingFlightsByNumber(
+    String flightNumber,
+  ) {
     throw UnimplementedError();
   }
 }

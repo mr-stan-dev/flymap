@@ -6,6 +6,7 @@ import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/domain/entity/flight_summary.dart';
 import 'package:flymap/domain/usecase/search_flights_by_number_use_case.dart';
+import 'package:flymap/domain/usecase/search_upcoming_flights_by_number_use_case.dart';
 import 'package:flymap/i18n/strings.g.dart';
 
 import 'flight_number_search_state.dart';
@@ -14,14 +15,20 @@ import 'flight_number_validator.dart';
 class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
   FlightNumberSearchCubit({
     required SearchFlightsByNumberUseCase searchFlightsByNumberUseCase,
+    required SearchUpcomingFlightsByNumberUseCase
+    searchUpcomingFlightsByNumberUseCase,
     required AppAnalytics analytics,
     required AppCrashlytics crashlytics,
   }) : _searchFlightsByNumberUseCase = searchFlightsByNumberUseCase,
+       _searchUpcomingFlightsByNumberUseCase =
+           searchUpcomingFlightsByNumberUseCase,
        _analytics = analytics,
        _crashlytics = crashlytics,
        super(const FlightNumberSearchInitial());
 
   final SearchFlightsByNumberUseCase _searchFlightsByNumberUseCase;
+  final SearchUpcomingFlightsByNumberUseCase
+  _searchUpcomingFlightsByNumberUseCase;
   final AppAnalytics _analytics;
   final AppCrashlytics _crashlytics;
 
@@ -30,6 +37,40 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
     if (normalized == null) return;
 
     emit(const FlightNumberSearchLoading());
+
+    // Upcoming scheduled departures first (next 7 days). The dated entries
+    // are grouped per distinct flight (number + pair) so the user picks ONE
+    // card here and the date on the dedicated travel-date step — seven
+    // near-identical dated cards are impossible to tell apart. Any upcoming
+    // failure degrades to the historical search rather than blocking the
+    // flow.
+    try {
+      final upcoming = await _searchUpcomingFlightsByNumberUseCase.call(
+        normalized,
+      );
+      if (upcoming.isNotEmpty) {
+        final groups = <String, List<FlightSummary>>{};
+        for (final flight in upcoming) {
+          groups.putIfAbsent(candidateGroupKey(flight), () => []).add(flight);
+        }
+        final representatives = groups.values
+            .map((group) => group.first)
+            .toList(growable: false);
+        _logLookupResult(result: FlightNumberLookupResult.success);
+        emit(
+          FlightNumberSearchResultsLoaded(
+            candidates: representatives,
+            // Preselect the only (or first) flight so a single tap on
+            // Continue works; users can still switch.
+            selectedCandidate: representatives.first,
+            upcomingGroups: groups,
+          ),
+        );
+        return;
+      }
+    } catch (_) {
+      // Fall through to the historical search below.
+    }
 
     try {
       final candidates = await _searchFlightsByNumberUseCase.call(normalized);
@@ -60,6 +101,16 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
     }
   }
 
+  /// Groups dated departures of the same flight: one card per key.
+  static String candidateGroupKey(FlightSummary flight) {
+    final number = (flight.flightNumber ?? '').toUpperCase();
+    final orig = (flight.origIcao ?? flight.departure?.icaoCode ?? '')
+        .toUpperCase();
+    final dest = (flight.destIcao ?? flight.arrival?.icaoCode ?? '')
+        .toUpperCase();
+    return '$number|$orig|$dest';
+  }
+
   void selectCandidate(FlightSummary candidate) {
     final currentState = state;
     if (currentState is! FlightNumberSearchResultsLoaded) return;
@@ -68,6 +119,7 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
       FlightNumberSearchResultsLoaded(
         candidates: currentState.candidates,
         selectedCandidate: candidate,
+        upcomingGroups: currentState.upcomingGroups,
       ),
     );
   }
@@ -100,6 +152,11 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
               _normalize(selectedCandidate.flightNumber ?? normalized) ??
               normalized,
           fr24Id: selectedCandidate.fr24Id,
+          scheduleOptions:
+              currentState.upcomingGroups[candidateGroupKey(
+                selectedCandidate,
+              )] ??
+              const <FlightSummary>[],
         ),
       );
     } catch (_) {

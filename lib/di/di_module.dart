@@ -12,6 +12,7 @@ import 'package:flymap/data/api/feedback_api.dart';
 import 'package:flymap/data/api/flight_info_api.dart';
 import 'package:flymap/data/api/flight_lookup_api.dart';
 import 'package:flymap/data/api/flight_number_search_api.dart';
+import 'package:flymap/data/api/upcoming_flight_search_api.dart';
 import 'package:flymap/data/api/mapbox_env_config.dart';
 import 'package:flymap/data/api/flight_route_preview_api.dart';
 import 'package:flymap/data/api/flight_route_search_api.dart';
@@ -83,6 +84,7 @@ import 'package:flymap/domain/usecase/download_wikipedia_articles_use_case.dart'
 import 'package:flymap/domain/usecase/get_flight_info_use_case.dart';
 import 'package:flymap/domain/usecase/lookup_flight_by_number_use_case.dart';
 import 'package:flymap/domain/usecase/search_flights_by_number_use_case.dart';
+import 'package:flymap/domain/usecase/search_upcoming_flights_by_number_use_case.dart';
 import 'package:flymap/domain/usecase/build_flight_route_preview_use_case.dart';
 import 'package:flymap/domain/usecase/generate_flight_video_use_case.dart';
 import 'package:flymap/domain/usecase/generate_share_image_use_case.dart';
@@ -181,6 +183,9 @@ class DiModule {
     i.registerLazySingleton<FlightNumberSearchApi>(
       () => FlightNumberSearchApi(),
     );
+    i.registerLazySingleton<UpcomingFlightSearchApi>(
+      () => UpcomingFlightSearchApi(),
+    );
     i.registerLazySingleton<FlightRouteSearchApi>(() => FlightRouteSearchApi());
     i.registerLazySingleton<FlightRoutePreviewApi>(
       () => FlightRoutePreviewApi(),
@@ -198,6 +203,7 @@ class DiModule {
       () => ApiFlightSearchRepository(
         lookupApi: i.get(),
         numberSearchApi: i.get(),
+        upcomingSearchApi: i.get(),
         routeSearchApi: i.get(),
         routePreviewApi: i.get(),
         airportsDb: i.get(),
@@ -209,6 +215,9 @@ class DiModule {
     );
     i.registerLazySingleton<SearchFlightsByNumberUseCase>(
       () => SearchFlightsByNumberUseCase(repository: i.get()),
+    );
+    i.registerLazySingleton<SearchUpcomingFlightsByNumberUseCase>(
+      () => SearchUpcomingFlightsByNumberUseCase(repository: i.get()),
     );
     i.registerLazySingleton<BuildFlightRoutePreviewUseCase>(
       () => BuildFlightRoutePreviewUseCase(repository: i.get()),

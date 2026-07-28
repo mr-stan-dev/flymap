@@ -16,6 +16,7 @@ import 'package:flymap/ui/screens/create_flight/flight_number_search/widgets/sea
 import 'package:flymap/ui/screens/create_flight/airports_search/viewmodel/airport_selection_screen_state.dart';
 import 'package:flymap/ui/screens/create_flight/airports_search/widgets/flight_search_airport_selection_step.dart';
 import 'package:flymap/ui/screens/create_flight/airports_search/widgets/selected_departure_row.dart';
+import 'package:flymap/ui/screens/create_flight/travel_date/travel_date_pick_screen.dart';
 import 'package:get_it/get_it.dart';
 
 import 'viewmodel/real_route_airport_search_cubit.dart';
@@ -87,13 +88,17 @@ class _RealRouteAirportSearchScreenState
               }
               final selection = state.pendingSelection;
               if (selection != null) {
-                AppRouter.goToFlightOverview(
+                // Flight confirmed — the date is picked on its own step,
+                // which fetches this number's 7-day schedule itself.
+                AppRouter.goToTravelDatePick(
                   context,
-                  departure: selection.departure,
-                  arrival: selection.arrival,
-                  flightNumber: selection.flightNumber,
-                  fr24Id: selection.fr24Id,
-                  hasPendingFlightUnlock: widget.hasPendingFlightUnlock,
+                  args: TravelDatePickArgs(
+                    departure: selection.departure,
+                    arrival: selection.arrival,
+                    flightNumber: selection.flightNumber,
+                    fr24Id: selection.fr24Id,
+                    hasPendingFlightUnlock: widget.hasPendingFlightUnlock,
+                  ),
                 );
                 context
                     .read<RealRouteAirportSearchCubit>()
@@ -119,18 +124,18 @@ class _RealRouteAirportSearchScreenState
                   ),
                   body: SafeArea(
                     top: false,
-                    child:
-                        state.view ==
-                            RealRouteAirportSearchView.airportSelection
-                        ? _InitialRouteSearchView(
-                            state: state,
-                            searchController: _searchController,
-                          )
-                        : _RouteResultsRouterView(
-                            state: state,
-                            hasPendingFlightUnlock:
-                                widget.hasPendingFlightUnlock,
-                          ),
+                    child: switch (state.view) {
+                      RealRouteAirportSearchView.airportSelection =>
+                        _InitialRouteSearchView(
+                          state: state,
+                          searchController: _searchController,
+                        ),
+                      RealRouteAirportSearchView.results =>
+                        _RouteResultsRouterView(
+                          state: state,
+                          hasPendingFlightUnlock: widget.hasPendingFlightUnlock,
+                        ),
+                    },
                   ),
                 ),
               );

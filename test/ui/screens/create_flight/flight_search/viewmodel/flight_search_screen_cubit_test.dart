@@ -16,6 +16,7 @@ import 'package:flymap/domain/entity/route_poi.dart';
 import 'package:flymap/domain/entity/flight_poi_type.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_route_metrics.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_status.dart';
 import 'package:flymap/domain/entity/flight_waypoint.dart';
 import 'package:flymap/domain/entity/route_overview.dart';
@@ -775,6 +776,13 @@ class _UnusedFlightSearchRepository implements FlightSearchRepository {
   }
 
   @override
+  Future<List<FlightSummary>> searchUpcomingFlightsByNumber(
+    String flightNumber,
+  ) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Airport> resolveAirport({
     LatLng? latLon,
     required String? code,
@@ -810,6 +818,7 @@ class _FakeDownloadMapUseCase implements DownloadMapUseCase {
     required FlightRoute flightRoute,
     required FlightInfo flightInfo,
     FlightOperationalData? flightOperationalData,
+    FlightSchedule? flightSchedule,
     required String flightAccessTier,
     required int maxZoom,
   }) {

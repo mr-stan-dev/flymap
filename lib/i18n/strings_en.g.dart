@@ -958,6 +958,7 @@ class TranslationsCreateFlightEn {
 	late final TranslationsCreateFlightStepsEn steps = TranslationsCreateFlightStepsEn.internal(_root);
 	late final TranslationsCreateFlightRouteTypeSelectorEn routeTypeSelector = TranslationsCreateFlightRouteTypeSelectorEn.internal(_root);
 	late final TranslationsCreateFlightProAccessEn proAccess = TranslationsCreateFlightProAccessEn.internal(_root);
+	late final TranslationsCreateFlightTravelDateEn travelDate = TranslationsCreateFlightTravelDateEn.internal(_root);
 	late final TranslationsCreateFlightFlightNumberSearchEn flightNumberSearch = TranslationsCreateFlightFlightNumberSearchEn.internal(_root);
 	late final TranslationsCreateFlightRealRouteAirportSearchEn realRouteAirportSearch = TranslationsCreateFlightRealRouteAirportSearchEn.internal(_root);
 	late final TranslationsCreateFlightSearchEn search = TranslationsCreateFlightSearchEn.internal(_root);
@@ -2331,6 +2332,33 @@ class TranslationsCreateFlightProAccessEn {
 	String get tooltip => 'Pro access info';
 }
 
+// Path: createFlight.travelDate
+class TranslationsCreateFlightTravelDateEn {
+	TranslationsCreateFlightTravelDateEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'In $count days'
+	String inDays({required Object count}) => 'In ${count} days';
+
+	/// en: 'Today'
+	String get today => 'Today';
+
+	/// en: 'Tomorrow'
+	String get tomorrow => 'Tomorrow';
+
+	/// en: 'When are you flying?'
+	String get stepTitle => 'When are you flying?';
+
+	/// en: 'Pick another date'
+	String get customDate => 'Pick another date';
+
+	/// en: 'Continue without a date'
+	String get skipDate => 'Continue without a date';
+}
+
 // Path: createFlight.flightNumberSearch
 class TranslationsCreateFlightFlightNumberSearchEn {
 	TranslationsCreateFlightFlightNumberSearchEn.internal(this._root);
@@ -2380,6 +2408,9 @@ class TranslationsCreateFlightFlightNumberSearchEn {
 
 	/// en: 'We found your flight'
 	String get foundTitle => 'We found your flight';
+
+	/// en: 'Flying later? For the freshest and most accurate flight map, we recommend downloading within 7 days of your flight.'
+	String get beyondWindowHint => 'Flying later? For the freshest and most accurate flight map, we recommend downloading within 7 days of your flight.';
 
 	/// en: '* Based on the most recent recorded route for the same flight'
 	String get basedOnSameFlightOn => '* Based on the most recent recorded route for the same flight';
@@ -3923,6 +3954,12 @@ extension on Translations {
 			'createFlight.proAccess.unlockedFlight' => 'This flight is unlocked',
 			'createFlight.proAccess.unlockedFlightBody' => 'All Pro features are enabled for this flight.',
 			'createFlight.proAccess.tooltip' => 'Pro access info',
+			'createFlight.travelDate.inDays' => ({required Object count}) => 'In ${count} days',
+			'createFlight.travelDate.today' => 'Today',
+			'createFlight.travelDate.tomorrow' => 'Tomorrow',
+			'createFlight.travelDate.stepTitle' => 'When are you flying?',
+			'createFlight.travelDate.customDate' => 'Pick another date',
+			'createFlight.travelDate.skipDate' => 'Continue without a date',
 			'createFlight.flightNumberSearch.title' => 'Flight number',
 			'createFlight.flightNumberSearch.subtitle' => 'Enter a flight number (for example BA117).',
 			'createFlight.flightNumberSearch.hint' => 'e.g. BA117',
@@ -3937,6 +3974,7 @@ extension on Translations {
 			'createFlight.flightNumberSearch.airportsFallbackButton' => 'Find by airports',
 			'createFlight.flightNumberSearch.confirmTitle' => 'Confirm flight',
 			'createFlight.flightNumberSearch.foundTitle' => 'We found your flight',
+			'createFlight.flightNumberSearch.beyondWindowHint' => 'Flying later? For the freshest and most accurate flight map, we recommend downloading within 7 days of your flight.',
 			'createFlight.flightNumberSearch.basedOnSameFlightOn' => '* Based on the most recent recorded route for the same flight',
 			'createFlight.realRouteAirportSearch.title' => 'Flight by airports',
 			'createFlight.realRouteAirportSearch.subtitle' => 'Choose departure and arrival airports to look up recent real flights on this route.',
@@ -4083,6 +4121,8 @@ extension on Translations {
 			'createFlight.downloading.currentStep' => 'Current',
 			'createFlight.downloading.pending' => 'Pending',
 			'createFlight.downloading.inProgress' => 'In progress',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.downloading.completed' => 'Completed',
 			'createFlight.downloading.completedWithIssues' => 'Completed with issues',
 			'createFlight.downloading.failed' => 'Failed',
@@ -4090,8 +4130,6 @@ extension on Translations {
 			'createFlight.downloading.waitingForMap' => 'Waiting for map download...',
 			'createFlight.downloading.mapFailed' => 'Map download failed.',
 			'createFlight.downloading.noPoiSelected' => 'No place summaries selected.',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.downloading.preparingPoi' => 'Preparing place summaries...',
 			'createFlight.downloading.poiProgress' => ({required Object completed, required Object total}) => 'Places: ${completed}/${total}',
 			'createFlight.downloading.poiProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Places: ${completed}/${total} (${failed} failed)',
@@ -4597,6 +4635,8 @@ extension on Translations {
 			'countries.TD' => 'Chad',
 			'countries.TG' => 'Togo',
 			'countries.TH' => 'Thailand',
+			_ => null,
+		} ?? switch (path) {
 			'countries.TJ' => 'Tajikistan',
 			'countries.TL' => 'Timor-Leste',
 			'countries.TM' => 'Turkmenistan',
@@ -4604,8 +4644,6 @@ extension on Translations {
 			'countries.TR' => 'Turkey',
 			'countries.TT' => 'Trinidad and Tobago',
 			'countries.TW' => 'Taiwan, China',
-			_ => null,
-		} ?? switch (path) {
 			'countries.TZ' => 'Tanzania, United Republic of',
 			'countries.UA' => 'Ukraine',
 			'countries.UG' => 'Uganda',

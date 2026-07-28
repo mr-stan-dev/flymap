@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flymap/domain/entity/flight_offline_content.dart';
 import 'package:flymap/domain/entity/flight_operational_data.dart';
 import 'package:flymap/domain/entity/flight_route_insights.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_status.dart';
 import 'package:flymap/domain/entity/flight_timestamp.dart';
 import 'package:latlong2/latlong.dart';
@@ -25,6 +26,9 @@ class Flight extends Equatable {
   final String flightAccessTier;
   final FlightOperationalData? operationalData;
 
+  /// When the user is flying. Always optional — see [FlightSchedule].
+  final FlightSchedule? schedule;
+
   const Flight({
     required this.id,
     required this.route,
@@ -35,7 +39,35 @@ class Flight extends Equatable {
     this.status = FlightStatus.upcoming,
     this.flightAccessTier = accessTierBasic,
     this.operationalData,
+    this.schedule,
   });
+
+  Flight copyWith({
+    String? id,
+    FlightRoute? route,
+    List<FlightMap>? maps,
+    FlightRouteInsights? routeInsights,
+    FlightOfflineContent? offlineContent,
+    FlightTimestamp? timestamp,
+    FlightStatus? status,
+    String? flightAccessTier,
+    FlightOperationalData? operationalData,
+    FlightSchedule? schedule,
+    bool clearSchedule = false,
+  }) {
+    return Flight(
+      id: id ?? this.id,
+      route: route ?? this.route,
+      maps: maps ?? this.maps,
+      routeInsights: routeInsights ?? this.routeInsights,
+      offlineContent: offlineContent ?? this.offlineContent,
+      timestamp: timestamp ?? this.timestamp,
+      status: status ?? this.status,
+      flightAccessTier: flightAccessTier ?? this.flightAccessTier,
+      operationalData: operationalData ?? this.operationalData,
+      schedule: clearSchedule ? null : (schedule ?? this.schedule),
+    );
+  }
 
   bool get hasProAccess => flightAccessTier == accessTierPro;
 
@@ -70,5 +102,6 @@ class Flight extends Equatable {
     status,
     flightAccessTier,
     operationalData,
+    schedule,
   ];
 }

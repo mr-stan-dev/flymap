@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/flight_summary.dart';
 import 'package:flymap/ui/screens/settings/distance_unit_context.dart';
 import 'package:flymap/utils/duration_format_utils.dart';
+import 'package:flymap/utils/travel_date_format_utils.dart';
 import 'package:flymap/utils/unit_format_utils.dart';
 
 class FlightSummaryCard extends StatelessWidget {
@@ -13,6 +14,10 @@ class FlightSummaryCard extends StatelessWidget {
   /// The airport pair row. Off in the airport-pair search results, where all
   /// candidates share the same route shown once in the header.
   final bool showAirports;
+
+  /// The scheduled date/time row. Off in the flight-pick step, where the
+  /// date is chosen on the dedicated travel-date step afterwards.
+  final bool showSchedule;
   final Widget? trailing;
 
   const FlightSummaryCard({
@@ -20,6 +25,7 @@ class FlightSummaryCard extends StatelessWidget {
     required this.summary,
     this.showBorder = true,
     this.showAirports = true,
+    this.showSchedule = true,
     this.trailing,
   });
 
@@ -52,6 +58,10 @@ class FlightSummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (showSchedule && summary.isUpcoming) ...[
+              _ScheduledDateRow(summary: summary),
+              const SizedBox(height: 12),
+            ],
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,6 +171,38 @@ class FlightSummaryCard extends StatelessWidget {
         ),
       if (aircraftType != null && aircraftType.isNotEmpty) aircraftType,
     ];
+  }
+}
+
+/// Scheduled departure date + local time — the key differentiator when the
+/// user is picking their flight among identical dated departures.
+class _ScheduledDateRow extends StatelessWidget {
+  const _ScheduledDateRow({required this.summary});
+
+  final FlightSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final travelDate = summary.travelDateLocal;
+    if (travelDate == null) return const SizedBox.shrink();
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Row(
+      children: [
+        Icon(Icons.event_rounded, size: 18, color: colorScheme.primary),
+        const SizedBox(width: 6),
+        Text(
+          TravelDateFormatUtils.formatDateWithOptionalTime(
+            travelDate,
+            summary.scheduledDepartureLocal,
+          ),
+          style: textTheme.titleMedium?.copyWith(
+            color: colorScheme.primary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
   }
 }
 

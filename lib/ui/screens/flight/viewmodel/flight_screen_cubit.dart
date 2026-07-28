@@ -126,18 +126,11 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
         return false;
       }
 
-      _currentFlight = Flight(
-        id: _currentFlight.id,
-        route: _currentFlight.route,
-        maps: _currentFlight.maps,
-        routeInsights: _currentFlight.routeInsights,
-        offlineContent: _currentFlight.offlineContent,
+      _currentFlight = _currentFlight.copyWith(
         timestamp: _currentFlight.timestamp.copyWith(
           inProgressAt: DateTime.now(),
         ),
         status: FlightStatus.inProgress,
-        flightAccessTier: _currentFlight.flightAccessTier,
-        operationalData: _currentFlight.operationalData,
       );
 
       final currentState = state;
@@ -167,11 +160,8 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
 
       final current = state;
       if (current is FlightScreenLoaded) {
-        _currentFlight = Flight(
-          id: current.flight.id,
-          route: current.flight.route,
+        _currentFlight = current.flight.copyWith(
           maps: deleteOfflineData ? const [] : current.flight.maps,
-          routeInsights: current.flight.routeInsights,
           offlineContent: deleteOfflineData
               ? current.flight.offlineContent.copyWith(articles: const [])
               : current.flight.offlineContent,
@@ -180,8 +170,6 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
             completedAt: DateTime.now(),
           ),
           status: FlightStatus.completed,
-          flightAccessTier: current.flight.flightAccessTier,
-          operationalData: current.flight.operationalData,
         );
         emit(current.copyWith(flight: _currentFlight));
       }

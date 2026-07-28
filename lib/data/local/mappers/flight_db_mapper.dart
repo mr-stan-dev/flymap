@@ -5,6 +5,7 @@ import 'package:flymap/domain/entity/flight_operational_data.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_route_metrics.dart';
 import 'package:flymap/domain/entity/flight_route_source.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_status.dart';
 import 'package:flymap/domain/entity/flight_timestamp.dart';
 import 'package:flymap/domain/entity/flight_waypoint.dart';
@@ -58,6 +59,10 @@ class FlightDBKeys {
   static const destinationCode = 'destinationCode';
   static const actualDistanceKm = 'actualDistanceKm';
   static const observedAt = 'observedAt';
+  static const schedule = 'schedule';
+  static const travelDate = 'travelDate';
+  static const scheduledDepartureUtc = 'scheduledDepartureUtc';
+  static const departureUtcOffsetMinutes = 'departureUtcOffsetMinutes';
 }
 
 class FlightDbMapper {
@@ -89,6 +94,8 @@ class FlightDbMapper {
         FlightDBKeys.operationalData: _toOperationalDataDb(
           flight.operationalData!,
         ),
+      if (flight.schedule != null)
+        FlightDBKeys.schedule: _toScheduleDb(flight.schedule!),
       FlightDBKeys.updatedAt: nowIso,
     };
     final legacyInfo = _infoMapper.toFlightInfoMap(flight.info);
@@ -236,6 +243,7 @@ class FlightDbMapper {
       status: FlightStatus.fromRaw((map[FlightDBKeys.status] ?? '').toString()),
       flightAccessTier: flightAccessTier,
       operationalData: operationalData,
+      schedule: _fromScheduleDb(map[FlightDBKeys.schedule]),
     );
   }
 
@@ -438,5 +446,43 @@ class FlightDbMapper {
   DateTime? _toDateTime(dynamic raw) {
     final asString = _toNonEmptyString(raw);
     return asString == null ? null : DateTime.tryParse(asString);
+  }
+
+  Map<String, dynamic> _toScheduleDb(FlightSchedule schedule) {
+    final travelDate = schedule.travelDate;
+    final yyyy = travelDate.year.toString().padLeft(4, '0');
+    final mm = travelDate.month.toString().padLeft(2, '0');
+    final dd = travelDate.day.toString().padLeft(2, '0');
+    return <String, dynamic>{
+      // Date-only on purpose: no time component to mis-parse across zones.
+      FlightDBKeys.travelDate: '$yyyy-$mm-$dd',
+      if (schedule.scheduledDepartureUtc != null)
+        FlightDBKeys.scheduledDepartureUtc: schedule.scheduledDepartureUtc!
+            .toUtc()
+            .toIso8601String(),
+      if (schedule.departureUtcOffsetMinutes != null)
+        FlightDBKeys.departureUtcOffsetMinutes:
+            schedule.departureUtcOffsetMinutes,
+    };
+  }
+
+  FlightSchedule? _fromScheduleDb(dynamic raw) {
+    if (raw is! Map) return null;
+    final map = raw.cast<String, dynamic>();
+    final travelDateRaw = _toNonEmptyString(map[FlightDBKeys.travelDate]);
+    final travelDate = travelDateRaw == null
+        ? null
+        : DateTime.tryParse(travelDateRaw);
+    if (travelDate == null) return null;
+    final scheduledDepartureUtc = _toDateTime(
+      map[FlightDBKeys.scheduledDepartureUtc],
+    )?.toUtc();
+    return FlightSchedule(
+      travelDate: DateTime(travelDate.year, travelDate.month, travelDate.day),
+      scheduledDepartureUtc: scheduledDepartureUtc,
+      departureUtcOffsetMinutes: _toInt(
+        map[FlightDBKeys.departureUtcOffsetMinutes],
+      ),
+    );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flymap/data/api/flight_lookup_api.dart';
 import 'package:flymap/data/api/flight_number_search_api.dart';
 import 'package:flymap/data/api/flight_route_preview_api.dart';
 import 'package:flymap/data/api/flight_route_search_api.dart';
+import 'package:flymap/data/api/upcoming_flight_search_api.dart';
 import 'package:flymap/data/local/airlines_database.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/domain/entity/airport.dart';
@@ -14,6 +15,13 @@ abstract interface class FlightSearchRepository {
   Future<FlightSummary> lookupFlightByNumber(String flightNumber);
 
   Future<List<FlightSummary>> searchFlightsByNumber(String flightNumber);
+
+  /// Upcoming scheduled departures (7-day window) for a flight number,
+  /// dated and stitched to recorded FR24 legs. Throws `not-found` when the
+  /// number has no departures in the window.
+  Future<List<FlightSummary>> searchUpcomingFlightsByNumber(
+    String flightNumber,
+  );
 
   Future<List<FlightSummary>> searchFlightsByRoute({
     required String departureCode,
@@ -43,12 +51,14 @@ class ApiFlightSearchRepository implements FlightSearchRepository {
   ApiFlightSearchRepository({
     required FlightLookupApi lookupApi,
     required FlightNumberSearchApi numberSearchApi,
+    required UpcomingFlightSearchApi upcomingSearchApi,
     required FlightRouteSearchApi routeSearchApi,
     required FlightRoutePreviewApi routePreviewApi,
     required AirportsDatabase airportsDb,
     required AirlinesDatabase airlinesDb,
   }) : _lookupApi = lookupApi,
        _numberSearchApi = numberSearchApi,
+       _upcomingSearchApi = upcomingSearchApi,
        _routeSearchApi = routeSearchApi,
        _routePreviewApi = routePreviewApi,
        _airportsDb = airportsDb,
@@ -56,6 +66,7 @@ class ApiFlightSearchRepository implements FlightSearchRepository {
 
   final FlightLookupApi _lookupApi;
   final FlightNumberSearchApi _numberSearchApi;
+  final UpcomingFlightSearchApi _upcomingSearchApi;
   final FlightRouteSearchApi _routeSearchApi;
   final FlightRoutePreviewApi _routePreviewApi;
   final AirportsDatabase _airportsDb;
@@ -72,6 +83,16 @@ class ApiFlightSearchRepository implements FlightSearchRepository {
   Future<List<FlightSummary>> searchFlightsByNumber(String flightNumber) async {
     final flights = await _numberSearchApi.searchFlightsByNumber(flightNumber);
     return _enrichFlightSummaries(flights, logPrefix: 'numberMatch');
+  }
+
+  @override
+  Future<List<FlightSummary>> searchUpcomingFlightsByNumber(
+    String flightNumber,
+  ) async {
+    final flights = await _upcomingSearchApi.searchUpcomingFlightsByNumber(
+      flightNumber,
+    );
+    return _enrichFlightSummaries(flights, logPrefix: 'upcomingMatch');
   }
 
   @override

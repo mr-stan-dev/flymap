@@ -45,6 +45,13 @@ class _FakeFlightSearchRepository implements FlightSearchRepository {
   }
 
   @override
+  Future<List<FlightSummary>> searchUpcomingFlightsByNumber(
+    String flightNumber,
+  ) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Airport> resolveAirport({
     LatLng? latLon,
     required String? code,

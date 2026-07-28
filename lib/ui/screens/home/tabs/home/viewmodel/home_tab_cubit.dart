@@ -305,7 +305,24 @@ class HomeTabCubit extends Cubit<HomeTabState> {
     final sorted = [..._allFlights];
     switch (_sort) {
       case HomeFlightsSort.mostRecent:
-        sorted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        // Dated upcoming flights first (soonest departure on top), then the
+        // dateless/past ones by creation date as before.
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        DateTime? upcomingTravelDate(Flight flight) {
+          final travelDate = flight.schedule?.travelDate;
+          if (travelDate == null) return null;
+          if (flight.status == FlightStatus.completed) return null;
+          return travelDate.isBefore(today) ? null : travelDate;
+        }
+        sorted.sort((a, b) {
+          final dateA = upcomingTravelDate(a);
+          final dateB = upcomingTravelDate(b);
+          if (dateA != null && dateB != null) return dateA.compareTo(dateB);
+          if (dateA != null) return -1;
+          if (dateB != null) return 1;
+          return b.createdAt.compareTo(a.createdAt);
+        });
         break;
       case HomeFlightsSort.longestDistance:
         sorted.sort(

@@ -297,6 +297,8 @@ class RealRouteAirportSearchCubit extends Cubit<RealRouteAirportSearchState> {
     await searchFlights();
   }
 
+  /// Candidate confirmed — the date is picked on the dedicated travel-date
+  /// step, which the screen navigates to via [pendingSelection].
   void confirmSelectedFlight() {
     final flight = state.selectedMatchedFlight;
     if (flight == null) return;

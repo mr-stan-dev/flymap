@@ -1,5 +1,4 @@
 import 'package:flymap/data/local/flights_db_service.dart';
-import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/entity/flight_status.dart';
 import 'package:flymap/domain/usecase/flight_assets_deleter.dart';
 
@@ -33,19 +32,14 @@ class CompleteFlightUseCase {
     // are kept (offline maps/articles are keyed by route, not flight).
     await _assetsDeleter.deleteAssets(flight);
 
-    final updated = Flight(
-      id: flight.id,
-      route: flight.route,
+    final updated = flight.copyWith(
       maps: const [],
-      routeInsights: flight.routeInsights,
       offlineContent: flight.offlineContent.copyWith(articles: const []),
       timestamp: flight.timestamp.copyWith(
         clearInProgressAt: true,
         completedAt: DateTime.now(),
       ),
       status: FlightStatus.completed,
-      flightAccessTier: flight.flightAccessTier,
-      operationalData: flight.operationalData,
     );
     await _service.saveOrUpdateFlight(updated);
     return true;

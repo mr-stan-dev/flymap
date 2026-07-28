@@ -50,16 +50,9 @@ class FlightsDBService {
   Future<bool> updateFlightInfo(String flightId, FlightInfo info) async {
     final existing = await getFlightById(flightId);
     if (existing == null) return false;
-    final updated = Flight(
-      id: existing.id,
-      route: existing.route,
-      maps: existing.maps,
+    final updated = existing.copyWith(
       routeInsights: info.routeInsights,
       offlineContent: info.offlineContent,
-      timestamp: existing.timestamp,
-      status: existing.status,
-      flightAccessTier: existing.flightAccessTier,
-      operationalData: existing.operationalData,
     );
     await saveOrUpdateFlight(updated);
     return true;
@@ -68,17 +61,7 @@ class FlightsDBService {
   Future<bool> updateFlightMaps(String flightId, List<FlightMap> maps) async {
     final existing = await getFlightById(flightId);
     if (existing == null) return false;
-    final updated = Flight(
-      id: existing.id,
-      route: existing.route,
-      maps: maps,
-      routeInsights: existing.routeInsights,
-      offlineContent: existing.offlineContent,
-      timestamp: existing.timestamp,
-      status: existing.status,
-      flightAccessTier: existing.flightAccessTier,
-      operationalData: existing.operationalData,
-    );
+    final updated = existing.copyWith(maps: maps);
     await saveOrUpdateFlight(updated);
     return true;
   }
@@ -108,20 +91,13 @@ class FlightsDBService {
         nextCompletedAt = completedAt ?? existing.completedAt ?? DateTime.now();
         break;
     }
-    final updated = Flight(
-      id: existing.id,
-      route: existing.route,
-      maps: existing.maps,
-      routeInsights: existing.routeInsights,
-      offlineContent: existing.offlineContent,
+    final updated = existing.copyWith(
       timestamp: FlightTimestamp(
         createdAt: existing.createdAt,
         inProgressAt: nextInProgressAt,
         completedAt: nextCompletedAt,
       ),
       status: status,
-      flightAccessTier: existing.flightAccessTier,
-      operationalData: existing.operationalData,
     );
     await saveOrUpdateFlight(updated);
     return true;
@@ -317,18 +293,10 @@ class FlightsDBService {
       );
     }).toList();
 
-    return Flight(
-      id: baseFlight.id,
-      route: baseFlight.route,
-      maps: baseFlight.maps,
-      routeInsights: baseFlight.routeInsights,
+    return baseFlight.copyWith(
       offlineContent: baseFlight.offlineContent.copyWith(
         articles: hydratedArticles,
       ),
-      timestamp: baseFlight.timestamp,
-      status: baseFlight.status,
-      flightAccessTier: baseFlight.flightAccessTier,
-      operationalData: baseFlight.operationalData,
     );
   }
 

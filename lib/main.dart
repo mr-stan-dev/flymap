@@ -20,6 +20,7 @@ import 'package:flymap/i18n/app_localization.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:get_it/get_it.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'di/di_module.dart';
 
@@ -53,6 +54,8 @@ void main() async {
       await GetIt.I<AutoCompleteStaleInProgressFlightsUseCase>().call();
 
       await AppLocalization.initLocalization(settingsRepository: GetIt.I());
+      // Date symbols for DateFormat in non-en app locales (de/es/fr).
+      await initializeDateFormatting();
       final hasSeenOnboarding = await GetIt.I<OnboardingRepository>()
           .hasSeenOnboarding();
       Bloc.observer = CubitStateObserver.create();

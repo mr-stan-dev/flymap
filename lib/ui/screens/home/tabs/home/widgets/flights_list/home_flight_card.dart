@@ -14,6 +14,7 @@ import 'package:flymap/ui/screens/home/tabs/home/widgets/flights_list/home_route
 import 'package:flymap/ui/theme/app_colours.dart';
 import 'package:flymap/utils/duration_format_utils.dart';
 import 'package:flymap/utils/route_utils.dart';
+import 'package:flymap/utils/travel_date_format_utils.dart';
 import 'package:flymap/utils/unit_format_utils.dart';
 
 class HomeFlightCard extends StatelessWidget {
@@ -99,6 +100,9 @@ class HomeFlightCard extends StatelessWidget {
               child: _SavedFlightCardBody(
                 distance: distance,
                 duration: duration,
+                travelDateLabel: TravelDateFormatUtils.countdownLabel(
+                  flight.schedule,
+                ),
                 departureCode: departure.displayCode,
                 arrivalCode: arrival.displayCode,
                 departureCountryCode: departure.countryCode,
@@ -208,6 +212,7 @@ class _SavedFlightCardBody extends StatelessWidget {
   const _SavedFlightCardBody({
     required this.distance,
     required this.duration,
+    required this.travelDateLabel,
     required this.departureCode,
     required this.arrivalCode,
     required this.departureCountryCode,
@@ -219,6 +224,7 @@ class _SavedFlightCardBody extends StatelessWidget {
 
   final String distance;
   final String? duration;
+  final String? travelDateLabel;
   final String departureCode;
   final String arrivalCode;
   final String departureCountryCode;
@@ -236,6 +242,8 @@ class _SavedFlightCardBody extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
+            if (travelDateLabel != null)
+              MetaPill(icon: Icons.event_rounded, text: travelDateLabel!),
             MetaPill(icon: Icons.route, text: distance),
             if (duration != null)
               MetaPill(icon: Icons.schedule_rounded, text: duration!),

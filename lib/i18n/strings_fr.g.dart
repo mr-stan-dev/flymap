@@ -406,6 +406,7 @@ class _TranslationsCreateFlightFr extends TranslationsCreateFlightEn {
 	@override late final _TranslationsCreateFlightStepsFr steps = _TranslationsCreateFlightStepsFr._(_root);
 	@override late final _TranslationsCreateFlightRouteTypeSelectorFr routeTypeSelector = _TranslationsCreateFlightRouteTypeSelectorFr._(_root);
 	@override late final _TranslationsCreateFlightProAccessFr proAccess = _TranslationsCreateFlightProAccessFr._(_root);
+	@override late final _TranslationsCreateFlightTravelDateFr travelDate = _TranslationsCreateFlightTravelDateFr._(_root);
 	@override late final _TranslationsCreateFlightFlightNumberSearchFr flightNumberSearch = _TranslationsCreateFlightFlightNumberSearchFr._(_root);
 	@override late final _TranslationsCreateFlightRealRouteAirportSearchFr realRouteAirportSearch = _TranslationsCreateFlightRealRouteAirportSearchFr._(_root);
 	@override late final _TranslationsCreateFlightSearchFr search = _TranslationsCreateFlightSearchFr._(_root);
@@ -953,6 +954,21 @@ class _TranslationsCreateFlightProAccessFr extends TranslationsCreateFlightProAc
 	@override String get tooltip => 'Infos d’accès Pro';
 }
 
+// Path: createFlight.travelDate
+class _TranslationsCreateFlightTravelDateFr extends TranslationsCreateFlightTravelDateEn {
+	_TranslationsCreateFlightTravelDateFr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String inDays({required Object count}) => 'Dans ${count} jours';
+	@override String get today => 'Aujourd\'hui';
+	@override String get tomorrow => 'Demain';
+	@override String get stepTitle => 'Quand partez-vous ?';
+	@override String get customDate => 'Choisir une autre date';
+	@override String get skipDate => 'Continuer sans date';
+}
+
 // Path: createFlight.flightNumberSearch
 class _TranslationsCreateFlightFlightNumberSearchFr extends TranslationsCreateFlightFlightNumberSearchEn {
 	_TranslationsCreateFlightFlightNumberSearchFr._(TranslationsFr root) : this._root = root, super.internal(root);
@@ -974,6 +990,7 @@ class _TranslationsCreateFlightFlightNumberSearchFr extends TranslationsCreateFl
 	@override String get airportsFallbackButton => 'Trouver par aéroports';
 	@override String get confirmTitle => 'Confirmer le vol';
 	@override String get foundTitle => 'Nous avons trouvé votre vol';
+	@override String get beyondWindowHint => 'Vous volez plus tard ? Pour une carte de vol la plus récente et précise, nous recommandons de la télécharger dans les 7 jours précédant votre vol.';
 	@override String get basedOnSameFlightOn => '* Basé sur l’itinéraire enregistré le plus récent pour ce même vol';
 }
 
@@ -1841,6 +1858,12 @@ extension on TranslationsFr {
 			'createFlight.proAccess.unlockedFlight' => 'Ce vol est débloqué',
 			'createFlight.proAccess.unlockedFlightBody' => 'Toutes les fonctionnalités Pro sont activées pour ce vol.',
 			'createFlight.proAccess.tooltip' => 'Infos d’accès Pro',
+			'createFlight.travelDate.inDays' => ({required Object count}) => 'Dans ${count} jours',
+			'createFlight.travelDate.today' => 'Aujourd\'hui',
+			'createFlight.travelDate.tomorrow' => 'Demain',
+			'createFlight.travelDate.stepTitle' => 'Quand partez-vous ?',
+			'createFlight.travelDate.customDate' => 'Choisir une autre date',
+			'createFlight.travelDate.skipDate' => 'Continuer sans date',
 			'createFlight.flightNumberSearch.title' => 'Numéro de vol',
 			'createFlight.flightNumberSearch.subtitle' => 'Saisissez un numéro de vol (par exemple BA117).',
 			'createFlight.flightNumberSearch.hint' => 'ex. BA117',
@@ -1855,6 +1878,7 @@ extension on TranslationsFr {
 			'createFlight.flightNumberSearch.airportsFallbackButton' => 'Trouver par aéroports',
 			'createFlight.flightNumberSearch.confirmTitle' => 'Confirmer le vol',
 			'createFlight.flightNumberSearch.foundTitle' => 'Nous avons trouvé votre vol',
+			'createFlight.flightNumberSearch.beyondWindowHint' => 'Vous volez plus tard ? Pour une carte de vol la plus récente et précise, nous recommandons de la télécharger dans les 7 jours précédant votre vol.',
 			'createFlight.flightNumberSearch.basedOnSameFlightOn' => '* Basé sur l’itinéraire enregistré le plus récent pour ce même vol',
 			'createFlight.realRouteAirportSearch.title' => 'Trouver des vols réels par aéroports',
 			'createFlight.realRouteAirportSearch.subtitle' => 'Choisissez les aéroports de départ et d’arrivée pour rechercher des vols réels récents sur cet itinéraire.',
@@ -2001,6 +2025,8 @@ extension on TranslationsFr {
 			'createFlight.downloading.currentStep' => 'En cours',
 			'createFlight.downloading.pending' => 'En attente',
 			'createFlight.downloading.inProgress' => 'En cours',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.downloading.completed' => 'Terminé',
 			'createFlight.downloading.completedWithIssues' => 'Terminé avec des problèmes',
 			'createFlight.downloading.failed' => 'Échec',
@@ -2008,8 +2034,6 @@ extension on TranslationsFr {
 			'createFlight.downloading.waitingForMap' => 'En attente du téléchargement de la carte...',
 			'createFlight.downloading.mapFailed' => 'Le téléchargement de la carte a échoué.',
 			'createFlight.downloading.noPoiSelected' => 'Aucun résumé de lieu sélectionné.',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.downloading.preparingPoi' => 'Préparation des résumés de lieux...',
 			'createFlight.downloading.poiProgress' => ({required Object completed, required Object total}) => 'Lieux : ${completed}/${total}',
 			'createFlight.downloading.poiProgressWithFailed' => ({required Object completed, required Object total, required Object failed}) => 'Lieux : ${completed}/${total} (${failed} échecs)',
@@ -2515,6 +2539,8 @@ extension on TranslationsFr {
 			'countries.TD' => 'Tchad',
 			'countries.TG' => 'Togo',
 			'countries.TH' => 'Thaïlande',
+			_ => null,
+		} ?? switch (path) {
 			'countries.TJ' => 'Tadjikistan',
 			'countries.TL' => 'Timor oriental',
 			'countries.TM' => 'Turkménistan',
@@ -2522,8 +2548,6 @@ extension on TranslationsFr {
 			'countries.TR' => 'Turquie',
 			'countries.TT' => 'Trinité-et-Tobago',
 			'countries.TW' => 'Taïwan, Chine',
-			_ => null,
-		} ?? switch (path) {
 			'countries.TZ' => 'Tanzanie',
 			'countries.UA' => 'Ukraine',
 			'countries.UG' => 'Ouganda',

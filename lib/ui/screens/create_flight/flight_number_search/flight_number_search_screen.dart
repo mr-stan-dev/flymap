@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/domain/entity/flight_summary.dart';
 import 'package:flymap/domain/usecase/search_flights_by_number_use_case.dart';
+import 'package:flymap/domain/usecase/search_upcoming_flights_by_number_use_case.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/ui/screens/create_flight/travel_date/travel_date_pick_screen.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
 import 'package:get_it/get_it.dart';
@@ -54,19 +56,25 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
       create: (context) => FlightNumberSearchCubit(
         searchFlightsByNumberUseCase: GetIt.I
             .get<SearchFlightsByNumberUseCase>(),
+        searchUpcomingFlightsByNumberUseCase: GetIt.I
+            .get<SearchUpcomingFlightsByNumberUseCase>(),
         analytics: GetIt.I.get(),
         crashlytics: GetIt.I.get(),
       ),
       child: BlocConsumer<FlightNumberSearchCubit, FlightNumberSearchState>(
         listener: (context, state) {
           if (state is FlightNumberSearchSuccess) {
-            AppRouter.goToFlightOverview(
+            // Flight confirmed — the date is picked on its own step next.
+            AppRouter.goToTravelDatePick(
               context,
-              departure: state.departure,
-              arrival: state.arrival,
-              flightNumber: state.flightNumber,
-              fr24Id: state.fr24Id,
-              hasPendingFlightUnlock: widget.hasPendingFlightUnlock,
+              args: TravelDatePickArgs(
+                departure: state.departure,
+                arrival: state.arrival,
+                flightNumber: state.flightNumber,
+                fr24Id: state.fr24Id,
+                scheduleOptions: state.scheduleOptions,
+                hasPendingFlightUnlock: widget.hasPendingFlightUnlock,
+              ),
             );
           }
         },
@@ -203,7 +211,10 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                FlightSummaryCard(summary: singleCandidate),
+                FlightSummaryCard(
+                  summary: singleCandidate,
+                  showSchedule: false,
+                ),
               ] else if (candidates.isNotEmpty) ...[
                 Text(
                   t.confirmTitle,
@@ -298,6 +309,7 @@ class _SelectableFlightSummaryCard extends StatelessWidget {
       child: FlightSummaryCard(
         summary: summary,
         showBorder: false,
+        showSchedule: false,
         trailing: Icon(
           isSelected
               ? Icons.check_circle

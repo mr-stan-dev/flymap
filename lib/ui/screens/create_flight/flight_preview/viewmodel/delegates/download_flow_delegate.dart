@@ -312,6 +312,7 @@ class DownloadFlowDelegate {
       route: route,
       infoForSave: enrichedInfo,
       flightOperationalData: _cubit.state.flightOperationalData,
+      flightSchedule: _cubit.state.flightSchedule,
       flightAccessTier: isPro ? Flight.accessTierPro : Flight.accessTierBasic,
       effectiveMaxZoom: effectiveMaxZoom,
       routeLengthKm: routeLengthKm,
@@ -786,6 +787,7 @@ class DownloadFlowDelegate {
     required FlightRoute route,
     required FlightInfo infoForSave,
     FlightOperationalData? flightOperationalData,
+    FlightSchedule? flightSchedule,
     required String flightAccessTier,
     required int effectiveMaxZoom,
     required double routeLengthKm,
@@ -798,6 +800,7 @@ class DownloadFlowDelegate {
             flightRoute: route,
             flightInfo: infoForSave,
             flightOperationalData: flightOperationalData,
+            flightSchedule: flightSchedule,
             flightAccessTier: flightAccessTier,
             maxZoom: effectiveMaxZoom,
           )
