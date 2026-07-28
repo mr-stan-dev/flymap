@@ -13,6 +13,7 @@ import 'package:flymap/domain/entity/flight_operational_data.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_route_source.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
+import 'package:flymap/domain/usecase/fetch_flight_weather_use_case.dart';
 import 'package:flymap/domain/entity/map_detail_level.dart';
 import 'package:flymap/domain/entity/route_overview.dart';
 import 'package:flymap/domain/entity/route_poi_summary.dart';
@@ -52,6 +53,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     this.flightNumber,
     this.fr24Id,
     FlightSchedule? schedule,
+    FetchFlightWeatherUseCase? fetchFlightWeatherUseCase,
     bool hasPendingFlightUnlock = false,
     required ConnectivityChecker connectivityChecker,
     required GetRouteOverviewUseCase getRouteOverviewUseCase,
@@ -73,6 +75,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   }) : _analytics = analytics,
        _crashlytics = crashlytics,
        _subscriptionRepository = subscriptionRepository,
+       _fetchFlightWeatherUseCase = fetchFlightWeatherUseCase,
        super(
          FlightPreviewState.initial().copyWith(
            hasPendingFlightUnlock: hasPendingFlightUnlock,
@@ -109,6 +112,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   final AppAnalytics _analytics;
   final AppCrashlytics _crashlytics;
   final SubscriptionRepository _subscriptionRepository;
+  final FetchFlightWeatherUseCase? _fetchFlightWeatherUseCase;
   final Airport departure;
   final Airport arrival;
   final String? flightNumber;
@@ -119,6 +123,39 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   late final DownloadFlowDelegate _downloadFlowDelegate;
 
   Future<void> preparePreview() => _previewPreparationDelegate.preparePreview();
+
+  void continueFromWeather() => _navigationDelegate.continueFromWeather();
+
+  /// Fetches the weather picture for the weather step. Failure is
+  /// non-blocking: the step shows a retry and Continue stays available.
+  Future<void> fetchWeather({bool force = false}) async {
+    final useCase = _fetchFlightWeatherUseCase;
+    final route = state.flightRoute;
+    if (useCase == null || route == null) {
+      _emitState(state.copyWith(weatherFailed: true));
+      return;
+    }
+    if (state.isWeatherLoading) return;
+    if (!force && state.flightWeather != null) return;
+
+    _emitState(state.copyWith(isWeatherLoading: true, weatherFailed: false));
+    try {
+      final weather = await useCase.call(
+        route: route,
+        schedule: state.flightSchedule,
+      );
+      if (isClosed) return;
+      _emitState(
+        state.copyWith(isWeatherLoading: false, flightWeather: weather),
+      );
+    } catch (e) {
+      _logger.error('Weather fetch failed: $e');
+      if (isClosed) return;
+      _emitState(
+        state.copyWith(isWeatherLoading: false, weatherFailed: true),
+      );
+    }
+  }
 
   void continueFromOverview({
     required bool isSkipped,

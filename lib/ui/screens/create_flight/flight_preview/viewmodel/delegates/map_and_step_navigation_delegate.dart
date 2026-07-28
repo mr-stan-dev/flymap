@@ -9,6 +9,17 @@ class MapAndStepNavigationDelegate {
     if (_cubit.state.flightRoute == null) return;
     _cubit._emitState(
       _cubit.state.copyWith(
+        step: CreateFlightStep.weather,
+        clearErrorMessage: true,
+        clearDownloadErrorMessage: true,
+      ),
+    );
+    unawaited(_cubit.fetchWeather());
+  }
+
+  void continueFromWeather() {
+    _cubit._emitState(
+      _cubit.state.copyWith(
         step: CreateFlightStep.wikipediaArticles,
         clearErrorMessage: true,
         clearDownloadErrorMessage: true,
@@ -24,10 +35,19 @@ class MapAndStepNavigationDelegate {
       case CreateFlightStep.overview:
         await _cubit.clearPendingFlightUnlock();
         return true;
-      case CreateFlightStep.wikipediaArticles:
+      case CreateFlightStep.weather:
         _cubit._emitState(
           _cubit.state.copyWith(
             step: CreateFlightStep.overview,
+            clearErrorMessage: true,
+            clearDownloadErrorMessage: true,
+          ),
+        );
+        return false;
+      case CreateFlightStep.wikipediaArticles:
+        _cubit._emitState(
+          _cubit.state.copyWith(
+            step: CreateFlightStep.weather,
             clearErrorMessage: true,
             clearDownloadErrorMessage: true,
           ),

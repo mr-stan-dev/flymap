@@ -404,6 +404,7 @@ class _TranslationsCreateFlightFr extends TranslationsCreateFlightEn {
 
 	// Translations
 	@override late final _TranslationsCreateFlightStepsFr steps = _TranslationsCreateFlightStepsFr._(_root);
+	@override late final _TranslationsCreateFlightWeatherFr weather = _TranslationsCreateFlightWeatherFr._(_root);
 	@override late final _TranslationsCreateFlightRouteTypeSelectorFr routeTypeSelector = _TranslationsCreateFlightRouteTypeSelectorFr._(_root);
 	@override late final _TranslationsCreateFlightProAccessFr proAccess = _TranslationsCreateFlightProAccessFr._(_root);
 	@override late final _TranslationsCreateFlightTravelDateFr travelDate = _TranslationsCreateFlightTravelDateFr._(_root);
@@ -921,6 +922,44 @@ class _TranslationsCreateFlightStepsFr extends TranslationsCreateFlightStepsEn {
 	@override String get mapPreviewTitle => 'Aperçu de la carte';
 	@override String get overviewTitle => 'Aperçu de l’itinéraire';
 	@override String get wikipediaTitle => 'Articles Wikipédia';
+	@override String get weatherTitle => 'Météo du vol';
+}
+
+// Path: createFlight.weather
+class _TranslationsCreateFlightWeatherFr extends TranslationsCreateFlightWeatherEn {
+	_TranslationsCreateFlightWeatherFr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Verrez-vous le sol ?';
+	@override String get loading => 'Vérification du ciel le long de votre itinéraire…';
+	@override String get loadFailed => 'Impossible de charger les prévisions pour le moment. Réessayez ou continuez sans elles.';
+	@override String get estimatedBadge => 'horaires estimés';
+	@override String get departureLabel => 'Départ';
+	@override String get arrivalLabel => 'Arrivée';
+	@override String get verdictClearTitle => 'Vues dégagées';
+	@override String get verdictClearBody => 'Le hublot vaut le coup — le sol devrait être visible pendant presque tout le vol.';
+	@override String get verdictPatchyTitle => 'Nuages épars';
+	@override String get verdictPatchyBody => 'Les vues iront et viendront entre les nuages.';
+	@override String get verdictCarpetTitle => 'Tapis de nuages en dessous';
+	@override String get verdictCarpetBody => 'Une mer de nuages blancs sous vous — magnifique, mais le sol restera le plus souvent caché.';
+	@override String get verdictOvercastTitle => 'Ciel couvert';
+	@override String get verdictOvercastBody => 'Les plus belles vues seront au décollage et à l\'atterrissage.';
+	@override String get expectClear => '☀️ Dégagé';
+	@override String get expectPatchy => '⛅ Épars';
+	@override String get expectCarpet => '☁️ Tapis de nuages';
+	@override String get expectOvercast => '🌫 Couvert';
+	@override String get segmentAfterTakeoff => 'après le décollage';
+	@override String get segmentMidFlight => 'en milieu de vol';
+	@override String get segmentBeforeLanding => 'avant l\'atterrissage';
+	@override String segmentOver({required Object name}) => 'au-dessus de ${name}';
+	@override String get proTeaserTitle => 'Carte des nuages de votre itinéraire';
+	@override String get proTeaserBody => 'Voyez où seront les nuages — et regardez votre avion survoler toute la route au-dessus d\'eux.';
+	@override String get attribution => 'Données météo : MET Norway';
+	@override String get hedge => 'Les prévisions s\'affinent à l\'approche du départ.';
+	@override String forecastFor({required Object date}) => 'Prévisions pour le ${date}';
+	@override String updatedAt({required Object time}) => 'Mis à jour ${time}';
 }
 
 // Path: createFlight.routeTypeSelector
@@ -1845,6 +1884,35 @@ extension on TranslationsFr {
 			'createFlight.steps.mapPreviewTitle' => 'Aperçu de la carte',
 			'createFlight.steps.overviewTitle' => 'Aperçu de l’itinéraire',
 			'createFlight.steps.wikipediaTitle' => 'Articles Wikipédia',
+			'createFlight.steps.weatherTitle' => 'Météo du vol',
+			'createFlight.weather.title' => 'Verrez-vous le sol ?',
+			'createFlight.weather.loading' => 'Vérification du ciel le long de votre itinéraire…',
+			'createFlight.weather.loadFailed' => 'Impossible de charger les prévisions pour le moment. Réessayez ou continuez sans elles.',
+			'createFlight.weather.estimatedBadge' => 'horaires estimés',
+			'createFlight.weather.departureLabel' => 'Départ',
+			'createFlight.weather.arrivalLabel' => 'Arrivée',
+			'createFlight.weather.verdictClearTitle' => 'Vues dégagées',
+			'createFlight.weather.verdictClearBody' => 'Le hublot vaut le coup — le sol devrait être visible pendant presque tout le vol.',
+			'createFlight.weather.verdictPatchyTitle' => 'Nuages épars',
+			'createFlight.weather.verdictPatchyBody' => 'Les vues iront et viendront entre les nuages.',
+			'createFlight.weather.verdictCarpetTitle' => 'Tapis de nuages en dessous',
+			'createFlight.weather.verdictCarpetBody' => 'Une mer de nuages blancs sous vous — magnifique, mais le sol restera le plus souvent caché.',
+			'createFlight.weather.verdictOvercastTitle' => 'Ciel couvert',
+			'createFlight.weather.verdictOvercastBody' => 'Les plus belles vues seront au décollage et à l\'atterrissage.',
+			'createFlight.weather.expectClear' => '☀️ Dégagé',
+			'createFlight.weather.expectPatchy' => '⛅ Épars',
+			'createFlight.weather.expectCarpet' => '☁️ Tapis de nuages',
+			'createFlight.weather.expectOvercast' => '🌫 Couvert',
+			'createFlight.weather.segmentAfterTakeoff' => 'après le décollage',
+			'createFlight.weather.segmentMidFlight' => 'en milieu de vol',
+			'createFlight.weather.segmentBeforeLanding' => 'avant l\'atterrissage',
+			'createFlight.weather.segmentOver' => ({required Object name}) => 'au-dessus de ${name}',
+			'createFlight.weather.proTeaserTitle' => 'Carte des nuages de votre itinéraire',
+			'createFlight.weather.proTeaserBody' => 'Voyez où seront les nuages — et regardez votre avion survoler toute la route au-dessus d\'eux.',
+			'createFlight.weather.attribution' => 'Données météo : MET Norway',
+			'createFlight.weather.hedge' => 'Les prévisions s\'affinent à l\'approche du départ.',
+			'createFlight.weather.forecastFor' => ({required Object date}) => 'Prévisions pour le ${date}',
+			'createFlight.weather.updatedAt' => ({required Object time}) => 'Mis à jour ${time}',
 			'createFlight.routeTypeSelector.title' => 'Nouveau vol',
 			'createFlight.routeTypeSelector.basicTitle' => 'Itinéraire approximatif',
 			'createFlight.routeTypeSelector.basicSubtitle' => 'Depuis les aéroports',
@@ -1996,6 +2064,8 @@ extension on TranslationsFr {
 			'createFlight.overview.timeline.regionType.isthmus' => 'Isthme',
 			'createFlight.overview.timeline.regionType.unknown' => 'Type de région inconnu',
 			'createFlight.wikipedia.title' => 'Téléchargez des articles et lisez-les pendant que vous êtes en l’air',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.wikipedia.loadingIntro' => 'Recherche d’articles liés à l’itinéraire...',
 			'createFlight.wikipedia.foundIntro' => ({required Object count}) => 'D’après votre itinéraire, nous avons trouvé ${count} articles pertinents',
 			'createFlight.wikipedia.emptyIntro' => 'Aucun article Wikipédia lié à l’itinéraire n’a été trouvé. Vous pouvez continuer avec le téléchargement de la carte uniquement.',
@@ -2025,8 +2095,6 @@ extension on TranslationsFr {
 			'createFlight.downloading.currentStep' => 'En cours',
 			'createFlight.downloading.pending' => 'En attente',
 			'createFlight.downloading.inProgress' => 'En cours',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.downloading.completed' => 'Terminé',
 			'createFlight.downloading.completedWithIssues' => 'Terminé avec des problèmes',
 			'createFlight.downloading.failed' => 'Échec',
@@ -2510,6 +2578,8 @@ extension on TranslationsFr {
 			'countries.PH' => 'Philippines',
 			'countries.PK' => 'Pakistan',
 			'countries.PL' => 'Pologne',
+			_ => null,
+		} ?? switch (path) {
 			'countries.PR' => 'Porto Rico',
 			'countries.PS' => 'Cisjordanie et bande de Gaza',
 			'countries.PT' => 'Portugal',
@@ -2539,8 +2609,6 @@ extension on TranslationsFr {
 			'countries.TD' => 'Tchad',
 			'countries.TG' => 'Togo',
 			'countries.TH' => 'Thaïlande',
-			_ => null,
-		} ?? switch (path) {
 			'countries.TJ' => 'Tadjikistan',
 			'countries.TL' => 'Timor oriental',
 			'countries.TM' => 'Turkménistan',

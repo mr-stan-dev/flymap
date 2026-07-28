@@ -404,6 +404,7 @@ class _TranslationsCreateFlightDe extends TranslationsCreateFlightEn {
 
 	// Translations
 	@override late final _TranslationsCreateFlightStepsDe steps = _TranslationsCreateFlightStepsDe._(_root);
+	@override late final _TranslationsCreateFlightWeatherDe weather = _TranslationsCreateFlightWeatherDe._(_root);
 	@override late final _TranslationsCreateFlightRouteTypeSelectorDe routeTypeSelector = _TranslationsCreateFlightRouteTypeSelectorDe._(_root);
 	@override late final _TranslationsCreateFlightProAccessDe proAccess = _TranslationsCreateFlightProAccessDe._(_root);
 	@override late final _TranslationsCreateFlightTravelDateDe travelDate = _TranslationsCreateFlightTravelDateDe._(_root);
@@ -921,6 +922,44 @@ class _TranslationsCreateFlightStepsDe extends TranslationsCreateFlightStepsEn {
 	@override String get mapPreviewTitle => 'Kartenvorschau';
 	@override String get overviewTitle => 'Routenübersicht';
 	@override String get wikipediaTitle => 'Wikipedia-Artikel';
+	@override String get weatherTitle => 'Flugwetter';
+}
+
+// Path: createFlight.weather
+class _TranslationsCreateFlightWeatherDe extends TranslationsCreateFlightWeatherEn {
+	_TranslationsCreateFlightWeatherDe._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Wirst du den Boden sehen?';
+	@override String get loading => 'Wir prüfen den Himmel entlang deiner Route…';
+	@override String get loadFailed => 'Die Vorhersage konnte gerade nicht geladen werden. Versuche es erneut oder fahre ohne sie fort.';
+	@override String get estimatedBadge => 'Zeiten geschätzt';
+	@override String get departureLabel => 'Abflug';
+	@override String get arrivalLabel => 'Ankunft';
+	@override String get verdictClearTitle => 'Klare Sicht';
+	@override String get verdictClearBody => 'Der Fensterplatz lohnt sich — der Boden sollte fast den ganzen Flug sichtbar sein.';
+	@override String get verdictPatchyTitle => 'Aufgelockerte Bewölkung';
+	@override String get verdictPatchyBody => 'Die Sicht kommt und geht zwischen den Wolken.';
+	@override String get verdictCarpetTitle => 'Wolkenteppich unter dir';
+	@override String get verdictCarpetBody => 'Ein weißes Wolkenmeer unter dir — wunderschön, aber der Boden bleibt meist verborgen.';
+	@override String get verdictOvercastTitle => 'Bedeckter Himmel';
+	@override String get verdictOvercastBody => 'Die beste Sicht gibt es bei Start und Landung.';
+	@override String get expectClear => '☀️ Klar';
+	@override String get expectPatchy => '⛅ Aufgelockert';
+	@override String get expectCarpet => '☁️ Wolkenteppich';
+	@override String get expectOvercast => '🌫 Bedeckt';
+	@override String get segmentAfterTakeoff => 'nach dem Start';
+	@override String get segmentMidFlight => 'in der Flugmitte';
+	@override String get segmentBeforeLanding => 'vor der Landung';
+	@override String segmentOver({required Object name}) => 'über ${name}';
+	@override String get proTeaserTitle => 'Wolkenkarte entlang deiner Route';
+	@override String get proTeaserBody => 'Sieh, wo die Wolken sein werden — und schau deinem Flugzeug zu, wie es die ganze Route darüber fliegt.';
+	@override String get attribution => 'Wetterdaten: MET Norwegen';
+	@override String get hedge => 'Vorhersagen werden näher am Abflug genauer.';
+	@override String forecastFor({required Object date}) => 'Vorhersage für ${date}';
+	@override String updatedAt({required Object time}) => 'Aktualisiert ${time}';
 }
 
 // Path: createFlight.routeTypeSelector
@@ -1845,6 +1884,35 @@ extension on TranslationsDe {
 			'createFlight.steps.mapPreviewTitle' => 'Kartenvorschau',
 			'createFlight.steps.overviewTitle' => 'Routenübersicht',
 			'createFlight.steps.wikipediaTitle' => 'Wikipedia-Artikel',
+			'createFlight.steps.weatherTitle' => 'Flugwetter',
+			'createFlight.weather.title' => 'Wirst du den Boden sehen?',
+			'createFlight.weather.loading' => 'Wir prüfen den Himmel entlang deiner Route…',
+			'createFlight.weather.loadFailed' => 'Die Vorhersage konnte gerade nicht geladen werden. Versuche es erneut oder fahre ohne sie fort.',
+			'createFlight.weather.estimatedBadge' => 'Zeiten geschätzt',
+			'createFlight.weather.departureLabel' => 'Abflug',
+			'createFlight.weather.arrivalLabel' => 'Ankunft',
+			'createFlight.weather.verdictClearTitle' => 'Klare Sicht',
+			'createFlight.weather.verdictClearBody' => 'Der Fensterplatz lohnt sich — der Boden sollte fast den ganzen Flug sichtbar sein.',
+			'createFlight.weather.verdictPatchyTitle' => 'Aufgelockerte Bewölkung',
+			'createFlight.weather.verdictPatchyBody' => 'Die Sicht kommt und geht zwischen den Wolken.',
+			'createFlight.weather.verdictCarpetTitle' => 'Wolkenteppich unter dir',
+			'createFlight.weather.verdictCarpetBody' => 'Ein weißes Wolkenmeer unter dir — wunderschön, aber der Boden bleibt meist verborgen.',
+			'createFlight.weather.verdictOvercastTitle' => 'Bedeckter Himmel',
+			'createFlight.weather.verdictOvercastBody' => 'Die beste Sicht gibt es bei Start und Landung.',
+			'createFlight.weather.expectClear' => '☀️ Klar',
+			'createFlight.weather.expectPatchy' => '⛅ Aufgelockert',
+			'createFlight.weather.expectCarpet' => '☁️ Wolkenteppich',
+			'createFlight.weather.expectOvercast' => '🌫 Bedeckt',
+			'createFlight.weather.segmentAfterTakeoff' => 'nach dem Start',
+			'createFlight.weather.segmentMidFlight' => 'in der Flugmitte',
+			'createFlight.weather.segmentBeforeLanding' => 'vor der Landung',
+			'createFlight.weather.segmentOver' => ({required Object name}) => 'über ${name}',
+			'createFlight.weather.proTeaserTitle' => 'Wolkenkarte entlang deiner Route',
+			'createFlight.weather.proTeaserBody' => 'Sieh, wo die Wolken sein werden — und schau deinem Flugzeug zu, wie es die ganze Route darüber fliegt.',
+			'createFlight.weather.attribution' => 'Wetterdaten: MET Norwegen',
+			'createFlight.weather.hedge' => 'Vorhersagen werden näher am Abflug genauer.',
+			'createFlight.weather.forecastFor' => ({required Object date}) => 'Vorhersage für ${date}',
+			'createFlight.weather.updatedAt' => ({required Object time}) => 'Aktualisiert ${time}',
 			'createFlight.routeTypeSelector.title' => 'Neuer Flug',
 			'createFlight.routeTypeSelector.basicTitle' => 'Ungefähre Route',
 			'createFlight.routeTypeSelector.basicSubtitle' => 'Von Flughäfen',
@@ -1996,6 +2064,8 @@ extension on TranslationsDe {
 			'createFlight.overview.timeline.regionType.isthmus' => 'Isthmus',
 			'createFlight.overview.timeline.regionType.unknown' => 'Unbekannter Regionstyp',
 			'createFlight.wikipedia.title' => 'Lade Artikel herunter und lies sie während des Flugs',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.wikipedia.loadingIntro' => 'Routenbezogene Artikel werden gesucht...',
 			'createFlight.wikipedia.foundIntro' => ({required Object count}) => 'Basierend auf deiner Route haben wir ${count} relevante Artikel gefunden',
 			'createFlight.wikipedia.emptyIntro' => 'Keine routenbezogenen Wikipedia-Artikel gefunden. Du kannst nur mit dem Kartendownload fortfahren.',
@@ -2025,8 +2095,6 @@ extension on TranslationsDe {
 			'createFlight.downloading.currentStep' => 'Aktuell',
 			'createFlight.downloading.pending' => 'Ausstehend',
 			'createFlight.downloading.inProgress' => 'In Bearbeitung',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.downloading.completed' => 'Abgeschlossen',
 			'createFlight.downloading.completedWithIssues' => 'Mit Problemen abgeschlossen',
 			'createFlight.downloading.failed' => 'Fehlgeschlagen',
@@ -2510,6 +2578,8 @@ extension on TranslationsDe {
 			'countries.PH' => 'Philippinen',
 			'countries.PK' => 'Pakistan',
 			'countries.PL' => 'Polen',
+			_ => null,
+		} ?? switch (path) {
 			'countries.PR' => 'Puerto Rico',
 			'countries.PS' => 'Westjordanland und Gazastreifen',
 			'countries.PT' => 'Portugal',
@@ -2539,8 +2609,6 @@ extension on TranslationsDe {
 			'countries.TD' => 'Tschad',
 			'countries.TG' => 'Togo',
 			'countries.TH' => 'Thailand',
-			_ => null,
-		} ?? switch (path) {
 			'countries.TJ' => 'Tadschikistan',
 			'countries.TL' => 'Timor-Leste',
 			'countries.TM' => 'Turkmenistan',

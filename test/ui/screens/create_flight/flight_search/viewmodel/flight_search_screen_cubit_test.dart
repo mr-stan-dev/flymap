@@ -342,7 +342,8 @@ void main() {
       );
     });
 
-    test('back from wiki to overview preserves pending unlock', () async {
+    test('back from wiki steps through weather and preserves pending unlock',
+        () async {
       final pois = _routePoiSummaries(120);
       cubit.setStateForTest(
         cubit.state.copyWith(
@@ -355,9 +356,12 @@ void main() {
         ),
       );
 
-      final shouldPop = await cubit.handleBackAction();
+      final backFromWiki = await cubit.handleBackAction();
+      expect(backFromWiki, isFalse);
+      expect(cubit.state.step, CreateFlightStep.weather);
 
-      expect(shouldPop, isFalse);
+      final backFromWeather = await cubit.handleBackAction();
+      expect(backFromWeather, isFalse);
       expect(cubit.state.step, CreateFlightStep.overview);
       expect(cubit.state.hasPendingFlightUnlock, isTrue);
     });

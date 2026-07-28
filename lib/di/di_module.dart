@@ -14,6 +14,7 @@ import 'package:flymap/data/api/flight_number_search_api.dart';
 import 'package:flymap/data/api/upcoming_flight_search_api.dart';
 import 'package:flymap/data/api/mapbox_env_config.dart';
 import 'package:flymap/data/api/flight_route_preview_api.dart';
+import 'package:flymap/data/api/met_norway_api.dart';
 import 'package:flymap/data/api/flight_route_search_api.dart';
 import 'package:flymap/data/api/mapbox_raster_tile_api.dart';
 import 'package:flymap/data/api/mapbox_static_image_api.dart';
@@ -88,6 +89,7 @@ import 'package:flymap/domain/usecase/generate_share_image_use_case.dart';
 import 'package:flymap/domain/usecase/search_flights_by_route_use_case.dart';
 
 import 'package:flymap/domain/usecase/get_place_info_use_case.dart';
+import 'package:flymap/domain/usecase/fetch_flight_weather_use_case.dart';
 import 'package:flymap/domain/usecase/get_route_overview_use_case.dart';
 import 'package:flymap/domain/usecase/get_wiki_articles_use_case.dart';
 import 'package:flymap/domain/usecase/get_learn_article_progress_use_case.dart';
@@ -183,6 +185,10 @@ class DiModule {
       () => UpcomingFlightSearchApi(),
     );
     i.registerLazySingleton<FlightRouteSearchApi>(() => FlightRouteSearchApi());
+    i.registerLazySingleton<MetNorwayApi>(() => MetNorwayApi());
+    i.registerLazySingleton<FetchFlightWeatherUseCase>(
+      () => FetchFlightWeatherUseCase(api: i.get()),
+    );
     i.registerLazySingleton<FlightRoutePreviewApi>(
       () => FlightRoutePreviewApi(),
     );

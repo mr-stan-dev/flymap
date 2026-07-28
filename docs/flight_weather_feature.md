@@ -1,8 +1,28 @@
 # Flight weather & cloud cover — "Will you see anything?" (feature spec)
 
-Status: **spec'd July 2026, not implemented.** Supersedes and absorbs section 4 of
-[flight_date_feature.md](flight_date_feature.md); depends on its section 1 (travel
-date field), which this feature extends with a time of day.
+Status: **simplified architecture decided 2026-07-28, app-side v1 in progress.**
+Supersedes and absorbs section 4 of [flight_date_feature.md](flight_date_feature.md);
+depends on its section 1 (travel date field), which shipped with exact STDs from
+schedule picks.
+
+> **2026-07-28 simplification (supersedes §3/§4/§5 details below):**
+> - **One time slice per sample point — the "overhead time" model.** The user
+>   needs the weather at each route point at the moment their plane is there,
+>   which we can compute (STD + progress × block time). ~15–20 centerline
+>   samples every 50–75 km, one timestamp each, instead of a grid × 24 hourly
+>   slices. The rendered cloud field is time-correct along the route by
+>   construction; the "timelapse" becomes our existing plane-along-path
+>   animation flying over a static field. Scrubber/multi-hour deferred.
+> - **No Firestore cell cache.** Cross-user corridor reuse is near zero at this
+>   app's scale (same long-tail argument as the AeroDataBox cache). Politeness
+>   is handled by low sample counts and limited concurrency instead.
+> - **v1 is app-side only, no backend callable** — MET Norway is keyless and
+>   designed for direct client use (identifying User-Agent + attribution).
+>   A backend proxy remains the plan IF volume or provider swap demands it.
+> - **Dedicated WEATHER STEP in flight creation** (decision 2026-07-28,
+>   supersedes §3 "not a new step"): route overview → **weather step** →
+>   Wikipedia articles. Airport weather + verdict + expectation line for
+>   everyone; the cloud-field visualization Pro-gated.
 
 The product promise of Flymap is "what's below you". Cloud cover is the honest
 caveat to that promise, and turning it into a feature — *"will you actually see

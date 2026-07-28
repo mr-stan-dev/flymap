@@ -1,0 +1,323 @@
+import 'dart:math' as math;
+import 'dart:ui' show Offset;
+
+import 'package:flymap/data/api/met_norway_api.dart';
+import 'package:flymap/domain/entity/flight_route.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
+import 'package:flymap/domain/entity/flight_weather.dart';
+import 'package:flymap/logger.dart';
+import 'package:flymap/ui/map/map_utils.dart';
+import 'package:flymap/ui/screens/share_flight/utils/static_route_map.dart';
+import 'package:latlong2/latlong.dart' show LatLng;
+
+/// Fetches the "overhead time" weather picture for a flight: surface
+/// forecasts at both airports (at STD/STA) plus ~15-20 cloud samples along
+/// the route, each at the moment the plane is over that point.
+///
+/// Total: 2 + sampleCount requests to api.met.no per flight — few enough
+/// that no cache is needed (decision 2026-07-28); requests run with limited
+/// concurrency to stay polite.
+class FetchFlightWeatherUseCase {
+  FetchFlightWeatherUseCase({required MetNorwayApi api}) : _api = api;
+
+  /// One sample roughly every this many km along the route.
+  static const double sampleSpacingKm = 75;
+  static const int minSamples = 5;
+  static const int maxSamples = 20;
+
+  /// Grid spacing (in the square map-card viewport) for the full-card
+  /// cloud field; grid cells the corridor already covers are skipped.
+  static const double areaGridSpacingPx = 95;
+  static const int _maxConcurrentRequests = 6;
+
+  final MetNorwayApi _api;
+  final _logger = const Logger('FetchFlightWeatherUseCase');
+
+  Future<FlightWeather> call({
+    required FlightRoute route,
+    FlightSchedule? schedule,
+  }) async {
+    final (departureUtc, isTimeEstimated) = _departureUtc(schedule);
+    final blockMinutes = math.max(30, route.durations.blockMinutes);
+    final arrivalUtc = departureUtc.add(Duration(minutes: blockMinutes));
+    final points = _samplePoints(route);
+    final areaPoints = _areaGridPoints(route, points);
+
+    final departureOffset = schedule?.departureUtcOffsetMinutes ?? 0;
+    // Timeline window: the whole flight ±1 h, for animating cloud
+    // evolution — the provider response contains it anyway.
+    final windowStart = departureUtc.subtract(const Duration(hours: 1));
+    final windowEnd = arrivalUtc.add(const Duration(hours: 1));
+    final results = await _fetchAll([
+      _PointRequest(route.departure.latLon, departureUtc),
+      _PointRequest(route.arrival.latLon, arrivalUtc),
+      for (final point in [...points, ...areaPoints])
+        _PointRequest(
+          point.latLon,
+          departureUtc.add(
+            Duration(
+              minutes: (blockMinutes * point.routeProgress).round(),
+            ),
+          ),
+          routeProgress: point.routeProgress,
+          isAreaSample: areaPoints.contains(point),
+        ),
+    ]);
+
+    final departureForecast = _nearest(results[0]);
+    final arrivalForecast = _nearest(results[1]);
+    if (departureForecast == null || arrivalForecast == null) {
+      throw const WeatherUnavailableException();
+    }
+
+    final samples = <RouteCloudSample>[];
+    final areaSamples = <RouteCloudSample>[];
+    for (final result in results.skip(2)) {
+      final forecast = _nearest(result);
+      final progress = result.request.routeProgress;
+      if (forecast == null || progress == null) continue;
+      final sample = RouteCloudSample(
+        routeProgress: progress,
+        latLon: result.request.latLon,
+        timeUtc: result.request.targetTimeUtc,
+        cloudLowPercent: forecast.cloudLowPercent ?? 0,
+        cloudMidPercent: forecast.cloudMidPercent ?? 0,
+        cloudHighPercent: forecast.cloudHighPercent ?? 0,
+        precipitationMm: forecast.precipitationMm,
+        timeline: [
+          for (final slice in result.series)
+            if (!slice.timeUtc.isBefore(windowStart) &&
+                !slice.timeUtc.isAfter(windowEnd))
+              CloudTimeSlice(
+                timeUtc: slice.timeUtc,
+                cloudLowPercent: slice.cloudLowPercent ?? 0,
+                cloudMidPercent: slice.cloudMidPercent ?? 0,
+                cloudHighPercent: slice.cloudHighPercent ?? 0,
+              ),
+        ],
+      );
+      (result.request.isAreaSample ? areaSamples : samples).add(sample);
+    }
+    _logger.log(
+      'weather fetched: samples=${samples.length}/${points.length} '
+      'area=${areaSamples.length}/${areaPoints.length} '
+      'estimated=$isTimeEstimated',
+    );
+
+    return FlightWeather(
+      departure: _airportWeather(
+        departureForecast,
+        departureUtc,
+        departureOffset,
+      ),
+      arrival: _airportWeather(
+        arrivalForecast,
+        arrivalUtc,
+        // Arrival offset is unknown for schedule-less flights; the
+        // departure offset is the closest honest guess for display.
+        departureOffset,
+      ),
+      samples: samples,
+      areaSamples: areaSamples,
+      fetchedAt: DateTime.now(),
+      isTimeEstimated: isTimeEstimated,
+    );
+  }
+
+  /// Sparse grid over the map card's viewport (the same square framing the
+  /// card renders), skipping cells the corridor samples already cover. Each
+  /// grid point borrows the overhead time of the nearest route point so the
+  /// full-card field animates coherently with the corridor.
+  List<({LatLng latLon, double routeProgress})> _areaGridPoints(
+    FlightRoute route,
+    List<({LatLng latLon, double routeProgress})> routePoints,
+  ) {
+    final waypoints = route.waypointLatLngs;
+    final framePoints = waypoints.length >= 2
+        ? waypoints
+        : [route.departure.latLon, route.arrival.latLon];
+    final viewport = StaticRouteMap.buildViewport(
+      points: framePoints,
+      width: staticWeatherMapSize,
+      height: staticWeatherMapSize,
+    );
+    final projectedRoute = StaticRouteMap.projectRoute(
+      points: routePoints.map((p) => p.latLon).toList(growable: false),
+      viewport: viewport,
+    );
+
+    final grid = <({LatLng latLon, double routeProgress})>[];
+    for (var x = areaGridSpacingPx / 2;
+        x < viewport.width;
+        x += areaGridSpacingPx) {
+      for (var y = areaGridSpacingPx / 2;
+          y < viewport.height;
+          y += areaGridSpacingPx) {
+        final pixel = Offset(x, y);
+        // Skip cells the corridor band already covers; remember the nearest
+        // route point's progress for the overhead time either way.
+        var nearestDistance = double.infinity;
+        var nearestProgress = 0.5;
+        for (var i = 0; i < projectedRoute.length; i++) {
+          final distance = (projectedRoute[i].toOffset() - pixel).distance;
+          if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestProgress = routePoints[i].routeProgress;
+          }
+        }
+        if (nearestDistance < areaGridSpacingPx * 0.7) continue;
+        grid.add(
+          (
+            latLon: StaticRouteMap.unproject(
+              viewport: viewport,
+              point: pixel,
+            ),
+            routeProgress: nearestProgress,
+          ),
+        );
+      }
+    }
+    return grid;
+  }
+
+  /// STD when a schedule pick provided one; otherwise midday on the travel
+  /// date (or "in two hours" for dateless flights) flagged as an estimate.
+  (DateTime, bool) _departureUtc(FlightSchedule? schedule) {
+    final scheduled = schedule?.scheduledDepartureUtc;
+    if (scheduled != null) return (scheduled.toUtc(), false);
+    final travelDate = schedule?.travelDate;
+    if (travelDate != null) {
+      final localNoon = DateTime(
+        travelDate.year,
+        travelDate.month,
+        travelDate.day,
+        12,
+      );
+      return (localNoon.toUtc(), true);
+    }
+    return (DateTime.now().toUtc().add(const Duration(hours: 2)), true);
+  }
+
+  AirportWeather _airportWeather(
+    MetNorwayForecastPoint forecast,
+    DateTime timeUtc,
+    int utcOffsetMinutes,
+  ) {
+    return AirportWeather(
+      timeUtc: timeUtc,
+      utcOffsetMinutes: utcOffsetMinutes,
+      temperatureC: forecast.temperatureC,
+      windSpeedMs: forecast.windSpeedMs,
+      precipitationMm: forecast.precipitationMm,
+      cloudCoverPercent: forecast.cloudCoverPercent,
+      symbolCode: forecast.symbolCode,
+    );
+  }
+
+  /// Evenly spaced points along the route polyline (great-circle line when
+  /// no waypoints exist), excluding the endpoints (airports are separate).
+  List<({LatLng latLon, double routeProgress})> _samplePoints(
+    FlightRoute route,
+  ) {
+    final polyline = route.waypointLatLngs.length >= 2
+        ? route.waypointLatLngs
+        : [route.departure.latLon, route.arrival.latLon];
+    final distanceKm = math.max(1.0, route.distanceInKm);
+    final sampleCount = (distanceKm / sampleSpacingKm)
+        .round()
+        .clamp(minSamples, maxSamples);
+
+    // Cumulative distances along the polyline for progress-accurate
+    // interpolation.
+    final cumulative = <double>[0];
+    for (var i = 1; i < polyline.length; i++) {
+      cumulative.add(
+        cumulative[i - 1] +
+            MapUtils.distanceKm(
+              departure: polyline[i - 1],
+              arrival: polyline[i],
+            ),
+      );
+    }
+    final total = cumulative.last <= 0 ? 1.0 : cumulative.last;
+
+    final points = <({LatLng latLon, double routeProgress})>[];
+    for (var s = 1; s <= sampleCount; s++) {
+      final progress = s / (sampleCount + 1);
+      final target = progress * total;
+      var segment = 1;
+      while (segment < cumulative.length - 1 && cumulative[segment] < target) {
+        segment++;
+      }
+      final segmentStart = cumulative[segment - 1];
+      final segmentLength = cumulative[segment] - segmentStart;
+      final t = segmentLength <= 0
+          ? 0.0
+          : ((target - segmentStart) / segmentLength).clamp(0.0, 1.0);
+      final a = polyline[segment - 1];
+      final b = polyline[segment];
+      points.add(
+        (
+          latLon: LatLng(
+            a.latitude + (b.latitude - a.latitude) * t,
+            a.longitude + (b.longitude - a.longitude) * t,
+          ),
+          routeProgress: progress,
+        ),
+      );
+    }
+    return points;
+  }
+
+  Future<List<_PointResult>> _fetchAll(List<_PointRequest> requests) async {
+    final results = List<_PointResult?>.filled(requests.length, null);
+    for (var start = 0; start < requests.length; start += _maxConcurrentRequests) {
+      final end = math.min(start + _maxConcurrentRequests, requests.length);
+      await Future.wait([
+        for (var i = start; i < end; i++)
+          _fetchOne(requests[i]).then((result) => results[i] = result),
+      ]);
+    }
+    return results.whereType<_PointResult>().toList(growable: false);
+  }
+
+  Future<_PointResult> _fetchOne(_PointRequest request) async {
+    try {
+      final series = await _api.forecastSeries(request.latLon);
+      return _PointResult(request, series);
+    } catch (e) {
+      _logger.error('weather point failed: $e');
+      return _PointResult(request, const []);
+    }
+  }
+
+  MetNorwayForecastPoint? _nearest(_PointResult result) {
+    return MetNorwayApi.nearestTo(result.series, result.request.targetTimeUtc);
+  }
+}
+
+/// Both airport forecasts missing — nothing meaningful to show.
+class WeatherUnavailableException implements Exception {
+  const WeatherUnavailableException();
+}
+
+class _PointRequest {
+  const _PointRequest(
+    this.latLon,
+    this.targetTimeUtc, {
+    this.routeProgress,
+    this.isAreaSample = false,
+  });
+
+  final LatLng latLon;
+  final DateTime targetTimeUtc;
+  final double? routeProgress;
+  final bool isAreaSample;
+}
+
+class _PointResult {
+  const _PointResult(this.request, this.series);
+
+  final _PointRequest request;
+  final List<MetNorwayForecastPoint> series;
+}

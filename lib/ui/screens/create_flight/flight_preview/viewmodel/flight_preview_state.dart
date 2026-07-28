@@ -3,11 +3,12 @@ import 'package:flymap/domain/entity/flight_info.dart';
 import 'package:flymap/domain/entity/flight_operational_data.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
+import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/domain/entity/route_region.dart';
 import 'package:flymap/domain/entity/route_poi_summary.dart';
 import 'package:flymap/domain/entity/wiki_article_candidate.dart';
 
-enum CreateFlightStep { routeNotSupported, overview, wikipediaArticles }
+enum CreateFlightStep { routeNotSupported, overview, weather, wikipediaArticles }
 
 enum DownloadStage {
   idle,
@@ -130,6 +131,9 @@ class RoutePreviewState extends Equatable {
     required this.flightRoute,
     required this.flightOperationalData,
     required this.flightSchedule,
+    required this.flightWeather,
+    required this.isWeatherLoading,
+    required this.weatherFailed,
     required this.allRoutePois,
     required this.routeRegions,
     required this.routeBlockMinutes,
@@ -144,6 +148,9 @@ class RoutePreviewState extends Equatable {
     : flightRoute = null,
       flightOperationalData = null,
       flightSchedule = null,
+      flightWeather = null,
+      isWeatherLoading = false,
+      weatherFailed = false,
       allRoutePois = const [],
       routeRegions = const [],
       routeBlockMinutes = 0,
@@ -159,6 +166,11 @@ class RoutePreviewState extends Equatable {
   /// When the user is flying — picked in the search step or via the
   /// download-step chips; null when unknown.
   final FlightSchedule? flightSchedule;
+
+  /// Weather picture fetched for the weather step; null until loaded.
+  final FlightWeather? flightWeather;
+  final bool isWeatherLoading;
+  final bool weatherFailed;
   final List<RoutePoiSummary> allRoutePois;
   final List<RouteRegion> routeRegions;
   final int routeBlockMinutes;
@@ -175,6 +187,9 @@ class RoutePreviewState extends Equatable {
     bool clearFlightOperationalData = false,
     FlightSchedule? flightSchedule,
     bool clearFlightSchedule = false,
+    FlightWeather? flightWeather,
+    bool? isWeatherLoading,
+    bool? weatherFailed,
     List<RoutePoiSummary>? allRoutePois,
     bool clearAllRoutePois = false,
     List<RouteRegion>? routeRegions,
@@ -196,6 +211,9 @@ class RoutePreviewState extends Equatable {
       flightSchedule: clearFlightSchedule
           ? null
           : flightSchedule ?? this.flightSchedule,
+      flightWeather: flightWeather ?? this.flightWeather,
+      isWeatherLoading: isWeatherLoading ?? this.isWeatherLoading,
+      weatherFailed: weatherFailed ?? this.weatherFailed,
       allRoutePois: clearAllRoutePois
           ? const []
           : allRoutePois ?? this.allRoutePois,
@@ -218,6 +236,9 @@ class RoutePreviewState extends Equatable {
     flightRoute,
     flightOperationalData,
     flightSchedule,
+    flightWeather,
+    isWeatherLoading,
+    weatherFailed,
     allRoutePois,
     routeRegions,
     routeBlockMinutes,
@@ -487,6 +508,9 @@ class FlightPreviewState extends Equatable {
   FlightOperationalData? get flightOperationalData =>
       routeState.flightOperationalData;
   FlightSchedule? get flightSchedule => routeState.flightSchedule;
+  FlightWeather? get flightWeather => routeState.flightWeather;
+  bool get isWeatherLoading => routeState.isWeatherLoading;
+  bool get weatherFailed => routeState.weatherFailed;
   List<RoutePoiSummary> get allRoutePois => routeState.allRoutePois;
   List<RouteRegion> get routeRegions => routeState.routeRegions;
   int get routeBlockMinutes => routeState.routeBlockMinutes;
@@ -535,6 +559,9 @@ class FlightPreviewState extends Equatable {
     bool clearFlightOperationalData = false,
     FlightSchedule? flightSchedule,
     bool clearFlightSchedule = false,
+    FlightWeather? flightWeather,
+    bool? isWeatherLoading,
+    bool? weatherFailed,
     List<RoutePoiSummary>? allRoutePois,
     bool clearAllRoutePois = false,
     List<RouteRegion>? routeRegions,
@@ -590,6 +617,9 @@ class FlightPreviewState extends Equatable {
         clearFlightOperationalData: clearFlightOperationalData,
         flightSchedule: flightSchedule,
         clearFlightSchedule: clearFlightSchedule,
+        flightWeather: flightWeather,
+        isWeatherLoading: isWeatherLoading,
+        weatherFailed: weatherFailed,
         allRoutePois: allRoutePois,
         clearAllRoutePois: clearAllRoutePois,
         routeRegions: routeRegions,

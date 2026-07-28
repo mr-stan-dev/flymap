@@ -6,6 +6,10 @@ import 'package:latlong2/latlong.dart';
 const double staticShareMapWidth = 540;
 const double staticShareMapHeight = 800;
 const double staticShareMapPadding = 80;
+
+/// Square variant used by the weather map card — identical framing for
+/// horizontal and vertical routes, and less vertical space than portrait.
+const double staticWeatherMapSize = 540;
 const int maxStaticRoutePoints = 120;
 const double _tileSize = 512;
 const double _maxLat = 85.05112878;
@@ -161,6 +165,25 @@ class StaticRouteMap {
       zoom: double.parse(zoom.toStringAsFixed(2)),
       width: width,
       height: height,
+    );
+  }
+
+  /// Inverse of [projectRoute] for a single pixel of the viewport: which
+  /// coordinate sits at [point]? Used to place the full-card weather grid.
+  static LatLng unproject({
+    required StaticMapViewport viewport,
+    required Offset point,
+  }) {
+    final worldSize = _tileSize * pow(2, viewport.zoom);
+    final centerX =
+        (_normalizeLon(viewport.center.longitude) + 180) / 360 * worldSize;
+    final centerY =
+        _mercatorY(viewport.center.latitude) * pow(2, viewport.zoom);
+    final pointX = centerX + (point.dx - viewport.width / 2);
+    final pointY = centerY + (point.dy - viewport.height / 2);
+    return LatLng(
+      _latFromMercatorY(pointY / pow(2, viewport.zoom)),
+      _normalizeLon(pointX / worldSize * 360 - 180),
     );
   }
 

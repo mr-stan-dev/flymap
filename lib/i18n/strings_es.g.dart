@@ -404,6 +404,7 @@ class _TranslationsCreateFlightEs extends TranslationsCreateFlightEn {
 
 	// Translations
 	@override late final _TranslationsCreateFlightStepsEs steps = _TranslationsCreateFlightStepsEs._(_root);
+	@override late final _TranslationsCreateFlightWeatherEs weather = _TranslationsCreateFlightWeatherEs._(_root);
 	@override late final _TranslationsCreateFlightRouteTypeSelectorEs routeTypeSelector = _TranslationsCreateFlightRouteTypeSelectorEs._(_root);
 	@override late final _TranslationsCreateFlightProAccessEs proAccess = _TranslationsCreateFlightProAccessEs._(_root);
 	@override late final _TranslationsCreateFlightTravelDateEs travelDate = _TranslationsCreateFlightTravelDateEs._(_root);
@@ -921,6 +922,44 @@ class _TranslationsCreateFlightStepsEs extends TranslationsCreateFlightStepsEn {
 	@override String get mapPreviewTitle => 'Vista previa del mapa';
 	@override String get overviewTitle => 'Resumen de la ruta';
 	@override String get wikipediaTitle => 'Artículos de Wikipedia';
+	@override String get weatherTitle => 'Clima del vuelo';
+}
+
+// Path: createFlight.weather
+class _TranslationsCreateFlightWeatherEs extends TranslationsCreateFlightWeatherEn {
+	_TranslationsCreateFlightWeatherEs._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '¿Verás el suelo?';
+	@override String get loading => 'Comprobando el cielo a lo largo de tu ruta…';
+	@override String get loadFailed => 'No se pudo cargar el pronóstico ahora mismo. Reintenta o continúa sin él.';
+	@override String get estimatedBadge => 'horas estimadas';
+	@override String get departureLabel => 'Salida';
+	@override String get arrivalLabel => 'Llegada';
+	@override String get verdictClearTitle => 'Vistas despejadas';
+	@override String get verdictClearBody => 'El asiento de ventanilla merece la pena: el suelo debería verse casi todo el vuelo.';
+	@override String get verdictPatchyTitle => 'Nubes dispersas';
+	@override String get verdictPatchyBody => 'Las vistas irán y vendrán entre las nubes.';
+	@override String get verdictCarpetTitle => 'Manto de nubes debajo';
+	@override String get verdictCarpetBody => 'Un mar blanco de nubes bajo el avión: precioso, pero el suelo quedará casi siempre oculto.';
+	@override String get verdictOvercastTitle => 'Cielo cubierto';
+	@override String get verdictOvercastBody => 'Las mejores vistas serán en el despegue y el aterrizaje.';
+	@override String get expectClear => '☀️ Despejado';
+	@override String get expectPatchy => '⛅ Nubes dispersas';
+	@override String get expectCarpet => '☁️ Manto de nubes';
+	@override String get expectOvercast => '🌫 Cubierto';
+	@override String get segmentAfterTakeoff => 'tras el despegue';
+	@override String get segmentMidFlight => 'a mitad de vuelo';
+	@override String get segmentBeforeLanding => 'antes de aterrizar';
+	@override String segmentOver({required Object name}) => 'sobre ${name}';
+	@override String get proTeaserTitle => 'Mapa de nubes de tu ruta';
+	@override String get proTeaserBody => 'Mira dónde estarán las nubes y observa tu avión volar toda la ruta por encima de ellas.';
+	@override String get attribution => 'Datos meteorológicos: MET Norway';
+	@override String get hedge => 'Los pronósticos se afinan cuanto más cerca está la salida.';
+	@override String forecastFor({required Object date}) => 'Pronóstico para el ${date}';
+	@override String updatedAt({required Object time}) => 'Actualizado ${time}';
 }
 
 // Path: createFlight.routeTypeSelector
@@ -1845,6 +1884,35 @@ extension on TranslationsEs {
 			'createFlight.steps.mapPreviewTitle' => 'Vista previa del mapa',
 			'createFlight.steps.overviewTitle' => 'Resumen de la ruta',
 			'createFlight.steps.wikipediaTitle' => 'Artículos de Wikipedia',
+			'createFlight.steps.weatherTitle' => 'Clima del vuelo',
+			'createFlight.weather.title' => '¿Verás el suelo?',
+			'createFlight.weather.loading' => 'Comprobando el cielo a lo largo de tu ruta…',
+			'createFlight.weather.loadFailed' => 'No se pudo cargar el pronóstico ahora mismo. Reintenta o continúa sin él.',
+			'createFlight.weather.estimatedBadge' => 'horas estimadas',
+			'createFlight.weather.departureLabel' => 'Salida',
+			'createFlight.weather.arrivalLabel' => 'Llegada',
+			'createFlight.weather.verdictClearTitle' => 'Vistas despejadas',
+			'createFlight.weather.verdictClearBody' => 'El asiento de ventanilla merece la pena: el suelo debería verse casi todo el vuelo.',
+			'createFlight.weather.verdictPatchyTitle' => 'Nubes dispersas',
+			'createFlight.weather.verdictPatchyBody' => 'Las vistas irán y vendrán entre las nubes.',
+			'createFlight.weather.verdictCarpetTitle' => 'Manto de nubes debajo',
+			'createFlight.weather.verdictCarpetBody' => 'Un mar blanco de nubes bajo el avión: precioso, pero el suelo quedará casi siempre oculto.',
+			'createFlight.weather.verdictOvercastTitle' => 'Cielo cubierto',
+			'createFlight.weather.verdictOvercastBody' => 'Las mejores vistas serán en el despegue y el aterrizaje.',
+			'createFlight.weather.expectClear' => '☀️ Despejado',
+			'createFlight.weather.expectPatchy' => '⛅ Nubes dispersas',
+			'createFlight.weather.expectCarpet' => '☁️ Manto de nubes',
+			'createFlight.weather.expectOvercast' => '🌫 Cubierto',
+			'createFlight.weather.segmentAfterTakeoff' => 'tras el despegue',
+			'createFlight.weather.segmentMidFlight' => 'a mitad de vuelo',
+			'createFlight.weather.segmentBeforeLanding' => 'antes de aterrizar',
+			'createFlight.weather.segmentOver' => ({required Object name}) => 'sobre ${name}',
+			'createFlight.weather.proTeaserTitle' => 'Mapa de nubes de tu ruta',
+			'createFlight.weather.proTeaserBody' => 'Mira dónde estarán las nubes y observa tu avión volar toda la ruta por encima de ellas.',
+			'createFlight.weather.attribution' => 'Datos meteorológicos: MET Norway',
+			'createFlight.weather.hedge' => 'Los pronósticos se afinan cuanto más cerca está la salida.',
+			'createFlight.weather.forecastFor' => ({required Object date}) => 'Pronóstico para el ${date}',
+			'createFlight.weather.updatedAt' => ({required Object time}) => 'Actualizado ${time}',
 			'createFlight.routeTypeSelector.title' => 'Nuevo vuelo',
 			'createFlight.routeTypeSelector.basicTitle' => 'Ruta aproximada',
 			'createFlight.routeTypeSelector.basicSubtitle' => 'Desde aeropuertos',
@@ -1996,6 +2064,8 @@ extension on TranslationsEs {
 			'createFlight.overview.timeline.regionType.isthmus' => 'Istmo',
 			'createFlight.overview.timeline.regionType.unknown' => 'Tipo de región desconocido',
 			'createFlight.wikipedia.title' => 'Descarga artículos y lee mientras estás en el aire',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.wikipedia.loadingIntro' => 'Buscando artículos relacionados con la ruta...',
 			'createFlight.wikipedia.foundIntro' => ({required Object count}) => 'Según tu ruta, encontramos ${count} artículos relevantes',
 			'createFlight.wikipedia.emptyIntro' => 'No se encontraron artículos de Wikipedia relacionados con la ruta. Puedes continuar descargando solo el mapa.',
@@ -2025,8 +2095,6 @@ extension on TranslationsEs {
 			'createFlight.downloading.currentStep' => 'Actual',
 			'createFlight.downloading.pending' => 'Pendiente',
 			'createFlight.downloading.inProgress' => 'En curso',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.downloading.completed' => 'Completado',
 			'createFlight.downloading.completedWithIssues' => 'Completado con incidencias',
 			'createFlight.downloading.failed' => 'Fallido',
@@ -2510,6 +2578,8 @@ extension on TranslationsEs {
 			'countries.PH' => 'Filipinas',
 			'countries.PK' => 'Pakistan',
 			'countries.PL' => 'Polonia',
+			_ => null,
+		} ?? switch (path) {
 			'countries.PR' => 'Puerto Rico',
 			'countries.PS' => 'Cisjordania y Franja de Gaza',
 			'countries.PT' => 'Portugal',
@@ -2539,8 +2609,6 @@ extension on TranslationsEs {
 			'countries.TD' => 'Chad',
 			'countries.TG' => 'Togo',
 			'countries.TH' => 'Tailandia',
-			_ => null,
-		} ?? switch (path) {
 			'countries.TJ' => 'Tayikistan',
 			'countries.TL' => 'Timor Oriental',
 			'countries.TM' => 'Turkmenistan',

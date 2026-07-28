@@ -30,6 +30,8 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/widgets/pro_widgets.dart';
 import 'package:flymap/domain/usecase/download_map_use_case.dart';
+import 'package:flymap/domain/usecase/fetch_flight_weather_use_case.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/flight_search_weather_step.dart';
 import 'package:flymap/domain/usecase/download_region_wiki_articles_use_case.dart';
 import 'package:flymap/domain/usecase/download_wikipedia_articles_use_case.dart';
 import 'package:flymap/domain/usecase/get_route_overview_use_case.dart';
@@ -51,6 +53,7 @@ class FlightPreviewScreen extends StatelessWidget {
         flightNumber: args.flightNumber,
         fr24Id: args.fr24Id,
         schedule: args.schedule,
+        fetchFlightWeatherUseCase: GetIt.I.get<FetchFlightWeatherUseCase>(),
         hasPendingFlightUnlock: args.hasPendingFlightUnlock,
         connectivityChecker: GetIt.I.get<ConnectivityChecker>(),
         getRouteOverviewUseCase: GetIt.I.get<GetRouteOverviewUseCase>(),
@@ -283,6 +286,21 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
             ),
           ),
         );
+      case CreateFlightStep.weather:
+        return FlightSearchWeatherStep(
+          state: state,
+          isProUser: isProUser,
+          onRetry: () => unawaited(cubit.fetchWeather(force: true)),
+          onContinue: cubit.continueFromWeather,
+          onPremiumGateTap: () => unawaited(
+            _handleUpgradeToProFromOverview(
+              context: context,
+              cubit: cubit,
+              state: state,
+              subscriptionCubit: subscriptionCubit,
+            ),
+          ),
+        );
       case CreateFlightStep.wikipediaArticles:
         return FlightSearchWikipediaArticlesStep(
           state: state,
@@ -469,7 +487,8 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
     return switch (step) {
       CreateFlightStep.routeNotSupported => 0,
       CreateFlightStep.overview => 0,
-      CreateFlightStep.wikipediaArticles => 1,
+      CreateFlightStep.weather => 1,
+      CreateFlightStep.wikipediaArticles => 2,
     };
   }
 
@@ -524,6 +543,7 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
       CreateFlightStep.routeNotSupported =>
         context.t.createFlight.steps.routeNotSupportedTitle,
       CreateFlightStep.overview => context.t.createFlight.steps.overviewTitle,
+      CreateFlightStep.weather => context.t.createFlight.steps.weatherTitle,
       CreateFlightStep.wikipediaArticles =>
         context.t.createFlight.steps.wikipediaTitle,
     };

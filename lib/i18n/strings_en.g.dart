@@ -956,6 +956,7 @@ class TranslationsCreateFlightEn {
 
 	// Translations
 	late final TranslationsCreateFlightStepsEn steps = TranslationsCreateFlightStepsEn.internal(_root);
+	late final TranslationsCreateFlightWeatherEn weather = TranslationsCreateFlightWeatherEn.internal(_root);
 	late final TranslationsCreateFlightRouteTypeSelectorEn routeTypeSelector = TranslationsCreateFlightRouteTypeSelectorEn.internal(_root);
 	late final TranslationsCreateFlightProAccessEn proAccess = TranslationsCreateFlightProAccessEn.internal(_root);
 	late final TranslationsCreateFlightTravelDateEn travelDate = TranslationsCreateFlightTravelDateEn.internal(_root);
@@ -2273,6 +2274,102 @@ class TranslationsCreateFlightStepsEn {
 
 	/// en: 'Wikipedia articles'
 	String get wikipediaTitle => 'Wikipedia articles';
+
+	/// en: 'Flight weather'
+	String get weatherTitle => 'Flight weather';
+}
+
+// Path: createFlight.weather
+class TranslationsCreateFlightWeatherEn {
+	TranslationsCreateFlightWeatherEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Will you see the ground?'
+	String get title => 'Will you see the ground?';
+
+	/// en: 'Checking the skies along your route…'
+	String get loading => 'Checking the skies along your route…';
+
+	/// en: 'Couldn't load the forecast right now. You can retry or continue without it.'
+	String get loadFailed => 'Couldn\'t load the forecast right now. You can retry or continue without it.';
+
+	/// en: 'times estimated'
+	String get estimatedBadge => 'times estimated';
+
+	/// en: 'Departure'
+	String get departureLabel => 'Departure';
+
+	/// en: 'Arrival'
+	String get arrivalLabel => 'Arrival';
+
+	/// en: 'Clear views'
+	String get verdictClearTitle => 'Clear views';
+
+	/// en: 'Window seat worth it — the ground should be visible for most of the flight.'
+	String get verdictClearBody => 'Window seat worth it — the ground should be visible for most of the flight.';
+
+	/// en: 'Patchy clouds'
+	String get verdictPatchyTitle => 'Patchy clouds';
+
+	/// en: 'Views will come and go between the clouds.'
+	String get verdictPatchyBody => 'Views will come and go between the clouds.';
+
+	/// en: 'Cloud carpet below'
+	String get verdictCarpetTitle => 'Cloud carpet below';
+
+	/// en: 'A white sea of clouds beneath you — beautiful, but the ground will mostly stay hidden.'
+	String get verdictCarpetBody => 'A white sea of clouds beneath you — beautiful, but the ground will mostly stay hidden.';
+
+	/// en: 'Overcast skies'
+	String get verdictOvercastTitle => 'Overcast skies';
+
+	/// en: 'Best views at takeoff and landing.'
+	String get verdictOvercastBody => 'Best views at takeoff and landing.';
+
+	/// en: '☀️ Clear'
+	String get expectClear => '☀️ Clear';
+
+	/// en: '⛅ Patchy'
+	String get expectPatchy => '⛅ Patchy';
+
+	/// en: '☁️ Cloud carpet'
+	String get expectCarpet => '☁️ Cloud carpet';
+
+	/// en: '🌫 Overcast'
+	String get expectOvercast => '🌫 Overcast';
+
+	/// en: 'after takeoff'
+	String get segmentAfterTakeoff => 'after takeoff';
+
+	/// en: 'mid-flight'
+	String get segmentMidFlight => 'mid-flight';
+
+	/// en: 'before landing'
+	String get segmentBeforeLanding => 'before landing';
+
+	/// en: 'over $name'
+	String segmentOver({required Object name}) => 'over ${name}';
+
+	/// en: 'Cloud map along your route'
+	String get proTeaserTitle => 'Cloud map along your route';
+
+	/// en: 'See where the clouds will be — and watch your plane fly the whole route above them.'
+	String get proTeaserBody => 'See where the clouds will be — and watch your plane fly the whole route above them.';
+
+	/// en: 'Weather data: MET Norway'
+	String get attribution => 'Weather data: MET Norway';
+
+	/// en: 'Forecasts firm up closer to departure.'
+	String get hedge => 'Forecasts firm up closer to departure.';
+
+	/// en: 'Forecast for $date'
+	String forecastFor({required Object date}) => 'Forecast for ${date}';
+
+	/// en: 'Updated $time'
+	String updatedAt({required Object time}) => 'Updated ${time}';
 }
 
 // Path: createFlight.routeTypeSelector
@@ -3941,6 +4038,35 @@ extension on Translations {
 			'createFlight.steps.mapPreviewTitle' => 'Map preview',
 			'createFlight.steps.overviewTitle' => 'Route overview',
 			'createFlight.steps.wikipediaTitle' => 'Wikipedia articles',
+			'createFlight.steps.weatherTitle' => 'Flight weather',
+			'createFlight.weather.title' => 'Will you see the ground?',
+			'createFlight.weather.loading' => 'Checking the skies along your route…',
+			'createFlight.weather.loadFailed' => 'Couldn\'t load the forecast right now. You can retry or continue without it.',
+			'createFlight.weather.estimatedBadge' => 'times estimated',
+			'createFlight.weather.departureLabel' => 'Departure',
+			'createFlight.weather.arrivalLabel' => 'Arrival',
+			'createFlight.weather.verdictClearTitle' => 'Clear views',
+			'createFlight.weather.verdictClearBody' => 'Window seat worth it — the ground should be visible for most of the flight.',
+			'createFlight.weather.verdictPatchyTitle' => 'Patchy clouds',
+			'createFlight.weather.verdictPatchyBody' => 'Views will come and go between the clouds.',
+			'createFlight.weather.verdictCarpetTitle' => 'Cloud carpet below',
+			'createFlight.weather.verdictCarpetBody' => 'A white sea of clouds beneath you — beautiful, but the ground will mostly stay hidden.',
+			'createFlight.weather.verdictOvercastTitle' => 'Overcast skies',
+			'createFlight.weather.verdictOvercastBody' => 'Best views at takeoff and landing.',
+			'createFlight.weather.expectClear' => '☀️ Clear',
+			'createFlight.weather.expectPatchy' => '⛅ Patchy',
+			'createFlight.weather.expectCarpet' => '☁️ Cloud carpet',
+			'createFlight.weather.expectOvercast' => '🌫 Overcast',
+			'createFlight.weather.segmentAfterTakeoff' => 'after takeoff',
+			'createFlight.weather.segmentMidFlight' => 'mid-flight',
+			'createFlight.weather.segmentBeforeLanding' => 'before landing',
+			'createFlight.weather.segmentOver' => ({required Object name}) => 'over ${name}',
+			'createFlight.weather.proTeaserTitle' => 'Cloud map along your route',
+			'createFlight.weather.proTeaserBody' => 'See where the clouds will be — and watch your plane fly the whole route above them.',
+			'createFlight.weather.attribution' => 'Weather data: MET Norway',
+			'createFlight.weather.hedge' => 'Forecasts firm up closer to departure.',
+			'createFlight.weather.forecastFor' => ({required Object date}) => 'Forecast for ${date}',
+			'createFlight.weather.updatedAt' => ({required Object time}) => 'Updated ${time}',
 			'createFlight.routeTypeSelector.title' => 'New flight',
 			'createFlight.routeTypeSelector.basicTitle' => 'Approximate route',
 			'createFlight.routeTypeSelector.basicSubtitle' => 'From airports',
@@ -4092,6 +4218,8 @@ extension on Translations {
 			'createFlight.overview.timeline.regionType.isthmus' => 'Isthmus',
 			'createFlight.overview.timeline.regionType.unknown' => 'Unknown region type',
 			'createFlight.wikipedia.title' => 'Download articles and read while you’re in the air',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.wikipedia.loadingIntro' => 'Finding route-related articles...',
 			'createFlight.wikipedia.foundIntro' => ({required Object count}) => 'Based on your route we found ${count} relevant articles',
 			'createFlight.wikipedia.emptyIntro' => 'No route-related Wikipedia articles found. You can continue with map download only.',
@@ -4121,8 +4249,6 @@ extension on Translations {
 			'createFlight.downloading.currentStep' => 'Current',
 			'createFlight.downloading.pending' => 'Pending',
 			'createFlight.downloading.inProgress' => 'In progress',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.downloading.completed' => 'Completed',
 			'createFlight.downloading.completedWithIssues' => 'Completed with issues',
 			'createFlight.downloading.failed' => 'Failed',
@@ -4606,6 +4732,8 @@ extension on Translations {
 			'countries.PH' => 'Philippines',
 			'countries.PK' => 'Pakistan',
 			'countries.PL' => 'Poland',
+			_ => null,
+		} ?? switch (path) {
 			'countries.PR' => 'Puerto Rico',
 			'countries.PS' => 'West Bank and Gaza Strip',
 			'countries.PT' => 'Portugal',
@@ -4635,8 +4763,6 @@ extension on Translations {
 			'countries.TD' => 'Chad',
 			'countries.TG' => 'Togo',
 			'countries.TH' => 'Thailand',
-			_ => null,
-		} ?? switch (path) {
 			'countries.TJ' => 'Tajikistan',
 			'countries.TL' => 'Timor-Leste',
 			'countries.TM' => 'Turkmenistan',
