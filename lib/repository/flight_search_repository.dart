@@ -1,4 +1,3 @@
-import 'package:flymap/data/api/flight_lookup_api.dart';
 import 'package:flymap/data/api/flight_number_search_api.dart';
 import 'package:flymap/data/api/flight_route_preview_api.dart';
 import 'package:flymap/data/api/flight_route_search_api.dart';
@@ -12,8 +11,6 @@ import 'package:flymap/ui/map/map_utils.dart';
 import 'package:latlong2/latlong.dart';
 
 abstract interface class FlightSearchRepository {
-  Future<FlightSummary> lookupFlightByNumber(String flightNumber);
-
   Future<List<FlightSummary>> searchFlightsByNumber(String flightNumber);
 
   /// Upcoming scheduled departures (7-day window) for a flight number,
@@ -49,22 +46,19 @@ abstract interface class FlightSearchRepository {
 
 class ApiFlightSearchRepository implements FlightSearchRepository {
   ApiFlightSearchRepository({
-    required FlightLookupApi lookupApi,
     required FlightNumberSearchApi numberSearchApi,
     required UpcomingFlightSearchApi upcomingSearchApi,
     required FlightRouteSearchApi routeSearchApi,
     required FlightRoutePreviewApi routePreviewApi,
     required AirportsDatabase airportsDb,
     required AirlinesDatabase airlinesDb,
-  }) : _lookupApi = lookupApi,
-       _numberSearchApi = numberSearchApi,
+  }) : _numberSearchApi = numberSearchApi,
        _upcomingSearchApi = upcomingSearchApi,
        _routeSearchApi = routeSearchApi,
        _routePreviewApi = routePreviewApi,
        _airportsDb = airportsDb,
        _airlinesDb = airlinesDb;
 
-  final FlightLookupApi _lookupApi;
   final FlightNumberSearchApi _numberSearchApi;
   final UpcomingFlightSearchApi _upcomingSearchApi;
   final FlightRouteSearchApi _routeSearchApi;
@@ -72,12 +66,6 @@ class ApiFlightSearchRepository implements FlightSearchRepository {
   final AirportsDatabase _airportsDb;
   final AirlinesDatabase _airlinesDb;
   final _logger = const Logger('FlightSearchRepository');
-
-  @override
-  Future<FlightSummary> lookupFlightByNumber(String flightNumber) async {
-    final map = await _lookupApi.lookupFlightByNumber(flightNumber);
-    return FlightSummary.fromApi(map, flightNumber);
-  }
 
   @override
   Future<List<FlightSummary>> searchFlightsByNumber(String flightNumber) async {

@@ -1,6 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flymap/data/api/flight_lookup_api.dart';
 import 'package:flymap/data/api/flight_number_search_api.dart';
 import 'package:flymap/data/api/flight_route_preview_api.dart';
 import 'package:flymap/data/api/flight_route_search_api.dart';
@@ -19,7 +18,6 @@ void main() {
     setUp(() {
       routeSearchApi = _FakeFlightRouteSearchApi();
       repository = ApiFlightSearchRepository(
-        lookupApi: _FakeFlightLookupApi(),
         numberSearchApi: _FakeFlightNumberSearchApi(),
         upcomingSearchApi: _FakeUpcomingFlightSearchApi(),
         routeSearchApi: routeSearchApi,
@@ -125,15 +123,6 @@ void main() {
       );
     });
   });
-}
-
-class _FakeFlightLookupApi extends FlightLookupApi {
-  _FakeFlightLookupApi() : super();
-
-  @override
-  Future<Map<String, dynamic>> lookupFlightByNumber(String flightNumber) {
-    throw UnimplementedError();
-  }
 }
 
 class _FakeFlightRouteSearchApi extends FlightRouteSearchApi {

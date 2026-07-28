@@ -10,7 +10,6 @@ import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics_initializer.dart';
 import 'package:flymap/data/api/feedback_api.dart';
 import 'package:flymap/data/api/flight_info_api.dart';
-import 'package:flymap/data/api/flight_lookup_api.dart';
 import 'package:flymap/data/api/flight_number_search_api.dart';
 import 'package:flymap/data/api/upcoming_flight_search_api.dart';
 import 'package:flymap/data/api/mapbox_env_config.dart';
@@ -81,8 +80,6 @@ import 'package:flymap/domain/usecase/can_open_learn_article_use_case.dart';
 import 'package:flymap/domain/usecase/download_map_use_case.dart';
 import 'package:flymap/domain/usecase/download_region_wiki_articles_use_case.dart';
 import 'package:flymap/domain/usecase/download_wikipedia_articles_use_case.dart';
-import 'package:flymap/domain/usecase/get_flight_info_use_case.dart';
-import 'package:flymap/domain/usecase/lookup_flight_by_number_use_case.dart';
 import 'package:flymap/domain/usecase/search_flights_by_number_use_case.dart';
 import 'package:flymap/domain/usecase/search_upcoming_flights_by_number_use_case.dart';
 import 'package:flymap/domain/usecase/build_flight_route_preview_use_case.dart';
@@ -179,7 +176,6 @@ class DiModule {
 
     i.registerFactory<RouteOverviewApiMapper>(() => RouteOverviewApiMapper());
     i.registerLazySingleton<RouteOverviewApi>(() => RouteOverviewApi());
-    i.registerLazySingleton<FlightLookupApi>(() => FlightLookupApi());
     i.registerLazySingleton<FlightNumberSearchApi>(
       () => FlightNumberSearchApi(),
     );
@@ -201,7 +197,6 @@ class DiModule {
     );
     i.registerLazySingleton<FlightSearchRepository>(
       () => ApiFlightSearchRepository(
-        lookupApi: i.get(),
         numberSearchApi: i.get(),
         upcomingSearchApi: i.get(),
         routeSearchApi: i.get(),
@@ -209,9 +204,6 @@ class DiModule {
         airportsDb: i.get(),
         airlinesDb: i.get(),
       ),
-    );
-    i.registerLazySingleton<LookupFlightByNumberUseCase>(
-      () => LookupFlightByNumberUseCase(repository: i.get()),
     );
     i.registerLazySingleton<SearchFlightsByNumberUseCase>(
       () => SearchFlightsByNumberUseCase(repository: i.get()),
@@ -306,9 +298,6 @@ class DiModule {
     );
     i.registerLazySingleton<DownloadWikipediaArticlesUseCase>(
       () => DownloadWikipediaArticlesUseCase(articleClient: GetIt.I.get()),
-    );
-    i.registerLazySingleton<GetFlightInfoUseCase>(
-      () => GetFlightInfoUseCase(flightInfoApi: GetIt.I.get()),
     );
     i.registerLazySingleton<GetWikiArticlesUseCase>(
       () => GetWikiArticlesUseCase(flightInfoApi: GetIt.I.get()),

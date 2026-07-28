@@ -765,10 +765,6 @@ class _UnusedFlightSearchRepository implements FlightSearchRepository {
     throw UnimplementedError();
   }
 
-  @override
-  Future<FlightSummary> lookupFlightByNumber(String flightNumber) {
-    throw UnimplementedError();
-  }
 
   @override
   Future<List<FlightSummary>> searchFlightsByNumber(String flightNumber) {

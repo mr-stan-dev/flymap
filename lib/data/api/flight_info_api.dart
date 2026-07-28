@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flymap/data/api/flight_info_api_mapper.dart';
-import 'package:flymap/domain/entity/flight_info.dart';
 import 'package:flymap/domain/entity/user_profile.dart';
 import 'package:flymap/domain/entity/user_interests_payload.dart';
 import 'package:flymap/domain/entity/wiki_article_candidate.dart';
@@ -103,8 +102,6 @@ List<LatLng> sampleWaypointsForFlightRequest(
 
 class FlightInfoApi {
   final functions = FirebaseFunctions.instance;
-  static const _overviewPromptVersion = 3;
-  static const _getOverviewFunction = 'get_flight_overview';
   static const _wikiArticlesPromptVersion = 7;
   static const _getWikiArticlesFunction = 'get_flight_wiki_articles';
   final _logger = Logger('FlightInfoApi');
@@ -112,37 +109,6 @@ class FlightInfoApi {
   final FlightInfoApiMapper _mapper;
 
   FlightInfoApi({required FlightInfoApiMapper apiMapper}) : _mapper = apiMapper;
-
-  Future<FlightInfo> getFlightOverview(
-    String airportDeparture,
-    String airportArrival,
-    List<LatLng> waypoints,
-  ) async {
-    _logger.log(
-      'getFlightOverview dep="$airportDeparture" arr="$airportArrival" '
-      'waypoints=${waypoints.length}',
-    );
-    final result = await functions
-        .httpsCallable(_getOverviewFunction)
-        .call(
-          _buildFunctionRequest(
-            airportDeparture: airportDeparture,
-            airportArrival: airportArrival,
-            waypoints: waypoints,
-            promptVersion: _overviewPromptVersion,
-          ),
-        );
-    final decoded = _decodeFunctionData(result.data);
-    _logger.log('Overview response decoded type=${decoded.runtimeType}');
-    if (decoded is! Map) {
-      throw const FormatException('Invalid overview response payload');
-    }
-    final map = decoded.cast<String, dynamic>();
-    _logger.log('Overview payload keys=[${map.keys.take(10).join(', ')}]');
-    final info = _mapper.toFlightInfo(map);
-    _logger.log('Overview mapped overviewLen=${info.overview.length}');
-    return info;
-  }
 
   Future<List<WikiArticleCandidate>> getFlightWikiArticles(
     String airportDeparture,
