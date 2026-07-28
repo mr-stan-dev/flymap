@@ -44,7 +44,10 @@ class WeatherRouteMapCard extends StatefulWidget {
 class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
     with SingleTickerProviderStateMixin {
   /// Cloud-field frames spanning the flight; crossfaded by plane progress.
-  static const int _cloudFrameCount = 12;
+  static const int _cloudFrameCount = 24;
+
+  /// ~4 viewport px per field cell — fine enough for wispy cloud edges.
+  static const int _cloudFieldResolution = 135;
 
   late final AnimationController _plane = AnimationController(
     vsync: this,
@@ -105,18 +108,22 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
       positions: _projectedSamples,
       viewportWidth: staticWeatherMapSize,
       viewportHeight: staticWeatherMapSize,
-      fieldWidth: 68,
-      fieldHeight: 68,
+      fieldWidth: _cloudFieldResolution,
+      fieldHeight: _cloudFieldResolution,
     );
-    final buffers = builder.buildFrameBuffers(
+    // Lazy generator + a yield per frame: the raster work spreads across
+    // event-loop turns instead of one long jank.
+    final images = <ui.Image>[];
+    for (final buffer in builder.buildFrameBuffers(
       frameCount: end.isAfter(start) ? _cloudFrameCount : 1,
       start: start,
       end: end,
-    );
-    final images = await Future.wait([
-      for (final buffer in buffers)
-        _decodeRgba(buffer, builder.fieldWidth, builder.fieldHeight),
-    ]);
+    )) {
+      images.add(
+        await _decodeRgba(buffer, builder.fieldWidth, builder.fieldHeight),
+      );
+      await Future<void>.delayed(Duration.zero);
+    }
     if (!mounted) {
       for (final image in images) {
         image.dispose();
@@ -287,21 +294,83 @@ class _WeatherMapPainter extends CustomPainter {
       routePoints,
       routeKm: routeKm,
     );
-    // Same teal as the share card route — visible on any satellite imagery.
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = ShareImagePainter.routeColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3 * scale
-        ..strokeCap = StrokeCap.round,
-    );
+    // Same visual language as the home-card thumbnails: the share card's
+    // dashed teal route, scaled to this card's stroke width.
+    final routePaint = Paint()
+      ..color = ShareImagePainter.routeColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3 * scale
+      ..strokeCap = StrokeCap.round;
+    final dashK = routePaint.strokeWidth / ShareImagePainter.routeStrokeWidth;
+    final dashLength = ShareImagePainter.routeDashLength * dashK;
+    final dashGap = ShareImagePainter.routeDashGap * dashK;
+
+    final progress = planeProgress;
+    final metrics = path.computeMetrics().toList(growable: false);
+    if (progress != null && metrics.isNotEmpty) {
+      // The dash gap travels with the plane, like the share card's
+      // plane-in-a-gap — but live.
+      final metric = metrics.first;
+      final planeOffset = metric.length * progress;
+      final halfGap = ShareImagePainter.planeGapLength * dashK / 2;
+      final gapStart = math.max(0.0, planeOffset - halfGap);
+      final gapEnd = math.min(metric.length, planeOffset + halfGap);
+      if (gapStart > 0) {
+        _drawDashedPath(
+          canvas,
+          metric.extractPath(0, gapStart),
+          routePaint,
+          dashLength: dashLength,
+          dashGap: dashGap,
+        );
+      }
+      if (gapEnd < metric.length) {
+        _drawDashedPath(
+          canvas,
+          metric.extractPath(gapEnd, metric.length),
+          routePaint,
+          dashLength: dashLength,
+          dashGap: dashGap,
+        );
+      }
+    } else {
+      _drawDashedPath(
+        canvas,
+        path,
+        routePaint,
+        dashLength: dashLength,
+        dashGap: dashGap,
+      );
+    }
 
     _drawAirport(canvas, routePoints.first, departureCode, scale, size);
     _drawAirport(canvas, routePoints.last, arrivalCode, scale, size);
 
-    final progress = planeProgress;
     if (progress != null) _drawPlane(canvas, path, progress, scale);
+  }
+
+  void _drawDashedPath(
+    Canvas canvas,
+    Path source,
+    Paint paint, {
+    required double dashLength,
+    required double dashGap,
+  }) {
+    for (final metric in source.computeMetrics()) {
+      var distance = 0.0;
+      var draw = true;
+      while (distance < metric.length) {
+        final length = draw ? dashLength : dashGap;
+        if (draw) {
+          canvas.drawPath(
+            metric.extractPath(distance, distance + length),
+            paint,
+          );
+        }
+        distance += length;
+        draw = !draw;
+      }
+    }
   }
 
   /// The continuous cloud layer: the current flight instant selects two
@@ -333,14 +402,19 @@ class _WeatherMapPainter extends CustomPainter {
     final index = framePosition.floor().clamp(0, cloudFrames.length - 2);
     final blend = framePosition - index;
     canvas.saveLayer(rect, Paint());
+    // Continuous sub-frame drift in the same direction as the baked noise
+    // motion — the field visibly moves at frame rate, not only when the
+    // crossfade advances. Drawn slightly inflated so edges never gap.
+    canvas.translate((0.5 - progress) * 20, (0.5 - progress) * 7);
+    final dst = rect.inflate(14);
     final paint = Paint()
       ..filterQuality = FilterQuality.low
       ..color = Colors.white.withValues(alpha: 1 - blend);
-    canvas.drawImageRect(cloudFrames[index], src, rect, paint);
+    canvas.drawImageRect(cloudFrames[index], src, dst, paint);
     paint
       ..color = Colors.white.withValues(alpha: blend)
       ..blendMode = BlendMode.plus;
-    canvas.drawImageRect(cloudFrames[index + 1], src, rect, paint);
+    canvas.drawImageRect(cloudFrames[index + 1], src, dst, paint);
     canvas.restore();
   }
 
@@ -352,10 +426,10 @@ class _WeatherMapPainter extends CustomPainter {
     Size size,
   ) {
     // Share-card endpoint style: white ring with a teal core.
-    canvas.drawCircle(center, 7 * scale, Paint()..color = Colors.white);
+    canvas.drawCircle(center, 10.5 * scale, Paint()..color = Colors.white);
     canvas.drawCircle(
       center,
-      5.5 * scale,
+      8.25 * scale,
       Paint()..color = ShareImagePainter.routeColor,
     );
 
@@ -364,14 +438,14 @@ class _WeatherMapPainter extends CustomPainter {
         text: code,
         style: TextStyle(
           color: Colors.white,
-          fontSize: 13 * scale,
+          fontSize: 19.5 * scale,
           fontWeight: FontWeight.w700,
           shadows: const [Shadow(color: Colors.black87, blurRadius: 6)],
         ),
       ),
       textDirection: TextDirection.ltr,
     )..layout();
-    var labelOrigin = center + Offset(-painter.width / 2, 10 * scale);
+    var labelOrigin = center + Offset(-painter.width / 2, 14 * scale);
     // Keep labels inside the card.
     labelOrigin = Offset(
       labelOrigin.dx.clamp(4, size.width - painter.width - 4),
@@ -391,7 +465,7 @@ class _WeatherMapPainter extends CustomPainter {
       text: TextSpan(
         text: String.fromCharCode(Icons.flight.codePoint),
         style: TextStyle(
-          fontSize: 26 * scale,
+          fontSize: 39 * scale,
           fontFamily: Icons.flight.fontFamily,
           color: ShareImagePainter.routeColor,
           shadows: const [Shadow(color: Colors.black87, blurRadius: 6)],

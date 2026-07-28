@@ -360,6 +360,8 @@
       "estimatedBadge": "horaires estimés",
       "departureLabel": "Départ",
       "arrivalLabel": "Arrivée",
+      "tomorrow": "demain",
+      "localTimesHint": "Les heures sont locales à chaque aéroport.",
       "verdictClearTitle": "Vues dégagées",
       "verdictClearBody": "Le hublot vaut le coup — le sol devrait être visible pendant presque tout le vol.",
       "verdictPatchyTitle": "Nuages épars",

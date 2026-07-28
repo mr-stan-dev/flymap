@@ -938,6 +938,8 @@ class _TranslationsCreateFlightWeatherDe extends TranslationsCreateFlightWeather
 	@override String get estimatedBadge => 'Zeiten geschätzt';
 	@override String get departureLabel => 'Abflug';
 	@override String get arrivalLabel => 'Ankunft';
+	@override String get tomorrow => 'morgen';
+	@override String get localTimesHint => 'Zeiten sind Ortszeit des jeweiligen Flughafens.';
 	@override String get verdictClearTitle => 'Klare Sicht';
 	@override String get verdictClearBody => 'Der Fensterplatz lohnt sich — der Boden sollte fast den ganzen Flug sichtbar sein.';
 	@override String get verdictPatchyTitle => 'Aufgelockerte Bewölkung';
@@ -1891,6 +1893,8 @@ extension on TranslationsDe {
 			'createFlight.weather.estimatedBadge' => 'Zeiten geschätzt',
 			'createFlight.weather.departureLabel' => 'Abflug',
 			'createFlight.weather.arrivalLabel' => 'Ankunft',
+			'createFlight.weather.tomorrow' => 'morgen',
+			'createFlight.weather.localTimesHint' => 'Zeiten sind Ortszeit des jeweiligen Flughafens.',
 			'createFlight.weather.verdictClearTitle' => 'Klare Sicht',
 			'createFlight.weather.verdictClearBody' => 'Der Fensterplatz lohnt sich — der Boden sollte fast den ganzen Flug sichtbar sein.',
 			'createFlight.weather.verdictPatchyTitle' => 'Aufgelockerte Bewölkung',
@@ -2062,10 +2066,10 @@ extension on TranslationsDe {
 			'createFlight.overview.timeline.regionType.continent' => 'Kontinent',
 			'createFlight.overview.timeline.regionType.geoarea' => 'Geografisches Gebiet',
 			'createFlight.overview.timeline.regionType.isthmus' => 'Isthmus',
-			'createFlight.overview.timeline.regionType.unknown' => 'Unbekannter Regionstyp',
-			'createFlight.wikipedia.title' => 'Lade Artikel herunter und lies sie während des Flugs',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.timeline.regionType.unknown' => 'Unbekannter Regionstyp',
+			'createFlight.wikipedia.title' => 'Lade Artikel herunter und lies sie während des Flugs',
 			'createFlight.wikipedia.loadingIntro' => 'Routenbezogene Artikel werden gesucht...',
 			'createFlight.wikipedia.foundIntro' => ({required Object count}) => 'Basierend auf deiner Route haben wir ${count} relevante Artikel gefunden',
 			'createFlight.wikipedia.emptyIntro' => 'Keine routenbezogenen Wikipedia-Artikel gefunden. Du kannst nur mit dem Kartendownload fortfahren.',
@@ -2576,10 +2580,10 @@ extension on TranslationsDe {
 			'countries.PE' => 'Peru',
 			'countries.PG' => 'Papua-Neuguinea',
 			'countries.PH' => 'Philippinen',
-			'countries.PK' => 'Pakistan',
-			'countries.PL' => 'Polen',
 			_ => null,
 		} ?? switch (path) {
+			'countries.PK' => 'Pakistan',
+			'countries.PL' => 'Polen',
 			'countries.PR' => 'Puerto Rico',
 			'countries.PS' => 'Westjordanland und Gazastreifen',
 			'countries.PT' => 'Portugal',

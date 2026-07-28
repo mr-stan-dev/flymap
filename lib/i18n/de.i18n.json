@@ -360,6 +360,8 @@
       "estimatedBadge": "Zeiten geschätzt",
       "departureLabel": "Abflug",
       "arrivalLabel": "Ankunft",
+      "tomorrow": "morgen",
+      "localTimesHint": "Zeiten sind Ortszeit des jeweiligen Flughafens.",
       "verdictClearTitle": "Klare Sicht",
       "verdictClearBody": "Der Fensterplatz lohnt sich — der Boden sollte fast den ganzen Flug sichtbar sein.",
       "verdictPatchyTitle": "Aufgelockerte Bewölkung",

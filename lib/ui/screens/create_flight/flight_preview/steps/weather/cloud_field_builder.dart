@@ -33,28 +33,41 @@ class CloudFieldBuilder {
   final int fieldWidth;
   final int fieldHeight;
 
-  /// Interpolate each cell from this many nearest samples (Shepard/IDW).
-  static const int _neighborCount = 4;
+  /// Interpolate each cell from this many nearest samples. Gaussian-weighted
+  /// (see [_weightSigmaPx]): by the time a neighbor drops out of the set its
+  /// weight is negligible, so the field stays smooth — nearest-few IDW with
+  /// heavy weights produces angular seams where the neighbor set switches.
+  static const int _neighborCount = 8;
+
+  /// Gaussian falloff radius for neighbor weights, in viewport px (~the
+  /// area-grid spacing).
+  static const double _weightSigmaPx = 75;
 
   /// Semi-transparent by design: even solid overcast keeps the map visible.
   static const double _maxCloudAlpha = 0.8;
 
-  /// RGBA (premultiplied-alpha) pixel buffers, one per animation frame, spanning
-  /// [start]..[end] flight time. Frame f's cloud densities come from each
-  /// sample's hourly timeline at that frame's instant, so the field honestly
-  /// evolves; the noise mask drifts slightly per frame so the crossfaded
-  /// animation reads as cloud motion.
-  List<Uint8List> buildFrameBuffers({
+  /// Noise-mask drift per frame, in viewport px — crossfading two adjacent
+  /// frames then reads as cloud motion, not just density morphing.
+  static const double _driftXPx = 5.0;
+  static const double _driftYPx = 1.6;
+
+  /// RGBA (premultiplied-alpha) pixel buffers, one per animation frame,
+  /// spanning [start]..[end] flight time. Frame f's cloud densities come
+  /// from each sample's hourly timeline at that frame's instant, so the
+  /// field honestly evolves. Lazy: each iteration rasterizes one frame, so
+  /// the caller can spread the work across event-loop turns.
+  Iterable<Uint8List> buildFrameBuffers({
     required int frameCount,
     required DateTime start,
     required DateTime end,
-  }) {
-    if (samples.isEmpty || frameCount < 1) return const [];
+  }) sync* {
+    if (samples.isEmpty || frameCount < 1) return;
     final cells = fieldWidth * fieldHeight;
     final (neighborIndex, neighborWeight) = _precomputeNeighbors(cells);
     final spanSeconds = end.difference(start).inSeconds;
+    final cellW = viewportWidth / fieldWidth;
+    final cellH = viewportHeight / fieldHeight;
 
-    final frames = <Uint8List>[];
     final hiddenAt = Float32List(samples.length);
     final highAt = Float32List(samples.length);
     for (var f = 0; f < frameCount; f++) {
@@ -80,34 +93,41 @@ class CloudFieldBuilder {
           high += weight * highAt[neighborIndex[base + k]];
         }
 
-        final cx = cell % fieldWidth;
-        final cy = cell ~/ fieldWidth;
-        // Per-frame offset drifts the noise so crossfades read as motion.
-        final noise = _fbm(cx + f * 1.3, cy + f * 0.5);
+        // Noise sampled in viewport px (resolution-independent), drifting
+        // per frame so the crossfaded animation reads as motion.
+        final px = (cell % fieldWidth) * cellW + f * _driftXPx;
+        final py = (cell ~/ fieldWidth) * cellH + f * _driftYPx;
+        final noise = _fbm(px, py);
 
         // Coverage-as-threshold: the density decides how much of the noise
         // "passes" — 0 stays perfectly clear, partial cover turns patchy,
         // full cover approaches a solid (but still translucent) deck.
-        final edge = 1.02 - hidden * 1.3;
-        final raw = ((noise - edge) / 0.32).clamp(0.0, 1.0);
+        final edge = 1.02 - hidden * 1.2;
+        final raw = ((noise - edge) / 0.35).clamp(0.0, 1.0);
         final cloud = raw * raw * (3 - 2 * raw);
-        var alpha = cloud * _maxCloudAlpha;
+        // Noise keeps modulating alpha even where the threshold saturates:
+        // a full deck stays textured and drifts with the noise instead of
+        // freezing into a flat slab that only creeps with the hourly data.
+        var alpha = cloud * (0.62 + 0.38 * noise) * _maxCloudAlpha;
         // Thin high cirrus: a faint noise-textured veil over everything.
         final veil = (high * (0.16 + 0.14 * noise)).clamp(0.0, 0.3);
         alpha = (alpha + veil * (1 - alpha)).clamp(0.0, 0.85);
 
-        // PREMULTIPLIED white: decodeImageFromPixels treats rgba8888 as
-        // premul, so straight-alpha data (RGB=255) blows out to solid white.
+        // Dense cores shade slightly gray — depth, like a real deck seen
+        // from above; thin cover stays white.
+        final brightness = 1.0 - 0.15 * cloud * (0.4 + 0.6 * noise);
+
+        // PREMULTIPLIED: decodeImageFromPixels treats rgba8888 as premul,
+        // so straight-alpha data (RGB=255) blows out to solid white.
         final byte = cell * 4;
-        final value = (alpha * 255).round();
-        bytes[byte] = value;
-        bytes[byte + 1] = value;
-        bytes[byte + 2] = value;
-        bytes[byte + 3] = value;
+        final channel = (alpha * brightness * 255).round();
+        bytes[byte] = channel;
+        bytes[byte + 1] = channel;
+        bytes[byte + 2] = channel;
+        bytes[byte + 3] = (alpha * 255).round();
       }
-      frames.add(bytes);
+      yield bytes;
     }
-    return frames;
   }
 
   /// For each field cell: the [_neighborCount] nearest samples and their
@@ -148,9 +168,10 @@ class CloudFieldBuilder {
 
       var totalWeight = 0.0;
       final base = cell * _neighborCount;
+      const sigma2 = 2 * _weightSigmaPx * _weightSigmaPx;
       for (var k = 0; k < found; k++) {
-        // +900 (~30px) softening keeps on-top samples from spiking.
-        final w = 1.0 / (bestDistance[k] + 900);
+        // Tiny floor so a cell far from every sample still normalizes.
+        final w = math.exp(-bestDistance[k] / sigma2) + 1e-9;
         index[base + k] = bestIndex[k];
         weight[base + k] = w;
         totalWeight += w;
@@ -164,13 +185,16 @@ class CloudFieldBuilder {
     return (index, weight);
   }
 
-  /// Three octaves of value noise in cell units (base wavelength ~22 cells,
-  /// ~170px on the card), contrast-stretched to use the full 0..1 range.
+  /// Four octaves of value noise in viewport px (base wavelength ~176px on
+  /// the card, finest ~16px), contrast-stretched to use the full 0..1
+  /// range. The finest octave is what gives wispy edges — it only resolves
+  /// when the field is rasterized at ~4px cells.
   double _fbm(double x, double y) {
-    final n = 0.55 * _valueNoise(x / 22, y / 22) +
-        0.30 * _valueNoise(x / 10, y / 10) +
-        0.15 * _valueNoise(x / 4.5, y / 4.5);
-    return ((n - 0.5) * 1.6 + 0.5).clamp(0.0, 1.0);
+    final n = 0.42 * _valueNoise(x / 176, y / 176) +
+        0.28 * _valueNoise(x / 80, y / 80) +
+        0.18 * _valueNoise(x / 36, y / 36) +
+        0.12 * _valueNoise(x / 16, y / 16);
+    return ((n - 0.5) * 1.7 + 0.5).clamp(0.0, 1.0);
   }
 
   double _valueNoise(double x, double y) {

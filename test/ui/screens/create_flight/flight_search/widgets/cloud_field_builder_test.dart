@@ -57,7 +57,7 @@ void main() {
       frameCount: 3,
       start: start,
       end: end,
-    );
+    ).toList();
 
     expect(frames, hasLength(3));
     expect(frames.first.length, builder.fieldWidth * builder.fieldHeight * 4);

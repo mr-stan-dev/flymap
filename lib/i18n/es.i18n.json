@@ -360,6 +360,8 @@
       "estimatedBadge": "horas estimadas",
       "departureLabel": "Salida",
       "arrivalLabel": "Llegada",
+      "tomorrow": "mañana",
+      "localTimesHint": "Las horas son locales de cada aeropuerto.",
       "verdictClearTitle": "Vistas despejadas",
       "verdictClearBody": "El asiento de ventanilla merece la pena: el suelo debería verse casi todo el vuelo.",
       "verdictPatchyTitle": "Nubes dispersas",

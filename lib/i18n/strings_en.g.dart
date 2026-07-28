@@ -2305,6 +2305,12 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Arrival'
 	String get arrivalLabel => 'Arrival';
 
+	/// en: 'tomorrow'
+	String get tomorrow => 'tomorrow';
+
+	/// en: 'Times are local to each airport.'
+	String get localTimesHint => 'Times are local to each airport.';
+
 	/// en: 'Clear views'
 	String get verdictClearTitle => 'Clear views';
 
@@ -4045,6 +4051,8 @@ extension on Translations {
 			'createFlight.weather.estimatedBadge' => 'times estimated',
 			'createFlight.weather.departureLabel' => 'Departure',
 			'createFlight.weather.arrivalLabel' => 'Arrival',
+			'createFlight.weather.tomorrow' => 'tomorrow',
+			'createFlight.weather.localTimesHint' => 'Times are local to each airport.',
 			'createFlight.weather.verdictClearTitle' => 'Clear views',
 			'createFlight.weather.verdictClearBody' => 'Window seat worth it — the ground should be visible for most of the flight.',
 			'createFlight.weather.verdictPatchyTitle' => 'Patchy clouds',
@@ -4216,10 +4224,10 @@ extension on Translations {
 			'createFlight.overview.timeline.regionType.continent' => 'Continent',
 			'createFlight.overview.timeline.regionType.geoarea' => 'Geographic area',
 			'createFlight.overview.timeline.regionType.isthmus' => 'Isthmus',
-			'createFlight.overview.timeline.regionType.unknown' => 'Unknown region type',
-			'createFlight.wikipedia.title' => 'Download articles and read while you’re in the air',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.timeline.regionType.unknown' => 'Unknown region type',
+			'createFlight.wikipedia.title' => 'Download articles and read while you’re in the air',
 			'createFlight.wikipedia.loadingIntro' => 'Finding route-related articles...',
 			'createFlight.wikipedia.foundIntro' => ({required Object count}) => 'Based on your route we found ${count} relevant articles',
 			'createFlight.wikipedia.emptyIntro' => 'No route-related Wikipedia articles found. You can continue with map download only.',
@@ -4730,10 +4738,10 @@ extension on Translations {
 			'countries.PE' => 'Peru',
 			'countries.PG' => 'Papua New Guinea',
 			'countries.PH' => 'Philippines',
-			'countries.PK' => 'Pakistan',
-			'countries.PL' => 'Poland',
 			_ => null,
 		} ?? switch (path) {
+			'countries.PK' => 'Pakistan',
+			'countries.PL' => 'Poland',
 			'countries.PR' => 'Puerto Rico',
 			'countries.PS' => 'West Bank and Gaza Strip',
 			'countries.PT' => 'Portugal',

@@ -1,3 +1,4 @@
+import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
@@ -167,6 +168,7 @@ class _WeatherContent extends StatelessWidget {
                   label: t.departureLabel,
                   code: route?.departure.displayCode ?? '',
                   city: route?.departure.city ?? '',
+                  countryCode: route?.departure.countryCode ?? '',
                   weather: weather.departure,
                 ),
               ),
@@ -176,10 +178,19 @@ class _WeatherContent extends StatelessWidget {
                   label: t.arrivalLabel,
                   code: route?.arrival.displayCode ?? '',
                   city: route?.arrival.city ?? '',
+                  countryCode: route?.arrival.countryCode ?? '',
                   weather: weather.arrival,
+                  isNextDay: _arrivalIsNextDay,
                 ),
               ),
             ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          t.localTimesHint,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
           ),
         ),
         if (route != null && weather.samples.isNotEmpty) ...[
@@ -216,6 +227,17 @@ class _WeatherContent extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  /// True when the arrival's local calendar date is one day after the
+  /// departure's — the arrival card marks it "(tomorrow)".
+  bool get _arrivalIsNextDay {
+    DateTime dateOnly(DateTime value) =>
+        DateTime(value.year, value.month, value.day);
+    return dateOnly(weather.arrival.timeLocal)
+            .difference(dateOnly(weather.departure.timeLocal))
+            .inDays ==
+        1;
   }
 
   /// "☀️ Clear after takeoff · ☁️ Cloud carpet over the Alps · …"
@@ -265,30 +287,47 @@ class _AirportWeatherCard extends StatelessWidget {
     required this.label,
     required this.code,
     required this.city,
+    required this.countryCode,
     required this.weather,
+    this.isNextDay = false,
   });
 
   final String label;
   final String code;
   final String city;
+  final String countryCode;
   final AirportWeather weather;
+
+  /// Arrival lands on the day after departure — mark it "(tomorrow)".
+  final bool isNextDay;
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t.createFlight.weather;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final temperature = weather.temperatureC;
+    final flagCode = countryCode.trim().toUpperCase();
+
+    var dateLine = TravelDateFormatUtils.formatShortDate(weather.timeLocal);
+    if (isNextDay) dateLine = '$dateLine (${t.tomorrow})';
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: colorScheme.surfaceContainerLow,
+        // Elevated tone + hairline border: reads as a card on both themes
+        // (surfaceContainerLow vanished against the dark background).
+        color: colorScheme.surfaceContainerHigh,
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Text(
@@ -299,11 +338,22 @@ class _AirportWeatherCard extends StatelessWidget {
                   ),
                 ),
               ),
-              Text(
-                TravelDateFormatUtils.formatTime(weather.timeLocal),
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    TravelDateFormatUtils.formatTime(weather.timeLocal),
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    dateLine,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -315,13 +365,30 @@ class _AirportWeatherCard extends StatelessWidget {
             ),
           ),
           if (city.isNotEmpty)
-            Text(
-              city,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+            Row(
+              children: [
+                if (flagCode.length == 2) ...[
+                  ClipOval(
+                    child: CountryFlag.fromCountryCode(
+                      flagCode,
+                      width: 12,
+                      height: 12,
+                      shape: const Rectangle(),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                ],
+                Expanded(
+                  child: Text(
+                    flagCode.length == 2 ? '$city · $flagCode' : city,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
             ),
           const SizedBox(height: 10),
           Row(

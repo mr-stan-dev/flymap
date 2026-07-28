@@ -360,6 +360,8 @@
       "estimatedBadge": "times estimated",
       "departureLabel": "Departure",
       "arrivalLabel": "Arrival",
+      "tomorrow": "tomorrow",
+      "localTimesHint": "Times are local to each airport.",
       "verdictClearTitle": "Clear views",
       "verdictClearBody": "Window seat worth it — the ground should be visible for most of the flight.",
       "verdictPatchyTitle": "Patchy clouds",
