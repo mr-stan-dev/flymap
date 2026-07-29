@@ -48,7 +48,7 @@ class MetNorwayApi {
   // (verified live 2026-07-28).
   static const _path = '/weatherapi/locationforecast/2.0/complete';
   static const _userAgent =
-      'Flymap-app flymap.app (contact: stanislav.sydorenko@gmail.com)';
+      'Flymap-app flymap.app (contact: team@apptractor.dev)';
 
   final http.Client _httpClient;
   final _logger = const Logger('MetNorwayApi');
