@@ -17,6 +17,7 @@ import 'package:flymap/ui/screens/onboarding/model/onboarding_step_definition.da
 import 'package:flymap/ui/screens/onboarding/steps/onboarding_area_payoff_step.dart';
 import 'package:flymap/ui/screens/onboarding/steps/onboarding_home_airport_step.dart';
 import 'package:flymap/ui/screens/onboarding/steps/onboarding_interests_step.dart';
+import 'package:flymap/ui/screens/onboarding/steps/onboarding_weather_payoff_step.dart';
 import 'package:flymap/ui/screens/onboarding/steps/onboarding_welcome_step.dart';
 import 'package:flymap/ui/screens/onboarding/viewmodel/onboarding_profile_form_cubit.dart';
 import 'package:flymap/ui/screens/onboarding/viewmodel/onboarding_profile_form_state.dart';
@@ -56,7 +57,7 @@ class _OnboardingFlowView extends StatefulWidget {
 }
 
 class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
-  static const String _flowVersion = 'v4_direct_paywall';
+  static const String _flowVersion = 'v5_weather_payoff';
   static const String _entrySource = 'app_launch';
 
   final AppAnalytics _analytics = GetIt.I<AppAnalytics>();
@@ -115,6 +116,14 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
             status: state.homeAreaStatus,
             summary: state.homeAreaSummary,
           ),
+          primaryActionLabel: (context, _) => context.t.common.kContinue,
+          canContinue: (_) => true,
+        ),
+        // The Pro seller right before the paywall: the real animated cloud
+        // map on a canned London -> Rome forecast.
+        OnboardingStepDefinition(
+          id: OnboardingStepId.weatherPayoff,
+          stepBuilder: (context, _, __) => const OnboardingWeatherPayoffStep(),
           primaryActionLabel: (context, _) =>
               context.t.onboarding.planFirstFlight,
           canContinue: (_) => true,
@@ -397,6 +406,8 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
         HomeAreaSummaryStatus.failed => 'failed',
         HomeAreaSummaryStatus.none => 'fallback',
       },
+      // Pure showcase — nothing the user inputs.
+      OnboardingStepId.weatherPayoff => 'none',
     };
   }
 }

@@ -982,6 +982,11 @@
       "moreNearby": "…y $count+ lugares más por descubrir cerca:",
       "fallbackTitle": "Deja de perderte lo que hay debajo",
       "fallbackSubtitle": "Cada vuelo sobrevuela volcanes, montañas, islas y lagos que la mayoría de los viajeros nunca nota. Flymap te muestra lo que hay tras tu ventanilla."
+    },
+    "weatherPayoff": {
+      "title": "Consulta el tiempo de tu vuelo",
+      "subtitle": "Cada vuelo que planificas incluye el tiempo en los aeropuertos y una previsión de nubes para tu ventanilla.",
+      "exampleBadge": "Ejemplo"
     }
   },
   "countries": {

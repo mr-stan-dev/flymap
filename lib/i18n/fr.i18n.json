@@ -982,6 +982,11 @@
       "moreNearby": "…et $count+ autres lieux à découvrir à proximité :",
       "fallbackTitle": "Ne manquez plus ce qui se trouve sous vos ailes",
       "fallbackSubtitle": "Chaque vol survole des volcans, des montagnes, des îles et des lacs que la plupart des voyageurs ne remarquent jamais. Flymap vous montre ce qu'il y a derrière votre hublot."
+    },
+    "weatherPayoff": {
+      "title": "Vérifiez la météo de votre vol",
+      "subtitle": "Chaque vol planifié s'accompagne de la météo des aéroports et d'une prévision des nuages pour votre hublot.",
+      "exampleBadge": "Exemple"
     }
   },
   "countries": {

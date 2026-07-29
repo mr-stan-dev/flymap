@@ -642,6 +642,7 @@ class _TranslationsOnboardingFr extends TranslationsOnboardingEn {
 	@override String get planFirstFlight => 'Planifier mon premier vol';
 	@override String get failedLoadProfile => 'Échec du chargement de votre profil.';
 	@override late final _TranslationsOnboardingPayoffFr payoff = _TranslationsOnboardingPayoffFr._(_root);
+	@override late final _TranslationsOnboardingWeatherPayoffFr weatherPayoff = _TranslationsOnboardingWeatherPayoffFr._(_root);
 }
 
 // Path: countries
@@ -1476,6 +1477,18 @@ class _TranslationsOnboardingPayoffFr extends TranslationsOnboardingPayoffEn {
 	@override String moreNearby({required Object count}) => '…et ${count}+ autres lieux à découvrir à proximité :';
 	@override String get fallbackTitle => 'Ne manquez plus ce qui se trouve sous vos ailes';
 	@override String get fallbackSubtitle => 'Chaque vol survole des volcans, des montagnes, des îles et des lacs que la plupart des voyageurs ne remarquent jamais. Flymap vous montre ce qu\'il y a derrière votre hublot.';
+}
+
+// Path: onboarding.weatherPayoff
+class _TranslationsOnboardingWeatherPayoffFr extends TranslationsOnboardingWeatherPayoffEn {
+	_TranslationsOnboardingWeatherPayoffFr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Vérifiez la météo de votre vol';
+	@override String get subtitle => 'Chaque vol planifié s\'accompagne de la météo des aéroports et d\'une prévision des nuages pour votre hublot.';
+	@override String get exampleBadge => 'Exemple';
 }
 
 // Path: createFlight.overview.airportCard
@@ -2469,6 +2482,9 @@ extension on TranslationsFr {
 			'onboarding.payoff.moreNearby' => ({required Object count}) => '…et ${count}+ autres lieux à découvrir à proximité :',
 			'onboarding.payoff.fallbackTitle' => 'Ne manquez plus ce qui se trouve sous vos ailes',
 			'onboarding.payoff.fallbackSubtitle' => 'Chaque vol survole des volcans, des montagnes, des îles et des lacs que la plupart des voyageurs ne remarquent jamais. Flymap vous montre ce qu\'il y a derrière votre hublot.',
+			'onboarding.weatherPayoff.title' => 'Vérifiez la météo de votre vol',
+			'onboarding.weatherPayoff.subtitle' => 'Chaque vol planifié s\'accompagne de la météo des aéroports et d\'une prévision des nuages pour votre hublot.',
+			'onboarding.weatherPayoff.exampleBadge' => 'Exemple',
 			'countries.AE' => 'Émirats arabes unis',
 			'countries.AF' => 'Afghanistan',
 			'countries.AG' => 'Antigua-et-Barbuda',
@@ -2589,11 +2605,11 @@ extension on TranslationsFr {
 			'countries.MT' => 'Malte',
 			'countries.MX' => 'Mexique',
 			'countries.MY' => 'Malaisie',
+			_ => null,
+		} ?? switch (path) {
 			'countries.MZ' => 'Mozambique',
 			'countries.NA' => 'Namibie',
 			'countries.NC' => 'Nouvelle-Calédonie',
-			_ => null,
-		} ?? switch (path) {
 			'countries.NE' => 'Niger',
 			'countries.NG' => 'Nigeria',
 			'countries.NI' => 'Nicaragua',

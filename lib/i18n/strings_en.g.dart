@@ -1506,6 +1506,7 @@ class TranslationsOnboardingEn {
 	String get failedLoadProfile => 'Failed to load your profile.';
 
 	late final TranslationsOnboardingPayoffEn payoff = TranslationsOnboardingPayoffEn.internal(_root);
+	late final TranslationsOnboardingWeatherPayoffEn weatherPayoff = TranslationsOnboardingWeatherPayoffEn.internal(_root);
 }
 
 // Path: countries
@@ -3573,6 +3574,24 @@ class TranslationsOnboardingPayoffEn {
 	String get fallbackSubtitle => 'Every flight soars over volcanoes, mountains, islands and lakes most travelers never notice. Flymap shows you what\'s out your window.';
 }
 
+// Path: onboarding.weatherPayoff
+class TranslationsOnboardingWeatherPayoffEn {
+	TranslationsOnboardingWeatherPayoffEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Check the weather for your flight'
+	String get title => 'Check the weather for your flight';
+
+	/// en: 'Every flight you plan comes with airport weather and a window-seat cloud forecast.'
+	String get subtitle => 'Every flight you plan comes with airport weather and a window-seat cloud forecast.';
+
+	/// en: 'Example'
+	String get exampleBadge => 'Example';
+}
+
 // Path: createFlight.overview.airportCard
 class TranslationsCreateFlightOverviewAirportCardEn {
 	TranslationsCreateFlightOverviewAirportCardEn.internal(this._root);
@@ -4651,6 +4670,9 @@ extension on Translations {
 			'onboarding.payoff.moreNearby' => ({required Object count}) => '…and ${count}+ more to discover nearby:',
 			'onboarding.payoff.fallbackTitle' => 'Stop missing what\'s below',
 			'onboarding.payoff.fallbackSubtitle' => 'Every flight soars over volcanoes, mountains, islands and lakes most travelers never notice. Flymap shows you what\'s out your window.',
+			'onboarding.weatherPayoff.title' => 'Check the weather for your flight',
+			'onboarding.weatherPayoff.subtitle' => 'Every flight you plan comes with airport weather and a window-seat cloud forecast.',
+			'onboarding.weatherPayoff.exampleBadge' => 'Example',
 			'countries.AE' => 'United Arab Emirates',
 			'countries.AF' => 'Afghanistan',
 			'countries.AG' => 'Antigua and Barbuda',
@@ -4771,11 +4793,11 @@ extension on Translations {
 			'countries.MT' => 'Malta',
 			'countries.MX' => 'Mexico',
 			'countries.MY' => 'Malaysia',
+			_ => null,
+		} ?? switch (path) {
 			'countries.MZ' => 'Mozambique',
 			'countries.NA' => 'Namibia',
 			'countries.NC' => 'New Caledonia',
-			_ => null,
-		} ?? switch (path) {
 			'countries.NE' => 'Niger',
 			'countries.NG' => 'Nigeria',
 			'countries.NI' => 'Nicaragua',

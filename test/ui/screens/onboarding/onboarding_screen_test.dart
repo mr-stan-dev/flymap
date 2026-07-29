@@ -155,9 +155,15 @@ void main() {
       await _pumpUi(tester);
       await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
 
-      // Payoff is the last step; its CTA presents the paywall (the fake
-      // repository reports it as cancelled) and finishes onboarding.
+      // Area payoff continues into the weather payoff — the last step,
+      // whose CTA presents the paywall (the fake repository reports it as
+      // cancelled) and finishes onboarding.
       await _pumpUntilVisible(tester, find.text("Stop missing what's below"));
+      await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
+      await _pumpUntilVisible(
+        tester,
+        find.text('Check the weather for your flight'),
+      );
 
       await tester.tap(
         find.widgetWithText(PrimaryButton, 'Start my first flight'),

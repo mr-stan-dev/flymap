@@ -642,6 +642,7 @@ class _TranslationsOnboardingEs extends TranslationsOnboardingEn {
 	@override String get planFirstFlight => 'Empezar mi primer vuelo';
 	@override String get failedLoadProfile => 'No se pudo cargar tu perfil.';
 	@override late final _TranslationsOnboardingPayoffEs payoff = _TranslationsOnboardingPayoffEs._(_root);
+	@override late final _TranslationsOnboardingWeatherPayoffEs weatherPayoff = _TranslationsOnboardingWeatherPayoffEs._(_root);
 }
 
 // Path: countries
@@ -1476,6 +1477,18 @@ class _TranslationsOnboardingPayoffEs extends TranslationsOnboardingPayoffEn {
 	@override String moreNearby({required Object count}) => '…y ${count}+ lugares más por descubrir cerca:';
 	@override String get fallbackTitle => 'Deja de perderte lo que hay debajo';
 	@override String get fallbackSubtitle => 'Cada vuelo sobrevuela volcanes, montañas, islas y lagos que la mayoría de los viajeros nunca nota. Flymap te muestra lo que hay tras tu ventanilla.';
+}
+
+// Path: onboarding.weatherPayoff
+class _TranslationsOnboardingWeatherPayoffEs extends TranslationsOnboardingWeatherPayoffEn {
+	_TranslationsOnboardingWeatherPayoffEs._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Consulta el tiempo de tu vuelo';
+	@override String get subtitle => 'Cada vuelo que planificas incluye el tiempo en los aeropuertos y una previsión de nubes para tu ventanilla.';
+	@override String get exampleBadge => 'Ejemplo';
 }
 
 // Path: createFlight.overview.airportCard
@@ -2469,6 +2482,9 @@ extension on TranslationsEs {
 			'onboarding.payoff.moreNearby' => ({required Object count}) => '…y ${count}+ lugares más por descubrir cerca:',
 			'onboarding.payoff.fallbackTitle' => 'Deja de perderte lo que hay debajo',
 			'onboarding.payoff.fallbackSubtitle' => 'Cada vuelo sobrevuela volcanes, montañas, islas y lagos que la mayoría de los viajeros nunca nota. Flymap te muestra lo que hay tras tu ventanilla.',
+			'onboarding.weatherPayoff.title' => 'Consulta el tiempo de tu vuelo',
+			'onboarding.weatherPayoff.subtitle' => 'Cada vuelo que planificas incluye el tiempo en los aeropuertos y una previsión de nubes para tu ventanilla.',
+			'onboarding.weatherPayoff.exampleBadge' => 'Ejemplo',
 			'countries.AE' => 'Emiratos Arabes Unidos',
 			'countries.AF' => 'Afganistan',
 			'countries.AG' => 'Antigua y Barbuda',
@@ -2589,11 +2605,11 @@ extension on TranslationsEs {
 			'countries.MT' => 'Malta',
 			'countries.MX' => 'Mexico',
 			'countries.MY' => 'Malasia',
+			_ => null,
+		} ?? switch (path) {
 			'countries.MZ' => 'Mozambique',
 			'countries.NA' => 'Namibia',
 			'countries.NC' => 'Nueva Caledonia',
-			_ => null,
-		} ?? switch (path) {
 			'countries.NE' => 'Niger',
 			'countries.NG' => 'Nigeria',
 			'countries.NI' => 'Nicaragua',

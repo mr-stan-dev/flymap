@@ -982,6 +982,11 @@
       "moreNearby": "…und $count+ weitere Orte in der Nähe:",
       "fallbackTitle": "Verpasse nie wieder, was unter dir liegt",
       "fallbackSubtitle": "Jeder Flug führt über Vulkane, Berge, Inseln und Seen, die die meisten Reisenden nie bemerken. Flymap zeigt dir, was vor deinem Fenster liegt."
+    },
+    "weatherPayoff": {
+      "title": "Prüfe das Wetter für deinen Flug",
+      "subtitle": "Jeder geplante Flug kommt mit Flughafenwetter und einer Wolkenvorhersage für deinen Fensterplatz.",
+      "exampleBadge": "Beispiel"
     }
   },
   "countries": {

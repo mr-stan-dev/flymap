@@ -982,6 +982,11 @@
       "moreNearby": "…and $count+ more to discover nearby:",
       "fallbackTitle": "Stop missing what's below",
       "fallbackSubtitle": "Every flight soars over volcanoes, mountains, islands and lakes most travelers never notice. Flymap shows you what's out your window."
+    },
+    "weatherPayoff": {
+      "title": "Check the weather for your flight",
+      "subtitle": "Every flight you plan comes with airport weather and a window-seat cloud forecast.",
+      "exampleBadge": "Example"
     }
   },
   "countries": {

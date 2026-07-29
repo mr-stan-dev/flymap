@@ -642,6 +642,7 @@ class _TranslationsOnboardingDe extends TranslationsOnboardingEn {
 	@override String get planFirstFlight => 'Meinen ersten Flug planen';
 	@override String get failedLoadProfile => 'Dein Profil konnte nicht geladen werden.';
 	@override late final _TranslationsOnboardingPayoffDe payoff = _TranslationsOnboardingPayoffDe._(_root);
+	@override late final _TranslationsOnboardingWeatherPayoffDe weatherPayoff = _TranslationsOnboardingWeatherPayoffDe._(_root);
 }
 
 // Path: countries
@@ -1476,6 +1477,18 @@ class _TranslationsOnboardingPayoffDe extends TranslationsOnboardingPayoffEn {
 	@override String moreNearby({required Object count}) => '…und ${count}+ weitere Orte in der Nähe:';
 	@override String get fallbackTitle => 'Verpasse nie wieder, was unter dir liegt';
 	@override String get fallbackSubtitle => 'Jeder Flug führt über Vulkane, Berge, Inseln und Seen, die die meisten Reisenden nie bemerken. Flymap zeigt dir, was vor deinem Fenster liegt.';
+}
+
+// Path: onboarding.weatherPayoff
+class _TranslationsOnboardingWeatherPayoffDe extends TranslationsOnboardingWeatherPayoffEn {
+	_TranslationsOnboardingWeatherPayoffDe._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Prüfe das Wetter für deinen Flug';
+	@override String get subtitle => 'Jeder geplante Flug kommt mit Flughafenwetter und einer Wolkenvorhersage für deinen Fensterplatz.';
+	@override String get exampleBadge => 'Beispiel';
 }
 
 // Path: createFlight.overview.airportCard
@@ -2469,6 +2482,9 @@ extension on TranslationsDe {
 			'onboarding.payoff.moreNearby' => ({required Object count}) => '…und ${count}+ weitere Orte in der Nähe:',
 			'onboarding.payoff.fallbackTitle' => 'Verpasse nie wieder, was unter dir liegt',
 			'onboarding.payoff.fallbackSubtitle' => 'Jeder Flug führt über Vulkane, Berge, Inseln und Seen, die die meisten Reisenden nie bemerken. Flymap zeigt dir, was vor deinem Fenster liegt.',
+			'onboarding.weatherPayoff.title' => 'Prüfe das Wetter für deinen Flug',
+			'onboarding.weatherPayoff.subtitle' => 'Jeder geplante Flug kommt mit Flughafenwetter und einer Wolkenvorhersage für deinen Fensterplatz.',
+			'onboarding.weatherPayoff.exampleBadge' => 'Beispiel',
 			'countries.AE' => 'Vereinigte Arabische Emirate',
 			'countries.AF' => 'Afghanistan',
 			'countries.AG' => 'Antigua und Barbuda',
@@ -2589,11 +2605,11 @@ extension on TranslationsDe {
 			'countries.MT' => 'Malta',
 			'countries.MX' => 'Mexiko',
 			'countries.MY' => 'Malaysia',
+			_ => null,
+		} ?? switch (path) {
 			'countries.MZ' => 'Mosambik',
 			'countries.NA' => 'Namibia',
 			'countries.NC' => 'Neukaledonien',
-			_ => null,
-		} ?? switch (path) {
 			'countries.NE' => 'Niger',
 			'countries.NG' => 'Nigeria',
 			'countries.NI' => 'Nicaragua',

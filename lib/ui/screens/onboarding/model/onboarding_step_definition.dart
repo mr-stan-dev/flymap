@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flymap/ui/screens/onboarding/viewmodel/onboarding_profile_form_cubit.dart';
 import 'package:flymap/ui/screens/onboarding/viewmodel/onboarding_profile_form_state.dart';
 
-enum OnboardingStepId { welcome, interests, homeAirport, areaPayoff }
+enum OnboardingStepId {
+  welcome,
+  interests,
+  homeAirport,
+  areaPayoff,
+  weatherPayoff,
+}
 
 typedef OnboardingStepWidgetBuilder =
     Widget Function(
