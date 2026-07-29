@@ -2296,9 +2296,6 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Couldn't load the forecast right now. You can retry or continue without it.'
 	String get loadFailed => 'Couldn\'t load the forecast right now. You can retry or continue without it.';
 
-	/// en: 'daytime forecast'
-	String get estimatedBadge => 'daytime forecast';
-
 	/// en: 'Departure'
 	String get departureLabel => 'Departure';
 
@@ -2307,9 +2304,6 @@ class TranslationsCreateFlightWeatherEn {
 
 	/// en: 'tomorrow'
 	String get tomorrow => 'tomorrow';
-
-	/// en: 'Times are local to each airport.'
-	String get localTimesHint => 'Times are local to each airport.';
 
 	/// en: 'Clear views'
 	String get verdictClearTitle => 'Clear views';
@@ -2335,29 +2329,26 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Best views at takeoff and landing.'
 	String get verdictOvercastBody => 'Best views at takeoff and landing.';
 
-	/// en: '☀️ Clear'
-	String get expectClear => '☀️ Clear';
+	/// en: 'Calm'
+	String get windCalm => 'Calm';
 
-	/// en: '⛅ Patchy'
-	String get expectPatchy => '⛅ Patchy';
+	/// en: 'Light wind'
+	String get windLight => 'Light wind';
 
-	/// en: '☁️ Cloud carpet'
-	String get expectCarpet => '☁️ Cloud carpet';
+	/// en: 'Breezy'
+	String get windBreezy => 'Breezy';
 
-	/// en: '🌫 Overcast'
-	String get expectOvercast => '🌫 Overcast';
+	/// en: 'Windy'
+	String get windWindy => 'Windy';
 
-	/// en: 'after takeoff'
-	String get segmentAfterTakeoff => 'after takeoff';
+	/// en: 'Strong wind'
+	String get windStrong => 'Strong wind';
 
-	/// en: 'mid-flight'
-	String get segmentMidFlight => 'mid-flight';
+	/// en: 'Windy takeoff in $city ($speed m/s) — expect some bumps'
+	String windTakeoff({required Object city, required Object speed}) => 'Windy takeoff in ${city} (${speed} m/s) — expect some bumps';
 
-	/// en: 'before landing'
-	String get segmentBeforeLanding => 'before landing';
-
-	/// en: 'over $name'
-	String segmentOver({required Object name}) => 'over ${name}';
+	/// en: 'Windy landing in $city ($speed m/s) — expect some bumps'
+	String windLanding({required Object city, required Object speed}) => 'Windy landing in ${city} (${speed} m/s) — expect some bumps';
 
 	/// en: 'Cloud map along your route'
 	String get proTeaserTitle => 'Cloud map along your route';
@@ -2371,8 +2362,20 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Forecasts firm up closer to departure.'
 	String get hedge => 'Forecasts firm up closer to departure.';
 
-	/// en: 'Forecast for $date'
-	String forecastFor({required Object date}) => 'Forecast for ${date}';
+	/// en: 'Share'
+	String get share => 'Share';
+
+	/// en: 'Share as image'
+	String get shareAsImage => 'Share as image';
+
+	/// en: 'Share as video'
+	String get shareAsVideo => 'Share as video';
+
+	/// en: 'Preparing your share…'
+	String get preparingShare => 'Preparing your share…';
+
+	/// en: 'Couldn't prepare the share — try again.'
+	String get shareFailed => 'Couldn\'t prepare the share — try again.';
 
 	/// en: 'Updated $time'
 	String updatedAt({required Object time}) => 'Updated ${time}';
@@ -2461,6 +2464,18 @@ class TranslationsCreateFlightTravelDateEn {
 	/// en: 'Pick your travel date'
 	String get pickDate => 'Pick your travel date';
 
+	/// en: 'Your flight on this date'
+	String get yourFlightOnDate => 'Your flight on this date';
+
+	/// en: 'Change date'
+	String get changeDate => 'Change date';
+
+	/// en: 'Checking the flight schedule…'
+	String get checkingSchedule => 'Checking the flight schedule…';
+
+	/// en: 'No date yet'
+	String get noDateYet => 'No date yet';
+
 	/// en: 'Continue without a date'
 	String get skipDate => 'Continue without a date';
 
@@ -2530,6 +2545,9 @@ class TranslationsCreateFlightFlightNumberSearchEn {
 	/// en: 'We found your flight'
 	String get foundTitle => 'We found your flight';
 
+	/// en: 'Edit flight number'
+	String get editFlightNumber => 'Edit flight number';
+
 	/// en: 'Flying later? For the freshest and most accurate flight map, we recommend downloading within 7 days of your flight.'
 	String get beyondWindowHint => 'Flying later? For the freshest and most accurate flight map, we recommend downloading within 7 days of your flight.';
 
@@ -2581,11 +2599,11 @@ class TranslationsCreateFlightRealRouteAirportSearchEn {
 	/// en: 'Something went wrong while searching this route. Please try again.'
 	String get unexpectedError => 'Something went wrong while searching this route. Please try again.';
 
-	/// en: 'Found 1 flight'
-	String get foundOneTitle => 'Found 1 flight';
+	/// en: 'Found 1 flight · $route'
+	String foundOneTitle({required Object route}) => 'Found 1 flight · ${route}';
 
-	/// en: 'Found $count flights'
-	String foundManyTitle({required Object count}) => 'Found ${count} flights';
+	/// en: 'Found $count flights · $route'
+	String foundManyTitle({required Object count, required Object route}) => 'Found ${count} flights · ${route}';
 
 	/// en: 'Make sure these match the airports on your flight ticket.'
 	String get ticketMatchHint => 'Make sure these match the airports on your flight ticket.';
@@ -4066,11 +4084,9 @@ extension on Translations {
 			'createFlight.weather.title' => 'Will you see the ground?',
 			'createFlight.weather.loading' => 'Checking the skies along your route…',
 			'createFlight.weather.loadFailed' => 'Couldn\'t load the forecast right now. You can retry or continue without it.',
-			'createFlight.weather.estimatedBadge' => 'daytime forecast',
 			'createFlight.weather.departureLabel' => 'Departure',
 			'createFlight.weather.arrivalLabel' => 'Arrival',
 			'createFlight.weather.tomorrow' => 'tomorrow',
-			'createFlight.weather.localTimesHint' => 'Times are local to each airport.',
 			'createFlight.weather.verdictClearTitle' => 'Clear views',
 			'createFlight.weather.verdictClearBody' => 'Window seat worth it — the ground should be visible for most of the flight.',
 			'createFlight.weather.verdictPatchyTitle' => 'Patchy clouds',
@@ -4079,19 +4095,22 @@ extension on Translations {
 			'createFlight.weather.verdictCarpetBody' => 'A white sea of clouds beneath you — beautiful, but the ground will mostly stay hidden.',
 			'createFlight.weather.verdictOvercastTitle' => 'Overcast skies',
 			'createFlight.weather.verdictOvercastBody' => 'Best views at takeoff and landing.',
-			'createFlight.weather.expectClear' => '☀️ Clear',
-			'createFlight.weather.expectPatchy' => '⛅ Patchy',
-			'createFlight.weather.expectCarpet' => '☁️ Cloud carpet',
-			'createFlight.weather.expectOvercast' => '🌫 Overcast',
-			'createFlight.weather.segmentAfterTakeoff' => 'after takeoff',
-			'createFlight.weather.segmentMidFlight' => 'mid-flight',
-			'createFlight.weather.segmentBeforeLanding' => 'before landing',
-			'createFlight.weather.segmentOver' => ({required Object name}) => 'over ${name}',
+			'createFlight.weather.windCalm' => 'Calm',
+			'createFlight.weather.windLight' => 'Light wind',
+			'createFlight.weather.windBreezy' => 'Breezy',
+			'createFlight.weather.windWindy' => 'Windy',
+			'createFlight.weather.windStrong' => 'Strong wind',
+			'createFlight.weather.windTakeoff' => ({required Object city, required Object speed}) => 'Windy takeoff in ${city} (${speed} m/s) — expect some bumps',
+			'createFlight.weather.windLanding' => ({required Object city, required Object speed}) => 'Windy landing in ${city} (${speed} m/s) — expect some bumps',
 			'createFlight.weather.proTeaserTitle' => 'Cloud map along your route',
 			'createFlight.weather.proTeaserBody' => 'See where the clouds will be — and watch your plane fly the whole route above them.',
 			'createFlight.weather.attribution' => 'Weather data: MET Norway',
 			'createFlight.weather.hedge' => 'Forecasts firm up closer to departure.',
-			'createFlight.weather.forecastFor' => ({required Object date}) => 'Forecast for ${date}',
+			'createFlight.weather.share' => 'Share',
+			'createFlight.weather.shareAsImage' => 'Share as image',
+			'createFlight.weather.shareAsVideo' => 'Share as video',
+			'createFlight.weather.preparingShare' => 'Preparing your share…',
+			'createFlight.weather.shareFailed' => 'Couldn\'t prepare the share — try again.',
 			'createFlight.weather.updatedAt' => ({required Object time}) => 'Updated ${time}',
 			'createFlight.routeTypeSelector.title' => 'New flight',
 			'createFlight.routeTypeSelector.basicTitle' => 'Approximate route',
@@ -4112,6 +4131,10 @@ extension on Translations {
 			'createFlight.travelDate.stepTitle' => 'When are you flying?',
 			'createFlight.travelDate.customDate' => 'Pick another date',
 			'createFlight.travelDate.pickDate' => 'Pick your travel date',
+			'createFlight.travelDate.yourFlightOnDate' => 'Your flight on this date',
+			'createFlight.travelDate.changeDate' => 'Change date',
+			'createFlight.travelDate.checkingSchedule' => 'Checking the flight schedule…',
+			'createFlight.travelDate.noDateYet' => 'No date yet',
 			'createFlight.travelDate.skipDate' => 'Continue without a date',
 			'createFlight.travelDate.addDepartureTime' => 'Add departure time (optional)',
 			'createFlight.travelDate.departureTimeAt' => ({required Object time}) => 'Departure time · ${time}',
@@ -4132,6 +4155,7 @@ extension on Translations {
 			'createFlight.flightNumberSearch.airportsFallbackButton' => 'Find by airports',
 			'createFlight.flightNumberSearch.confirmTitle' => 'Confirm flight',
 			'createFlight.flightNumberSearch.foundTitle' => 'We found your flight',
+			'createFlight.flightNumberSearch.editFlightNumber' => 'Edit flight number',
 			'createFlight.flightNumberSearch.beyondWindowHint' => 'Flying later? For the freshest and most accurate flight map, we recommend downloading within 7 days of your flight.',
 			'createFlight.flightNumberSearch.basedOnSameFlightOn' => '* Based on the most recent recorded route for the same flight',
 			'createFlight.realRouteAirportSearch.title' => 'Flight by airports',
@@ -4146,8 +4170,8 @@ extension on Translations {
 			'createFlight.realRouteAirportSearch.rateLimitedError' => 'Too many flight searches right now. Please try again in a moment.',
 			'createFlight.realRouteAirportSearch.providerUnavailableError' => 'Real-flight data is temporarily unavailable. Please try again in a moment.',
 			'createFlight.realRouteAirportSearch.unexpectedError' => 'Something went wrong while searching this route. Please try again.',
-			'createFlight.realRouteAirportSearch.foundOneTitle' => 'Found 1 flight',
-			'createFlight.realRouteAirportSearch.foundManyTitle' => ({required Object count}) => 'Found ${count} flights',
+			'createFlight.realRouteAirportSearch.foundOneTitle' => ({required Object route}) => 'Found 1 flight · ${route}',
+			'createFlight.realRouteAirportSearch.foundManyTitle' => ({required Object count, required Object route}) => 'Found ${count} flights · ${route}',
 			'createFlight.realRouteAirportSearch.ticketMatchHint' => 'Make sure these match the airports on your flight ticket.',
 			'createFlight.realRouteAirportSearch.findByFlightNumber' => 'Find by flight number',
 			'createFlight.search.departureHint' => 'Search departure airport',
@@ -4236,14 +4260,14 @@ extension on Translations {
 			'createFlight.overview.timeline.regionType.coast' => 'Coast',
 			'createFlight.overview.timeline.regionType.mountainRange' => 'Mountain range',
 			'createFlight.overview.timeline.regionType.valley' => 'Valley',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.plateau' => 'Plateau',
 			'createFlight.overview.timeline.regionType.plain' => 'Plain',
 			'createFlight.overview.timeline.regionType.basin' => 'Basin',
 			'createFlight.overview.timeline.regionType.lowland' => 'Lowland',
 			'createFlight.overview.timeline.regionType.tundra' => 'Tundra',
 			'createFlight.overview.timeline.regionType.wetlands' => 'Wetlands',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.desert' => 'Desert',
 			'createFlight.overview.timeline.regionType.delta' => 'Delta',
 			'createFlight.overview.timeline.regionType.reservoir' => 'Reservoir',
@@ -4750,14 +4774,14 @@ extension on Translations {
 			'countries.MZ' => 'Mozambique',
 			'countries.NA' => 'Namibia',
 			'countries.NC' => 'New Caledonia',
+			_ => null,
+		} ?? switch (path) {
 			'countries.NE' => 'Niger',
 			'countries.NG' => 'Nigeria',
 			'countries.NI' => 'Nicaragua',
 			'countries.NL' => 'Netherlands',
 			'countries.NO' => 'Norway',
 			'countries.NP' => 'Nepal',
-			_ => null,
-		} ?? switch (path) {
 			'countries.NZ' => 'New Zealand',
 			'countries.OM' => 'Oman',
 			'countries.PA' => 'Panama',

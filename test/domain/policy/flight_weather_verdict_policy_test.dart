@@ -94,4 +94,38 @@ void main() {
       expect(segments.single.verdict, WindowVerdict.clearViews);
     });
   });
+
+  group('rainRuns', () {
+    RouteCloudSample sample(double progress, double precip) => RouteCloudSample(
+      routeProgress: progress,
+      latLon: const LatLng(50, 0),
+      timeUtc: DateTime.utc(2026, 8, 3, 10),
+      cloudLowPercent: 80,
+      cloudMidPercent: 0,
+      cloudHighPercent: 0,
+      precipitationMm: precip,
+    );
+
+    test('detects contiguous rainy stretches above the threshold', () {
+      final runs = FlightWeatherVerdictPolicy.rainRuns([
+        sample(0.1, 0),
+        sample(0.3, 1.2),
+        sample(0.5, 2.0),
+        sample(0.7, 0.1), // dry noise below threshold
+        sample(0.9, 0.8),
+      ]);
+
+      expect(runs, hasLength(2));
+      expect(runs.first.startProgress, 0.3);
+      expect(runs.first.endProgress, 0.5);
+      expect(runs.last.startProgress, 0.9);
+    });
+
+    test('dry route yields no runs', () {
+      expect(
+        FlightWeatherVerdictPolicy.rainRuns([sample(0.5, 0.2)]),
+        isEmpty,
+      );
+    });
+  });
 }

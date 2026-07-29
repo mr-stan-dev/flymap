@@ -25,6 +25,7 @@ import 'package:flymap/data/api/flight_info_api_mapper.dart';
 import 'package:flymap/data/gps_data_provider.dart';
 import 'package:flymap/data/map_asset_cache_service.dart';
 import 'package:flymap/data/local/airport_timezone_service.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/share/weather_share_service.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/local/airlines_database.dart';
 import 'package:flymap/data/local/app_database.dart';
@@ -192,6 +193,9 @@ class DiModule {
     );
     i.registerLazySingleton<FetchFlightWeatherUseCase>(
       () => FetchFlightWeatherUseCase(api: i.get(), timezoneService: i.get()),
+    );
+    i.registerLazySingleton<WeatherShareService>(
+      () => WeatherShareService(mapApi: i.get(), encoder: i.get()),
     );
     i.registerLazySingleton<FlightRoutePreviewApi>(
       () => FlightRoutePreviewApi(),

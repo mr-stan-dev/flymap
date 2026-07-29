@@ -9,6 +9,7 @@ RouteCloudSample _sample({
   required double progress,
   required double hidden,
   double high = 0,
+  double precip = 0,
 }) {
   return RouteCloudSample(
     routeProgress: progress,
@@ -17,6 +18,7 @@ RouteCloudSample _sample({
     cloudLowPercent: hidden,
     cloudMidPercent: 0,
     cloudHighPercent: high,
+    precipitationMm: precip,
   );
 }
 
@@ -104,5 +106,29 @@ void main() {
     }
     expect(clear, greaterThan(0), reason: 'gaps between clouds expected');
     expect(cloudy, greaterThan(0), reason: 'cloud cores expected');
+  });
+
+  test('rain darkens and cool-tints the cloud cores', () {
+    Uint8List frame(double precip) => _builder([
+      for (var i = 0; i < 6; i++)
+        _sample(progress: i / 5, hidden: 100, precip: precip),
+    ]).buildFrameBuffers(frameCount: 1, start: start, end: start).single;
+
+    final dry = frame(0);
+    final rainy = frame(5);
+
+    var dryRed = 0, rainyRed = 0, rainyBlue = 0, rainyAlpha = 0, dryAlpha = 0;
+    for (var i = 0; i < dry.length; i += 4) {
+      dryRed += dry[i];
+      dryAlpha += dry[i + 3];
+      rainyRed += rainy[i];
+      rainyBlue += rainy[i + 2];
+      rainyAlpha += rainy[i + 3];
+    }
+    // Same coverage, but rain-darkened...
+    expect(rainyAlpha, dryAlpha);
+    expect(rainyRed, lessThan(dryRed * 0.6));
+    // ...with a cool tint: blue stays above red.
+    expect(rainyBlue, greaterThan(rainyRed));
   });
 }

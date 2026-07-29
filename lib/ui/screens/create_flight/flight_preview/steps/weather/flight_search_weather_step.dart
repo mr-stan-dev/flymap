@@ -2,10 +2,10 @@ import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
-import 'package:flymap/domain/policy/route_region_timeline_policy.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_route_map_card.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_symbols.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 import 'package:flymap/utils/travel_date_format_utils.dart';
 
@@ -123,41 +123,10 @@ class _WeatherContent extends StatelessWidget {
     final verdict = FlightWeatherVerdictPolicy.overallVerdict(weather.samples);
     final route = state.flightRoute;
 
-    // The forecast is for the FLIGHT date — say so prominently, not just
-    // via a fetch timestamp.
-    final forecastDateLine = [
-      t.forecastFor(
-        date: TravelDateFormatUtils.formatShortDate(
-          weather.departure.timeLocal,
-        ),
-      ),
-      if (weather.isTimeEstimated) t.estimatedBadge,
-    ].join(' · ');
-
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         Text(t.title, style: theme.textTheme.titleLarge),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            Icon(
-              Icons.event_rounded,
-              size: 16,
-              color: theme.colorScheme.primary,
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                forecastDateLine,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
-        ),
         const SizedBox(height: 14),
         IntrinsicHeight(
           child: Row(
@@ -165,7 +134,6 @@ class _WeatherContent extends StatelessWidget {
             children: [
               Expanded(
                 child: _AirportWeatherCard(
-                  label: t.departureLabel,
                   code: route?.departure.displayCode ?? '',
                   city: route?.departure.city ?? '',
                   countryCode: route?.departure.countryCode ?? '',
@@ -176,7 +144,6 @@ class _WeatherContent extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: _AirportWeatherCard(
-                  label: t.arrivalLabel,
                   code: route?.arrival.displayCode ?? '',
                   city: route?.arrival.city ?? '',
                   countryCode: route?.arrival.countryCode ?? '',
@@ -188,13 +155,6 @@ class _WeatherContent extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          t.localTimesHint,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
           ),
         ),
         if (route != null && weather.samples.isNotEmpty) ...[
@@ -218,7 +178,7 @@ class _WeatherContent extends StatelessWidget {
           const SizedBox(height: 14),
           _VerdictBanner(
             verdict: verdict,
-            expectationLine: _expectationLine(context),
+            expectationItems: _expectationItems(context),
           ),
         ],
         const SizedBox(height: 14),
@@ -238,57 +198,73 @@ class _WeatherContent extends StatelessWidget {
   bool get _arrivalIsNextDay {
     DateTime dateOnly(DateTime value) =>
         DateTime(value.year, value.month, value.day);
-    return dateOnly(weather.arrival.timeLocal)
-            .difference(dateOnly(weather.departure.timeLocal))
-            .inDays ==
+    return dateOnly(
+          weather.arrival.timeLocal,
+        ).difference(dateOnly(weather.departure.timeLocal)).inDays ==
         1;
   }
 
-  /// "☀️ Clear after takeoff · ☁️ Cloud carpet over the Alps · …"
-  String? _expectationLine(BuildContext context) {
+  /// Wind warnings only, in flight order: a windy takeoff opens the list,
+  /// a windy landing closes it; calm stays silent (the card gauges say so).
+  ///
+  /// Deliberately NOT a per-region cloud/rain breakdown: real forecasts
+  /// oscillate, so long routes produced 6-8 rows, and the coarse place
+  /// vocabulary collapsed distinct stretches into identical labels
+  /// ("before landing" x3) that read as contradictions. The map is the
+  /// honest picture of that variability; text at this granularity isn't.
+  List<ExpectationItem> _expectationItems(BuildContext context) {
     final t = context.t.createFlight.weather;
-    final segments = FlightWeatherVerdictPolicy.segments(weather.samples);
-    if (segments.length <= 1) return null;
     final route = state.flightRoute;
-    final markers = route == null
-        ? const <RouteRegionMarker>[]
-        : RouteRegionTimelinePolicy.forFlight(
-            regions: state.routeRegions,
-            departureCountryCode: route.departure.countryCode,
-            arrivalCountryCode: route.arrival.countryCode,
-            totalRouteKm: route.distanceInKm,
-            languageCode: LocaleSettings.currentLocale.languageCode,
-          );
+    final departureWind = weather.departure.windSpeedMs;
+    final arrivalWind = weather.arrival.windSpeedMs;
+    final windyDeparture =
+        departureWind != null && departureWind >= windyThresholdMs;
+    final windyArrival = arrivalWind != null && arrivalWind >= windyThresholdMs;
 
-    String verdictWord(WindowVerdict verdict) => switch (verdict) {
-      WindowVerdict.clearViews => t.expectClear,
-      WindowVerdict.patchyClouds => t.expectPatchy,
-      WindowVerdict.cloudCarpet => t.expectCarpet,
-      WindowVerdict.overcast => t.expectOvercast,
-    };
+    return [
+      if (windyDeparture)
+        ExpectationItem(
+          '💨',
+          t.windTakeoff(
+            city: _windPlace(route?.departure.city, route?.departure.displayCode),
+            speed: '${departureWind.round()}',
+          ),
+        ),
+      if (windyArrival)
+        ExpectationItem(
+          '💨',
+          t.windLanding(
+            city: _windPlace(route?.arrival.city, route?.arrival.displayCode),
+            speed: '${arrivalWind.round()}',
+          ),
+        ),
+    ];
+  }
 
-    String placePhrase(WeatherSegment segment) {
-      for (final marker in markers) {
-        if (marker.routeProgress >= segment.startProgress &&
-            marker.routeProgress <= segment.endProgress) {
-          return t.segmentOver(name: marker.name);
-        }
-      }
-      if (segment.midProgress < 0.33) return t.segmentAfterTakeoff;
-      if (segment.midProgress < 0.66) return t.segmentMidFlight;
-      return t.segmentBeforeLanding;
-    }
-
-    return segments
-        .map((segment) =>
-            '${verdictWord(segment.verdict)} ${placePhrase(segment)}')
-        .join(' · ');
+  String _windPlace(String? city, String? code) {
+    final trimmed = city?.trim() ?? '';
+    if (trimmed.isNotEmpty) return trimmed;
+    return code ?? '';
   }
 }
 
+/// One row of the verdict card's timeline list.
+class ExpectationItem {
+  const ExpectationItem(this.emoji, this.text);
+
+  final String emoji;
+  final String text;
+}
+
+/// Wind bands (m/s) shared by the airport-card indicator and the verdict
+/// timeline: below [breezyThresholdMs] reads as calm/light (smooth ride),
+/// from [windyThresholdMs] it is worth a warning.
+const double breezyThresholdMs = 5;
+const double windyThresholdMs = 8;
+const double strongWindThresholdMs = 14;
+
 class _AirportWeatherCard extends StatelessWidget {
   const _AirportWeatherCard({
-    required this.label,
     required this.code,
     required this.city,
     required this.countryCode,
@@ -297,7 +273,6 @@ class _AirportWeatherCard extends StatelessWidget {
     this.isNextDay = false,
   });
 
-  final String label;
   final String code;
   final String city;
   final String countryCode;
@@ -335,15 +310,16 @@ class _AirportWeatherCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // No departure/arrival captions: position (left/right card) and
+          // the times say it; the width goes to the code + zoned time.
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Text(
-                  label.toUpperCase(),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    letterSpacing: 0.6,
+                  code,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
@@ -351,10 +327,24 @@ class _AirportWeatherCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   if (showTime)
-                    Text(
-                      TravelDateFormatUtils.formatTime(weather.timeLocal),
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                    Text.rich(
+                      TextSpan(
+                        text: TravelDateFormatUtils.formatTime(
+                          weather.timeLocal,
+                        ),
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                        children: [
+                          if (_utcOffsetLabel != null)
+                            TextSpan(
+                              text: ' ${_utcOffsetLabel!}',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   Text(
@@ -368,12 +358,6 @@ class _AirportWeatherCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 4),
-          Text(
-            code,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
-          ),
           if (city.isNotEmpty)
             Row(
               children: [
@@ -404,7 +388,10 @@ class _AirportWeatherCard extends StatelessWidget {
           Row(
             children: [
               Text(
-                _symbolEmoji(weather.symbolCode, weather.cloudCoverPercent),
+                weatherSymbolEmoji(
+                  weather.symbolCode,
+                  weather.cloudCoverPercent,
+                ),
                 style: const TextStyle(fontSize: 30),
               ),
               const SizedBox(width: 10),
@@ -418,24 +405,12 @@ class _AirportWeatherCard extends StatelessWidget {
           ),
           const Spacer(),
           const SizedBox(height: 8),
-          Row(
-            children: [
-              if (weather.windSpeedMs != null) ...[
-                Icon(
-                  Icons.air_rounded,
-                  size: 14,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '${weather.windSpeedMs!.round()} m/s',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-              if ((weather.precipitationMm ?? 0) > 0) ...[
-                const SizedBox(width: 10),
+          if (weather.windSpeedMs != null)
+            _WindIndicator(speedMs: weather.windSpeedMs!),
+          if ((weather.precipitationMm ?? 0) > 0) ...[
+            const SizedBox(height: 4),
+            Row(
+              children: [
                 Icon(
                   Icons.umbrella_rounded,
                   size: 14,
@@ -449,65 +424,102 @@ class _AirportWeatherCard extends StatelessWidget {
                   ),
                 ),
               ],
-            ],
-          ),
+            ),
+          ],
         ],
       ),
     );
   }
 
-  /// Native emoji (yellow sun, real clouds) instead of tinted icons.
-  String _symbolEmoji(String? symbolCode, double? cloudCover) {
-    final code = symbolCode ?? '';
-    if (code.contains('thunder')) return '⛈️';
-    if (code.contains('snow') || code.contains('sleet')) return '🌨️';
-    if (code.contains('rain')) return '🌧️';
-    if (code.contains('fog')) return '🌫️';
-    if (code.startsWith('clearsky')) return '☀️';
-    if (code.startsWith('fair')) return '🌤️';
-    if (code.startsWith('partlycloudy')) return '⛅';
-    if (code.startsWith('cloudy')) return '☁️';
-    // No symbol (6h-block entries sometimes omit it): fall back to cover.
-    final cover = cloudCover ?? 50;
-    if (cover < 25) return '☀️';
-    if (cover < 70) return '⛅';
-    return '☁️';
+  /// "GMT+2" / "GMT+5:30" from the forecast's UTC offset. Omitted at offset
+  /// zero: the entity uses 0 for "unknown", so a bare time is more honest
+  /// than a possibly-wrong "GMT".
+  String? get _utcOffsetLabel {
+    final minutes = weather.utcOffsetMinutes;
+    if (minutes == 0) return null;
+    final sign = minutes < 0 ? '-' : '+';
+    final absolute = minutes.abs();
+    final hours = absolute ~/ 60;
+    final rest = absolute % 60;
+    final restText = rest == 0 ? '' : ':${rest.toString().padLeft(2, '0')}';
+    return 'GMT$sign$hours$restText';
   }
 }
 
-class _VerdictBanner extends StatelessWidget {
-  const _VerdictBanner({required this.verdict, this.expectationLine});
+/// Wind strength at a glance: three signal-style bars fill and warm up in
+/// color as the wind picks up, next to a qualitative label and the m/s
+/// value — "is my drink safe on the tray" beats a bare number.
+class _WindIndicator extends StatelessWidget {
+  const _WindIndicator({required this.speedMs});
 
-  final WindowVerdict verdict;
-  final String? expectationLine;
+  final double speedMs;
 
   @override
   Widget build(BuildContext context) {
     final t = context.t.createFlight.weather;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final (emoji, title, body) = switch (verdict) {
-      WindowVerdict.clearViews => (
-        '☀️',
-        t.verdictClearTitle,
-        t.verdictClearBody,
-      ),
-      WindowVerdict.patchyClouds => (
-        '⛅',
-        t.verdictPatchyTitle,
-        t.verdictPatchyBody,
-      ),
-      WindowVerdict.cloudCarpet => (
-        '☁️',
-        t.verdictCarpetTitle,
-        t.verdictCarpetBody,
-      ),
-      WindowVerdict.overcast => (
-        '🌫️',
-        t.verdictOvercastTitle,
-        t.verdictOvercastBody,
-      ),
+
+    final (label, filledBars, Color? accent) = switch (speedMs) {
+      < 2 => (t.windCalm, 1, null),
+      < breezyThresholdMs => (t.windLight, 1, null),
+      < windyThresholdMs => (t.windBreezy, 2, null),
+      < strongWindThresholdMs => (t.windWindy, 3, Colors.amber.shade800),
+      _ => (t.windStrong, 3, Colors.deepOrange.shade600),
     };
+    final color = accent ?? colorScheme.onSurfaceVariant;
+
+    return Row(
+      children: [
+        for (var bar = 0; bar < 3; bar++)
+          Padding(
+            padding: const EdgeInsets.only(right: 2),
+            child: Container(
+              width: 3,
+              height: 6 + bar * 3,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(1.5),
+                color: bar < filledBars
+                    ? color
+                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.25),
+              ),
+            ),
+          ),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            '$label · ${speedMs.round()} m/s',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: color,
+              fontWeight: accent == null ? null : FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _VerdictBanner extends StatelessWidget {
+  const _VerdictBanner({
+    required this.verdict,
+    this.expectationItems = const <ExpectationItem>[],
+  });
+
+  final WindowVerdict verdict;
+
+  /// Timeline-ordered key points; when present they replace the generic
+  /// body sentence — a scannable list instead of a prose paragraph.
+  final List<ExpectationItem> expectationItems;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t.createFlight.weather;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final (emoji, title, body) = verdictPresentation(verdict, t);
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -532,19 +544,59 @@ class _VerdictBanner extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(body, style: theme.textTheme.bodyMedium),
-          if (expectationLine != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              expectationLine!,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
+          if (expectationItems.isEmpty) ...[
+            const SizedBox(height: 4),
+            Text(body, style: theme.textTheme.bodyMedium),
+          ] else
+            for (final item in expectationItems) ...[
+              const SizedBox(height: 8),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 24,
+                    child: Text(
+                      item.emoji,
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      item.text,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
+            ],
         ],
       ),
     );
   }
+}
+
+/// (emoji, title, body) for a window verdict — shared by the banner and
+/// the weather share card.
+(String, String, String) verdictPresentation(WindowVerdict verdict, dynamic t) {
+  return switch (verdict) {
+    WindowVerdict.clearViews => ('☀️', t.verdictClearTitle, t.verdictClearBody),
+    WindowVerdict.patchyClouds => (
+      '⛅',
+      t.verdictPatchyTitle,
+      t.verdictPatchyBody,
+    ),
+    WindowVerdict.cloudCarpet => (
+      '☁️',
+      t.verdictCarpetTitle,
+      t.verdictCarpetBody,
+    ),
+    WindowVerdict.overcast => (
+      '🌫️',
+      t.verdictOvercastTitle,
+      t.verdictOvercastBody,
+    ),
+  };
 }

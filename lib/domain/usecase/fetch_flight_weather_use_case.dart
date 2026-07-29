@@ -119,6 +119,7 @@ class FetchFlightWeatherUseCase {
                 cloudLowPercent: slice.cloudLowPercent ?? 0,
                 cloudMidPercent: slice.cloudMidPercent ?? 0,
                 cloudHighPercent: slice.cloudHighPercent ?? 0,
+                precipitationMm: slice.precipitationMm ?? 0,
               ),
         ],
       );

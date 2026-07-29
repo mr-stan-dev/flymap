@@ -70,27 +70,31 @@ class CloudFieldBuilder {
 
     final hiddenAt = Float32List(samples.length);
     final highAt = Float32List(samples.length);
+    final rainAt = Float32List(samples.length);
     for (var f = 0; f < frameCount; f++) {
       final t = frameCount == 1
           ? start
-          : start.add(
-              Duration(seconds: spanSeconds * f ~/ (frameCount - 1)),
-            );
+          : start.add(Duration(seconds: spanSeconds * f ~/ (frameCount - 1)));
       for (var s = 0; s < samples.length; s++) {
         hiddenAt[s] = samples[s].hiddenAt(t) / 100;
         highAt[s] = samples[s].highAt(t) / 100;
+        // Normalized rain intensity with a sqrt curve: light rain
+        // (0.5-1 mm/h) is already subtly visible, 3+ mm/h reads as heavy.
+        rainAt[s] = math.sqrt((samples[s].rainAt(t) / 3).clamp(0.0, 1.0));
       }
 
       final bytes = Uint8List(cells * 4);
       for (var cell = 0; cell < cells; cell++) {
         var hidden = 0.0;
         var high = 0.0;
+        var rain = 0.0;
         final base = cell * _neighborCount;
         for (var k = 0; k < _neighborCount; k++) {
           final weight = neighborWeight[base + k];
           if (weight <= 0) continue;
           hidden += weight * hiddenAt[neighborIndex[base + k]];
           high += weight * highAt[neighborIndex[base + k]];
+          rain += weight * rainAt[neighborIndex[base + k]];
         }
 
         // Noise sampled in viewport px (resolution-independent), drifting
@@ -117,13 +121,19 @@ class CloudFieldBuilder {
         // from above; thin cover stays white.
         final brightness = 1.0 - 0.15 * cloud * (0.4 + 0.6 * noise);
 
+        // Rain darkens the cloud toward a cool slate blue: red drops the
+        // most, blue the least, so wet cores read as rain, not dirt.
+        final darken = 1.0 - 0.45 * rain;
+        final red = brightness * darken * (1.0 - 0.18 * rain);
+        final green = brightness * darken * (1.0 - 0.08 * rain);
+        final blue = brightness * darken;
+
         // PREMULTIPLIED: decodeImageFromPixels treats rgba8888 as premul,
         // so straight-alpha data (RGB=255) blows out to solid white.
         final byte = cell * 4;
-        final channel = (alpha * brightness * 255).round();
-        bytes[byte] = channel;
-        bytes[byte + 1] = channel;
-        bytes[byte + 2] = channel;
+        bytes[byte] = (alpha * red * 255).round();
+        bytes[byte + 1] = (alpha * green * 255).round();
+        bytes[byte + 2] = (alpha * blue * 255).round();
         bytes[byte + 3] = (alpha * 255).round();
       }
       yield bytes;
@@ -190,7 +200,8 @@ class CloudFieldBuilder {
   /// range. The finest octave is what gives wispy edges — it only resolves
   /// when the field is rasterized at ~4px cells.
   double _fbm(double x, double y) {
-    final n = 0.42 * _valueNoise(x / 176, y / 176) +
+    final n =
+        0.42 * _valueNoise(x / 176, y / 176) +
         0.28 * _valueNoise(x / 80, y / 80) +
         0.18 * _valueNoise(x / 36, y / 36) +
         0.12 * _valueNoise(x / 16, y / 16);

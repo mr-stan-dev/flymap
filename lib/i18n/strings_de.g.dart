@@ -935,11 +935,9 @@ class _TranslationsCreateFlightWeatherDe extends TranslationsCreateFlightWeather
 	@override String get title => 'Wirst du den Boden sehen?';
 	@override String get loading => 'Wir prüfen den Himmel entlang deiner Route…';
 	@override String get loadFailed => 'Die Vorhersage konnte gerade nicht geladen werden. Versuche es erneut oder fahre ohne sie fort.';
-	@override String get estimatedBadge => 'Tagesprognose';
 	@override String get departureLabel => 'Abflug';
 	@override String get arrivalLabel => 'Ankunft';
 	@override String get tomorrow => 'morgen';
-	@override String get localTimesHint => 'Zeiten sind Ortszeit des jeweiligen Flughafens.';
 	@override String get verdictClearTitle => 'Klare Sicht';
 	@override String get verdictClearBody => 'Der Fensterplatz lohnt sich — der Boden sollte fast den ganzen Flug sichtbar sein.';
 	@override String get verdictPatchyTitle => 'Aufgelockerte Bewölkung';
@@ -948,19 +946,22 @@ class _TranslationsCreateFlightWeatherDe extends TranslationsCreateFlightWeather
 	@override String get verdictCarpetBody => 'Ein weißes Wolkenmeer unter dir — wunderschön, aber der Boden bleibt meist verborgen.';
 	@override String get verdictOvercastTitle => 'Bedeckter Himmel';
 	@override String get verdictOvercastBody => 'Die beste Sicht gibt es bei Start und Landung.';
-	@override String get expectClear => '☀️ Klar';
-	@override String get expectPatchy => '⛅ Aufgelockert';
-	@override String get expectCarpet => '☁️ Wolkenteppich';
-	@override String get expectOvercast => '🌫 Bedeckt';
-	@override String get segmentAfterTakeoff => 'nach dem Start';
-	@override String get segmentMidFlight => 'in der Flugmitte';
-	@override String get segmentBeforeLanding => 'vor der Landung';
-	@override String segmentOver({required Object name}) => 'über ${name}';
+	@override String get windCalm => 'Windstill';
+	@override String get windLight => 'Leichter Wind';
+	@override String get windBreezy => 'Frischer Wind';
+	@override String get windWindy => 'Windig';
+	@override String get windStrong => 'Starker Wind';
+	@override String windTakeoff({required Object city, required Object speed}) => 'Windiger Start in ${city} (${speed} m/s) — es kann ruckeln';
+	@override String windLanding({required Object city, required Object speed}) => 'Windige Landung in ${city} (${speed} m/s) — es kann ruckeln';
 	@override String get proTeaserTitle => 'Wolkenkarte entlang deiner Route';
 	@override String get proTeaserBody => 'Sieh, wo die Wolken sein werden — und schau deinem Flugzeug zu, wie es die ganze Route darüber fliegt.';
 	@override String get attribution => 'Wetterdaten: MET Norwegen';
 	@override String get hedge => 'Vorhersagen werden näher am Abflug genauer.';
-	@override String forecastFor({required Object date}) => 'Vorhersage für ${date}';
+	@override String get share => 'Teilen';
+	@override String get shareAsImage => 'Als Bild teilen';
+	@override String get shareAsVideo => 'Als Video teilen';
+	@override String get preparingShare => 'Teilen wird vorbereitet…';
+	@override String get shareFailed => 'Teilen konnte nicht vorbereitet werden — versuche es erneut.';
 	@override String updatedAt({required Object time}) => 'Aktualisiert ${time}';
 }
 
@@ -1008,6 +1009,10 @@ class _TranslationsCreateFlightTravelDateDe extends TranslationsCreateFlightTrav
 	@override String get stepTitle => 'Wann fliegst du?';
 	@override String get customDate => 'Anderes Datum wählen';
 	@override String get pickDate => 'Reisedatum auswählen';
+	@override String get yourFlightOnDate => 'Dein Flug an diesem Datum';
+	@override String get changeDate => 'Datum ändern';
+	@override String get checkingSchedule => 'Flugplan wird geprüft…';
+	@override String get noDateYet => 'Noch kein Datum';
 	@override String get skipDate => 'Ohne Datum fortfahren';
 	@override String get addDepartureTime => 'Abflugzeit hinzufügen (optional)';
 	@override String departureTimeAt({required Object time}) => 'Abflugzeit · ${time}';
@@ -1037,6 +1042,7 @@ class _TranslationsCreateFlightFlightNumberSearchDe extends TranslationsCreateFl
 	@override String get airportsFallbackButton => 'Nach Flughäfen suchen';
 	@override String get confirmTitle => 'Flug bestätigen';
 	@override String get foundTitle => 'Wir haben deinen Flug gefunden';
+	@override String get editFlightNumber => 'Flugnummer ändern';
 	@override String get beyondWindowHint => 'Fliegst du später? Für die aktuellste und genaueste Flugkarte empfehlen wir den Download innerhalb von 7 Tagen vor deinem Flug.';
 	@override String get basedOnSameFlightOn => '* Basierend auf der zuletzt aufgezeichneten Route für denselben Flug';
 }
@@ -1060,8 +1066,8 @@ class _TranslationsCreateFlightRealRouteAirportSearchDe extends TranslationsCrea
 	@override String get rateLimitedError => 'Im Moment gibt es zu viele Flugabfragen. Bitte versuche es gleich noch einmal.';
 	@override String get providerUnavailableError => 'Echte Flugdaten sind vorübergehend nicht verfügbar. Bitte versuche es gleich noch einmal.';
 	@override String get unexpectedError => 'Beim Suchen dieser Strecke ist ein Fehler aufgetreten. Bitte versuche es erneut.';
-	@override String get foundOneTitle => '1 Flug gefunden';
-	@override String foundManyTitle({required Object count}) => '${count} Flüge gefunden';
+	@override String foundOneTitle({required Object route}) => '1 Flug gefunden · ${route}';
+	@override String foundManyTitle({required Object count, required Object route}) => '${count} Flüge gefunden · ${route}';
 	@override String get ticketMatchHint => 'Achte darauf, dass diese den Flughäfen auf deinem Flugticket entsprechen.';
 	@override String get findByFlightNumber => 'Nach Flugnummer suchen';
 }
@@ -1896,11 +1902,9 @@ extension on TranslationsDe {
 			'createFlight.weather.title' => 'Wirst du den Boden sehen?',
 			'createFlight.weather.loading' => 'Wir prüfen den Himmel entlang deiner Route…',
 			'createFlight.weather.loadFailed' => 'Die Vorhersage konnte gerade nicht geladen werden. Versuche es erneut oder fahre ohne sie fort.',
-			'createFlight.weather.estimatedBadge' => 'Tagesprognose',
 			'createFlight.weather.departureLabel' => 'Abflug',
 			'createFlight.weather.arrivalLabel' => 'Ankunft',
 			'createFlight.weather.tomorrow' => 'morgen',
-			'createFlight.weather.localTimesHint' => 'Zeiten sind Ortszeit des jeweiligen Flughafens.',
 			'createFlight.weather.verdictClearTitle' => 'Klare Sicht',
 			'createFlight.weather.verdictClearBody' => 'Der Fensterplatz lohnt sich — der Boden sollte fast den ganzen Flug sichtbar sein.',
 			'createFlight.weather.verdictPatchyTitle' => 'Aufgelockerte Bewölkung',
@@ -1909,19 +1913,22 @@ extension on TranslationsDe {
 			'createFlight.weather.verdictCarpetBody' => 'Ein weißes Wolkenmeer unter dir — wunderschön, aber der Boden bleibt meist verborgen.',
 			'createFlight.weather.verdictOvercastTitle' => 'Bedeckter Himmel',
 			'createFlight.weather.verdictOvercastBody' => 'Die beste Sicht gibt es bei Start und Landung.',
-			'createFlight.weather.expectClear' => '☀️ Klar',
-			'createFlight.weather.expectPatchy' => '⛅ Aufgelockert',
-			'createFlight.weather.expectCarpet' => '☁️ Wolkenteppich',
-			'createFlight.weather.expectOvercast' => '🌫 Bedeckt',
-			'createFlight.weather.segmentAfterTakeoff' => 'nach dem Start',
-			'createFlight.weather.segmentMidFlight' => 'in der Flugmitte',
-			'createFlight.weather.segmentBeforeLanding' => 'vor der Landung',
-			'createFlight.weather.segmentOver' => ({required Object name}) => 'über ${name}',
+			'createFlight.weather.windCalm' => 'Windstill',
+			'createFlight.weather.windLight' => 'Leichter Wind',
+			'createFlight.weather.windBreezy' => 'Frischer Wind',
+			'createFlight.weather.windWindy' => 'Windig',
+			'createFlight.weather.windStrong' => 'Starker Wind',
+			'createFlight.weather.windTakeoff' => ({required Object city, required Object speed}) => 'Windiger Start in ${city} (${speed} m/s) — es kann ruckeln',
+			'createFlight.weather.windLanding' => ({required Object city, required Object speed}) => 'Windige Landung in ${city} (${speed} m/s) — es kann ruckeln',
 			'createFlight.weather.proTeaserTitle' => 'Wolkenkarte entlang deiner Route',
 			'createFlight.weather.proTeaserBody' => 'Sieh, wo die Wolken sein werden — und schau deinem Flugzeug zu, wie es die ganze Route darüber fliegt.',
 			'createFlight.weather.attribution' => 'Wetterdaten: MET Norwegen',
 			'createFlight.weather.hedge' => 'Vorhersagen werden näher am Abflug genauer.',
-			'createFlight.weather.forecastFor' => ({required Object date}) => 'Vorhersage für ${date}',
+			'createFlight.weather.share' => 'Teilen',
+			'createFlight.weather.shareAsImage' => 'Als Bild teilen',
+			'createFlight.weather.shareAsVideo' => 'Als Video teilen',
+			'createFlight.weather.preparingShare' => 'Teilen wird vorbereitet…',
+			'createFlight.weather.shareFailed' => 'Teilen konnte nicht vorbereitet werden — versuche es erneut.',
 			'createFlight.weather.updatedAt' => ({required Object time}) => 'Aktualisiert ${time}',
 			'createFlight.routeTypeSelector.title' => 'Neuer Flug',
 			'createFlight.routeTypeSelector.basicTitle' => 'Ungefähre Route',
@@ -1942,6 +1949,10 @@ extension on TranslationsDe {
 			'createFlight.travelDate.stepTitle' => 'Wann fliegst du?',
 			'createFlight.travelDate.customDate' => 'Anderes Datum wählen',
 			'createFlight.travelDate.pickDate' => 'Reisedatum auswählen',
+			'createFlight.travelDate.yourFlightOnDate' => 'Dein Flug an diesem Datum',
+			'createFlight.travelDate.changeDate' => 'Datum ändern',
+			'createFlight.travelDate.checkingSchedule' => 'Flugplan wird geprüft…',
+			'createFlight.travelDate.noDateYet' => 'Noch kein Datum',
 			'createFlight.travelDate.skipDate' => 'Ohne Datum fortfahren',
 			'createFlight.travelDate.addDepartureTime' => 'Abflugzeit hinzufügen (optional)',
 			'createFlight.travelDate.departureTimeAt' => ({required Object time}) => 'Abflugzeit · ${time}',
@@ -1962,6 +1973,7 @@ extension on TranslationsDe {
 			'createFlight.flightNumberSearch.airportsFallbackButton' => 'Nach Flughäfen suchen',
 			'createFlight.flightNumberSearch.confirmTitle' => 'Flug bestätigen',
 			'createFlight.flightNumberSearch.foundTitle' => 'Wir haben deinen Flug gefunden',
+			'createFlight.flightNumberSearch.editFlightNumber' => 'Flugnummer ändern',
 			'createFlight.flightNumberSearch.beyondWindowHint' => 'Fliegst du später? Für die aktuellste und genaueste Flugkarte empfehlen wir den Download innerhalb von 7 Tagen vor deinem Flug.',
 			'createFlight.flightNumberSearch.basedOnSameFlightOn' => '* Basierend auf der zuletzt aufgezeichneten Route für denselben Flug',
 			'createFlight.realRouteAirportSearch.title' => 'Echte Flüge nach Flughäfen finden',
@@ -1976,8 +1988,8 @@ extension on TranslationsDe {
 			'createFlight.realRouteAirportSearch.rateLimitedError' => 'Im Moment gibt es zu viele Flugabfragen. Bitte versuche es gleich noch einmal.',
 			'createFlight.realRouteAirportSearch.providerUnavailableError' => 'Echte Flugdaten sind vorübergehend nicht verfügbar. Bitte versuche es gleich noch einmal.',
 			'createFlight.realRouteAirportSearch.unexpectedError' => 'Beim Suchen dieser Strecke ist ein Fehler aufgetreten. Bitte versuche es erneut.',
-			'createFlight.realRouteAirportSearch.foundOneTitle' => '1 Flug gefunden',
-			'createFlight.realRouteAirportSearch.foundManyTitle' => ({required Object count}) => '${count} Flüge gefunden',
+			'createFlight.realRouteAirportSearch.foundOneTitle' => ({required Object route}) => '1 Flug gefunden · ${route}',
+			'createFlight.realRouteAirportSearch.foundManyTitle' => ({required Object count, required Object route}) => '${count} Flüge gefunden · ${route}',
 			'createFlight.realRouteAirportSearch.ticketMatchHint' => 'Achte darauf, dass diese den Flughäfen auf deinem Flugticket entsprechen.',
 			'createFlight.realRouteAirportSearch.findByFlightNumber' => 'Nach Flugnummer suchen',
 			'createFlight.search.departureHint' => 'Abflughafen suchen',
@@ -2066,14 +2078,14 @@ extension on TranslationsDe {
 			'createFlight.overview.timeline.regionType.coast' => 'Küste',
 			'createFlight.overview.timeline.regionType.mountainRange' => 'Gebirge',
 			'createFlight.overview.timeline.regionType.valley' => 'Tal',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.plateau' => 'Hochebene',
 			'createFlight.overview.timeline.regionType.plain' => 'Ebene',
 			'createFlight.overview.timeline.regionType.basin' => 'Becken',
 			'createFlight.overview.timeline.regionType.lowland' => 'Tiefland',
 			'createFlight.overview.timeline.regionType.tundra' => 'Tundra',
 			'createFlight.overview.timeline.regionType.wetlands' => 'Feuchtgebiet',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.desert' => 'Wüste',
 			'createFlight.overview.timeline.regionType.delta' => 'Delta',
 			'createFlight.overview.timeline.regionType.reservoir' => 'Stausee',
@@ -2580,14 +2592,14 @@ extension on TranslationsDe {
 			'countries.MZ' => 'Mosambik',
 			'countries.NA' => 'Namibia',
 			'countries.NC' => 'Neukaledonien',
+			_ => null,
+		} ?? switch (path) {
 			'countries.NE' => 'Niger',
 			'countries.NG' => 'Nigeria',
 			'countries.NI' => 'Nicaragua',
 			'countries.NL' => 'Niederlande',
 			'countries.NO' => 'Norwegen',
 			'countries.NP' => 'Nepal',
-			_ => null,
-		} ?? switch (path) {
 			'countries.NZ' => 'Neuseeland',
 			'countries.OM' => 'Oman',
 			'countries.PA' => 'Panama',

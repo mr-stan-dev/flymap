@@ -33,6 +33,16 @@ class WeatherSegment {
   double get length => endProgress - startProgress;
 }
 
+/// A contiguous stretch of the route with meaningful precipitation.
+class RainRun {
+  const RainRun({required this.startProgress, required this.endProgress});
+
+  final double startProgress;
+  final double endProgress;
+
+  double get midProgress => (startProgress + endProgress) / 2;
+}
+
 /// Turns route cloud samples into the overall window verdict and
 /// per-segment breakdown. Pure math, no I/O.
 class FlightWeatherVerdictPolicy {
@@ -123,5 +133,30 @@ class FlightWeatherVerdictPolicy {
       }
     }
     return merged;
+  }
+
+  /// Below this the forecast precipitation is treated as dry noise.
+  static const double rainThresholdMm = 0.5;
+
+  /// Contiguous stretches where the overhead-time precipitation reaches
+  /// [rainThresholdMm] — the expectation line calls these out.
+  static List<RainRun> rainRuns(List<RouteCloudSample> samples) {
+    final runs = <RainRun>[];
+    double? runStart;
+    double lastProgress = 0;
+    for (final sample in samples) {
+      final rainy = (sample.precipitationMm ?? 0) >= rainThresholdMm;
+      if (rainy) {
+        runStart ??= sample.routeProgress;
+        lastProgress = sample.routeProgress;
+      } else if (runStart != null) {
+        runs.add(RainRun(startProgress: runStart, endProgress: lastProgress));
+        runStart = null;
+      }
+    }
+    if (runStart != null) {
+      runs.add(RainRun(startProgress: runStart, endProgress: lastProgress));
+    }
+    return runs;
   }
 }

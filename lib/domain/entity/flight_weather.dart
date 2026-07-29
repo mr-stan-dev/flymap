@@ -48,12 +48,16 @@ class CloudTimeSlice extends Equatable {
     required this.cloudLowPercent,
     required this.cloudMidPercent,
     required this.cloudHighPercent,
+    this.precipitationMm = 0,
   });
 
   final DateTime timeUtc;
   final double cloudLowPercent;
   final double cloudMidPercent;
   final double cloudHighPercent;
+
+  /// Expected precipitation (mm, next hour) at this instant.
+  final double precipitationMm;
 
   double get groundHiddenPercent =>
       (cloudLowPercent + cloudMidPercent).clamp(0, 100);
@@ -64,6 +68,7 @@ class CloudTimeSlice extends Equatable {
     cloudLowPercent,
     cloudMidPercent,
     cloudHighPercent,
+    precipitationMm,
   ];
 }
 
@@ -112,6 +117,13 @@ class RouteCloudSample extends Equatable {
   /// Linearly interpolated high-cirrus share at [timeUtc].
   double highAt(DateTime time) =>
       _interpolate(time, (slice) => slice.cloudHighPercent, cloudHighPercent);
+
+  /// Linearly interpolated precipitation (mm/h) at [timeUtc].
+  double rainAt(DateTime time) => _interpolate(
+    time,
+    (slice) => slice.precipitationMm,
+    precipitationMm ?? 0,
+  );
 
   double _interpolate(
     DateTime time,
