@@ -9,14 +9,14 @@ import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/ui/screens/create_flight/travel_date/travel_date_section.dart';
+import 'package:flymap/ui/screens/create_flight/widgets/compact_flight_strip.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
-import 'package:flymap/ui/screens/create_flight/flight_number_search/widgets/flight_summary_card.dart';
 import 'package:flymap/ui/screens/create_flight/widgets/flight_search_loading_view.dart';
 import 'package:flymap/ui/screens/create_flight/flight_number_search/widgets/search_fallback_action.dart';
 import 'package:flymap/ui/screens/create_flight/airports_search/viewmodel/airport_selection_screen_state.dart';
 import 'package:flymap/ui/screens/create_flight/airports_search/widgets/flight_search_airport_selection_step.dart';
 import 'package:flymap/ui/screens/create_flight/airports_search/widgets/selected_departure_row.dart';
-import 'package:flymap/ui/screens/create_flight/travel_date/travel_date_pick_screen.dart';
 import 'package:get_it/get_it.dart';
 
 import 'viewmodel/real_route_airport_search_cubit.dart';
@@ -69,8 +69,7 @@ class _RealRouteAirportSearchScreenState
           >(
             listenWhen: (previous, current) =>
                 previous.errorMessage != current.errorMessage ||
-                previous.searchQuery != current.searchQuery ||
-                previous.pendingSelection != current.pendingSelection,
+                previous.searchQuery != current.searchQuery,
             listener: (context, state) {
               if (_searchController.text != state.searchQuery) {
                 _searchController.value = TextEditingValue(
@@ -85,24 +84,6 @@ class _RealRouteAirportSearchScreenState
                 ScaffoldMessenger.of(
                   context,
                 ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
-              }
-              final selection = state.pendingSelection;
-              if (selection != null) {
-                // Flight confirmed — the date is picked on its own step,
-                // which fetches this number's 7-day schedule itself.
-                AppRouter.goToTravelDatePick(
-                  context,
-                  args: TravelDatePickArgs(
-                    departure: selection.departure,
-                    arrival: selection.arrival,
-                    flightNumber: selection.flightNumber,
-                    fr24Id: selection.fr24Id,
-                    hasPendingFlightUnlock: widget.hasPendingFlightUnlock,
-                  ),
-                );
-                context
-                    .read<RealRouteAirportSearchCubit>()
-                    .clearPendingSelection();
               }
             },
             builder: (context, state) {

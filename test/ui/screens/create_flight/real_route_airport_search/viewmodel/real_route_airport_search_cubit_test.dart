@@ -190,41 +190,6 @@ void main() {
       },
     );
 
-    test('selectFlight stores the selected matched flight', () async {
-      final flight = FlightSummary(
-        flightNumber: 'BA117',
-        fr24Id: 'track-1',
-        origIcao: 'EGLL',
-        destIcao: 'KJFK',
-        departure: _airports.first,
-        arrival: _airports[1],
-      );
-
-      cubit.selectFlight(flight);
-
-      expect(cubit.state.selectedMatchedFlight, flight);
-      expect(cubit.state.pendingSelection, isNull);
-    });
-
-    test('confirmSelectedFlight emits navigation-ready selection', () async {
-      final flight = FlightSummary(
-        flightNumber: 'BA117',
-        fr24Id: 'track-1',
-        origIcao: 'EGLL',
-        destIcao: 'KJFK',
-        departure: _airports.first,
-        arrival: _airports[1],
-      );
-
-      cubit.selectFlight(flight);
-      cubit.confirmSelectedFlight();
-
-      expect(cubit.state.pendingSelection, isNotNull);
-      expect(cubit.state.pendingSelection?.flightNumber, 'BA117');
-      expect(cubit.state.pendingSelection?.fr24Id, 'track-1');
-      expect(cubit.state.pendingSelection?.departure, _airports.first);
-      expect(cubit.state.pendingSelection?.arrival, _airports[1]);
-    });
   });
 }
 

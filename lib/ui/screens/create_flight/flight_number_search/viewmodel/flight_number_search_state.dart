@@ -1,4 +1,3 @@
-import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight_summary.dart';
 
 sealed class FlightNumberSearchState {
@@ -40,19 +39,5 @@ class FlightNumberSearchError extends FlightNumberSearchState {
     this.isRetryable = true,
     this.candidates = const <FlightSummary>[],
     this.selectedCandidate,
-  });
-}
-
-class FlightNumberSearchSuccess extends FlightNumberSearchState {
-  final Airport departure;
-  final Airport arrival;
-  final String flightNumber;
-  final String? fr24Id;
-
-  const FlightNumberSearchSuccess({
-    required this.departure,
-    required this.arrival,
-    required this.flightNumber,
-    this.fr24Id,
   });
 }

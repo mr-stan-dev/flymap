@@ -297,38 +297,6 @@ class RealRouteAirportSearchCubit extends Cubit<RealRouteAirportSearchState> {
     await searchFlights();
   }
 
-  /// Candidate confirmed — the date is picked on the dedicated travel-date
-  /// step, which the screen navigates to via [pendingSelection].
-  void confirmSelectedFlight() {
-    final flight = state.selectedMatchedFlight;
-    if (flight == null) return;
-
-    final normalizedFlightNumber = _normalizeFlightNumber(flight.flightNumber);
-    final departure = flight.departure ?? state.selectedDeparture;
-    final arrival = flight.arrival ?? state.selectedArrival;
-    if (normalizedFlightNumber == null ||
-        departure == null ||
-        arrival == null) {
-      return;
-    }
-
-    emit(
-      state.copyWith(
-        pendingSelection: RealRouteAirportSelection(
-          flightNumber: normalizedFlightNumber,
-          fr24Id: flight.fr24Id,
-          departure: departure,
-          arrival: arrival,
-        ),
-      ),
-    );
-  }
-
-  void clearPendingSelection() {
-    if (state.pendingSelection == null) return;
-    emit(state.copyWith(clearPendingSelection: true));
-  }
-
   Future<void> saveSelectedAirportsAsRecent() async {
     final departureCode = _airportCode(state.selectedDeparture);
     final arrivalCode = _airportCode(state.selectedArrival);
@@ -364,7 +332,6 @@ class RealRouteAirportSearchCubit extends Cubit<RealRouteAirportSearchState> {
         matchedFlights: const <FlightSummary>[],
         clearSelectedMatchedFlight: true,
         clearRouteSearchErrorMessage: true,
-        clearPendingSelection: true,
         clearErrorMessage: true,
         clearSelectedArrival: clearSelectedAirport,
       ),
@@ -493,11 +460,5 @@ class RealRouteAirportSearchCubit extends Cubit<RealRouteAirportSearchState> {
       };
     }
     return searchT.unexpectedError;
-  }
-
-  String? _normalizeFlightNumber(String? raw) {
-    if (raw == null) return null;
-    final value = raw.replaceAll(RegExp(r'\s+'), '').trim().toUpperCase();
-    return value.isEmpty ? null : value;
   }
 }

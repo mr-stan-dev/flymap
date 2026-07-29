@@ -175,47 +175,6 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
     );
   }
 
-  Future<void> confirmSummaryAndLoadRoute({
-    required String flightNumber,
-  }) async {
-    final normalized = _normalize(flightNumber);
-    final currentState = state;
-    if (normalized == null ||
-        currentState is! FlightNumberSearchResultsLoaded) {
-      return;
-    }
-
-    final selectedCandidate = currentState.selectedCandidate;
-    if (selectedCandidate == null ||
-        selectedCandidate.departure == null ||
-        selectedCandidate.arrival == null) {
-      return;
-    }
-
-    emit(const FlightNumberSearchLoading());
-
-    try {
-      emit(
-        FlightNumberSearchSuccess(
-          departure: selectedCandidate.departure!,
-          arrival: selectedCandidate.arrival!,
-          flightNumber:
-              _normalize(selectedCandidate.flightNumber ?? normalized) ??
-              normalized,
-          fr24Id: selectedCandidate.fr24Id,
-        ),
-      );
-    } catch (_) {
-      emit(
-        FlightNumberSearchError(
-          message: t.createFlight.flightNumberSearch.unexpectedError,
-          candidates: currentState.candidates,
-          selectedCandidate: currentState.selectedCandidate,
-        ),
-      );
-    }
-  }
-
   void clearSummary() {
     emit(const FlightNumberSearchInitial());
   }

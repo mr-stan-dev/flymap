@@ -8,7 +8,12 @@ import 'package:flymap/domain/entity/route_region.dart';
 import 'package:flymap/domain/entity/route_poi_summary.dart';
 import 'package:flymap/domain/entity/wiki_article_candidate.dart';
 
-enum CreateFlightStep { routeNotSupported, overview, weather, wikipediaArticles }
+enum CreateFlightStep {
+  routeNotSupported,
+  overview,
+  weather,
+  wikipediaArticles,
+}
 
 enum DownloadStage {
   idle,

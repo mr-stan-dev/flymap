@@ -5,7 +5,8 @@ import 'package:flymap/domain/usecase/search_flights_by_number_use_case.dart';
 import 'package:flymap/domain/usecase/search_upcoming_flights_by_number_use_case.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/router/app_router.dart';
-import 'package:flymap/ui/screens/create_flight/travel_date/travel_date_pick_screen.dart';
+import 'package:flymap/ui/screens/create_flight/travel_date/travel_date_section.dart';
+import 'package:flymap/ui/screens/create_flight/widgets/compact_flight_strip.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/theme/app_theme_ext.dart';
 import 'package:get_it/get_it.dart';
@@ -14,7 +15,6 @@ import '../widgets/flight_search_loading_view.dart';
 import 'viewmodel/flight_number_search_cubit.dart';
 import 'viewmodel/flight_number_search_state.dart';
 import 'viewmodel/flight_number_validator.dart';
-import 'widgets/flight_summary_card.dart';
 import 'widgets/search_fallback_action.dart';
 
 class FlightNumberSearchScreen extends StatefulWidget {
@@ -36,6 +36,30 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
   /// Validation feedback only appears after a search attempt — flagging
   /// "LH1114" as invalid while the user is still on "LH1" is just noise.
   bool _hasAttemptedSearch = false;
+
+  /// The inline date section's current choice (null = no date yet) and
+  /// whether its exact-day verification is still running.
+  TravelDateSelection? _dateSelection;
+  bool _dateBusy = false;
+
+  void _continueToOverview(FlightSummary candidate) {
+    final departure = candidate.departure;
+    final arrival = candidate.arrival;
+    if (departure == null || arrival == null) return;
+    final number = (candidate.flightNumber ?? _controller.text)
+        .replaceAll(RegExp(r'\s+'), '')
+        .trim()
+        .toUpperCase();
+    AppRouter.goToFlightOverview(
+      context,
+      departure: departure,
+      arrival: arrival,
+      flightNumber: number,
+      fr24Id: _dateSelection?.fr24Id ?? candidate.fr24Id,
+      schedule: _dateSelection?.schedule,
+      hasPendingFlightUnlock: widget.hasPendingFlightUnlock,
+    );
+  }
 
   void _goToAirportSearch() {
     AppRouter.goToRealRouteAirportSearch(
@@ -61,22 +85,7 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
         analytics: GetIt.I.get(),
         crashlytics: GetIt.I.get(),
       ),
-      child: BlocConsumer<FlightNumberSearchCubit, FlightNumberSearchState>(
-        listener: (context, state) {
-          if (state is FlightNumberSearchSuccess) {
-            // Flight confirmed — the date is picked on its own step next.
-            AppRouter.goToTravelDatePick(
-              context,
-              args: TravelDatePickArgs(
-                departure: state.departure,
-                arrival: state.arrival,
-                flightNumber: state.flightNumber,
-                fr24Id: state.fr24Id,
-                hasPendingFlightUnlock: widget.hasPendingFlightUnlock,
-              ),
-            );
-          }
-        },
+      child: BlocBuilder<FlightNumberSearchCubit, FlightNumberSearchState>(
         builder: (context, state) {
           final cubit = context.read<FlightNumberSearchCubit>();
           final isLoading = state is FlightNumberSearchLoading;
@@ -152,92 +161,168 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
             );
           }
 
+          void resetToSearch() {
+            setState(() {
+              _dateSelection = null;
+              _dateBusy = false;
+            });
+            cubit.clearSummary();
+          }
+
           final content = Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(t.title, style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 8),
-              Text(t.subtitle, style: Theme.of(context).textTheme.bodyMedium),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _controller,
-                textCapitalization: TextCapitalization.characters,
-                enabled: !isLoading,
-                decoration: InputDecoration(
-                  hintText: t.hint,
-                  border: const OutlineInputBorder(),
-                  errorText: showValidationError ? t.invalidFormatError : null,
-                ),
-                onChanged: (_) {
-                  _hasAttemptedSearch = false;
-                  if (candidates.isNotEmpty || isError) {
-                    cubit.clearSummary();
-                  } else {
-                    setState(() {});
-                  }
-                },
-                onSubmitted: (_) {
-                  if (candidates.isEmpty) {
-                    attemptSearch();
-                    return;
-                  }
-                  if (canContinue) {
-                    cubit.confirmSummaryAndLoadRoute(
-                      flightNumber: flightNumber,
-                    );
-                  }
-                },
-              ),
-              if (showInitialFindByAirports) ...[
+              // Once a flight is found, the search header collapses — the
+              // results title carries an edit action instead.
+              if (candidates.isEmpty) ...[
+                Text(t.title, style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TertiaryButton(
-                    label: t.findByAirports,
-                    onPressed: _goToAirportSearch,
-                    expand: false,
+                Text(t.subtitle, style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _controller,
+                  textCapitalization: TextCapitalization.characters,
+                  enabled: !isLoading,
+                  decoration: InputDecoration(
+                    hintText: t.hint,
+                    border: const OutlineInputBorder(),
+                    errorText: showValidationError
+                        ? t.invalidFormatError
+                        : null,
                   ),
+                  onChanged: (_) {
+                    _hasAttemptedSearch = false;
+                    _dateSelection = null;
+                    _dateBusy = false;
+                    if (candidates.isNotEmpty || isError) {
+                      cubit.clearSummary();
+                    } else {
+                      setState(() {});
+                    }
+                  },
+                  onSubmitted: (_) {
+                    if (candidates.isEmpty) {
+                      attemptSearch();
+                      return;
+                    }
+                    if (canContinue && !_dateBusy) {
+                      _continueToOverview(selectedCandidate);
+                    }
+                  },
                 ),
-                const SizedBox(height: 24),
-              ] else
-                const SizedBox(height: 24),
+                if (showInitialFindByAirports) ...[
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TertiaryButton(
+                      label: t.findByAirports,
+                      onPressed: _goToAirportSearch,
+                      expand: false,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ] else
+                  const SizedBox(height: 24),
+              ],
               if (feedback != null) feedback,
-              if (singleCandidate != null) ...[
-                Text(
-                  t.foundTitle,
-                  style: context.textTheme.title24Medium.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              // Compact identity strips keep the date question above the
+              // fold; the full card is the reveal AFTER a date is verified
+              // (inside the date section).
+              if (singleCandidate != null && !_dateBusy) ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        t.foundTitle,
+                        style: context.textTheme.title24Medium.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: resetToSearch,
+                      tooltip: t.editFlightNumber,
+                      icon: const Icon(Icons.edit_rounded, size: 20),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                FlightSummaryCard(
-                  summary: singleCandidate,
-                  showSchedule: false,
+                const SizedBox(height: 4),
+                // The identity strip renders inside the date section, so
+                // it can hide while verifying and become the full card.
+              ] else if (candidates.isNotEmpty &&
+                  _dateSelection == null &&
+                  !_dateBusy) ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        t.confirmTitle,
+                        style: context.textTheme.title24Medium.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: resetToSearch,
+                      tooltip: t.editFlightNumber,
+                      icon: const Icon(Icons.edit_rounded, size: 20),
+                    ),
+                  ],
                 ),
-              ] else if (candidates.isNotEmpty) ...[
-                Text(
-                  t.confirmTitle,
-                  style: context.textTheme.title24Medium.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 4),
                 ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: candidates.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final candidate = candidates[index];
-                    return InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () => cubit.selectCandidate(candidate),
-                      child: _SelectableFlightSummaryCard(
-                        summary: candidate,
-                        isSelected: selectedCandidate == candidate,
+                    final isSelected = selectedCandidate == candidate;
+                    return CompactFlightStrip(
+                      summary: candidate,
+                      isSelected: isSelected,
+                      onTap: () {
+                        setState(() {
+                          _dateSelection = null;
+                          _dateBusy = false;
+                        });
+                        cubit.selectCandidate(candidate);
+                      },
+                      trailing: Icon(
+                        isSelected
+                            ? Icons.check_circle
+                            : Icons.radio_button_unchecked_rounded,
+                        size: 20,
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     );
                   },
+                ),
+              ],
+              if (!isLoading &&
+                  !isError &&
+                  selectedCandidate != null &&
+                  selectedCandidate.departure != null &&
+                  selectedCandidate.arrival != null) ...[
+                const SizedBox(height: 20),
+                TravelDateSection(
+                  key: ValueKey(
+                    FlightNumberSearchCubit.candidateGroupKey(
+                      selectedCandidate,
+                    ),
+                  ),
+                  departure: selectedCandidate.departure!,
+                  arrival: selectedCandidate.arrival!,
+                  flightNumber: selectedCandidate.flightNumber ?? flightNumber,
+                  confirmedFlight: selectedCandidate,
+                  // With several candidates the selection list above is the
+                  // identity in the idle state.
+                  showIdleStrip: singleCandidate != null,
+                  onSelectionChanged: (selection) =>
+                      setState(() => _dateSelection = selection),
+                  onBusyChanged: (busy) => setState(() => _dateBusy = busy),
                 ),
               ],
             ],
@@ -252,19 +337,26 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
                 child: Column(
                   children: [
                     Expanded(child: SingleChildScrollView(child: content)),
+                    const SizedBox(height: 16),
                     if (!isLoading && !isError)
                       SizedBox(
                         width: double.infinity,
                         child: PrimaryButton(
                           label: candidates.isEmpty
                               ? context.t.common.search
+                              // Dateless is its own chip now — Continue
+                              // stays disabled until an explicit choice.
+                              : _dateSelection != null &&
+                                    _dateSelection!.schedule == null
+                              ? context.t.createFlight.travelDate.skipDate
                               : context.t.common.kContinue,
                           onPressed: candidates.isEmpty
                               ? (canSearch ? attemptSearch : null)
-                              : (canContinue
-                                    ? () => cubit.confirmSummaryAndLoadRoute(
-                                        flightNumber: flightNumber,
-                                      )
+                              : ((canContinue &&
+                                        !_dateBusy &&
+                                        _dateSelection != null)
+                                    ? () =>
+                                          _continueToOverview(selectedCandidate)
                                     : null),
                         ),
                       ),
@@ -274,50 +366,6 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class _SelectableFlightSummaryCard extends StatelessWidget {
-  const _SelectableFlightSummaryCard({
-    required this.summary,
-    required this.isSelected,
-  });
-
-  final FlightSummary summary;
-  final bool isSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isSelected
-              ? colorScheme.primary
-              : colorScheme.outline.withValues(alpha: 0.2),
-          width: 2,
-        ),
-        color: isSelected
-            ? colorScheme.primary.withValues(alpha: 0.05)
-            : Colors.transparent,
-      ),
-      child: FlightSummaryCard(
-        summary: summary,
-        showBorder: false,
-        showSchedule: false,
-        trailing: Icon(
-          isSelected
-              ? Icons.check_circle
-              : Icons.radio_button_unchecked_rounded,
-          size: 20,
-          color: isSelected
-              ? colorScheme.primary
-              : colorScheme.onSurfaceVariant,
-        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -341,6 +342,48 @@ void main() {
         PoiLimitsPolicy.maxPoisForTier(isProUser: true),
       );
     });
+
+    test(
+      'real flight without a recorded track falls back to a generated route',
+      () async {
+        final route = _route();
+        final fallbackCubit = _TestFlightPreviewCubit(
+          departure: route.departure,
+          arrival: route.arrival,
+          flightNumber: 'XX123',
+          connectivityChecker: connectivityChecker,
+          getRouteOverviewUseCase: routeOverviewUseCase,
+          // FR24 has never recorded the route: the preview callable 404s.
+          buildFlightRoutePreviewUseCase: _FakeBuildFlightRoutePreviewUseCase(
+            error: _TestFirebaseFunctionsException(
+              code: 'not-found',
+              message: 'No route track found for this flight',
+            ),
+          ),
+          downloadMapUseCase: mapUseCase,
+          downloadRegionWikiArticlesUseCase: regionWikiDownloadUseCase,
+          downloadWikipediaArticlesUseCase: wikiDownloadUseCase,
+          getWikiArticlesUseCase: _FakeGetWikiArticlesUseCase(),
+          userFlightPrefsRepository: _FakeUserFlightPrefsRepository(),
+          flightRepository: _FakeFlightRepository(),
+          subscriptionRepository: subscriptionRepository,
+          flightUnlockRepository: flightUnlockRepository,
+          deleteFlightUseCase: _FakeDeleteFlightUseCase(),
+          analytics: _FakeAppAnalytics(),
+          crashlytics: _FakeAppCrashlytics(),
+        );
+        addTearDown(fallbackCubit.close);
+
+        await fallbackCubit.preparePreview();
+
+        final state = fallbackCubit.state;
+        // No dead end: the generated route (approximate pipeline) loads...
+        expect(state.errorMessage, isNull);
+        expect(state.flightRoute, isNotNull);
+        // ...and the flight identity survives the fallback.
+        expect(state.flightOperationalData?.flightNumber, 'XX123');
+      },
+    );
 
     test('back from wiki steps through weather and preserves pending unlock',
         () async {
@@ -687,6 +730,7 @@ class _TestFlightPreviewCubit extends FlightPreviewCubit {
   _TestFlightPreviewCubit({
     required super.departure,
     required super.arrival,
+    super.flightNumber,
     required super.connectivityChecker,
     required super.getRouteOverviewUseCase,
     required super.buildFlightRoutePreviewUseCase,
@@ -740,8 +784,11 @@ class _FakeGetRouteOverviewUseCase implements GetRouteOverviewUseCase {
 
 class _FakeBuildFlightRoutePreviewUseCase
     extends BuildFlightRoutePreviewUseCase {
-  _FakeBuildFlightRoutePreviewUseCase()
+  _FakeBuildFlightRoutePreviewUseCase({this.error})
     : super(repository: _UnusedFlightSearchRepository());
+
+  /// Thrown on call when set (e.g. a not-found for unrecorded routes).
+  final Object? error;
 
   @override
   Future<FlightRoutePreviewResult> call({
@@ -751,7 +798,7 @@ class _FakeBuildFlightRoutePreviewUseCase
     String? destCode,
     required String lang,
   }) {
-    throw UnimplementedError();
+    throw error ?? UnimplementedError();
   }
 }
 
@@ -1080,4 +1127,8 @@ class _FakeFlightUnlockRepository implements FlightUnlockRepository {
     _controller.add(unusedCount);
     return unusedCount;
   }
+}
+
+class _TestFirebaseFunctionsException extends FirebaseFunctionsException {
+  _TestFirebaseFunctionsException({required super.code, required super.message});
 }

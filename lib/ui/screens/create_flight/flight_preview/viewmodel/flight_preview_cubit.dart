@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
@@ -151,9 +152,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     } catch (e) {
       _logger.error('Weather fetch failed: $e');
       if (isClosed) return;
-      _emitState(
-        state.copyWith(isWeatherLoading: false, weatherFailed: true),
-      );
+      _emitState(state.copyWith(isWeatherLoading: false, weatherFailed: true));
     }
   }
 

@@ -47,24 +47,54 @@ class PreviewPreparationDelegate {
       final RouteOverview overview;
       FlightOperationalData? operationalData;
       if (flightNumber != null && flightNumber.trim().isNotEmpty) {
-        final result = await _buildFlightRoutePreviewUseCase.call(
-          flightNumber: flightNumber,
-          fr24Id: fr24Id,
-          origCode: departure.icaoCode,
-          destCode: arrival.icaoCode,
-          lang: AppLocalization.currentLanguageCode,
-        );
-        overview = _getRouteOverviewUseCase.fromPayload(
-          payload: result.payload,
-          departure: result.departure,
-          arrival: result.arrival,
-        );
-        operationalData = _buildOperationalData(
-          overview: overview,
-          fallbackFlightNumber: flightNumber,
-          departureCode: result.departure.primaryCode,
-          arrivalCode: result.arrival.primaryCode,
-        );
+        FlightRoutePreviewResult? result;
+        try {
+          result = await _buildFlightRoutePreviewUseCase.call(
+            flightNumber: flightNumber,
+            fr24Id: fr24Id,
+            origCode: departure.icaoCode,
+            destCode: arrival.icaoCode,
+            lang: AppLocalization.currentLanguageCode,
+          );
+        } on FirebaseFunctionsException catch (e) {
+          // FR24 has never recorded this route (brand-new/seasonal leg).
+          // The flight is still real — the schedule provider confirmed it —
+          // so fall back to the generated route for the known airport pair
+          // instead of dead-ending. Same pipeline as approximate flights;
+          // only the actual recorded track shape is lost.
+          if (e.code != 'not-found') rethrow;
+          _cubit._logger.log(
+            'no recorded track for $flightNumber — generated-route fallback',
+          );
+        }
+        if (result != null) {
+          overview = _getRouteOverviewUseCase.fromPayload(
+            payload: result.payload,
+            departure: result.departure,
+            arrival: result.arrival,
+          );
+          operationalData = _buildOperationalData(
+            overview: overview,
+            fallbackFlightNumber: flightNumber,
+            departureCode: result.departure.primaryCode,
+            arrivalCode: result.arrival.primaryCode,
+          );
+        } else {
+          overview = await _getRouteOverviewUseCase.call(
+            departure: departure,
+            arrival: arrival,
+          );
+          operationalData = _buildOperationalData(
+            overview: overview,
+            fallbackFlightNumber: flightNumber,
+            departureCode: departure.icaoCode.trim().isNotEmpty
+                ? departure.icaoCode
+                : departure.iataCode,
+            arrivalCode: arrival.icaoCode.trim().isNotEmpty
+                ? arrival.icaoCode
+                : arrival.iataCode,
+          );
+        }
       } else {
         overview = await _getRouteOverviewUseCase.call(
           departure: departure,

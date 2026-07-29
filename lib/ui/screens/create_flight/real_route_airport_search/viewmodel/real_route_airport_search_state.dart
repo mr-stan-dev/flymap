@@ -5,23 +5,6 @@ import 'package:flymap/ui/screens/create_flight/airports_search/viewmodel/airpor
 
 enum RealRouteAirportSearchView { airportSelection, results }
 
-class RealRouteAirportSelection extends Equatable {
-  const RealRouteAirportSelection({
-    required this.flightNumber,
-    this.fr24Id,
-    required this.departure,
-    required this.arrival,
-  });
-
-  final String flightNumber;
-  final String? fr24Id;
-  final Airport departure;
-  final Airport arrival;
-
-  @override
-  List<Object?> get props => [flightNumber, fr24Id, departure, arrival];
-}
-
 class RealRouteAirportSearchState extends Equatable {
   const RealRouteAirportSearchState({
     required this.view,
@@ -41,7 +24,6 @@ class RealRouteAirportSearchState extends Equatable {
     required this.routeSearchErrorMessage,
     required this.matchedFlights,
     required this.selectedMatchedFlight,
-    required this.pendingSelection,
   });
 
   factory RealRouteAirportSearchState.initial() {
@@ -63,7 +45,6 @@ class RealRouteAirportSearchState extends Equatable {
       routeSearchErrorMessage: null,
       matchedFlights: <FlightSummary>[],
       selectedMatchedFlight: null,
-      pendingSelection: null,
     );
   }
 
@@ -84,7 +65,6 @@ class RealRouteAirportSearchState extends Equatable {
   final String? routeSearchErrorMessage;
   final List<FlightSummary> matchedFlights;
   final FlightSummary? selectedMatchedFlight;
-  final RealRouteAirportSelection? pendingSelection;
 
   Airport? get selectedAirport => airportStep == AirportSelectionStep.departure
       ? selectedDeparture
@@ -114,8 +94,6 @@ class RealRouteAirportSearchState extends Equatable {
     List<FlightSummary>? matchedFlights,
     FlightSummary? selectedMatchedFlight,
     bool clearSelectedMatchedFlight = false,
-    RealRouteAirportSelection? pendingSelection,
-    bool clearPendingSelection = false,
   }) {
     return RealRouteAirportSearchState(
       view: view ?? this.view,
@@ -146,9 +124,6 @@ class RealRouteAirportSearchState extends Equatable {
       selectedMatchedFlight: clearSelectedMatchedFlight
           ? null
           : selectedMatchedFlight ?? this.selectedMatchedFlight,
-      pendingSelection: clearPendingSelection
-          ? null
-          : pendingSelection ?? this.pendingSelection,
     );
   }
 
@@ -171,7 +146,6 @@ class RealRouteAirportSearchState extends Equatable {
     routeSearchErrorMessage,
     matchedFlights,
     selectedMatchedFlight,
-    pendingSelection,
   ];
 
   @override
@@ -187,7 +161,6 @@ class RealRouteAirportSearchState extends Equatable {
         'matchedFlights:${matchedFlights.length}, '
         'routeError:${routeSearchErrorMessage != null}, '
         'selection:${selectedMatchedFlight?.flightNumber ?? '-'}, '
-        'pending:${pendingSelection?.flightNumber ?? '-'}'
         ')';
   }
 }
