@@ -75,6 +75,21 @@ void main() {
     expect(find.byType(CustomPaint), findsWidgets);
   });
 
+  testWidgets('date-only flights never display the internal noon estimate', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      app(stateWith(weather: _weather(isTimeEstimated: true))),
+    );
+
+    expect(tester.takeException(), isNull);
+    // 10:00 local = the noon-ish estimate; the clock must not be shown.
+    expect(find.textContaining('10:00'), findsNothing);
+    expect(find.textContaining('(tomorrow)'), findsNothing);
+    // The badge explains what the forecast represents instead.
+    expect(find.textContaining('daytime forecast'), findsOneWidget);
+  });
+
   testWidgets('failed load shows retry and keeps Continue', (tester) async {
     await tester.pumpWidget(app(stateWith()));
 
@@ -110,7 +125,7 @@ FlightRoute _route() {
   );
 }
 
-FlightWeather _weather() {
+FlightWeather _weather({bool isTimeEstimated = false}) {
   AirportWeather airport() => AirportWeather(
     timeUtc: DateTime.utc(2026, 8, 3, 8),
     utcOffsetMinutes: 120,
@@ -135,6 +150,6 @@ FlightWeather _weather() {
         ),
     ],
     fetchedAt: DateTime.utc(2026, 7, 28, 9),
-    isTimeEstimated: false,
+    isTimeEstimated: isTimeEstimated,
   );
 }

@@ -199,8 +199,9 @@ class _FakeFlightSearchRepository implements FlightSearchRepository {
   // which is what these tests exercise.
   @override
   Future<List<FlightSummary>> searchUpcomingFlightsByNumber(
-    String flightNumber,
-  ) async {
+    String flightNumber, {
+    DateTime? date,
+  }) async {
     return const <FlightSummary>[];
   }
 

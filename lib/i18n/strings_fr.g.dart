@@ -935,7 +935,7 @@ class _TranslationsCreateFlightWeatherFr extends TranslationsCreateFlightWeather
 	@override String get title => 'Verrez-vous le sol ?';
 	@override String get loading => 'Vérification du ciel le long de votre itinéraire…';
 	@override String get loadFailed => 'Impossible de charger les prévisions pour le moment. Réessayez ou continuez sans elles.';
-	@override String get estimatedBadge => 'horaires estimés';
+	@override String get estimatedBadge => 'prévision de jour';
 	@override String get departureLabel => 'Départ';
 	@override String get arrivalLabel => 'Arrivée';
 	@override String get tomorrow => 'demain';
@@ -1007,7 +1007,13 @@ class _TranslationsCreateFlightTravelDateFr extends TranslationsCreateFlightTrav
 	@override String get tomorrow => 'Demain';
 	@override String get stepTitle => 'Quand partez-vous ?';
 	@override String get customDate => 'Choisir une autre date';
+	@override String get pickDate => 'Choisissez votre date de voyage';
 	@override String get skipDate => 'Continuer sans date';
+	@override String get addDepartureTime => 'Ajouter l\'heure de départ (facultatif)';
+	@override String departureTimeAt({required Object time}) => 'Heure de départ · ${time}';
+	@override String get noDepartureOnDateTitle => 'Nous n\'avons pas trouvé ce vol à cette date';
+	@override String get noDepartureOnDateBody => 'Vérifiez la date — touchez-la pour la modifier. Ou continuez quand même et nous n\'enregistrerons que la date.';
+	@override String get dateCheckFailed => 'Impossible de vérifier cette date — seule la date est enregistrée.';
 }
 
 // Path: createFlight.flightNumberSearch
@@ -1890,7 +1896,7 @@ extension on TranslationsFr {
 			'createFlight.weather.title' => 'Verrez-vous le sol ?',
 			'createFlight.weather.loading' => 'Vérification du ciel le long de votre itinéraire…',
 			'createFlight.weather.loadFailed' => 'Impossible de charger les prévisions pour le moment. Réessayez ou continuez sans elles.',
-			'createFlight.weather.estimatedBadge' => 'horaires estimés',
+			'createFlight.weather.estimatedBadge' => 'prévision de jour',
 			'createFlight.weather.departureLabel' => 'Départ',
 			'createFlight.weather.arrivalLabel' => 'Arrivée',
 			'createFlight.weather.tomorrow' => 'demain',
@@ -1935,7 +1941,13 @@ extension on TranslationsFr {
 			'createFlight.travelDate.tomorrow' => 'Demain',
 			'createFlight.travelDate.stepTitle' => 'Quand partez-vous ?',
 			'createFlight.travelDate.customDate' => 'Choisir une autre date',
+			'createFlight.travelDate.pickDate' => 'Choisissez votre date de voyage',
 			'createFlight.travelDate.skipDate' => 'Continuer sans date',
+			'createFlight.travelDate.addDepartureTime' => 'Ajouter l\'heure de départ (facultatif)',
+			'createFlight.travelDate.departureTimeAt' => ({required Object time}) => 'Heure de départ · ${time}',
+			'createFlight.travelDate.noDepartureOnDateTitle' => 'Nous n\'avons pas trouvé ce vol à cette date',
+			'createFlight.travelDate.noDepartureOnDateBody' => 'Vérifiez la date — touchez-la pour la modifier. Ou continuez quand même et nous n\'enregistrerons que la date.',
+			'createFlight.travelDate.dateCheckFailed' => 'Impossible de vérifier cette date — seule la date est enregistrée.',
 			'createFlight.flightNumberSearch.title' => 'Numéro de vol',
 			'createFlight.flightNumberSearch.subtitle' => 'Saisissez un numéro de vol (par exemple BA117).',
 			'createFlight.flightNumberSearch.hint' => 'ex. BA117',
@@ -2060,14 +2072,14 @@ extension on TranslationsFr {
 			'createFlight.overview.timeline.regionType.lowland' => 'Basses terres',
 			'createFlight.overview.timeline.regionType.tundra' => 'Toundra',
 			'createFlight.overview.timeline.regionType.wetlands' => 'Zones humides',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.desert' => 'Désert',
 			'createFlight.overview.timeline.regionType.delta' => 'Delta',
 			'createFlight.overview.timeline.regionType.reservoir' => 'Réservoir',
 			'createFlight.overview.timeline.regionType.continent' => 'Continent',
 			'createFlight.overview.timeline.regionType.geoarea' => 'Zone géographique',
 			'createFlight.overview.timeline.regionType.isthmus' => 'Isthme',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.unknown' => 'Type de région inconnu',
 			'createFlight.wikipedia.title' => 'Téléchargez des articles et lisez-les pendant que vous êtes en l’air',
 			'createFlight.wikipedia.loadingIntro' => 'Recherche d’articles liés à l’itinéraire...',
@@ -2574,14 +2586,14 @@ extension on TranslationsFr {
 			'countries.NL' => 'Pays-Bas',
 			'countries.NO' => 'Norvège',
 			'countries.NP' => 'Népal',
+			_ => null,
+		} ?? switch (path) {
 			'countries.NZ' => 'Nouvelle-Zélande',
 			'countries.OM' => 'Oman',
 			'countries.PA' => 'Panama',
 			'countries.PE' => 'Pérou',
 			'countries.PG' => 'Papouasie-Nouvelle-Guinée',
 			'countries.PH' => 'Philippines',
-			_ => null,
-		} ?? switch (path) {
 			'countries.PK' => 'Pakistan',
 			'countries.PL' => 'Pologne',
 			'countries.PR' => 'Porto Rico',

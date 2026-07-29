@@ -357,7 +357,7 @@
       "title": "Wirst du den Boden sehen?",
       "loading": "Wir prüfen den Himmel entlang deiner Route…",
       "loadFailed": "Die Vorhersage konnte gerade nicht geladen werden. Versuche es erneut oder fahre ohne sie fort.",
-      "estimatedBadge": "Zeiten geschätzt",
+      "estimatedBadge": "Tagesprognose",
       "departureLabel": "Abflug",
       "arrivalLabel": "Ankunft",
       "tomorrow": "morgen",
@@ -408,7 +408,13 @@
       "tomorrow": "Morgen",
       "stepTitle": "Wann fliegst du?",
       "customDate": "Anderes Datum wählen",
-      "skipDate": "Ohne Datum fortfahren"
+      "pickDate": "Reisedatum auswählen",
+      "skipDate": "Ohne Datum fortfahren",
+      "addDepartureTime": "Abflugzeit hinzufügen (optional)",
+      "departureTimeAt": "Abflugzeit · $time",
+      "noDepartureOnDateTitle": "Wir konnten diesen Flug an diesem Datum nicht finden",
+      "noDepartureOnDateBody": "Prüfe das Datum — tippe darauf, um es zu ändern. Oder fahre trotzdem fort, dann speichern wir nur das Datum.",
+      "dateCheckFailed": "Datum konnte nicht geprüft werden — nur das Datum wird gespeichert."
     },
     "flightNumberSearch": {
       "title": "Flugnummer",

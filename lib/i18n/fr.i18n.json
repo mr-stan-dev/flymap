@@ -357,7 +357,7 @@
       "title": "Verrez-vous le sol ?",
       "loading": "Vérification du ciel le long de votre itinéraire…",
       "loadFailed": "Impossible de charger les prévisions pour le moment. Réessayez ou continuez sans elles.",
-      "estimatedBadge": "horaires estimés",
+      "estimatedBadge": "prévision de jour",
       "departureLabel": "Départ",
       "arrivalLabel": "Arrivée",
       "tomorrow": "demain",
@@ -408,7 +408,13 @@
       "tomorrow": "Demain",
       "stepTitle": "Quand partez-vous ?",
       "customDate": "Choisir une autre date",
-      "skipDate": "Continuer sans date"
+      "pickDate": "Choisissez votre date de voyage",
+      "skipDate": "Continuer sans date",
+      "addDepartureTime": "Ajouter l'heure de départ (facultatif)",
+      "departureTimeAt": "Heure de départ · $time",
+      "noDepartureOnDateTitle": "Nous n'avons pas trouvé ce vol à cette date",
+      "noDepartureOnDateBody": "Vérifiez la date — touchez-la pour la modifier. Ou continuez quand même et nous n'enregistrerons que la date.",
+      "dateCheckFailed": "Impossible de vérifier cette date — seule la date est enregistrée."
     },
     "flightNumberSearch": {
       "title": "Numéro de vol",

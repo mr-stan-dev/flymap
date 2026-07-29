@@ -37,12 +37,33 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
 
     emit(const FlightNumberSearchLoading());
 
-    // Upcoming scheduled departures first (next 7 days). The dated entries
-    // are grouped per distinct flight (number + pair) so the user picks ONE
-    // card here and the date on the dedicated travel-date step — seven
-    // near-identical dated cards are impossible to tell apart. Any upcoming
-    // failure degrades to the historical search rather than blocking the
-    // flow.
+    // FR24 recorded legs FIRST: they carry everything the cards show
+    // (route pairs, recorded duration/distance, aircraft) at no schedule-
+    // provider cost. The schedule provider is consulted only as discovery
+    // fallback for numbers FR24 has never recorded (brand-new/seasonal
+    // routes) — and again with an exact date on the travel-date step,
+    // which is the real "does it fly on my day" gate.
+    Object? historicalError;
+    try {
+      final candidates = await _searchFlightsByNumberUseCase.call(normalized);
+      if (candidates.isNotEmpty) {
+        _logLookupResult(result: FlightNumberLookupResult.success);
+        emit(
+          FlightNumberSearchResultsLoaded(
+            candidates: candidates,
+            // Preselect the top (most recent) candidate so a single tap on
+            // Continue works; users can still switch.
+            selectedCandidate: candidates.first,
+          ),
+        );
+        return;
+      }
+    } catch (error) {
+      // Fall through to schedule discovery; a FR24 outage must not block
+      // the flow if the schedule provider can still produce a card.
+      historicalError = error;
+    }
+
     try {
       final upcoming = await _searchUpcomingFlightsByNumberUseCase.call(
         normalized,
@@ -52,8 +73,9 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
         for (final flight in upcoming) {
           groups.putIfAbsent(candidateGroupKey(flight), () => []).add(flight);
         }
+        mergeIncompleteRouteGroups(groups);
         final representatives = groups.values
-            .map((group) => group.first)
+            .map(_preferCompleteRoute)
             .toList(growable: false);
         _logScheduleLookup(FlightNumberLookupResult.success);
         _logLookupResult(result: FlightNumberLookupResult.success);
@@ -63,46 +85,72 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
             // Preselect the only (or first) flight so a single tap on
             // Continue works; users can still switch.
             selectedCandidate: representatives.first,
-            upcomingGroups: groups,
           ),
         );
         return;
       }
       _logScheduleLookup(FlightNumberLookupResult.notFound);
     } catch (error, stackTrace) {
-      // Fall through to the historical search below, but keep the schedule
-      // failure visible: rate limiting etc. would otherwise be masked by a
-      // successful dateless fallback.
       _reportScheduleFailure(error, stackTrace);
     }
 
-    try {
-      final candidates = await _searchFlightsByNumberUseCase.call(normalized);
-      _logLookupResult(result: FlightNumberLookupResult.success);
-      emit(
-        FlightNumberSearchResultsLoaded(
-          candidates: candidates,
-          // Preselect the top (most recent) candidate so a single tap on
-          // Continue works; users can still switch.
-          selectedCandidate: candidates.isEmpty ? null : candidates.first,
-        ),
-      );
-    } catch (error) {
-      final failureResult = flightNumberLookupResultFromError(error);
-      _logLookupResult(result: failureResult);
-      unawaited(
-        _crashlytics.setContext(
-          screen: 'flight_number_lookup_failed',
-          flightNumber: normalized,
-        ),
-      );
-      emit(
-        FlightNumberSearchError(
-          message: _lookupFailureMessage(failureResult),
-          isRetryable: _isRetryableFailure(failureResult),
-        ),
-      );
+    // Nothing from either source: surface the primary (historical) failure,
+    // or honest not-found when both simply had nothing.
+    final failureResult = historicalError != null
+        ? flightNumberLookupResultFromError(historicalError)
+        : FlightNumberLookupResult.notFound;
+    _logLookupResult(result: failureResult);
+    unawaited(
+      _crashlytics.setContext(
+        screen: 'flight_number_lookup_failed',
+        flightNumber: normalized,
+      ),
+    );
+    emit(
+      FlightNumberSearchError(
+        message: _lookupFailureMessage(failureResult),
+        isRetryable: _isRetryableFailure(failureResult),
+      ),
+    );
+  }
+
+  /// The provider's currently-active leg often arrives with an INCOMPLETE
+  /// arrival block (no destination codes), which would split the same
+  /// flight into two cards — one of them a mystery with a blank arrival.
+  /// Fold destination-less groups into the complete group with the same
+  /// number + origin, but only when that match is unambiguous.
+  static void mergeIncompleteRouteGroups(
+    Map<String, List<FlightSummary>> groups,
+  ) {
+    final incompleteKeys = [
+      for (final key in groups.keys)
+        if (_isIncompleteRouteKey(key)) key,
+    ];
+    for (final key in incompleteKeys) {
+      final prefix = key; // 'NUMBER|ORIG|'
+      final siblings = [
+        for (final other in groups.keys)
+          if (other != key && other.startsWith(prefix)) other,
+      ];
+      if (siblings.length != 1) continue;
+      groups[siblings.first]!.addAll(groups.remove(key)!);
     }
+  }
+
+  static bool _isIncompleteRouteKey(String key) {
+    final parts = key.split('|');
+    return parts.length == 3 && parts[1].isNotEmpty && parts[2].isEmpty;
+  }
+
+  /// Card representative: the first entry that knows its arrival (it also
+  /// carries the stitched recorded facts); the active-leg entry with the
+  /// blank arrival is never the face of the card.
+  static FlightSummary _preferCompleteRoute(List<FlightSummary> group) {
+    for (final flight in group) {
+      final dest = flight.destIcao ?? flight.arrival?.icaoCode ?? '';
+      if (dest.isNotEmpty) return flight;
+    }
+    return group.first;
   }
 
   /// Groups dated departures of the same flight: one card per key.
@@ -123,7 +171,6 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
       FlightNumberSearchResultsLoaded(
         candidates: currentState.candidates,
         selectedCandidate: candidate,
-        upcomingGroups: currentState.upcomingGroups,
       ),
     );
   }
@@ -156,11 +203,6 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
               _normalize(selectedCandidate.flightNumber ?? normalized) ??
               normalized,
           fr24Id: selectedCandidate.fr24Id,
-          scheduleOptions:
-              currentState.upcomingGroups[candidateGroupKey(
-                selectedCandidate,
-              )] ??
-              const <FlightSummary>[],
         ),
       );
     } catch (_) {
@@ -235,5 +277,4 @@ class FlightNumberSearchCubit extends Cubit<FlightNumberSearchState> {
       _ => true,
     };
   }
-
 }

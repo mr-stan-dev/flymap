@@ -172,8 +172,9 @@ class _FakeUpcomingFlightSearchApi extends UpcomingFlightSearchApi {
 
   @override
   Future<List<Map<String, dynamic>>> searchUpcomingFlightsByNumber(
-    String flightNumber,
-  ) {
+    String flightNumber, {
+    DateTime? date,
+  }) {
     throw UnimplementedError();
   }
 }

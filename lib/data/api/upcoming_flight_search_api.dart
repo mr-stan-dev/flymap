@@ -21,18 +21,27 @@ class UpcomingFlightSearchApi {
   _invokeCallable;
   final _logger = const Logger('UpcomingFlightSearchApi');
 
+  /// [date] switches from the default 7-day window to exact-date
+  /// verification for that local calendar day.
   Future<List<Map<String, dynamic>>> searchUpcomingFlightsByNumber(
-    String flightNumber,
-  ) async {
+    String flightNumber, {
+    DateTime? date,
+  }) async {
     final normalizedFlightNumber = _normalizeFlightNumber(flightNumber);
     if (normalizedFlightNumber == null) {
       throw ArgumentError('flightNumber must be non-empty');
     }
 
-    _logger.log('callable=$_function flightNumber=$normalizedFlightNumber');
+    _logger.log(
+      'callable=$_function flightNumber=$normalizedFlightNumber'
+      '${date == null ? '' : ' date=${_formatDate(date)}'}',
+    );
     try {
       final decoded = _decodeFunctionData(
-        await _callFunction(normalizedFlightNumber: normalizedFlightNumber),
+        await _callFunction(
+          normalizedFlightNumber: normalizedFlightNumber,
+          date: date,
+        ),
       );
       if (decoded is! Map) {
         throw const FormatException(
@@ -82,6 +91,12 @@ class UpcomingFlightSearchApi {
     return rawData;
   }
 
+  String _formatDate(DateTime date) {
+    final mm = date.month.toString().padLeft(2, '0');
+    final dd = date.day.toString().padLeft(2, '0');
+    return '${date.year.toString().padLeft(4, '0')}-$mm-$dd';
+  }
+
   String? _normalizeFlightNumber(String? raw) {
     if (raw == null) return null;
     final value = raw.replaceAll(RegExp(r'\s+'), '').trim().toUpperCase();
@@ -90,8 +105,12 @@ class UpcomingFlightSearchApi {
 
   Future<dynamic> _callFunction({
     required String normalizedFlightNumber,
+    DateTime? date,
   }) async {
-    final payload = <String, dynamic>{'flightNumber': normalizedFlightNumber};
+    final payload = <String, dynamic>{
+      'flightNumber': normalizedFlightNumber,
+      if (date != null) 'date': _formatDate(date),
+    };
     final invokeCallable = _invokeCallable;
     if (invokeCallable != null) {
       return invokeCallable(_function, payload);

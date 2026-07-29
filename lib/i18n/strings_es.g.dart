@@ -935,7 +935,7 @@ class _TranslationsCreateFlightWeatherEs extends TranslationsCreateFlightWeather
 	@override String get title => '¿Verás el suelo?';
 	@override String get loading => 'Comprobando el cielo a lo largo de tu ruta…';
 	@override String get loadFailed => 'No se pudo cargar el pronóstico ahora mismo. Reintenta o continúa sin él.';
-	@override String get estimatedBadge => 'horas estimadas';
+	@override String get estimatedBadge => 'previsión diurna';
 	@override String get departureLabel => 'Salida';
 	@override String get arrivalLabel => 'Llegada';
 	@override String get tomorrow => 'mañana';
@@ -1007,7 +1007,13 @@ class _TranslationsCreateFlightTravelDateEs extends TranslationsCreateFlightTrav
 	@override String get tomorrow => 'Mañana';
 	@override String get stepTitle => '¿Cuándo vuelas?';
 	@override String get customDate => 'Elegir otra fecha';
+	@override String get pickDate => 'Elige tu fecha de viaje';
 	@override String get skipDate => 'Continuar sin fecha';
+	@override String get addDepartureTime => 'Añadir hora de salida (opcional)';
+	@override String departureTimeAt({required Object time}) => 'Hora de salida · ${time}';
+	@override String get noDepartureOnDateTitle => 'No encontramos este vuelo en esta fecha';
+	@override String get noDepartureOnDateBody => 'Revisa la fecha — tócala para cambiarla. O continúa igualmente y guardaremos solo la fecha.';
+	@override String get dateCheckFailed => 'No se pudo comprobar esta fecha — se guarda solo la fecha.';
 }
 
 // Path: createFlight.flightNumberSearch
@@ -1890,7 +1896,7 @@ extension on TranslationsEs {
 			'createFlight.weather.title' => '¿Verás el suelo?',
 			'createFlight.weather.loading' => 'Comprobando el cielo a lo largo de tu ruta…',
 			'createFlight.weather.loadFailed' => 'No se pudo cargar el pronóstico ahora mismo. Reintenta o continúa sin él.',
-			'createFlight.weather.estimatedBadge' => 'horas estimadas',
+			'createFlight.weather.estimatedBadge' => 'previsión diurna',
 			'createFlight.weather.departureLabel' => 'Salida',
 			'createFlight.weather.arrivalLabel' => 'Llegada',
 			'createFlight.weather.tomorrow' => 'mañana',
@@ -1935,7 +1941,13 @@ extension on TranslationsEs {
 			'createFlight.travelDate.tomorrow' => 'Mañana',
 			'createFlight.travelDate.stepTitle' => '¿Cuándo vuelas?',
 			'createFlight.travelDate.customDate' => 'Elegir otra fecha',
+			'createFlight.travelDate.pickDate' => 'Elige tu fecha de viaje',
 			'createFlight.travelDate.skipDate' => 'Continuar sin fecha',
+			'createFlight.travelDate.addDepartureTime' => 'Añadir hora de salida (opcional)',
+			'createFlight.travelDate.departureTimeAt' => ({required Object time}) => 'Hora de salida · ${time}',
+			'createFlight.travelDate.noDepartureOnDateTitle' => 'No encontramos este vuelo en esta fecha',
+			'createFlight.travelDate.noDepartureOnDateBody' => 'Revisa la fecha — tócala para cambiarla. O continúa igualmente y guardaremos solo la fecha.',
+			'createFlight.travelDate.dateCheckFailed' => 'No se pudo comprobar esta fecha — se guarda solo la fecha.',
 			'createFlight.flightNumberSearch.title' => 'Número de vuelo',
 			'createFlight.flightNumberSearch.subtitle' => 'Introduce un número de vuelo (por ejemplo BA117).',
 			'createFlight.flightNumberSearch.hint' => 'p. ej. BA117',
@@ -2060,14 +2072,14 @@ extension on TranslationsEs {
 			'createFlight.overview.timeline.regionType.lowland' => 'Tierras bajas',
 			'createFlight.overview.timeline.regionType.tundra' => 'Tundra',
 			'createFlight.overview.timeline.regionType.wetlands' => 'Humedales',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.desert' => 'Desierto',
 			'createFlight.overview.timeline.regionType.delta' => 'Delta',
 			'createFlight.overview.timeline.regionType.reservoir' => 'Embalse',
 			'createFlight.overview.timeline.regionType.continent' => 'Continente',
 			'createFlight.overview.timeline.regionType.geoarea' => 'Área geográfica',
 			'createFlight.overview.timeline.regionType.isthmus' => 'Istmo',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.unknown' => 'Tipo de región desconocido',
 			'createFlight.wikipedia.title' => 'Descarga artículos y lee mientras estás en el aire',
 			'createFlight.wikipedia.loadingIntro' => 'Buscando artículos relacionados con la ruta...',
@@ -2574,14 +2586,14 @@ extension on TranslationsEs {
 			'countries.NL' => 'Paises Bajos',
 			'countries.NO' => 'Noruega',
 			'countries.NP' => 'Nepal',
+			_ => null,
+		} ?? switch (path) {
 			'countries.NZ' => 'Nueva Zelanda',
 			'countries.OM' => 'Oman',
 			'countries.PA' => 'Panama',
 			'countries.PE' => 'Peru',
 			'countries.PG' => 'Papua Nueva Guinea',
 			'countries.PH' => 'Filipinas',
-			_ => null,
-		} ?? switch (path) {
 			'countries.PK' => 'Pakistan',
 			'countries.PL' => 'Polonia',
 			'countries.PR' => 'Puerto Rico',

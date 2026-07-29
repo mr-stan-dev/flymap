@@ -2296,8 +2296,8 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Couldn't load the forecast right now. You can retry or continue without it.'
 	String get loadFailed => 'Couldn\'t load the forecast right now. You can retry or continue without it.';
 
-	/// en: 'times estimated'
-	String get estimatedBadge => 'times estimated';
+	/// en: 'daytime forecast'
+	String get estimatedBadge => 'daytime forecast';
 
 	/// en: 'Departure'
 	String get departureLabel => 'Departure';
@@ -2458,8 +2458,26 @@ class TranslationsCreateFlightTravelDateEn {
 	/// en: 'Pick another date'
 	String get customDate => 'Pick another date';
 
+	/// en: 'Pick your travel date'
+	String get pickDate => 'Pick your travel date';
+
 	/// en: 'Continue without a date'
 	String get skipDate => 'Continue without a date';
+
+	/// en: 'Add departure time (optional)'
+	String get addDepartureTime => 'Add departure time (optional)';
+
+	/// en: 'Departure time · $time'
+	String departureTimeAt({required Object time}) => 'Departure time · ${time}';
+
+	/// en: 'We couldn't find this flight on this date'
+	String get noDepartureOnDateTitle => 'We couldn\'t find this flight on this date';
+
+	/// en: 'Check the date — tap it to change. Or continue anyway and we'll save just the date.'
+	String get noDepartureOnDateBody => 'Check the date — tap it to change. Or continue anyway and we\'ll save just the date.';
+
+	/// en: 'Couldn't check this date — saved as a date only.'
+	String get dateCheckFailed => 'Couldn\'t check this date — saved as a date only.';
 }
 
 // Path: createFlight.flightNumberSearch
@@ -4048,7 +4066,7 @@ extension on Translations {
 			'createFlight.weather.title' => 'Will you see the ground?',
 			'createFlight.weather.loading' => 'Checking the skies along your route…',
 			'createFlight.weather.loadFailed' => 'Couldn\'t load the forecast right now. You can retry or continue without it.',
-			'createFlight.weather.estimatedBadge' => 'times estimated',
+			'createFlight.weather.estimatedBadge' => 'daytime forecast',
 			'createFlight.weather.departureLabel' => 'Departure',
 			'createFlight.weather.arrivalLabel' => 'Arrival',
 			'createFlight.weather.tomorrow' => 'tomorrow',
@@ -4093,7 +4111,13 @@ extension on Translations {
 			'createFlight.travelDate.tomorrow' => 'Tomorrow',
 			'createFlight.travelDate.stepTitle' => 'When are you flying?',
 			'createFlight.travelDate.customDate' => 'Pick another date',
+			'createFlight.travelDate.pickDate' => 'Pick your travel date',
 			'createFlight.travelDate.skipDate' => 'Continue without a date',
+			'createFlight.travelDate.addDepartureTime' => 'Add departure time (optional)',
+			'createFlight.travelDate.departureTimeAt' => ({required Object time}) => 'Departure time · ${time}',
+			'createFlight.travelDate.noDepartureOnDateTitle' => 'We couldn\'t find this flight on this date',
+			'createFlight.travelDate.noDepartureOnDateBody' => 'Check the date — tap it to change. Or continue anyway and we\'ll save just the date.',
+			'createFlight.travelDate.dateCheckFailed' => 'Couldn\'t check this date — saved as a date only.',
 			'createFlight.flightNumberSearch.title' => 'Flight number',
 			'createFlight.flightNumberSearch.subtitle' => 'Enter a flight number (for example BA117).',
 			'createFlight.flightNumberSearch.hint' => 'e.g. BA117',
@@ -4218,14 +4242,14 @@ extension on Translations {
 			'createFlight.overview.timeline.regionType.lowland' => 'Lowland',
 			'createFlight.overview.timeline.regionType.tundra' => 'Tundra',
 			'createFlight.overview.timeline.regionType.wetlands' => 'Wetlands',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.desert' => 'Desert',
 			'createFlight.overview.timeline.regionType.delta' => 'Delta',
 			'createFlight.overview.timeline.regionType.reservoir' => 'Reservoir',
 			'createFlight.overview.timeline.regionType.continent' => 'Continent',
 			'createFlight.overview.timeline.regionType.geoarea' => 'Geographic area',
 			'createFlight.overview.timeline.regionType.isthmus' => 'Isthmus',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.unknown' => 'Unknown region type',
 			'createFlight.wikipedia.title' => 'Download articles and read while you’re in the air',
 			'createFlight.wikipedia.loadingIntro' => 'Finding route-related articles...',
@@ -4732,14 +4756,14 @@ extension on Translations {
 			'countries.NL' => 'Netherlands',
 			'countries.NO' => 'Norway',
 			'countries.NP' => 'Nepal',
+			_ => null,
+		} ?? switch (path) {
 			'countries.NZ' => 'New Zealand',
 			'countries.OM' => 'Oman',
 			'countries.PA' => 'Panama',
 			'countries.PE' => 'Peru',
 			'countries.PG' => 'Papua New Guinea',
 			'countries.PH' => 'Philippines',
-			_ => null,
-		} ?? switch (path) {
 			'countries.PK' => 'Pakistan',
 			'countries.PL' => 'Poland',
 			'countries.PR' => 'Puerto Rico',

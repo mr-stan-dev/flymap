@@ -170,6 +170,7 @@ class _WeatherContent extends StatelessWidget {
                   city: route?.departure.city ?? '',
                   countryCode: route?.departure.countryCode ?? '',
                   weather: weather.departure,
+                  showTime: !weather.isTimeEstimated,
                 ),
               ),
               const SizedBox(width: 12),
@@ -180,7 +181,10 @@ class _WeatherContent extends StatelessWidget {
                   city: route?.arrival.city ?? '',
                   countryCode: route?.arrival.countryCode ?? '',
                   weather: weather.arrival,
-                  isNextDay: _arrivalIsNextDay,
+                  showTime: !weather.isTimeEstimated,
+                  // Derived from the noon estimate when no time is known —
+                  // a guess, so it is not shown either.
+                  isNextDay: _arrivalIsNextDay && !weather.isTimeEstimated,
                 ),
               ),
             ],
@@ -289,6 +293,7 @@ class _AirportWeatherCard extends StatelessWidget {
     required this.city,
     required this.countryCode,
     required this.weather,
+    this.showTime = true,
     this.isNextDay = false,
   });
 
@@ -297,6 +302,10 @@ class _AirportWeatherCard extends StatelessWidget {
   final String city;
   final String countryCode;
   final AirportWeather weather;
+
+  /// False when the flight has no scheduled time — the internal noon
+  /// estimate must never be displayed as a departure time.
+  final bool showTime;
 
   /// Arrival lands on the day after departure — mark it "(tomorrow)".
   final bool isNextDay;
@@ -341,12 +350,13 @@ class _AirportWeatherCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    TravelDateFormatUtils.formatTime(weather.timeLocal),
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
+                  if (showTime)
+                    Text(
+                      TravelDateFormatUtils.formatTime(weather.timeLocal),
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
                   Text(
                     dateLine,
                     style: theme.textTheme.labelSmall?.copyWith(

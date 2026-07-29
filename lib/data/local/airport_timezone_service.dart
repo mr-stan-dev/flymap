@@ -28,10 +28,15 @@ class AirportTimezoneService {
     return tz.TZDateTime.from(atUtc.toUtc(), location).timeZoneOffset.inMinutes;
   }
 
-  /// The UTC instant of [hour] o'clock wall-clock time at the airport on
-  /// [date] (e.g. true local noon for estimated departures), or null when
-  /// the airport's timezone is unknown.
-  DateTime? localTimeToUtc(Airport airport, DateTime date, {int hour = 12}) {
+  /// The UTC instant of [hour]:[minute] wall-clock time at the airport on
+  /// [date] (true local noon for estimated departures, or a user-entered
+  /// departure time), or null when the airport's timezone is unknown.
+  DateTime? localTimeToUtc(
+    Airport airport,
+    DateTime date, {
+    int hour = 12,
+    int minute = 0,
+  }) {
     final location = _locationFor(airport);
     if (location == null) return null;
     return tz.TZDateTime(
@@ -40,6 +45,7 @@ class AirportTimezoneService {
       date.month,
       date.day,
       hour,
+      minute,
     ).toUtc();
   }
 

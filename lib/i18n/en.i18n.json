@@ -357,7 +357,7 @@
       "title": "Will you see the ground?",
       "loading": "Checking the skies along your route…",
       "loadFailed": "Couldn't load the forecast right now. You can retry or continue without it.",
-      "estimatedBadge": "times estimated",
+      "estimatedBadge": "daytime forecast",
       "departureLabel": "Departure",
       "arrivalLabel": "Arrival",
       "tomorrow": "tomorrow",
@@ -408,7 +408,13 @@
       "tomorrow": "Tomorrow",
       "stepTitle": "When are you flying?",
       "customDate": "Pick another date",
-      "skipDate": "Continue without a date"
+      "pickDate": "Pick your travel date",
+      "skipDate": "Continue without a date",
+      "addDepartureTime": "Add departure time (optional)",
+      "departureTimeAt": "Departure time · $time",
+      "noDepartureOnDateTitle": "We couldn't find this flight on this date",
+      "noDepartureOnDateBody": "Check the date — tap it to change. Or continue anyway and we'll save just the date.",
+      "dateCheckFailed": "Couldn't check this date — saved as a date only."
     },
     "flightNumberSearch": {
       "title": "Flight number",

@@ -16,9 +16,12 @@ abstract interface class FlightSearchRepository {
   /// Upcoming scheduled departures (7-day window) for a flight number,
   /// dated and stitched to recorded FR24 legs. Throws `not-found` when the
   /// number has no departures in the window.
+  /// [date]: exact-date verification for that local day instead of the
+  /// default 7-day window.
   Future<List<FlightSummary>> searchUpcomingFlightsByNumber(
-    String flightNumber,
-  );
+    String flightNumber, {
+    DateTime? date,
+  });
 
   Future<List<FlightSummary>> searchFlightsByRoute({
     required String departureCode,
@@ -75,10 +78,12 @@ class ApiFlightSearchRepository implements FlightSearchRepository {
 
   @override
   Future<List<FlightSummary>> searchUpcomingFlightsByNumber(
-    String flightNumber,
-  ) async {
+    String flightNumber, {
+    DateTime? date,
+  }) async {
     final flights = await _upcomingSearchApi.searchUpcomingFlightsByNumber(
       flightNumber,
+      date: date,
     );
     return _enrichFlightSummaries(flights, logPrefix: 'upcomingMatch');
   }

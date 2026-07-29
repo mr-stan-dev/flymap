@@ -43,6 +43,133 @@ void main() {
       await cubit.close();
     });
 
+    test(
+      'active leg with missing arrival merges into the complete card',
+      () async {
+        const departure = Airport(
+          name: 'Heathrow',
+          city: 'London',
+          countryCode: 'GB',
+          latLon: LatLng(51.47, -0.45),
+          iataCode: 'LHR',
+          icaoCode: 'EGLL',
+          wikipediaUrl: '',
+        );
+        const arrival = Airport(
+          name: 'JFK',
+          city: 'New York',
+          countryCode: 'US',
+          latLon: LatLng(40.64, -73.78),
+          iataCode: 'JFK',
+          icaoCode: 'KJFK',
+          wikipediaUrl: '',
+        );
+        repository.historicalResults = const [];
+        repository.upcomingResults = [
+          // Currently-flying leg: incomplete arrival block, listed first.
+          FlightSummary(
+            flightNumber: 'BA117',
+            fr24Id: null,
+            origIcao: 'EGLL',
+            destIcao: null,
+            airlineCode: 'BA',
+            airlineName: 'British Airways',
+            historicalFlightDate: null,
+            aircraftType: 'Airbus A350-1000',
+            departure: departure,
+            travelDateLocal: DateTime(2026, 8, 3),
+          ),
+          FlightSummary(
+            flightNumber: 'BA117',
+            fr24Id: 'leg-1',
+            origIcao: 'EGLL',
+            destIcao: 'KJFK',
+            airlineCode: 'BA',
+            airlineName: 'British Airways',
+            historicalFlightDate: null,
+            aircraftType: 'Boeing 777',
+            departure: departure,
+            arrival: arrival,
+            travelDateLocal: DateTime(2026, 8, 4),
+          ),
+        ];
+
+        await cubit.loadFlightSummary('BA117');
+
+        final state = cubit.state;
+        expect(state, isA<FlightNumberSearchResultsLoaded>());
+        final loaded = state as FlightNumberSearchResultsLoaded;
+        // ONE card for the same flight, faced by the complete entry.
+        expect(loaded.candidates, hasLength(1));
+        expect(loaded.candidates.single.destIcao, 'KJFK');
+        expect(loaded.candidates.single.fr24Id, 'leg-1');
+      },
+    );
+
+    test('multi-leg numbers keep one card per leg after the merge', () async {
+      FlightSummary leg({
+        required String orig,
+        String? dest,
+        String? fr24Id,
+        required int day,
+      }) => FlightSummary(
+        flightNumber: 'QF1',
+        fr24Id: fr24Id,
+        origIcao: orig,
+        destIcao: dest,
+        airlineCode: 'QF',
+        airlineName: 'Qantas',
+        historicalFlightDate: null,
+        travelDateLocal: DateTime(2026, 8, day),
+      );
+
+      repository.historicalResults = const [];
+      repository.upcomingResults = [
+        // Active first leg with an incomplete arrival block.
+        leg(orig: 'YSSY', dest: null, day: 3),
+        leg(orig: 'YSSY', dest: 'WSSS', fr24Id: 'leg-syd-sin', day: 4),
+        leg(orig: 'WSSS', dest: 'EGLL', fr24Id: 'leg-sin-lhr', day: 4),
+      ];
+
+      await cubit.loadFlightSummary('QF1');
+
+      final loaded = cubit.state as FlightNumberSearchResultsLoaded;
+      // Two legs = two cards; the incomplete entry folded into ITS leg
+      // (same origin), never into the other one, and no blank-arrival card.
+      expect(loaded.candidates, hasLength(2));
+      expect(
+        loaded.candidates.map((c) => '${c.origIcao}->${c.destIcao}'),
+        containsAll(['YSSY->WSSS', 'WSSS->EGLL']),
+      );
+    });
+
+    test('ambiguous same-origin destinations are left unmerged', () async {
+      FlightSummary entry({String? dest, required int day}) => FlightSummary(
+        flightNumber: 'XX9',
+        fr24Id: null,
+        origIcao: 'EGLL',
+        destIcao: dest,
+        airlineCode: 'XX',
+        airlineName: 'Test Air',
+        historicalFlightDate: null,
+        travelDateLocal: DateTime(2026, 8, day),
+      );
+
+      repository.historicalResults = const [];
+      repository.upcomingResults = [
+        entry(dest: null, day: 3),
+        entry(dest: 'KJFK', day: 4),
+        entry(dest: 'KBOS', day: 5),
+      ];
+
+      await cubit.loadFlightSummary('XX9');
+
+      final loaded = cubit.state as FlightNumberSearchResultsLoaded;
+      // Two complete candidates share the origin — folding the incomplete
+      // one would be a guess, so it stays its own card.
+      expect(loaded.candidates, hasLength(3));
+    });
+
     test('shows specific not-found copy and analytics bucket', () async {
       repository.lookupError = _TestFirebaseFunctionsException(
         code: 'not-found',
@@ -99,8 +226,10 @@ void main() {
           'Flight data is temporarily unavailable. Please try again in a moment, or find by airports.',
         );
         expect(
-          _eventNamed(analytics, 'flight_number_lookup_result')
-              .firebaseParameters,
+          _eventNamed(
+            analytics,
+            'flight_number_lookup_result',
+          ).firebaseParameters,
           <String, Object>{'result': 'provider_invalid_response'},
         );
       },
@@ -122,8 +251,10 @@ void main() {
         'Something went wrong while looking up this flight. Please try again, or find by airports.',
       );
       expect(
-        _eventNamed(analytics, 'flight_number_lookup_result')
-            .firebaseParameters,
+        _eventNamed(
+          analytics,
+          'flight_number_lookup_result',
+        ).firebaseParameters,
         <String, Object>{'result': 'internal'},
       );
     });
@@ -144,8 +275,10 @@ void main() {
         'Enter a valid flight number like BA117.',
       );
       expect(
-        _eventNamed(analytics, 'flight_number_lookup_result')
-            .firebaseParameters,
+        _eventNamed(
+          analytics,
+          'flight_number_lookup_result',
+        ).firebaseParameters,
         <String, Object>{'result': 'invalid_argument'},
       );
     });
@@ -166,8 +299,10 @@ void main() {
         'Too many flight lookups right now. Please try again in a moment, or find by airports.',
       );
       expect(
-        _eventNamed(analytics, 'flight_number_lookup_result')
-            .firebaseParameters,
+        _eventNamed(
+          analytics,
+          'flight_number_lookup_result',
+        ).firebaseParameters,
         <String, Object>{'result': 'resource_exhausted'},
       );
     });
@@ -182,6 +317,11 @@ FirebaseAnalyticsEvent _eventNamed(_FakeAppAnalytics analytics, String name) {
 
 class _FakeFlightSearchRepository implements FlightSearchRepository {
   Object? lookupError;
+  List<FlightSummary> upcomingResults = const [];
+
+  /// Override for the FR24 historical result; null keeps the default
+  /// recorded candidate.
+  List<FlightSummary>? historicalResults;
 
   @override
   Future<Map<String, dynamic>> buildFlightRoutePreview({
@@ -196,12 +336,13 @@ class _FakeFlightSearchRepository implements FlightSearchRepository {
     throw UnimplementedError();
   }
 
-
   @override
   Future<List<FlightSummary>> searchFlightsByNumber(String flightNumber) async {
     if (lookupError != null) {
       throw lookupError!;
     }
+    final override = historicalResults;
+    if (override != null) return override;
     return const <FlightSummary>[
       FlightSummary(
         flightNumber: 'BA117',
@@ -216,9 +357,11 @@ class _FakeFlightSearchRepository implements FlightSearchRepository {
   // which is what these tests exercise.
   @override
   Future<List<FlightSummary>> searchUpcomingFlightsByNumber(
-    String flightNumber,
-  ) async {
-    return const <FlightSummary>[];
+    String flightNumber, {
+    DateTime? date,
+  }) async {
+    if (lookupError != null) throw lookupError!;
+    return upcomingResults;
   }
 
   @override

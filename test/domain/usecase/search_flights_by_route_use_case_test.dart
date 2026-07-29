@@ -42,8 +42,9 @@ class _FakeFlightSearchRepository implements FlightSearchRepository {
 
   @override
   Future<List<FlightSummary>> searchUpcomingFlightsByNumber(
-    String flightNumber,
-  ) {
+    String flightNumber, {
+    DateTime? date,
+  }) {
     throw UnimplementedError();
   }
 

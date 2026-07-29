@@ -8,11 +8,13 @@ class SearchUpcomingFlightsByNumberUseCase {
 
   final FlightSearchRepository _repository;
 
-  Future<List<FlightSummary>> call(String flightNumber) {
+  /// [date]: exact-date verification for that local day instead of the
+  /// default 7-day window.
+  Future<List<FlightSummary>> call(String flightNumber, {DateTime? date}) {
     final normalized = flightNumber
         .replaceAll(RegExp(r'\s+'), '')
         .trim()
         .toUpperCase();
-    return _repository.searchUpcomingFlightsByNumber(normalized);
+    return _repository.searchUpcomingFlightsByNumber(normalized, date: date);
   }
 }

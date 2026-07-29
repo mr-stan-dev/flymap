@@ -19,15 +19,9 @@ class FlightNumberSearchResultsLoaded extends FlightNumberSearchState {
   final List<FlightSummary> candidates;
   final FlightSummary? selectedCandidate;
 
-  /// Dated 7-day departures per candidate, keyed by
-  /// [FlightNumberSearchCubit.candidateGroupKey]. Empty for the historical
-  /// fallback — the travel-date step then shows its generic day list.
-  final Map<String, List<FlightSummary>> upcomingGroups;
-
   const FlightNumberSearchResultsLoaded({
     required this.candidates,
     required this.selectedCandidate,
-    this.upcomingGroups = const {},
   });
 }
 
@@ -55,15 +49,10 @@ class FlightNumberSearchSuccess extends FlightNumberSearchState {
   final String flightNumber;
   final String? fr24Id;
 
-  /// Dated departures for the confirmed flight, passed on to the
-  /// travel-date step. Empty when the schedule is unknown.
-  final List<FlightSummary> scheduleOptions;
-
   const FlightNumberSearchSuccess({
     required this.departure,
     required this.arrival,
     required this.flightNumber,
     this.fr24Id,
-    this.scheduleOptions = const <FlightSummary>[],
   });
 }
