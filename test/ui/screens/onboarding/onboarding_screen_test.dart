@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -193,9 +194,67 @@ void main() {
       );
     },
   );
+
+  testWidgets(
+    'Android skips the onboarding paywall and lands on the flight selector',
+    (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      try {
+        final repo = _FakeSubscriptionRepository();
+
+        await tester.pumpWidget(_buildTestApp(subscriptionRepository: repo));
+        await _completeOnboardingToFirstFlight(tester);
+
+        expect(find.text('New flight'), findsOneWidget);
+        expect(repo.paywallPresentedCount, 0);
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
+    },
+  );
+
+  testWidgets(
+    'iOS still presents the onboarding paywall before the flight selector',
+    (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      try {
+        final repo = _FakeSubscriptionRepository();
+
+        await tester.pumpWidget(_buildTestApp(subscriptionRepository: repo));
+        await _completeOnboardingToFirstFlight(tester);
+
+        expect(find.text('New flight'), findsOneWidget);
+        expect(repo.paywallPresentedCount, 1);
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
+    },
+  );
 }
 
-Widget _buildTestApp() {
+/// Walks the onboarding flow from the welcome step to tapping the final
+/// "Start my first flight" CTA and waiting for the route selector.
+Future<void> _completeOnboardingToFirstFlight(WidgetTester tester) async {
+  await _pumpUntilVisible(tester, find.text('Discover what’s below'));
+  for (var i = 0; i < 2; i++) {
+    await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
+    await _pumpUi(tester);
+  }
+  await _pumpUntilVisible(tester, find.text('Set your home airport'));
+  await tester.tap(find.textContaining('London Heathrow').first);
+  await _pumpUi(tester);
+  await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
+  await _pumpUntilVisible(tester, find.text("Stop missing what's below"));
+  await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
+  await _pumpUntilVisible(
+    tester,
+    find.text('Check the weather for your flight'),
+  );
+  await tester.tap(find.widgetWithText(PrimaryButton, 'Start my first flight'));
+  await _pumpUntilVisible(tester, find.text('New flight'));
+}
+
+Widget _buildTestApp({_FakeSubscriptionRepository? subscriptionRepository}) {
   final router = GoRouter(
     initialLocation: '/onboarding',
     routes: [
@@ -223,7 +282,7 @@ Widget _buildTestApp() {
   return TranslationProvider(
     child: BlocProvider(
       create: (_) => SubscriptionCubit(
-        repository: _FakeSubscriptionRepository(),
+        repository: subscriptionRepository ?? _FakeSubscriptionRepository(),
         flightUnlockRepository: _FakeFlightUnlockRepository(),
         analytics: const _FakeAppAnalytics(),
       ),
@@ -264,6 +323,10 @@ class _FakeSubscriptionRepository implements SubscriptionRepository {
 
   final SubscriptionStatus _currentStatus;
 
+  /// How many times a paywall was presented — lets the platform tests assert
+  /// Android never shows one while iOS does.
+  int paywallPresentedCount = 0;
+
   @override
   SubscriptionStatus get currentStatus => _currentStatus;
 
@@ -292,6 +355,7 @@ class _FakeSubscriptionRepository implements SubscriptionRepository {
 
   @override
   Future<SubscriptionPaywallResult> presentPaywallIfNeeded() async {
+    paywallPresentedCount += 1;
     return SubscriptionPaywallResult.cancelled;
   }
 
