@@ -98,13 +98,13 @@ class _HomeFlightCardMapHeaderState extends State<HomeFlightCardMapHeader> {
   @override
   Widget build(BuildContext context) {
     final file = _imageFile;
-    if (file == null) return _plainHeader(context);
+    if (file == null) return _plainHeader(context, showProInline: true);
     return _mapHeader(context, file);
   }
 
   /// Pre-imagery layout, byte-for-byte: title row with the menu, subtitle
   /// underneath.
-  Widget _plainHeader(BuildContext context) {
+  Widget _plainHeader(BuildContext context, {bool showProInline = false}) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
       child: Row(
@@ -114,7 +114,22 @@ class _HomeFlightCardMapHeaderState extends State<HomeFlightCardMapHeader> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _title(context),
+                // No thumbnail to carry the Pro badge here, so keep a small
+                // inline marker next to the title.
+                if (showProInline && widget.showProCrown)
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.workspace_premium_rounded,
+                        size: 18,
+                        color: DsBrandColors.proAmber,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(child: _title(context)),
+                    ],
+                  )
+                else
+                  _title(context),
                 if (widget.subtitle.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   _subtitleRow(context),
@@ -163,7 +178,14 @@ class _HomeFlightCardMapHeaderState extends State<HomeFlightCardMapHeader> {
                   aspectRatio:
                       RouteMapImageStore.cardWidth /
                       RouteMapImageStore.cardHeight,
-                  child: Stack(fit: StackFit.expand, children: baseLayers),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ...baseLayers,
+                      if (widget.showProCrown)
+                        const Positioned(top: 6, left: 6, child: _ProBadge()),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -224,16 +246,22 @@ class _HomeFlightCardMapHeaderState extends State<HomeFlightCardMapHeader> {
             Positioned(
               top: 6,
               right: 6,
-              child: Material(
-                color: Colors.black.withValues(alpha: 0.30),
-                shape: const CircleBorder(),
-                clipBehavior: Clip.antiAlias,
-                child: IconTheme(
-                  data: const IconThemeData(color: Colors.white, size: 22),
-                  child: widget.menuButton,
+              child: SizedBox(
+                width: _headerBadgeDiameter,
+                height: _headerBadgeDiameter,
+                child: Material(
+                  color: Colors.black.withValues(alpha: _headerBadgeScrimAlpha),
+                  shape: const CircleBorder(),
+                  clipBehavior: Clip.antiAlias,
+                  child: IconTheme(
+                    data: const IconThemeData(color: Colors.white, size: 22),
+                    child: widget.menuButton,
+                  ),
                 ),
               ),
             ),
+            if (widget.showProCrown)
+              const Positioned(top: 6, left: 6, child: _ProBadge()),
           ],
         ),
       ),
@@ -253,27 +281,44 @@ class _HomeFlightCardMapHeaderState extends State<HomeFlightCardMapHeader> {
 
   Widget _subtitleRow(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
-      children: [
-        if (widget.showProCrown) ...[
-          const Icon(
-            Icons.workspace_premium_rounded,
-            size: 12,
-            color: DsBrandColors.proAmber,
-          ),
-          const SizedBox(width: 4),
-        ],
-        Expanded(
-          child: Text(
-            widget.subtitle,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
+    // Pro is signalled by the badge on the map thumbnail now, not here.
+    return Text(
+      widget.subtitle,
+      style: theme.textTheme.bodyMedium?.copyWith(
+        color: theme.colorScheme.onSurfaceVariant,
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+/// Shared size + tint for the two thumbnail circles (Pro badge, menu button)
+/// so their frosted backgrounds match. Opacity is kept high enough to read on
+/// any satellite background.
+const double _headerBadgeDiameter = 40;
+const double _headerBadgeScrimAlpha = 0.35;
+
+/// The Pro badge: a bigger premium glyph in a frosted circle, pinned to the
+/// top-left of the map thumbnail (mirroring the menu button on the right).
+class _ProBadge extends StatelessWidget {
+  const _ProBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: _headerBadgeDiameter,
+      height: _headerBadgeDiameter,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: _headerBadgeScrimAlpha),
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(
+        Icons.workspace_premium_rounded,
+        size: 26,
+        color: DsBrandColors.proAmber,
+      ),
     );
   }
 }
