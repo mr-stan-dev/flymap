@@ -23,6 +23,7 @@ import 'package:flymap/ui/screens/settings/distance_unit_context.dart';
 import 'package:flymap/ui/screens/shared/route_timeline/route_timeline_grouping.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/utils/duration_format_utils.dart';
+import 'package:flymap/ui/screens/settings/date_display_format_context.dart';
 import 'package:flymap/utils/travel_date_format_utils.dart';
 import 'package:flymap/utils/unit_format_utils.dart';
 
@@ -221,7 +222,10 @@ class _FlightBoardingCard extends StatelessWidget {
 
     final scheduleParts = <String>[
       if (schedule != null)
-        TravelDateFormatUtils.formatShortDate(schedule.travelDate),
+        TravelDateFormatUtils.formatShortDate(
+          schedule.travelDate,
+          context.dateDisplayFormat,
+        ),
       if (schedule?.departureLocal != null)
         TravelDateFormatUtils.formatTime(schedule!.departureLocal!),
       if (flightNumber.isNotEmpty) flightNumber,

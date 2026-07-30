@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:flymap/data/local/flight_weather_store.dart';
 import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/entity/units.dart';
+import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
 import 'package:flymap/domain/policy/route_region_timeline_policy.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/ui/screens/settings/date_display_format_context.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_forecast_body.dart'
+    show verdictPresentation;
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/widgets/complete_flight_confirmation_dialog.dart';
 import 'package:flymap/ui/screens/flight/widgets/delete_flight_confirmation_dialog.dart';
@@ -98,10 +104,12 @@ class HomeFlightCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
               child: _SavedFlightCardBody(
+                flight: flight,
                 distance: distance,
                 duration: duration,
                 travelDateLabel: TravelDateFormatUtils.countdownLabel(
                   flight.schedule,
+                  context.dateDisplayFormat,
                 ),
                 departureCode: departure.displayCode,
                 arrivalCode: arrival.displayCode,
@@ -208,8 +216,9 @@ class HomeFlightCard extends StatelessWidget {
   }
 }
 
-class _SavedFlightCardBody extends StatelessWidget {
+class _SavedFlightCardBody extends StatefulWidget {
   const _SavedFlightCardBody({
+    required this.flight,
     required this.distance,
     required this.duration,
     required this.travelDateLabel,
@@ -222,6 +231,7 @@ class _SavedFlightCardBody extends StatelessWidget {
     required this.planeProgress,
   });
 
+  final Flight flight;
   final String distance;
   final String? duration;
   final String? travelDateLabel;
@@ -234,7 +244,70 @@ class _SavedFlightCardBody extends StatelessWidget {
   final double? planeProgress;
 
   @override
+  State<_SavedFlightCardBody> createState() => _SavedFlightCardBodyState();
+}
+
+class _SavedFlightCardBodyState extends State<_SavedFlightCardBody> {
+  WindowVerdict? _verdict;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVerdict();
+  }
+
+  @override
+  void didUpdateWidget(_SavedFlightCardBody oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.flight.id != widget.flight.id) {
+      _verdict = null;
+      _loadVerdict();
+    }
+  }
+
+  /// Loads the stored forecast (if any) and derives the one-word window
+  /// verdict for a chip beside the countdown. Best-effort and silent: no
+  /// store, no forecast, or a past flight simply shows no chip. Reads the
+  /// persisted forecast only — never triggers a network fetch from the list.
+  Future<void> _loadVerdict() async {
+    if (!_isForecastRelevant()) return;
+    if (!GetIt.I.isRegistered<FlightWeatherStore>()) return;
+    final weather = await GetIt.I.get<FlightWeatherStore>().load(
+      widget.flight.id,
+    );
+    if (!mounted || weather == null || weather.samples.isEmpty) return;
+    setState(() {
+      _verdict = FlightWeatherVerdictPolicy.overallVerdict(weather.samples);
+    });
+  }
+
+  /// A stored verdict is only worth surfacing for a flight that is still
+  /// upcoming (or in progress) — the forecast store is not cleared when a
+  /// flight slips into the past, so gate on the schedule here.
+  bool _isForecastRelevant() {
+    if (widget.showInProgressStatusChip) return true;
+    final schedule = widget.flight.schedule;
+    if (schedule == null) return false;
+    final departureUtc = schedule.departure?.utc;
+    if (departureUtc != null) {
+      return departureUtc.isAfter(
+        DateTime.now().toUtc().subtract(const Duration(hours: 6)),
+      );
+    }
+    final travel = schedule.travelDate;
+    final endOfTravelDay = DateTime(
+      travel.year,
+      travel.month,
+      travel.day,
+      23,
+      59,
+    );
+    return !endOfTravelDay.isBefore(DateTime.now());
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final verdict = _verdict;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -242,24 +315,49 @@ class _SavedFlightCardBody extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            if (travelDateLabel != null)
-              MetaPill(icon: Icons.event_rounded, text: travelDateLabel!),
-            MetaPill(icon: Icons.route, text: distance),
-            if (duration != null)
-              MetaPill(icon: Icons.schedule_rounded, text: duration!),
-            if (showInProgressStatusChip) _InProgressChip(),
+            if (widget.travelDateLabel != null)
+              MetaPill(
+                icon: Icons.event_rounded,
+                text: widget.travelDateLabel!,
+              ),
+            if (verdict != null) _WeatherVerdictChip(verdict: verdict),
+            MetaPill(icon: Icons.route, text: widget.distance),
+            if (widget.duration != null)
+              MetaPill(icon: Icons.schedule_rounded, text: widget.duration!),
+            if (widget.showInProgressStatusChip) _InProgressChip(),
           ],
         ),
         const SizedBox(height: 14),
         HomeRoutePreviewStrip(
-          departureCode: departureCode,
-          arrivalCode: arrivalCode,
-          departureCountryCode: departureCountryCode,
-          arrivalCountryCode: arrivalCountryCode,
-          regions: routeRegions,
-          planeProgress: planeProgress,
+          departureCode: widget.departureCode,
+          arrivalCode: widget.arrivalCode,
+          departureCountryCode: widget.departureCountryCode,
+          arrivalCountryCode: widget.arrivalCountryCode,
+          regions: widget.routeRegions,
+          planeProgress: widget.planeProgress,
         ),
       ],
+    );
+  }
+}
+
+/// The window verdict as a compact chip beside the countdown — emoji + short
+/// label ("☀️ Clear views"), matching [MetaPill]'s shape via its emoji
+/// leading. Only rendered when a forecast is stored for an upcoming flight.
+class _WeatherVerdictChip extends StatelessWidget {
+  const _WeatherVerdictChip({required this.verdict});
+
+  final WindowVerdict verdict;
+
+  @override
+  Widget build(BuildContext context) {
+    final (emoji, title, _) = verdictPresentation(
+      verdict,
+      context.t.createFlight.weather,
+    );
+    return MetaPill(
+      leading: Text(emoji, style: const TextStyle(fontSize: 12)),
+      text: title,
     );
   }
 }

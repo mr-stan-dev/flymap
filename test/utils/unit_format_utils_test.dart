@@ -32,6 +32,30 @@ void main() {
     });
   });
 
+  group('UnitFormatUtils.formatTemperatureValue', () {
+    test('keeps Celsius, rounded, bare degree', () {
+      expect(
+        UnitFormatUtils.formatTemperatureValue(21.4, TemperatureUnit.celsius),
+        '21°',
+      );
+    });
+
+    test('converts Celsius to Fahrenheit', () {
+      expect(
+        UnitFormatUtils.formatTemperatureValue(0, TemperatureUnit.fahrenheit),
+        '32°',
+      );
+      expect(
+        UnitFormatUtils.formatTemperatureValue(21, TemperatureUnit.fahrenheit),
+        '70°', // 69.8 rounds to 70
+      );
+      expect(
+        UnitFormatUtils.formatTemperatureValue(-40, TemperatureUnit.fahrenheit),
+        '-40°',
+      );
+    });
+  });
+
   group('UnitFormatUtils.formatDistanceApprox', () {
     test('rounds to nearest 10 and groups thousands', () {
       expect(

@@ -11,6 +11,9 @@ import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
 import 'package:flymap/i18n/strings.g.dart';
+import 'package:flymap/ui/screens/settings/date_display_format_context.dart';
+import 'package:flymap/ui/screens/settings/temperature_unit_context.dart';
+import 'package:flymap/utils/unit_format_utils.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_route_map_card.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_symbols.dart';
@@ -511,6 +514,7 @@ class _WeatherContent extends StatelessWidget {
           _VerdictBanner(
             verdict: verdict,
             expectationItems: _expectationItems(context),
+            smoothSkies: FlightWeatherVerdictPolicy.isCalmAndClear(weather),
           ),
         ],
         const SizedBox(height: 14),
@@ -625,7 +629,10 @@ class _AirportWeatherCard extends StatelessWidget {
     final temperature = weather.temperatureC;
     final flagCode = countryCode.trim().toUpperCase();
 
-    var dateLine = TravelDateFormatUtils.formatShortDate(weather.timeLocal);
+    var dateLine = TravelDateFormatUtils.formatShortDate(
+      weather.timeLocal,
+      context.dateDisplayFormat,
+    );
     if (isNextDay) dateLine = '$dateLine (${t.tomorrow})';
 
     return Container(
@@ -728,7 +735,12 @@ class _AirportWeatherCard extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text(
-                temperature == null ? '–' : '${temperature.round()}°',
+                temperature == null
+                    ? '–'
+                    : UnitFormatUtils.formatTemperatureValue(
+                        temperature,
+                        context.temperatureUnit,
+                      ),
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -838,6 +850,7 @@ class _VerdictBanner extends StatelessWidget {
   const _VerdictBanner({
     required this.verdict,
     this.expectationItems = const <ExpectationItem>[],
+    this.smoothSkies = false,
   });
 
   final WindowVerdict verdict;
@@ -845,6 +858,10 @@ class _VerdictBanner extends StatelessWidget {
   /// Timeline-ordered key points; when present they replace the generic
   /// body sentence — a scannable list instead of a prose paragraph.
   final List<ExpectationItem> expectationItems;
+
+  /// Good-news-only: appends a "calm, clear skies" line when the ride and the
+  /// view both look benign. Silent otherwise — never a bad-weather warning.
+  final bool smoothSkies;
 
   @override
   Widget build(BuildContext context) {
@@ -879,6 +896,27 @@ class _VerdictBanner extends StatelessWidget {
           if (expectationItems.isEmpty) ...[
             const SizedBox(height: 4),
             Text(body, style: theme.textTheme.bodyMedium),
+            if (smoothSkies) ...[
+              const SizedBox(height: 8),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    width: 24,
+                    child: Text('✨', style: TextStyle(fontSize: 15)),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      t.smoothSkies,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ] else
             for (final item in expectationItems) ...[
               const SizedBox(height: 8),

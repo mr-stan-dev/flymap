@@ -32,6 +32,17 @@ class UnitFormatUtils {
   static String formatTemperature(TemperatureUnit unit) =>
       unit == TemperatureUnit.fahrenheit ? '°F' : '°C';
 
+  /// Converts a Celsius reading to the display unit and formats it as a bare
+  /// degree value ("21°" / "70°"). Omits the C/F letter inline — the app-wide
+  /// unit setting disambiguates, same convention as distance which drops the
+  /// unit next to a value.
+  static String formatTemperatureValue(double celsius, TemperatureUnit unit) {
+    final value = unit == TemperatureUnit.fahrenheit
+        ? celsius * 9 / 5 + 32
+        : celsius;
+    return '${value.round()}°';
+  }
+
   static String formatDistance(double distanceKm, DistanceUnit unit) {
     final value = unit == DistanceUnit.mile
         ? distanceKm * 0.621371

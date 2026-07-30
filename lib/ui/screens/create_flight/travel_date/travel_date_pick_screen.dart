@@ -4,6 +4,7 @@ import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
+import 'package:flymap/ui/screens/settings/date_display_format_context.dart';
 import 'package:flymap/utils/travel_date_format_utils.dart';
 
 class TravelDatePickArgs {
@@ -64,7 +65,7 @@ class _TravelDatePickScreenState extends State<TravelDatePickScreen> {
     return switch (daysAway) {
       0 => dateT.today,
       1 => dateT.tomorrow,
-      _ => TravelDateFormatUtils.formatShortDate(date),
+      _ => TravelDateFormatUtils.formatShortDate(date, context.dateDisplayFormat),
     };
   }
 
@@ -161,7 +162,10 @@ class _TravelDatePickScreenState extends State<TravelDatePickScreen> {
                       icon: Icons.calendar_month_rounded,
                       label: _customDate == null
                           ? dateT.customDate
-                          : TravelDateFormatUtils.formatShortDate(_customDate!),
+                          : TravelDateFormatUtils.formatShortDate(
+                              _customDate!,
+                              context.dateDisplayFormat,
+                            ),
                       isSelected: _customSelected,
                       onTap: _pickCustomDate,
                     ),

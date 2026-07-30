@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/i18n/strings.g.dart';
+import 'package:flymap/domain/entity/units.dart';
+import 'package:flymap/ui/screens/settings/date_display_format_context.dart';
+import 'package:flymap/ui/screens/settings/temperature_unit_context.dart';
+import 'package:flymap/ui/screens/settings/viewmodel/settings_cubit.dart';
+import 'package:flymap/utils/unit_format_utils.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/share/weather_share_renderer.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/share/weather_share_service.dart';
@@ -152,9 +158,17 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
     final t = context.t.createFlight.weather;
     final route = widget.route;
     final weather = widget.weather;
+    // Event-handler context: read, not watch. The share card renders in the
+    // user's own unit preference.
+    final tempUnit = temperatureUnitFromSetting(
+      context.read<SettingsCubit>().state.temperatureUnit,
+    );
     final flightNumber = widget.flightNumber?.trim() ?? '';
     final date = TravelDateFormatUtils.formatShortDate(
       weather.departure.timeLocal,
+      dateDisplayFormatFromSetting(
+        context.read<SettingsCubit>().state.dateDisplayFormat,
+      ),
     );
     return WeatherShareData(
       headline: '${route.departure.displayCode} → ${route.arrival.displayCode}',
@@ -165,6 +179,7 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
         route.departure.city,
         weather.departure,
         weather.isTimeEstimated,
+        tempUnit,
       ),
       arrival: _airport(
         t.arrivalLabel,
@@ -172,6 +187,7 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
         route.arrival.city,
         weather.arrival,
         weather.isTimeEstimated,
+        tempUnit,
       ),
       verdictEmoji: widget.verdictEmoji,
       verdictTitle: widget.verdictTitle,
@@ -185,6 +201,7 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
     String city,
     AirportWeather weather,
     bool isTimeEstimated,
+    TemperatureUnit tempUnit,
   ) {
     final temperature = weather.temperatureC;
     return WeatherShareAirport(
@@ -192,7 +209,9 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
       code: code,
       city: city,
       emoji: weatherSymbolEmoji(weather.symbolCode, weather.cloudCoverPercent),
-      temperatureText: temperature == null ? '–' : '${temperature.round()}°',
+      temperatureText: temperature == null
+          ? '–'
+          : UnitFormatUtils.formatTemperatureValue(temperature, tempUnit),
       timeText: isTimeEstimated
           ? null
           : TravelDateFormatUtils.formatTime(weather.timeLocal),

@@ -131,6 +131,88 @@ void main() {
     });
   });
 
+  group('isCalmAndClear', () {
+    AirportWeather airport({double? wind, double? precip}) => AirportWeather(
+      timeUtc: DateTime.utc(2026, 8, 3, 10),
+      utcOffsetMinutes: 0,
+      windSpeedMs: wind,
+      precipitationMm: precip,
+    );
+
+    FlightWeather weather({
+      required List<RouteCloudSample> samples,
+      double depWind = 2,
+      double arrWind = 2,
+      double depPrecip = 0,
+      double arrPrecip = 0,
+    }) => FlightWeather(
+      departure: airport(wind: depWind, precip: depPrecip),
+      arrival: airport(wind: arrWind, precip: arrPrecip),
+      samples: samples,
+      fetchedAt: DateTime.utc(2026, 8, 3, 8),
+      isTimeEstimated: false,
+    );
+
+    final clearSamples = [
+      for (var i = 0; i < 5; i++) _sample(progress: 0.1 + i * 0.15, low: 5),
+    ];
+
+    test('true for calm, dry airports over a clear-views route', () {
+      expect(
+        FlightWeatherVerdictPolicy.isCalmAndClear(
+          weather(samples: clearSamples),
+        ),
+        isTrue,
+      );
+    });
+
+    test('false when an airport wind exceeds the calm threshold', () {
+      expect(
+        FlightWeatherVerdictPolicy.isCalmAndClear(
+          weather(samples: clearSamples, arrWind: 9),
+        ),
+        isFalse,
+      );
+    });
+
+    test('false when an airport wind is unknown', () {
+      final w = FlightWeather(
+        departure: airport(wind: null),
+        arrival: airport(wind: 2),
+        samples: clearSamples,
+        fetchedAt: DateTime.utc(2026, 8, 3, 8),
+        isTimeEstimated: false,
+      );
+      expect(FlightWeatherVerdictPolicy.isCalmAndClear(w), isFalse);
+    });
+
+    test('false when precipitation falls at an airport', () {
+      expect(
+        FlightWeatherVerdictPolicy.isCalmAndClear(
+          weather(samples: clearSamples, depPrecip: 1.0),
+        ),
+        isFalse,
+      );
+    });
+
+    test('false when the route is not clear-views', () {
+      final cloudy = [
+        for (var i = 0; i < 5; i++) _sample(progress: 0.1 + i * 0.15, low: 90),
+      ];
+      expect(
+        FlightWeatherVerdictPolicy.isCalmAndClear(weather(samples: cloudy)),
+        isFalse,
+      );
+    });
+
+    test('false with no samples', () {
+      expect(
+        FlightWeatherVerdictPolicy.isCalmAndClear(weather(samples: const [])),
+        isFalse,
+      );
+    });
+  });
+
   group('isBeyondForecastHorizon', () {
     final now = DateTime.utc(2026, 7, 30, 12);
 

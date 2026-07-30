@@ -103,10 +103,15 @@ class StatusChip extends StatelessWidget {
 }
 
 class MetaPill extends StatelessWidget {
-  const MetaPill({required this.icon, required this.text, super.key});
+  const MetaPill({this.icon, required this.text, this.leading, super.key})
+    : assert(icon != null || leading != null, 'provide an icon or a leading');
 
-  final IconData icon;
+  final IconData? icon;
   final String text;
+
+  /// Replaces the [icon] when set — e.g. an emoji glyph for the weather
+  /// verdict chip, which has no matching Material icon.
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +126,8 @@ class MetaPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: colorScheme.onSurfaceVariant),
+          leading ??
+              Icon(icon, size: 14, color: colorScheme.onSurfaceVariant),
           const SizedBox(width: 6),
           Text(
             text,

@@ -188,4 +188,27 @@ class FlightWeatherVerdictPolicy {
     }
     return runs;
   }
+
+  /// Wind speed (m/s) at or below which airport conditions read as calm.
+  static const double calmWindThresholdMs = 5;
+
+  /// Good-news-only signal for the verdict banner: the ride looks calm and the
+  /// view looks clear. A deliberately conservative proxy built from the data we
+  /// actually fetch — MET Norway `/complete` has no CAPE or winds-aloft, so
+  /// this is honestly "calm & clear", not a turbulence forecast: both airports
+  /// calm and dry, no precipitation along the corridor, and an overall
+  /// clear-views verdict. Any missing input returns false — silence beats a
+  /// wrong "smooth skies".
+  static bool isCalmAndClear(FlightWeather weather) {
+    final samples = weather.samples;
+    if (samples.isEmpty) return false;
+    if (overallVerdict(samples) != WindowVerdict.clearViews) return false;
+    if (rainRuns(samples).isNotEmpty) return false;
+    for (final airport in [weather.departure, weather.arrival]) {
+      final wind = airport.windSpeedMs;
+      if (wind == null || wind > calmWindThresholdMs) return false;
+      if ((airport.precipitationMm ?? 0) >= rainThresholdMm) return false;
+    }
+    return true;
+  }
 }

@@ -2392,6 +2392,9 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Best views at takeoff and landing.'
 	String get verdictOvercastBody => 'Best views at takeoff and landing.';
 
+	/// en: 'Calm, clear skies expected'
+	String get smoothSkies => 'Calm, clear skies expected';
+
 	/// en: 'Calm'
 	String get windCalm => 'Calm';
 
@@ -4229,6 +4232,7 @@ extension on Translations {
 			'createFlight.weather.verdictCarpetBody' => 'A white sea of clouds beneath you — beautiful, but the ground will mostly stay hidden.',
 			'createFlight.weather.verdictOvercastTitle' => 'Overcast skies',
 			'createFlight.weather.verdictOvercastBody' => 'Best views at takeoff and landing.',
+			'createFlight.weather.smoothSkies' => 'Calm, clear skies expected',
 			'createFlight.weather.windCalm' => 'Calm',
 			'createFlight.weather.windLight' => 'Light wind',
 			'createFlight.weather.windBreezy' => 'Breezy',
@@ -4382,9 +4386,9 @@ extension on Translations {
 			'createFlight.overview.timeline.regionType.sea' => 'Sea',
 			'createFlight.overview.timeline.regionType.ocean' => 'Ocean',
 			'createFlight.overview.timeline.regionType.strait' => 'Strait',
-			'createFlight.overview.timeline.regionType.channel' => 'Channel',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.timeline.regionType.channel' => 'Channel',
 			'createFlight.overview.timeline.regionType.gulf' => 'Gulf',
 			'createFlight.overview.timeline.regionType.bay' => 'Bay',
 			'createFlight.overview.timeline.regionType.lake' => 'Lake',
@@ -4896,9 +4900,9 @@ extension on Translations {
 			'countries.KW' => 'Kuwait',
 			'countries.KZ' => 'Kazakhstan',
 			'countries.LA' => 'Lao People\'s Dem. Rep.',
-			'countries.LB' => 'Lebanon',
 			_ => null,
 		} ?? switch (path) {
+			'countries.LB' => 'Lebanon',
 			'countries.LK' => 'Sri Lanka',
 			'countries.LR' => 'Liberia',
 			'countries.LS' => 'Lesotho',

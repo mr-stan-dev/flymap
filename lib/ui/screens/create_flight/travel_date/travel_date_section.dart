@@ -13,6 +13,7 @@ import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/create_flight/flight_number_search/widgets/flight_summary_card.dart';
 import 'package:flymap/ui/screens/create_flight/widgets/compact_flight_strip.dart';
+import 'package:flymap/ui/screens/settings/date_display_format_context.dart';
 import 'package:flymap/utils/travel_date_format_utils.dart';
 import 'package:get_it/get_it.dart';
 
@@ -490,7 +491,10 @@ class _TravelDateSectionState extends State<TravelDateSection> {
       SizedBox(
         width: double.infinity,
         child: _DateChip(
-          label: TravelDateFormatUtils.formatShortDate(_date!),
+          label: TravelDateFormatUtils.formatShortDate(
+            _date!,
+            context.dateDisplayFormat,
+          ),
           icon: Icons.calendar_month_rounded,
           isSelected: true,
           onTap: _pickCustomDate,

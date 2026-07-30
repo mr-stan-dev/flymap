@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/flight_summary.dart';
 import 'package:flymap/ui/screens/settings/distance_unit_context.dart';
 import 'package:flymap/utils/duration_format_utils.dart';
+import 'package:flymap/ui/screens/settings/date_display_format_context.dart';
 import 'package:flymap/utils/travel_date_format_utils.dart';
 import 'package:flymap/utils/unit_format_utils.dart';
 
@@ -195,6 +196,7 @@ class _ScheduledDateRow extends StatelessWidget {
           TravelDateFormatUtils.formatDateWithOptionalTime(
             travelDate,
             summary.scheduledDepartureLocal,
+            context.dateDisplayFormat,
           ),
           style: textTheme.titleMedium?.copyWith(
             color: colorScheme.primary,

@@ -981,6 +981,7 @@ class _TranslationsCreateFlightWeatherFr extends TranslationsCreateFlightWeather
 	@override String get verdictCarpetBody => 'Une mer de nuages blancs sous vous — magnifique, mais le sol restera le plus souvent caché.';
 	@override String get verdictOvercastTitle => 'Ciel couvert';
 	@override String get verdictOvercastBody => 'Les plus belles vues seront au décollage et à l\'atterrissage.';
+	@override String get smoothSkies => 'Ciel calme et dégagé attendu';
 	@override String get windCalm => 'Calme';
 	@override String get windLight => 'Vent léger';
 	@override String get windBreezy => 'Brise';
@@ -1991,6 +1992,7 @@ extension on TranslationsFr {
 			'createFlight.weather.verdictCarpetBody' => 'Une mer de nuages blancs sous vous — magnifique, mais le sol restera le plus souvent caché.',
 			'createFlight.weather.verdictOvercastTitle' => 'Ciel couvert',
 			'createFlight.weather.verdictOvercastBody' => 'Les plus belles vues seront au décollage et à l\'atterrissage.',
+			'createFlight.weather.smoothSkies' => 'Ciel calme et dégagé attendu',
 			'createFlight.weather.windCalm' => 'Calme',
 			'createFlight.weather.windLight' => 'Vent léger',
 			'createFlight.weather.windBreezy' => 'Brise',
@@ -2144,9 +2146,9 @@ extension on TranslationsFr {
 			'createFlight.overview.timeline.regionType.sea' => 'Mer',
 			'createFlight.overview.timeline.regionType.ocean' => 'Océan',
 			'createFlight.overview.timeline.regionType.strait' => 'Détroit',
-			'createFlight.overview.timeline.regionType.channel' => 'Canal',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.timeline.regionType.channel' => 'Canal',
 			'createFlight.overview.timeline.regionType.gulf' => 'Golfe',
 			'createFlight.overview.timeline.regionType.bay' => 'Baie',
 			'createFlight.overview.timeline.regionType.lake' => 'Lac',
@@ -2658,9 +2660,9 @@ extension on TranslationsFr {
 			'countries.KW' => 'Koweït',
 			'countries.KZ' => 'Kazakhstan',
 			'countries.LA' => 'Laos',
-			'countries.LB' => 'Liban',
 			_ => null,
 		} ?? switch (path) {
+			'countries.LB' => 'Liban',
 			'countries.LK' => 'Sri Lanka',
 			'countries.LR' => 'Libéria',
 			'countries.LS' => 'Lesotho',
