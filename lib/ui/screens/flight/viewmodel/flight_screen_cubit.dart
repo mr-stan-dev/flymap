@@ -13,6 +13,7 @@ import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/geo_awareness_engine.dart';
 import 'package:flymap/domain/usecase/complete_flight_use_case.dart';
 import 'package:flymap/domain/usecase/delete_flight_use_case.dart';
+import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/domain/usecase/start_flight_use_case.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get_it/get_it.dart';
@@ -22,6 +23,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   static const _gpsStaleThreshold = Duration(seconds: 20);
   final Flight flight;
   Flight _currentFlight;
+  final FlightRepository? _flightRepository;
   final DeleteFlightUseCase _deleteFlightUseCase;
   final CompleteFlightUseCase _completeFlightUseCase;
   final StartFlightUseCase _startFlightUseCase;
@@ -37,6 +39,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
 
   FlightScreenCubit({
     required this.flight,
+    FlightRepository? flightRepository,
     DeleteFlightUseCase? deleteFlightUseCase,
     CompleteFlightUseCase? completeFlightUseCase,
     StartFlightUseCase? startFlightUseCase,
@@ -46,6 +49,11 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
     Duration gpsStaleThreshold = _gpsStaleThreshold,
     bool enableGpsCheckTimer = true,
   }) : _currentFlight = flight,
+       _flightRepository =
+           flightRepository ??
+           (GetIt.I.isRegistered<FlightRepository>()
+               ? GetIt.I.get<FlightRepository>()
+               : null),
        _deleteFlightUseCase = deleteFlightUseCase ?? GetIt.I.get(),
        _completeFlightUseCase = completeFlightUseCase ?? GetIt.I.get(),
        _startFlightUseCase = startFlightUseCase ?? GetIt.I.get(),
@@ -61,6 +69,23 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
 
   Future<void> load() async {
     await _startGpsListening();
+  }
+
+  /// Re-reads the flight from storage so screens pick up changes made from a
+  /// pushed section screen (e.g. a date added or the flight unlocked on the
+  /// weather screen), which persist to the repository but not to the in-memory
+  /// snapshot this cubit holds. A no-op emit when nothing changed (the Loaded
+  /// state is value-equal).
+  Future<void> reload() async {
+    final repo = _flightRepository;
+    if (repo == null) return;
+    final fresh = await repo.getFlightById(_currentFlight.id);
+    if (fresh == null || isClosed) return;
+    _currentFlight = fresh;
+    final current = state;
+    if (current is FlightScreenLoaded) {
+      emit(current.copyWith(flight: fresh));
+    }
   }
 
   Future<void> _startGpsListening() async {

@@ -141,7 +141,11 @@ class _HubBody extends StatelessWidget {
             ),
             _WeatherSectionRow(
               flight: flight,
-              onTap: () => _push(context, FlightWeatherScreen(flight: flight)),
+              onTap: () => _push(
+                context,
+                FlightWeatherScreen(flight: flight),
+                reloadOnReturn: true,
+              ),
             ),
             _HubSectionRow(
               icon: Icons.article_rounded,
@@ -184,10 +188,14 @@ class _HubBody extends StatelessWidget {
     );
   }
 
-  void _push(BuildContext context, Widget screen) {
+  Future<void> _push(
+    BuildContext context,
+    Widget screen, {
+    bool reloadOnReturn = false,
+  }) async {
     final flightCubit = context.read<FlightScreenCubit>();
     final weatherCubit = context.read<FlightWeatherCubit>();
-    Navigator.of(context).push(
+    await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => MultiBlocProvider(
           providers: [
@@ -198,6 +206,10 @@ class _HubBody extends StatelessWidget {
         ),
       ),
     );
+    // The weather screen can add a date or unlock the flight (persisted to the
+    // repository); re-read so the hub's boarding card and lock state refresh
+    // instead of showing the pre-change snapshot.
+    if (reloadOnReturn) await flightCubit.reload();
   }
 }
 

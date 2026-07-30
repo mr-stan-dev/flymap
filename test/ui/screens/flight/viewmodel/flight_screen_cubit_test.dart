@@ -12,6 +12,7 @@ import 'package:flymap/domain/entity/gps_data.dart';
 import 'package:flymap/domain/usecase/complete_flight_use_case.dart';
 import 'package:flymap/domain/usecase/delete_flight_use_case.dart';
 import 'package:flymap/domain/usecase/start_flight_use_case.dart';
+import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/geo_awareness_engine.dart';
@@ -151,6 +152,68 @@ void main() {
       );
     });
   });
+
+  group('FlightScreenCubit reload', () {
+    test('re-reads the flight from the repository into Loaded', () async {
+      final gpsProvider = _FakeGpsDataProvider();
+      final unlocked = _buildFlight(
+        status: FlightStatus.upcoming,
+      ).copyWith(flightAccessTier: Flight.accessTierPro);
+      final cubit = FlightScreenCubit(
+        flight: _buildFlight(status: FlightStatus.upcoming),
+        flightRepository: _FakeFlightRepository(flight: unlocked),
+        deleteFlightUseCase: _NoopDeleteFlightUseCase(),
+        completeFlightUseCase: _NoopCompleteFlightUseCase(),
+        startFlightUseCase: _FakeStartFlightUseCase(result: true),
+        gpsProvider: gpsProvider,
+        enableGpsCheckTimer: false,
+      );
+      addTearDown(cubit.close);
+
+      await Future<void>.delayed(Duration.zero);
+      gpsProvider.emit(GpsStatus.off); // -> FlightScreenLoaded
+      await Future<void>.delayed(Duration.zero);
+      expect((cubit.state as FlightScreenLoaded).flight.hasProAccess, isFalse);
+
+      await cubit.reload();
+
+      expect((cubit.state as FlightScreenLoaded).flight.hasProAccess, isTrue);
+    });
+
+    test('no repository (test/DI-less) leaves state untouched', () async {
+      final gpsProvider = _FakeGpsDataProvider();
+      final cubit = FlightScreenCubit(
+        flight: _buildFlight(status: FlightStatus.upcoming),
+        deleteFlightUseCase: _NoopDeleteFlightUseCase(),
+        completeFlightUseCase: _NoopCompleteFlightUseCase(),
+        startFlightUseCase: _FakeStartFlightUseCase(result: true),
+        gpsProvider: gpsProvider,
+        enableGpsCheckTimer: false,
+      );
+      addTearDown(cubit.close);
+
+      await Future<void>.delayed(Duration.zero);
+      gpsProvider.emit(GpsStatus.off);
+      await Future<void>.delayed(Duration.zero);
+
+      // Must not throw when no FlightRepository is registered.
+      await cubit.reload();
+      expect(cubit.state, isA<FlightScreenLoaded>());
+    });
+  });
+}
+
+class _FakeFlightRepository implements FlightRepository {
+  _FakeFlightRepository({required this.flight});
+
+  final Flight flight;
+
+  @override
+  Future<Flight?> getFlightById(String flightId) async => flight;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      super.noSuchMethod(invocation);
 }
 
 Flight _buildFlight({required FlightStatus status}) {
