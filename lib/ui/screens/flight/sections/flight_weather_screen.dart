@@ -6,6 +6,7 @@ import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/subscription/paywall_source.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/share/weather_share_button.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_forecast_body.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_weather_cubit.dart';
@@ -28,6 +29,27 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
   bool get _hasProAccess =>
       widget.flight.hasProAccess ||
       context.read<SubscriptionCubit>().state.isPro;
+
+  /// Opens the upgrade path for the free teaser. The gate itself checks
+  /// connectivity first (`useOfflineInfoSheet`) and shows an offline sheet
+  /// instead of the paywall when there's no internet — very likely here,
+  /// since a saved flight is often opened in airplane mode.
+  void _openUpgradeGate() {
+    unawaited(
+      RoutePremiumGateInteractions.onGateTap(
+        context: context,
+        source: PaywallSource.routeTimelineGate,
+        useOfflineInfoSheet: true,
+        onActivated: () async {
+          if (!mounted) return;
+          await context.read<FlightWeatherCubit>().fetchIfNeeded(
+            hasProAccess: true,
+            force: true,
+          );
+        },
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -78,35 +100,44 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
             ],
           ),
           body: SafeArea(
-            child: WeatherForecastBody(
-              route: flight.route,
-              schedule: flight.schedule,
-              weather: weather,
-              isLoading: state.isLoading,
-              isProUser: isProUser,
-              // On a saved flight a failure means nothing was downloaded
-              // before takeoff — say that instead of a generic error.
-              failedCopy: context.t.createFlight.weather.notDownloadedBody,
-              onRetry: () => unawaited(
-                context.read<FlightWeatherCubit>().fetchIfNeeded(
-                  hasProAccess: _hasProAccess,
-                  force: true,
+            child: Column(
+              children: [
+                Expanded(
+                  child: WeatherForecastBody(
+                    route: flight.route,
+                    schedule: flight.schedule,
+                    weather: weather,
+                    isLoading: state.isLoading,
+                    isProUser: isProUser,
+                    // On a saved flight a failure means nothing was downloaded
+                    // before takeoff — say that instead of a generic error.
+                    failedCopy: context.t.createFlight.weather.notDownloadedBody,
+                    onRetry: () => unawaited(
+                      context.read<FlightWeatherCubit>().fetchIfNeeded(
+                        hasProAccess: _hasProAccess,
+                        force: true,
+                      ),
+                    ),
+                    onPremiumGateTap: _openUpgradeGate,
+                  ),
                 ),
-              ),
-              onPremiumGateTap: () => unawaited(
-                RoutePremiumGateInteractions.onGateTap(
-                  context: context,
-                  source: PaywallSource.routeTimelineGate,
-                  useOfflineInfoSheet: true,
-                  onActivated: () async {
-                    if (!mounted) return;
-                    await context.read<FlightWeatherCubit>().fetchIfNeeded(
-                      hasProAccess: true,
-                      force: true,
-                    );
-                  },
-                ),
-              ),
+                // The teaser itself is non-interactive; the free flow needs a
+                // real upgrade action, which the shared body leaves to the
+                // host. (No "continue without weather" here — this is a saved
+                // flight, not a step in the creation flow.)
+                if (!isProUser)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: PremiumButton(
+                        label: context.t.common.upgrade,
+                        icon: Icons.workspace_premium_rounded,
+                        onPressed: _openUpgradeGate,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         );
