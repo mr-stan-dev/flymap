@@ -457,10 +457,9 @@ class _TranslationsFlightEs extends TranslationsFlightEn {
 	// Translations
 	@override String get tabMap => 'Mapa';
 	@override String get tabDashboard => 'Panel';
-	@override String get tabRoute => 'Ruta';
-	@override String get tabRead => 'Leer';
 	@override String get tabCamera => 'Cámara';
 	@override String get tabInfo => 'Info';
+	@override late final _TranslationsFlightHubEs hub = _TranslationsFlightHubEs._(_root);
 	@override String get completeDialogTitle => '¿Completar vuelo?';
 	@override String get completeDialogBody => 'Esto marcará tu vuelo como completado.';
 	@override String get completeDialogDeleteOffline => 'Eliminar mapa y artículos offline';
@@ -1301,6 +1300,27 @@ class _TranslationsCreateFlightRealRouteChoiceEs extends TranslationsCreateFligh
 	@override String get body => 'Todo en este vuelo está desbloqueado. Aún usa una ruta aproximada — introduce tu número de vuelo y lo reconstruiremos con la trayectoria real.';
 	@override String get ctaEnterFlightNumber => 'Introducir mi número de vuelo';
 	@override String get ctaKeepRoute => 'Mantener ruta aproximada';
+}
+
+// Path: flight.hub
+class _TranslationsFlightHubEs extends TranslationsFlightHubEn {
+	_TranslationsFlightHubEs._(TranslationsEs root) : this._root = root, super.internal(root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get timelineTitle => 'Cronología';
+	@override String timelineSubtitle({required Object count}) => '${count} regiones a lo largo de tu ruta';
+	@override String get placesTitle => 'Lugares';
+	@override String placesSubtitle({required Object count}) => '${count} lugares para ver desde tu ventanilla';
+	@override String get filterAll => 'Todos';
+	@override String get noPlaces => 'No hay lugares guardados para este vuelo.';
+	@override String get weatherTitle => 'Tiempo';
+	@override String get weatherCheck => 'Consulta tu pronóstico';
+	@override String get weatherTooEarly => 'Aún es pronto para un pronóstico fiable: te avisaremos';
+	@override String get weatherLocked => 'Mapa de nubes y tiempo en aeropuertos — Pro';
+	@override String get articlesTitle => 'Artículos';
+	@override String articlesSubtitle({required Object count}) => '${count} artículos guardados sin conexión';
 }
 
 // Path: flight.map
@@ -2233,10 +2253,20 @@ extension on TranslationsEs {
 			'preview.flightRoute' => ({required Object distance}) => 'Ruta del vuelo (~ ${distance})',
 			'flight.tabMap' => 'Mapa',
 			'flight.tabDashboard' => 'Panel',
-			'flight.tabRoute' => 'Ruta',
-			'flight.tabRead' => 'Leer',
 			'flight.tabCamera' => 'Cámara',
 			'flight.tabInfo' => 'Info',
+			'flight.hub.timelineTitle' => 'Cronología',
+			'flight.hub.timelineSubtitle' => ({required Object count}) => '${count} regiones a lo largo de tu ruta',
+			'flight.hub.placesTitle' => 'Lugares',
+			'flight.hub.placesSubtitle' => ({required Object count}) => '${count} lugares para ver desde tu ventanilla',
+			'flight.hub.filterAll' => 'Todos',
+			'flight.hub.noPlaces' => 'No hay lugares guardados para este vuelo.',
+			'flight.hub.weatherTitle' => 'Tiempo',
+			'flight.hub.weatherCheck' => 'Consulta tu pronóstico',
+			'flight.hub.weatherTooEarly' => 'Aún es pronto para un pronóstico fiable: te avisaremos',
+			'flight.hub.weatherLocked' => 'Mapa de nubes y tiempo en aeropuertos — Pro',
+			'flight.hub.articlesTitle' => 'Artículos',
+			'flight.hub.articlesSubtitle' => ({required Object count}) => '${count} artículos guardados sin conexión',
 			'flight.completeDialogTitle' => '¿Completar vuelo?',
 			'flight.completeDialogBody' => 'Esto marcará tu vuelo como completado.',
 			'flight.completeDialogDeleteOffline' => 'Eliminar mapa y artículos offline',
@@ -2628,6 +2658,8 @@ extension on TranslationsEs {
 			'countries.LA' => 'Laos',
 			'countries.LB' => 'Libano',
 			'countries.LK' => 'Sri Lanka',
+			_ => null,
+		} ?? switch (path) {
 			'countries.LR' => 'Liberia',
 			'countries.LS' => 'Lesoto',
 			'countries.LT' => 'Lituania',
@@ -2638,8 +2670,6 @@ extension on TranslationsEs {
 			'countries.MD' => 'Moldavia',
 			'countries.ME' => 'Montenegro',
 			'countries.MG' => 'Madagascar',
-			_ => null,
-		} ?? switch (path) {
 			'countries.MK' => 'Macedonia del Norte',
 			'countries.ML' => 'Mali',
 			'countries.MM' => 'Myanmar',

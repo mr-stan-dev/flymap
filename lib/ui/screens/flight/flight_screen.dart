@@ -7,14 +7,15 @@ import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/map_download_config.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/ui/screens/flight/sections/flight_weather_screen.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
+import 'package:flymap/ui/screens/flight/viewmodel/flight_weather_cubit.dart';
 import 'package:flymap/ui/screens/flight/widgets/flight_app_bar.dart';
 import 'package:flymap/ui/screens/flight/widgets/gps_signal_help_sheet.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/dashboard_tab_view.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/hub/flight_hub_tab_view.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_tab.dart';
-import 'package:flymap/ui/screens/flight/widgets/tabs/read/read_tab_view.dart';
-import 'package:flymap/ui/screens/flight/widgets/tabs/route/flight_route_tab_view.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_screen.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
@@ -24,31 +25,46 @@ class FlightScreen extends StatelessWidget {
   final Flight flight;
   final FlightScreenCubit? cubit;
 
-  const FlightScreen({super.key, required this.flight, this.cubit});
+  /// True when opened from a forecast notification: lands directly on the
+  /// weather section.
+  final bool openWeather;
+
+  const FlightScreen({
+    super.key,
+    required this.flight,
+    this.cubit,
+    this.openWeather = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final child = BlocProvider(
+      create: (_) => FlightWeatherCubit(flight: flight),
+      child: _FlightScreenView(openWeather: openWeather),
+    );
     if (cubit != null) {
-      return BlocProvider.value(
-        value: cubit!,
-        child: const _FlightScreenView(),
-      );
+      return BlocProvider.value(value: cubit!, child: child);
     }
     return BlocProvider(
       create: (context) => FlightScreenCubit(flight: flight),
-      child: const _FlightScreenView(),
+      child: child,
     );
   }
 }
 
 class _FlightScreenView extends StatefulWidget {
-  const _FlightScreenView();
+  const _FlightScreenView({this.openWeather = false});
+
+  final bool openWeather;
 
   @override
   State<_FlightScreenView> createState() => _FlightScreenViewState();
 }
 
 class _FlightScreenViewState extends State<_FlightScreenView> {
+  static const int _hubTabIndex = 2;
+  static const int _cameraTabIndex = 3;
+
   int _tabIndex = 0;
   bool _isGpsHelpSheetOpen = false;
 
@@ -56,6 +72,14 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
   void initState() {
     super.initState();
     _logFlightOpened();
+    if (widget.openWeather) {
+      // Forecast notification tap: land on the hub with the weather
+      // section already open.
+      _tabIndex = _hubTabIndex;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_openWeatherScreen());
+      });
+    }
   }
 
   @override
@@ -88,14 +112,9 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
             label: t.flight.tabDashboard,
           ),
           BottomNavigationBarItem(
-            icon: const Icon(Icons.timeline_outlined),
-            activeIcon: const Icon(Icons.timeline),
-            label: t.flight.tabRoute,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.article_outlined),
-            activeIcon: const Icon(Icons.article),
-            label: t.flight.tabRead,
+            icon: const Icon(Icons.info_outline_rounded),
+            activeIcon: const Icon(Icons.info_rounded),
+            label: t.flight.tabInfo,
           ),
           BottomNavigationBarItem(
             icon: const Icon(
@@ -140,14 +159,7 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
                       topPadding: _tabTopPadding(context),
                       onGpsHelpTap: _openGpsSignalHelpSheet,
                     ),
-                    FlightRouteTabView(
-                      state: state,
-                      topPadding: _tabTopPadding(context),
-                    ),
-                    ReadTabView(
-                      state: state,
-                      topPadding: _tabTopPadding(context),
-                    ),
+                    FlightHubTabView(topPadding: _tabTopPadding(context)),
                   ],
                 ),
               ),
@@ -192,11 +204,27 @@ class _FlightScreenViewState extends State<_FlightScreenView> {
   }
 
   void _handleNavigationTap(int index) {
-    if (index == 4) {
+    if (index == _cameraTabIndex) {
       unawaited(_openCamera());
       return;
     }
     setState(() => _tabIndex = index);
+  }
+
+  Future<void> _openWeatherScreen() async {
+    final flightCubit = context.read<FlightScreenCubit>();
+    final weatherCubit = context.read<FlightWeatherCubit>();
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: flightCubit),
+            BlocProvider.value(value: weatherCubit),
+          ],
+          child: FlightWeatherScreen(flight: weatherCubit.flight),
+        ),
+      ),
+    );
   }
 
   Future<void> _openCamera() async {

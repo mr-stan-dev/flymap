@@ -162,8 +162,9 @@ class AppRouter {
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>?;
             final flight = extra?['flight'] as Flight;
+            final openWeather = extra?['openWeather'] == true;
 
-            return FlightScreen(flight: flight);
+            return FlightScreen(flight: flight, openWeather: openWeather);
           },
         ),
 

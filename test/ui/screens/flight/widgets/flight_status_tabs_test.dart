@@ -42,7 +42,8 @@ import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/gps_live_status_
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/geo_card/geo_awareness_card.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_gps_status_badge.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/widgets/map_bottom_status_card.dart';
-import 'package:flymap/ui/screens/flight/widgets/tabs/route/flight_route_tab_view.dart';
+import 'package:flymap/ui/screens/flight/viewmodel/flight_weather_cubit.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/hub/flight_hub_tab_view.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/theme/app_theme.dart';
 import 'package:latlong2/latlong.dart';
@@ -460,27 +461,33 @@ void main() {
     expect(find.byType(FlightDashboardPanel), findsOneWidget);
   });
 
-  testWidgets('route tab upcoming hides route progress and shows facts strip', (
+  testWidgets('hub tab upcoming hides route progress and shows facts strip', (
     tester,
   ) async {
-    final subscriptionCubit = _buildSubscriptionCubit();
-    addTearDown(subscriptionCubit.close);
-
-    await tester.pumpWidget(
-      _testApp(
-        child: BlocProvider.value(
-          value: subscriptionCubit,
-          child: FlightRouteTabView(
-            state: _loadedState(status: FlightStatus.upcoming),
-            topPadding: 0,
-          ),
-        ),
-      ),
+    final gpsProvider = _FakeGpsDataProvider();
+    final cubit = _buildFlightCubit(
+      status: FlightStatus.upcoming,
+      gpsProvider: gpsProvider,
     );
+    await tester.pumpWidget(_hubApp(cubit: cubit));
+    await tester.pump();
+    // The cubit emits Loaded on the first GPS callback.
+    gpsProvider.emit(GpsStatus.off);
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 20));
+    }
 
     expect(find.text('Route progress'), findsNothing);
-    expect(find.text('LHR → MUC'), findsOneWidget);
+    // Boarding card: each fact exactly once.
+    expect(find.text('LHR'), findsOneWidget);
+    expect(find.text('MUC'), findsOneWidget);
+    expect(find.text('London Heathrow'), findsOneWidget);
     expect(find.text('2h 40m'), findsOneWidget);
+    // The four hub sections are on screen.
+    expect(find.text('Timeline'), findsOneWidget);
+    expect(find.text('Places'), findsOneWidget);
+    expect(find.text('Weather'), findsOneWidget);
+    expect(find.text('Articles'), findsOneWidget);
   });
 
   testWidgets('route tab upcoming keeps historical duration consistent', (
@@ -528,41 +535,41 @@ void main() {
       ),
     );
 
-    await tester.pumpWidget(
-      _testApp(
-        child: BlocProvider.value(
-          value: subscriptionCubit,
-          child: FlightRouteTabView(
-            state: _loadedState(status: FlightStatus.upcoming, route: route),
-            topPadding: 0,
-          ),
-        ),
-      ),
+    final gpsProvider = _FakeGpsDataProvider();
+    final cubit = _buildFlightCubit(
+      status: FlightStatus.upcoming,
+      route: route,
+      gpsProvider: gpsProvider,
     );
+    await tester.pumpWidget(_hubApp(cubit: cubit));
+    await tester.pump();
+    gpsProvider.emit(GpsStatus.off);
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 20));
+    }
 
     expect(find.text('13h 45m'), findsOneWidget);
   });
 
-  testWidgets('route tab in-progress keeps route progress card behavior', (
+  testWidgets('hub tab in-progress keeps route progress card behavior', (
     tester,
   ) async {
-    final subscriptionCubit = _buildSubscriptionCubit();
-    addTearDown(subscriptionCubit.close);
-
-    await tester.pumpWidget(
-      _testApp(
-        child: BlocProvider.value(
-          value: subscriptionCubit,
-          child: FlightRouteTabView(
-            state: _loadedState(
-              status: FlightStatus.inProgress,
-              gpsData: const GpsData(latitude: 50.0, longitude: 10.0),
-            ),
-            topPadding: 0,
-          ),
-        ),
-      ),
+    final gpsProvider = _FakeGpsDataProvider();
+    final cubit = _buildFlightCubit(
+      status: FlightStatus.inProgress,
+      gpsProvider: gpsProvider,
     );
+    await tester.pumpWidget(_hubApp(cubit: cubit));
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+
+    gpsProvider.emit(
+      GpsStatus.gpsActive,
+      data: const GpsData(latitude: 50.0, longitude: 10.0),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 20));
 
     expect(find.text('Route progress'), findsOneWidget);
   });
@@ -625,29 +632,25 @@ void main() {
   });
 
   testWidgets(
-    'route tab keeps stale region/progress content visible while searching',
+    'hub tab keeps stale progress content visible while searching',
     (tester) async {
-      final subscriptionCubit = _buildSubscriptionCubit();
-      addTearDown(subscriptionCubit.close);
-
-      await tester.pumpWidget(
-        _testApp(
-          child: BlocProvider.value(
-            value: subscriptionCubit,
-            child: FlightRouteTabView(
-              state: _loadedState(
-                status: FlightStatus.inProgress,
-                gpsStatus: GpsStatus.searching,
-                gpsData: const GpsData(latitude: 50.0, longitude: 10.0),
-                gpsLastFixAt: DateTime.now().subtract(
-                  const Duration(seconds: 25),
-                ),
-              ),
-              topPadding: 0,
-            ),
-          ),
-        ),
+      final gpsProvider = _FakeGpsDataProvider();
+      final cubit = _buildFlightCubit(
+        status: FlightStatus.inProgress,
+        gpsProvider: gpsProvider,
       );
+      await tester.pumpWidget(_hubApp(cubit: cubit));
+      for (var i = 0; i < 5; i++) {
+        await tester.pump(const Duration(milliseconds: 20));
+      }
+
+      gpsProvider.emit(
+        GpsStatus.gpsActive,
+        data: const GpsData(latitude: 50.0, longitude: 10.0),
+      );
+      await tester.pump();
+      gpsProvider.emit(GpsStatus.searching);
+      await tester.pump();
 
       expect(find.text('Route progress'), findsOneWidget);
       expect(find.text('Showing last known data'), findsOneWidget);
@@ -713,7 +716,7 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.text('Route'));
+    await tester.tap(find.text('Info'));
     await tester.pump();
 
     expect(
@@ -726,7 +729,7 @@ void main() {
       tester
           .widget<BottomNavigationBar>(find.byType(BottomNavigationBar))
           .items,
-      hasLength(5),
+      hasLength(4),
     );
 
     await tester.tap(find.byKey(const Key('flight.camera_action')));
@@ -779,6 +782,37 @@ void main() {
 
     expect(find.byKey(const Key('flight.debug_menu_item')), findsOneWidget);
   });
+}
+
+FlightScreenCubit _buildFlightCubit({
+  required FlightStatus status,
+  FlightRoute? route,
+  GpsDataProvider? gpsProvider,
+}) {
+  return FlightScreenCubit(
+    flight: _buildFlight(status: status, route: route),
+    deleteFlightUseCase: _NoopDeleteFlightUseCase(),
+    completeFlightUseCase: _NoopCompleteFlightUseCase(),
+    startFlightUseCase: _FakeStartFlightUseCase(result: true),
+    gpsProvider: gpsProvider ?? _FakeGpsDataProvider(),
+    enableGpsCheckTimer: false,
+  );
+}
+
+Widget _hubApp({required FlightScreenCubit cubit}) {
+  final subscriptionCubit = _buildSubscriptionCubit();
+  addTearDown(subscriptionCubit.close);
+  addTearDown(cubit.close);
+  return _testApp(
+    child: MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: subscriptionCubit),
+        BlocProvider.value(value: cubit),
+        BlocProvider(create: (_) => FlightWeatherCubit(flight: cubit.flight)),
+      ],
+      child: const FlightHubTabView(topPadding: 0),
+    ),
+  );
 }
 
 Widget _testApp({

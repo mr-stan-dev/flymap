@@ -457,10 +457,9 @@ class _TranslationsFlightFr extends TranslationsFlightEn {
 	// Translations
 	@override String get tabMap => 'Carte';
 	@override String get tabDashboard => 'Tableau de bord';
-	@override String get tabRoute => 'Itinéraire';
-	@override String get tabRead => 'Lire';
 	@override String get tabCamera => 'Caméra';
 	@override String get tabInfo => 'Infos';
+	@override late final _TranslationsFlightHubFr hub = _TranslationsFlightHubFr._(_root);
 	@override String get completeDialogTitle => 'Terminer le vol ?';
 	@override String get completeDialogBody => 'Cela marquera votre vol comme terminé.';
 	@override String get completeDialogDeleteOffline => 'Supprimer la carte et les articles hors ligne';
@@ -1301,6 +1300,27 @@ class _TranslationsCreateFlightRealRouteChoiceFr extends TranslationsCreateFligh
 	@override String get body => 'Tout est désormais débloqué sur ce vol. Il utilise encore un tracé approximatif — saisissez votre numéro de vol et nous le reconstruirons à partir du tracé réel.';
 	@override String get ctaEnterFlightNumber => 'Saisir mon numéro de vol';
 	@override String get ctaKeepRoute => 'Garder le tracé approximatif';
+}
+
+// Path: flight.hub
+class _TranslationsFlightHubFr extends TranslationsFlightHubEn {
+	_TranslationsFlightHubFr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get timelineTitle => 'Chronologie';
+	@override String timelineSubtitle({required Object count}) => '${count} régions le long de votre itinéraire';
+	@override String get placesTitle => 'Lieux';
+	@override String placesSubtitle({required Object count}) => '${count} lieux à repérer depuis votre hublot';
+	@override String get filterAll => 'Tous';
+	@override String get noPlaces => 'Aucun lieu enregistré pour ce vol.';
+	@override String get weatherTitle => 'Météo';
+	@override String get weatherCheck => 'Consultez vos prévisions';
+	@override String get weatherTooEarly => 'Trop tôt pour des prévisions fiables — nous vous préviendrons';
+	@override String get weatherLocked => 'Carte des nuages et météo des aéroports — Pro';
+	@override String get articlesTitle => 'Articles';
+	@override String articlesSubtitle({required Object count}) => '${count} articles enregistrés hors ligne';
 }
 
 // Path: flight.map
@@ -2233,10 +2253,20 @@ extension on TranslationsFr {
 			'preview.flightRoute' => ({required Object distance}) => 'Itinéraire du vol (~ ${distance})',
 			'flight.tabMap' => 'Carte',
 			'flight.tabDashboard' => 'Tableau de bord',
-			'flight.tabRoute' => 'Itinéraire',
-			'flight.tabRead' => 'Lire',
 			'flight.tabCamera' => 'Caméra',
 			'flight.tabInfo' => 'Infos',
+			'flight.hub.timelineTitle' => 'Chronologie',
+			'flight.hub.timelineSubtitle' => ({required Object count}) => '${count} régions le long de votre itinéraire',
+			'flight.hub.placesTitle' => 'Lieux',
+			'flight.hub.placesSubtitle' => ({required Object count}) => '${count} lieux à repérer depuis votre hublot',
+			'flight.hub.filterAll' => 'Tous',
+			'flight.hub.noPlaces' => 'Aucun lieu enregistré pour ce vol.',
+			'flight.hub.weatherTitle' => 'Météo',
+			'flight.hub.weatherCheck' => 'Consultez vos prévisions',
+			'flight.hub.weatherTooEarly' => 'Trop tôt pour des prévisions fiables — nous vous préviendrons',
+			'flight.hub.weatherLocked' => 'Carte des nuages et météo des aéroports — Pro',
+			'flight.hub.articlesTitle' => 'Articles',
+			'flight.hub.articlesSubtitle' => ({required Object count}) => '${count} articles enregistrés hors ligne',
 			'flight.completeDialogTitle' => 'Terminer le vol ?',
 			'flight.completeDialogBody' => 'Cela marquera votre vol comme terminé.',
 			'flight.completeDialogDeleteOffline' => 'Supprimer la carte et les articles hors ligne',
@@ -2628,6 +2658,8 @@ extension on TranslationsFr {
 			'countries.LA' => 'Laos',
 			'countries.LB' => 'Liban',
 			'countries.LK' => 'Sri Lanka',
+			_ => null,
+		} ?? switch (path) {
 			'countries.LR' => 'Libéria',
 			'countries.LS' => 'Lesotho',
 			'countries.LT' => 'Lituanie',
@@ -2638,8 +2670,6 @@ extension on TranslationsFr {
 			'countries.MD' => 'Moldavie',
 			'countries.ME' => 'Monténégro',
 			'countries.MG' => 'Madagascar',
-			_ => null,
-		} ?? switch (path) {
 			'countries.MK' => 'Macédoine du Nord',
 			'countries.ML' => 'Mali',
 			'countries.MM' => 'Myanmar',

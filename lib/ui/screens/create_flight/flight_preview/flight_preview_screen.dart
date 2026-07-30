@@ -27,6 +27,7 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/steps/overview/fl
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/route_not_supported/flight_search_route_not_supported_step.dart';
 import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/share/weather_share_button.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_forecast_body.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/wikipedia_articles/flight_search_wikipedia_articles_step.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_cubit.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';

@@ -1049,17 +1049,13 @@ class TranslationsFlightEn {
 	/// en: 'Dashboard'
 	String get tabDashboard => 'Dashboard';
 
-	/// en: 'Route'
-	String get tabRoute => 'Route';
-
-	/// en: 'Read'
-	String get tabRead => 'Read';
-
 	/// en: 'Camera'
 	String get tabCamera => 'Camera';
 
 	/// en: 'Info'
 	String get tabInfo => 'Info';
+
+	late final TranslationsFlightHubEn hub = TranslationsFlightHubEn.internal(_root);
 
 	/// en: 'Complete flight?'
 	String get completeDialogTitle => 'Complete flight?';
@@ -3115,6 +3111,51 @@ class TranslationsCreateFlightRealRouteChoiceEn {
 	String get ctaKeepRoute => 'Keep approximate route';
 }
 
+// Path: flight.hub
+class TranslationsFlightHubEn {
+	TranslationsFlightHubEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Timeline'
+	String get timelineTitle => 'Timeline';
+
+	/// en: '$count regions along your route'
+	String timelineSubtitle({required Object count}) => '${count} regions along your route';
+
+	/// en: 'Places'
+	String get placesTitle => 'Places';
+
+	/// en: '$count places to spot from your window'
+	String placesSubtitle({required Object count}) => '${count} places to spot from your window';
+
+	/// en: 'All'
+	String get filterAll => 'All';
+
+	/// en: 'No places saved for this flight.'
+	String get noPlaces => 'No places saved for this flight.';
+
+	/// en: 'Weather'
+	String get weatherTitle => 'Weather';
+
+	/// en: 'Check your forecast'
+	String get weatherCheck => 'Check your forecast';
+
+	/// en: 'Too early for a reliable forecast — we'll notify you'
+	String get weatherTooEarly => 'Too early for a reliable forecast — we\'ll notify you';
+
+	/// en: 'Cloud map and airport forecasts — Pro'
+	String get weatherLocked => 'Cloud map and airport forecasts — Pro';
+
+	/// en: 'Articles'
+	String get articlesTitle => 'Articles';
+
+	/// en: '$count articles saved for offline reading'
+	String articlesSubtitle({required Object count}) => '${count} articles saved for offline reading';
+}
+
 // Path: flight.map
 class TranslationsFlightMapEn {
 	TranslationsFlightMapEn.internal(this._root);
@@ -4448,10 +4489,20 @@ extension on Translations {
 			'preview.flightRoute' => ({required Object distance}) => 'Flight route (~ ${distance})',
 			'flight.tabMap' => 'Map',
 			'flight.tabDashboard' => 'Dashboard',
-			'flight.tabRoute' => 'Route',
-			'flight.tabRead' => 'Read',
 			'flight.tabCamera' => 'Camera',
 			'flight.tabInfo' => 'Info',
+			'flight.hub.timelineTitle' => 'Timeline',
+			'flight.hub.timelineSubtitle' => ({required Object count}) => '${count} regions along your route',
+			'flight.hub.placesTitle' => 'Places',
+			'flight.hub.placesSubtitle' => ({required Object count}) => '${count} places to spot from your window',
+			'flight.hub.filterAll' => 'All',
+			'flight.hub.noPlaces' => 'No places saved for this flight.',
+			'flight.hub.weatherTitle' => 'Weather',
+			'flight.hub.weatherCheck' => 'Check your forecast',
+			'flight.hub.weatherTooEarly' => 'Too early for a reliable forecast — we\'ll notify you',
+			'flight.hub.weatherLocked' => 'Cloud map and airport forecasts — Pro',
+			'flight.hub.articlesTitle' => 'Articles',
+			'flight.hub.articlesSubtitle' => ({required Object count}) => '${count} articles saved for offline reading',
 			'flight.completeDialogTitle' => 'Complete flight?',
 			'flight.completeDialogBody' => 'This marks your flight as completed.',
 			'flight.completeDialogDeleteOffline' => 'Delete map and offline articles',
@@ -4843,6 +4894,8 @@ extension on Translations {
 			'countries.LA' => 'Lao People\'s Dem. Rep.',
 			'countries.LB' => 'Lebanon',
 			'countries.LK' => 'Sri Lanka',
+			_ => null,
+		} ?? switch (path) {
 			'countries.LR' => 'Liberia',
 			'countries.LS' => 'Lesotho',
 			'countries.LT' => 'Lithuania',
@@ -4853,8 +4906,6 @@ extension on Translations {
 			'countries.MD' => 'Moldova, Republic of',
 			'countries.ME' => 'Montenegro',
 			'countries.MG' => 'Madagascar',
-			_ => null,
-		} ?? switch (path) {
 			'countries.MK' => 'Macedonia, The former Yugoslav Rep. of',
 			'countries.ML' => 'Mali',
 			'countries.MM' => 'Myanmar',
