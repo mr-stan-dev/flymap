@@ -1,5 +1,10 @@
+import 'dart:async';
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
+import 'package:flymap/data/notifications/notification_permission_service.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
 import 'package:flymap/i18n/strings.g.dart';
@@ -8,6 +13,7 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/wea
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_symbols.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/viewmodel/flight_preview_state.dart';
 import 'package:flymap/utils/travel_date_format_utils.dart';
+import 'package:get_it/get_it.dart';
 
 /// Dedicated weather step: route overview -> WEATHER -> Wikipedia articles.
 ///
@@ -35,9 +41,59 @@ class FlightSearchWeatherStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.t.createFlight.weather;
     final weather = state.flightWeather;
+    // Flights beyond the reliable horizon never fetched anything (the
+    // cubit skips the API): explain instead of pretending to fail.
+    final isBeyondHorizon =
+        isProUser &&
+        weather == null &&
+        FlightWeatherVerdictPolicy.isBeyondForecastHorizon(
+          state.flightSchedule,
+          now: DateTime.now(),
+        );
 
     final Widget body;
-    if (state.isWeatherLoading) {
+    if (!isProUser) {
+      // Free flights never fetch the forecast (the cubit skips the API
+      // call): the step is a labeled demo behind glass + upgrade CTA.
+      body = _WeatherTeaser(state: state, onPremiumGateTap: onPremiumGateTap);
+    } else if (isBeyondHorizon) {
+      body = Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.notifications_active_rounded,
+                size: 40,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(height: 14),
+              Text(
+                t.forecastTooFarTitle,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                t.forecastTooFarBody(
+                  days:
+                      '${FlightWeatherVerdictPolicy.reliableForecastDaysAhead}',
+                ),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const _ForecastNotificationToggle(),
+            ],
+          ),
+        ),
+      );
+    } else if (state.isWeatherLoading) {
       body = Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -90,11 +146,296 @@ class FlightSearchWeatherStep extends StatelessWidget {
         Expanded(child: body),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: SizedBox(
-            width: double.infinity,
-            child: PrimaryButton(
-              label: context.t.common.kContinue,
-              onPressed: onContinue,
+          // Free flights get the paywall anatomy: upgrade is THE primary
+          // action, with a quiet way past it right below.
+          child: isProUser
+              ? SizedBox(
+                  width: double.infinity,
+                  child: PrimaryButton(
+                    label: isBeyondHorizon
+                        ? t.continueWithoutWeather
+                        : context.t.common.kContinue,
+                    onPressed: onContinue,
+                  ),
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    PremiumButton(
+                      label: context.t.common.upgrade,
+                      icon: Icons.workspace_premium_rounded,
+                      onPressed: onPremiumGateTap,
+                    ),
+                    const SizedBox(height: 4),
+                    TertiaryButton(
+                      label: t.continueWithoutWeather,
+                      onPressed: onContinue,
+                    ),
+                  ],
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The promised forecast alert can only arrive if notifications are
+/// allowed. Shown ONLY while the permission is missing: a hint + switch
+/// that requests it (falling through to app settings when permanently
+/// denied); once granted the row disappears. Re-checks on app resume so a
+/// grant made in system settings is picked up.
+class _ForecastNotificationToggle extends StatefulWidget {
+  const _ForecastNotificationToggle();
+
+  @override
+  State<_ForecastNotificationToggle> createState() =>
+      _ForecastNotificationToggleState();
+}
+
+class _ForecastNotificationToggleState
+    extends State<_ForecastNotificationToggle>
+    with WidgetsBindingObserver {
+  /// Null while the first check runs — the row stays hidden rather than
+  /// flashing in and out.
+  bool? _granted;
+  bool _requesting = false;
+
+  NotificationPermissionService? get _service =>
+      GetIt.I.isRegistered<NotificationPermissionService>()
+      ? GetIt.I.get<NotificationPermissionService>()
+      : null;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    unawaited(_refresh());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) unawaited(_refresh());
+  }
+
+  Future<void> _refresh() async {
+    final service = _service;
+    if (service == null) return;
+    final granted = await service.isGranted();
+    if (mounted) setState(() => _granted = granted);
+  }
+
+  Future<void> _request() async {
+    final service = _service;
+    if (service == null || _requesting) return;
+    setState(() => _requesting = true);
+    final granted = await service.request();
+    if (mounted) {
+      setState(() {
+        _granted = granted;
+        _requesting = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_granted != false) return const SizedBox.shrink();
+    final t = context.t.createFlight.weather;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        color: colorScheme.surfaceContainerHigh,
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.notifications_off_rounded,
+            size: 20,
+            color: colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              t.notificationPermissionHint,
+              style: theme.textTheme.bodySmall,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Switch.adaptive(
+            value: false,
+            onChanged: _requesting ? null : (_) => unawaited(_request()),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Free-flight weather step: the whole real-looking screen — mocked airport
+/// cards AND the animated demo cloud map on the user's route — sits behind
+/// one frosted blur, so the drifting clouds and the flying plane shimmer
+/// through without any fake number being readable. Centered on the glass:
+/// the lock, the pitch, and the upgrade button — no scrolling needed. No
+/// weather API call ever happens for free flights.
+class _WeatherTeaser extends StatelessWidget {
+  const _WeatherTeaser({required this.state, required this.onPremiumGateTap});
+
+  final FlightPreviewState state;
+  final VoidCallback onPremiumGateTap;
+
+  /// Plausible canned forecasts for the blurred cards. Fixed instants —
+  /// unreadable behind the blur, deterministic in tests.
+  static final AirportWeather _demoDeparture = AirportWeather(
+    timeUtc: DateTime.utc(2026, 5, 15, 8),
+    utcOffsetMinutes: 0,
+    temperatureC: 21,
+    windSpeedMs: 3,
+    precipitationMm: 0,
+    cloudCoverPercent: 35,
+    symbolCode: 'partlycloudy_day',
+  );
+  static final AirportWeather _demoArrival = AirportWeather(
+    timeUtc: DateTime.utc(2026, 5, 15, 11),
+    utcOffsetMinutes: 0,
+    temperatureC: 24,
+    windSpeedMs: 5,
+    precipitationMm: 0,
+    cloudCoverPercent: 10,
+    symbolCode: 'clearsky_day',
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t.createFlight.weather;
+    final theme = Theme.of(context);
+    final route = state.flightRoute;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        IgnorePointer(
+          child: ImageFiltered(
+            imageFilter: ui.ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(t.title, style: theme.textTheme.titleLarge),
+                  if (route != null) ...[
+                    const SizedBox(height: 14),
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: _AirportWeatherCard(
+                              code: route.departure.displayCode,
+                              city: route.departure.city,
+                              countryCode: route.departure.countryCode,
+                              weather: _demoDeparture,
+                              showTime: false,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _AirportWeatherCard(
+                              code: route.arrival.displayCode,
+                              city: route.arrival.city,
+                              countryCode: route.arrival.countryCode,
+                              weather: _demoArrival,
+                              showTime: false,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    // Square map shrunk to whatever height remains, so the
+                    // whole tease always fits one screen.
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final size = math.min(
+                            constraints.maxWidth,
+                            constraints.maxHeight,
+                          );
+                          if (size <= 0) return const SizedBox.shrink();
+                          return Align(
+                            alignment: Alignment.topCenter,
+                            child: SizedBox(
+                              width: size,
+                              height: size,
+                              child: WeatherRouteMapCard(
+                                route: route,
+                                samples: const [],
+                                isProUser: false,
+                                isDemo: true,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+        // Dim the glass so the pitch reads without any card chrome —
+        // classic locked-content look.
+        const IgnorePointer(
+          child: DecoratedBox(
+            decoration: BoxDecoration(color: Color(0x59000000)),
+          ),
+        ),
+        // Just the lock and the pitch — the actions live at the screen
+        // bottom (upgrade primary, continue-without tertiary).
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.18),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.lock_rounded,
+                    size: 36,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  t.proTeaserTitle,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    shadows: const [
+                      Shadow(color: Colors.black54, blurRadius: 8),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),

@@ -21,6 +21,7 @@ import 'package:flymap/domain/entity/route_poi_summary.dart';
 import 'package:flymap/domain/entity/route_region.dart';
 import 'package:flymap/domain/entity/user_flight_prefs.dart';
 import 'package:flymap/domain/entity/wiki_article_candidate.dart';
+import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
 import 'package:flymap/domain/policy/poi_interest_ranking_policy.dart';
 import 'package:flymap/domain/policy/poi_limits_policy.dart';
 import 'package:flymap/domain/policy/route_region_premium_gate_policy.dart';
@@ -130,6 +131,17 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   /// Fetches the weather picture for the weather step. Failure is
   /// non-blocking: the step shows a retry and Continue stays available.
   Future<void> fetchWeather({bool force = false}) async {
+    // Free flights never touch the weather API — the step shows the demo
+    // teaser instead; the fetch fires the moment Pro access is unlocked.
+    if (!hasEffectiveProAccess) return;
+    // Beyond the reliable horizon the step explains itself — calling the
+    // API for a two-months-out flight would only produce garbage.
+    if (FlightWeatherVerdictPolicy.isBeyondForecastHorizon(
+      state.flightSchedule,
+      now: DateTime.now(),
+    )) {
+      return;
+    }
     final useCase = _fetchFlightWeatherUseCase;
     final route = state.flightRoute;
     if (useCase == null || route == null) {
@@ -217,6 +229,13 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
 
   Future<void> refreshPoisForPro() async {
     _applyPoisForSubscriptionTier(state.allRoutePois, isProUser: true);
+    _fetchWeatherIfOnWeatherStep();
+  }
+
+  /// Upgrading from the weather teaser swaps in the real forecast without
+  /// leaving the step.
+  void _fetchWeatherIfOnWeatherStep() {
+    if (state.step == CreateFlightStep.weather) unawaited(fetchWeather());
   }
 
   Future<void> syncPoisForCurrentAccessTier() async {
@@ -229,6 +248,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   Future<void> enablePendingFlightUnlock() async {
     _emitState(state.copyWith(hasPendingFlightUnlock: true));
     await syncPoisForCurrentAccessTier();
+    _fetchWeatherIfOnWeatherStep();
   }
 
   Future<void> clearPendingFlightUnlock() async {

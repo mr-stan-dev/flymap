@@ -8,6 +8,7 @@ import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/cloud_field_builder.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/demo_cloud_story.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_map_painter.dart';
 import 'package:flymap/ui/screens/share_flight/utils/static_route_map.dart';
 import 'package:get_it/get_it.dart';
@@ -17,14 +18,16 @@ import 'package:latlong2/latlong.dart' show LatLng;
 /// as the share card, same portrait viewport math), the actual route drawn
 /// from its waypoints, and a Windy-style continuous cloud layer rendered
 /// from the forecast samples ([CloudFieldBuilder]). Pro sees the clouds and
-/// the plane flying the route; free sees the map + route with a lock
-/// overlay.
+/// the plane flying the route; the free teaser runs [isDemo] mode instead —
+/// canned [DemoCloudStory] clouds + plane over the real route, labeled with
+/// an EXAMPLE badge, no forecast fetched.
 class WeatherRouteMapCard extends StatefulWidget {
   const WeatherRouteMapCard({
     required this.route,
     required this.samples,
     this.areaSamples = const <RouteCloudSample>[],
     required this.isProUser,
+    this.isDemo = false,
     super.key,
   });
 
@@ -35,6 +38,11 @@ class WeatherRouteMapCard extends StatefulWidget {
   /// the whole picture instead of a corridor-only band.
   final List<RouteCloudSample> areaSamples;
   final bool isProUser;
+
+  /// Teaser mode for free users: ignores [samples] and animates the canned
+  /// [DemoCloudStory.generic] over the route, with an EXAMPLE badge and no
+  /// lock strip (the caller renders its own upgrade CTA).
+  final bool isDemo;
 
   @override
   State<WeatherRouteMapCard> createState() => _WeatherRouteMapCardState();
@@ -62,6 +70,18 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
   List<ui.Image> _cloudFrames = const [];
   Uint8List? _mapBytes;
 
+  /// True once the static map fetch definitively failed (offline, no DI) —
+  /// only then does the gradient stand in. While loading, the card shows a
+  /// quiet placeholder instead of flashing the gradient.
+  bool _mapFailed = false;
+
+  /// Demo backdrop: one of the bundled onboarding satellite maps. The
+  /// geography doesn't match the user's route, but behind the teaser blur
+  /// it just reads as real imagery — richer than a flat gradient, still
+  /// zero network.
+  static const _demoMapAsset =
+      'assets/images/onboarding_weather_map_lhr_fco.webp';
+
   @override
   void initState() {
     super.initState();
@@ -80,14 +100,24 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
       points: _routePoints,
       viewport: _viewport,
     ).map((p) => p.toOffset()).toList(growable: false);
-    // Corridor + full-card grid rendered as one field.
-    _cloudSamples = [...widget.samples, ...widget.areaSamples];
-    _projectedSamples = StaticRouteMap.projectRoute(
-      points: _cloudSamples.map((s) => s.latLon).toList(growable: false),
-      viewport: _viewport,
-    ).map((p) => p.toOffset()).toList(growable: false);
+    if (widget.isDemo) {
+      // Canned story along the real route — no forecast data involved.
+      final story = DemoCloudStory.generic.build(
+        projectedRoute: _projectedRoute,
+        viewportSize: staticWeatherMapSize,
+      );
+      _cloudSamples = story.samples;
+      _projectedSamples = story.positions;
+    } else {
+      // Corridor + full-card grid rendered as one field.
+      _cloudSamples = [...widget.samples, ...widget.areaSamples];
+      _projectedSamples = StaticRouteMap.projectRoute(
+        points: _cloudSamples.map((s) => s.latLon).toList(growable: false),
+        viewport: _viewport,
+      ).map((p) => p.toOffset()).toList(growable: false);
+    }
 
-    if (widget.isProUser) {
+    if (widget.isProUser || widget.isDemo) {
       _plane.repeat();
       unawaited(_buildCloudField());
     }
@@ -99,10 +129,12 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
   Future<void> _buildCloudField() async {
     if (_cloudSamples.isEmpty) return;
     final corridor = widget.samples;
-    final start =
-        (corridor.isNotEmpty ? corridor.first : _cloudSamples.first).timeUtc;
-    final end =
-        (corridor.isNotEmpty ? corridor.last : _cloudSamples.last).timeUtc;
+    final start = widget.isDemo
+        ? DemoCloudStory.defaultWindowStart
+        : (corridor.isNotEmpty ? corridor.first : _cloudSamples.first).timeUtc;
+    final end = widget.isDemo
+        ? DemoCloudStory.defaultWindowEnd
+        : (corridor.isNotEmpty ? corridor.last : _cloudSamples.last).timeUtc;
     final builder = CloudFieldBuilder(
       samples: _cloudSamples,
       positions: _projectedSamples,
@@ -148,7 +180,14 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
   Future<void> _fetchMapImage() async {
     // Guarded lookup so widget tests (no DI, no network) fall back to the
     // gradient background instead of crashing.
-    if (!GetIt.I.isRegistered<MapboxStaticImageApi>()) return;
+    // Demo mode sits behind the teaser blur — don't spend a Mapbox call on
+    // imagery nobody can see; the bundled onboarding map stands in. The DI
+    // guard keeps widget tests (no DI, no network) on the gradient. Both
+    // run synchronously from initState, before the first build.
+    if (widget.isDemo || !GetIt.I.isRegistered<MapboxStaticImageApi>()) {
+      _mapFailed = true;
+      return;
+    }
     try {
       final bytes = await GetIt.I
           .get<MapboxStaticImageApi>()
@@ -158,10 +197,18 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
             width: staticWeatherMapSize.toInt(),
             height: staticWeatherMapSize.toInt(),
           );
-      if (!mounted || bytes == null) return;
-      setState(() => _mapBytes = bytes);
+      if (!mounted) return;
+      setState(() {
+        if (bytes == null) {
+          _mapFailed = true;
+        } else {
+          _mapBytes = bytes;
+        }
+      });
     } catch (_) {
-      // Keep the fallback background — the overlay still communicates.
+      // Fall back to the gradient background — the overlay still
+      // communicates.
+      if (mounted) setState(() => _mapFailed = true);
     }
   }
 
@@ -177,7 +224,13 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
   @override
   Widget build(BuildContext context) {
     final t = context.t.createFlight.weather;
+    final colorScheme = Theme.of(context).colorScheme;
     final bytes = _mapBytes;
+    final showWeather = widget.isProUser || widget.isDemo;
+    // While the imagery loads, hold everything back — a quiet placeholder
+    // beats a blue flash, and route/clouds popping in with the map reads
+    // as one transition instead of two.
+    final isMapLoading = bytes == null && !_mapFailed;
 
     return AspectRatio(
       aspectRatio: 1,
@@ -186,39 +239,79 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
         child: Stack(
           fit: StackFit.expand,
           children: [
-            if (bytes != null)
-              Image.memory(bytes, fit: BoxFit.cover, gaplessPlayback: true)
-            else
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: widget.isDemo
+                  ? Image.asset(
+                      _demoMapAsset,
+                      key: const ValueKey('demo'),
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Color(0xFF16324F), Color(0xFF3E6C99)],
+                          ),
+                        ),
+                      ),
+                    )
+                  : bytes != null
+                  ? Image.memory(
+                      bytes,
+                      key: const ValueKey('map'),
+                      fit: BoxFit.cover,
+                      gaplessPlayback: true,
+                    )
+                  : _mapFailed
+                  ? const DecoratedBox(
+                      key: ValueKey('fallback'),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFF16324F), Color(0xFF3E6C99)],
+                        ),
+                      ),
+                    )
+                  : DecoratedBox(
+                      key: const ValueKey('loading'),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHigh,
+                      ),
+                      child: const Center(
+                        child: SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
+                        ),
+                      ),
+                    ),
+            ),
+            if (!isMapLoading) ...[
+              // Slight scrim so the white route/clouds read on bright
+              // imagery.
               const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xFF16324F), Color(0xFF3E6C99)],
+                decoration: BoxDecoration(color: Color(0x1F000000)),
+              ),
+              AnimatedBuilder(
+                animation: _plane,
+                builder: (context, _) => CustomPaint(
+                  painter: WeatherMapPainter(
+                    projectedRoute: _projectedRoute,
+                    cloudFrames: _cloudFrames,
+                    routeKm: widget.route.displayDistanceKm.toDouble(),
+                    departureCode: widget.route.departure.displayCode,
+                    arrivalCode: widget.route.arrival.displayCode,
+                    showClouds: showWeather,
+                    planeProgress: showWeather
+                        ? Curves.easeInOutSine.transform(_plane.value)
+                        : null,
                   ),
                 ),
               ),
-            // Slight scrim so the white route/clouds read on bright imagery.
-            const DecoratedBox(
-              decoration: BoxDecoration(color: Color(0x1F000000)),
-            ),
-            AnimatedBuilder(
-              animation: _plane,
-              builder: (context, _) => CustomPaint(
-                painter: WeatherMapPainter(
-                  projectedRoute: _projectedRoute,
-                  cloudFrames: _cloudFrames,
-                  routeKm: widget.route.displayDistanceKm.toDouble(),
-                  departureCode: widget.route.departure.displayCode,
-                  arrivalCode: widget.route.arrival.displayCode,
-                  showClouds: widget.isProUser,
-                  planeProgress: widget.isProUser
-                      ? Curves.easeInOutSine.transform(_plane.value)
-                      : null,
-                ),
-              ),
-            ),
-            if (!widget.isProUser)
+            ],
+            if (!widget.isProUser && !widget.isDemo)
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(

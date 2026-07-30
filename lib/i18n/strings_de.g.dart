@@ -939,6 +939,10 @@ class _TranslationsCreateFlightWeatherDe extends TranslationsCreateFlightWeather
 	@override String get departureLabel => 'Abflug';
 	@override String get arrivalLabel => 'Ankunft';
 	@override String get tomorrow => 'morgen';
+	@override String get continueWithoutWeather => 'Ohne Wetter fortfahren';
+	@override String get forecastTooFarTitle => 'Für eine zuverlässige Vorhersage ist es noch zu früh';
+	@override String forecastTooFarBody({required Object days}) => 'Wettervorhersagen sind nur bis zu ${days} Tage im Voraus verlässlich. Wir benachrichtigen dich vor deinem Flug, sobald eine zuverlässige Vorhersage verfügbar ist.';
+	@override String get notificationPermissionHint => 'Benachrichtigungen sind aus. Aktiviere sie, damit dich die Vorhersage-Erinnerung erreichen kann.';
 	@override String get verdictClearTitle => 'Klare Sicht';
 	@override String get verdictClearBody => 'Der Fensterplatz lohnt sich — der Boden sollte fast den ganzen Flug sichtbar sein.';
 	@override String get verdictPatchyTitle => 'Aufgelockerte Bewölkung';
@@ -954,8 +958,7 @@ class _TranslationsCreateFlightWeatherDe extends TranslationsCreateFlightWeather
 	@override String get windStrong => 'Starker Wind';
 	@override String windTakeoff({required Object city, required Object speed}) => 'Windiger Start in ${city} (${speed} m/s) — es kann ruckeln';
 	@override String windLanding({required Object city, required Object speed}) => 'Windige Landung in ${city} (${speed} m/s) — es kann ruckeln';
-	@override String get proTeaserTitle => 'Wolkenkarte entlang deiner Route';
-	@override String get proTeaserBody => 'Sieh, wo die Wolken sein werden — und schau deinem Flugzeug zu, wie es die ganze Route darüber fliegt.';
+	@override String get proTeaserTitle => 'Schalte Flughafenwetter und Wolken entlang deiner Route frei';
 	@override String get attribution => 'Wetterdaten: MET Norwegen';
 	@override String get hedge => 'Vorhersagen werden näher am Abflug genauer.';
 	@override String get share => 'Teilen';
@@ -1918,6 +1921,10 @@ extension on TranslationsDe {
 			'createFlight.weather.departureLabel' => 'Abflug',
 			'createFlight.weather.arrivalLabel' => 'Ankunft',
 			'createFlight.weather.tomorrow' => 'morgen',
+			'createFlight.weather.continueWithoutWeather' => 'Ohne Wetter fortfahren',
+			'createFlight.weather.forecastTooFarTitle' => 'Für eine zuverlässige Vorhersage ist es noch zu früh',
+			'createFlight.weather.forecastTooFarBody' => ({required Object days}) => 'Wettervorhersagen sind nur bis zu ${days} Tage im Voraus verlässlich. Wir benachrichtigen dich vor deinem Flug, sobald eine zuverlässige Vorhersage verfügbar ist.',
+			'createFlight.weather.notificationPermissionHint' => 'Benachrichtigungen sind aus. Aktiviere sie, damit dich die Vorhersage-Erinnerung erreichen kann.',
 			'createFlight.weather.verdictClearTitle' => 'Klare Sicht',
 			'createFlight.weather.verdictClearBody' => 'Der Fensterplatz lohnt sich — der Boden sollte fast den ganzen Flug sichtbar sein.',
 			'createFlight.weather.verdictPatchyTitle' => 'Aufgelockerte Bewölkung',
@@ -1933,8 +1940,7 @@ extension on TranslationsDe {
 			'createFlight.weather.windStrong' => 'Starker Wind',
 			'createFlight.weather.windTakeoff' => ({required Object city, required Object speed}) => 'Windiger Start in ${city} (${speed} m/s) — es kann ruckeln',
 			'createFlight.weather.windLanding' => ({required Object city, required Object speed}) => 'Windige Landung in ${city} (${speed} m/s) — es kann ruckeln',
-			'createFlight.weather.proTeaserTitle' => 'Wolkenkarte entlang deiner Route',
-			'createFlight.weather.proTeaserBody' => 'Sieh, wo die Wolken sein werden — und schau deinem Flugzeug zu, wie es die ganze Route darüber fliegt.',
+			'createFlight.weather.proTeaserTitle' => 'Schalte Flughafenwetter und Wolken entlang deiner Route frei',
 			'createFlight.weather.attribution' => 'Wetterdaten: MET Norwegen',
 			'createFlight.weather.hedge' => 'Vorhersagen werden näher am Abflug genauer.',
 			'createFlight.weather.share' => 'Teilen',
@@ -2088,11 +2094,11 @@ extension on TranslationsDe {
 			'createFlight.overview.timeline.regionType.island' => 'Insel',
 			'createFlight.overview.timeline.regionType.archipelago' => 'Archipel',
 			'createFlight.overview.timeline.regionType.peninsula' => 'Halbinsel',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.coast' => 'Küste',
 			'createFlight.overview.timeline.regionType.mountainRange' => 'Gebirge',
 			'createFlight.overview.timeline.regionType.valley' => 'Tal',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.plateau' => 'Hochebene',
 			'createFlight.overview.timeline.regionType.plain' => 'Ebene',
 			'createFlight.overview.timeline.regionType.basin' => 'Becken',
@@ -2602,11 +2608,11 @@ extension on TranslationsDe {
 			'countries.MU' => 'Mauritius',
 			'countries.MV' => 'Malediven',
 			'countries.MW' => 'Malawi',
+			_ => null,
+		} ?? switch (path) {
 			'countries.MT' => 'Malta',
 			'countries.MX' => 'Mexiko',
 			'countries.MY' => 'Malaysia',
-			_ => null,
-		} ?? switch (path) {
 			'countries.MZ' => 'Mosambik',
 			'countries.NA' => 'Namibia',
 			'countries.NC' => 'Neukaledonien',

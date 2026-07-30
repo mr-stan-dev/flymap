@@ -1,3 +1,4 @@
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 
 /// One-line answer to "will you see the ground?".
@@ -57,6 +58,34 @@ class FlightWeatherVerdictPolicy {
   /// High-cirrus cover above which a hidden stretch reads as grey overcast
   /// rather than a sunlit cloud carpet.
   static const double overcastHighThreshold = 60;
+
+  /// Forecasts degrade quickly past a week out — beyond this the step
+  /// explains instead of fetching anything.
+  static const int reliableForecastDaysAhead = 7;
+
+  /// True when the flight is too far in the future for a dependable
+  /// forecast. Uses the scheduled departure when known, otherwise the
+  /// calendar travel date; a null schedule (no date picked) is never
+  /// "too far" — the fetch falls back to today's estimate as before.
+  static bool isBeyondForecastHorizon(
+    FlightSchedule? schedule, {
+    required DateTime now,
+  }) {
+    if (schedule == null) return false;
+    const horizon = Duration(days: reliableForecastDaysAhead);
+    final departureUtc = schedule.departure?.utc;
+    if (departureUtc != null) {
+      return departureUtc.difference(now.toUtc()) > horizon;
+    }
+    final travel = schedule.travelDate;
+    final today = DateTime(now.year, now.month, now.day);
+    return DateTime(
+          travel.year,
+          travel.month,
+          travel.day,
+        ).difference(today) >
+        horizon;
+  }
 
   static WindowVerdict sampleVerdict(RouteCloudSample sample) {
     final hidden = sample.groundHiddenPercent;

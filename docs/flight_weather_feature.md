@@ -295,7 +295,49 @@ Two things preserve the value without the dread:
 - **Phase 3** — post-flight observed replay + share stamp (needs a historical
   source — Open-Meteo archive or ERA5); NASA GIBS satellite replay experiment.
 
-## 11. Risks & open questions
+## 11. Forecast-availability notifications (spec'd Jul 2026, NOT implemented)
+
+Context: flights created more than 7 days out never call the weather API
+(`FlightWeatherVerdictPolicy.isBeyondForecastHorizon`, threshold
+`reliableForecastDaysAhead = 7`). The weather step explains this and — per
+the shipped copy — **promises a notification** ("We'll notify you before
+your flight once a reliable forecast is available"). That promise is the
+contract this feature fulfils; ship it before (or with) the release that
+contains the far-future explainer copy.
+
+Two local notifications per saved flight with a known travel date:
+
+1. **T−7 days — "Forecast is ready"**: fires when the flight enters the
+   reliable horizon. Copy sells the payoff, e.g. "Your LHR → FCO forecast
+   is in: will you see the ground?" Deep-links to the flight screen (which
+   triggers the fresh fetch).
+2. **T−1 day — "Updated forecast"**: near-departure refresh with the
+   sharpest data, e.g. "Tomorrow's flight: clear views after takeoff ·
+   rain near Rome." If we can piggyback a background fetch, include the
+   real verdict emoji/word in the notification; otherwise generic copy.
+
+Mechanics / decisions to make at implementation time:
+
+- **Local scheduled notifications** (flutter_local_notifications), computed
+  from the stored `FlightSchedule` at flight save; no backend push needed.
+  Reschedule on flight edit (date change), cancel on flight delete.
+- Schedule at a humane local hour (e.g. 10:00 at the departure airport's
+  timezone via `AirportTimezoneService`), not exactly T−7d/T−1d.
+- Skip the T−7 notification when the flight was created inside the horizon
+  (user already saw a real forecast); always schedule T−1 when the flight
+  is >1 day out at save.
+- Pro gate: weather is Pro-only, so schedule for Pro users and
+  flight-unlocked flights; on entitlement loss the deep-link lands on the
+  teaser (acceptable — it's also an upgrade prompt).
+- Permission ask: DONE (Jul 2026) — the far-future weather step shows a
+  hint + switch when the system notification permission is missing
+  (`NotificationPermissionService` wrapping permission_handler; falls
+  through to app settings when permanently denied; row hidden once
+  granted; re-checks on app resume). Android manifest already declares
+  POST_NOTIFICATIONS. Never a cold ask at app start.
+- Analytics (PostHog product events): notification scheduled / opened.
+
+## 12. Risks & open questions
 
 - **Forecast disappointment risk**: a wrong "clear views" call burns trust —
   always show forecast age + "forecasts firm up closer to departure" copy on

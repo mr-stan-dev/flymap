@@ -4,9 +4,9 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/cloud_field_builder.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/demo_cloud_story.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_map_painter.dart';
 import 'package:flymap/ui/screens/onboarding/widgets/onboarding_step_scaffold.dart';
 import 'package:flymap/ui/screens/share_flight/utils/static_route_map.dart';
@@ -23,10 +23,7 @@ class _DemoRoute {
     required this.arrival,
     required this.routeKm,
     required this.asset,
-    required this.hiddenAnchors,
-    required this.rainCenter,
-    required this.rainWidth,
-    required this.rainAmplitudeMm,
+    required this.story,
   });
 
   final String departureCode;
@@ -35,12 +32,7 @@ class _DemoRoute {
   final LatLng arrival;
   final double routeKm;
   final String asset;
-
-  /// (routeProgress, hidden-ground %) anchor points of the cloud story.
-  final List<(double, double)> hiddenAnchors;
-  final double rainCenter;
-  final double rainWidth;
-  final double rainAmplitudeMm;
+  final DemoCloudStory story;
 
   String get chipLabel => '$departureCode → $arrivalCode';
 }
@@ -72,20 +64,22 @@ class _OnboardingWeatherPayoffStepState
       asset: 'assets/images/onboarding_weather_map_lhr_fco.webp',
       // Broken clouds leaving England, the Alps in full view, a rain deck
       // rolling in on the approach to Rome.
-      hiddenAnchors: [
-        (0.0, 55),
-        (0.12, 45),
-        (0.25, 24),
-        (0.40, 12),
-        (0.58, 10),
-        (0.68, 30),
-        (0.78, 82),
-        (0.88, 68),
-        (1.0, 45),
-      ],
-      rainCenter: 0.80,
-      rainWidth: 0.09,
-      rainAmplitudeMm: 2.4,
+      story: DemoCloudStory(
+        hiddenAnchors: [
+          (0.0, 55),
+          (0.12, 45),
+          (0.25, 24),
+          (0.40, 12),
+          (0.58, 10),
+          (0.68, 30),
+          (0.78, 82),
+          (0.88, 68),
+          (1.0, 45),
+        ],
+        rainCenter: 0.80,
+        rainWidth: 0.09,
+        rainAmplitudeMm: 2.4,
+      ),
     ),
     _DemoRoute(
       departureCode: 'LAX',
@@ -96,19 +90,21 @@ class _OnboardingWeatherPayoffStepState
       asset: 'assets/images/onboarding_weather_map_lax_jfk.webp',
       // Californian sun and clear Rockies, thickening over the plains,
       // rain on the East Coast approach.
-      hiddenAnchors: [
-        (0.0, 8),
-        (0.2, 10),
-        (0.35, 22),
-        (0.5, 40),
-        (0.65, 55),
-        (0.8, 75),
-        (0.9, 85),
-        (1.0, 60),
-      ],
-      rainCenter: 0.88,
-      rainWidth: 0.07,
-      rainAmplitudeMm: 2.0,
+      story: DemoCloudStory(
+        hiddenAnchors: [
+          (0.0, 8),
+          (0.2, 10),
+          (0.35, 22),
+          (0.5, 40),
+          (0.65, 55),
+          (0.8, 75),
+          (0.9, 85),
+          (1.0, 60),
+        ],
+        rainCenter: 0.88,
+        rainWidth: 0.07,
+        rainAmplitudeMm: 2.0,
+      ),
     ),
     _DemoRoute(
       departureCode: 'BER',
@@ -119,18 +115,20 @@ class _OnboardingWeatherPayoffStepState
       asset: 'assets/images/onboarding_weather_map_ber_dxb.webp',
       // Grey European start with rain over the Balkans, clearing over
       // Türkiye into cloudless desert skies at Dubai.
-      hiddenAnchors: [
-        (0.0, 65),
-        (0.15, 55),
-        (0.3, 40),
-        (0.45, 25),
-        (0.6, 12),
-        (0.8, 6),
-        (1.0, 4),
-      ],
-      rainCenter: 0.12,
-      rainWidth: 0.08,
-      rainAmplitudeMm: 1.8,
+      story: DemoCloudStory(
+        hiddenAnchors: [
+          (0.0, 65),
+          (0.15, 55),
+          (0.3, 40),
+          (0.45, 25),
+          (0.6, 12),
+          (0.8, 6),
+          (1.0, 4),
+        ],
+        rainCenter: 0.12,
+        rainWidth: 0.08,
+        rainAmplitudeMm: 1.8,
+      ),
     ),
   ];
 
@@ -200,69 +198,6 @@ class _OnboardingWeatherPayoffStepState
     _plane.forward(from: 0);
   }
 
-  static double _hiddenBase(_DemoRoute route, double progress) {
-    final anchors = route.hiddenAnchors;
-    for (var i = 1; i < anchors.length; i++) {
-      if (progress <= anchors[i].$1) {
-        final (p0, v0) = anchors[i - 1];
-        final (p1, v1) = anchors[i];
-        final t = ((progress - p0) / (p1 - p0)).clamp(0.0, 1.0);
-        return v0 + (v1 - v0) * t;
-      }
-    }
-    return anchors.last.$2;
-  }
-
-  static double _rainBase(_DemoRoute route, double progress) {
-    final d = (progress - route.rainCenter) / route.rainWidth;
-    return route.rainAmplitudeMm * math.exp(-d * d);
-  }
-
-  /// One synthetic sample: overhead values from the route's story curve,
-  /// plus a 4-slice timeline that wobbles the deck so the field visibly
-  /// evolves (and the rain builds) while the plane flies.
-  RouteCloudSample _sample(
-    _DemoRoute route, {
-    required double progress,
-    required double phase,
-    required double amplitude,
-  }) {
-    final base = _hiddenBase(route, progress);
-    final rain = _rainBase(route, progress);
-    final windowSeconds = _windowEnd.difference(_windowStart).inSeconds;
-    final slices = <CloudTimeSlice>[
-      for (var i = 0; i < 4; i++)
-        () {
-          final t = i / 3;
-          final wobble = 1 + amplitude * math.sin(t * math.pi * 1.6 + phase);
-          return CloudTimeSlice(
-            timeUtc: _windowStart.add(
-              Duration(seconds: (windowSeconds * t).round()),
-            ),
-            cloudLowPercent: (base * 0.6 * wobble).clamp(0.0, 100.0),
-            cloudMidPercent: (base * 0.4 * wobble).clamp(0.0, 100.0),
-            cloudHighPercent: (12 + 10 * math.sin(phase + t * 4)).clamp(
-              0.0,
-              100.0,
-            ),
-            precipitationMm: rain * (0.5 + 0.9 * t),
-          );
-        }(),
-    ];
-    return RouteCloudSample(
-      routeProgress: progress,
-      latLon: route.departure, // Unused by the field builder; positions rule.
-      timeUtc: _windowStart.add(
-        Duration(seconds: (windowSeconds * progress).round()),
-      ),
-      cloudLowPercent: base * 0.6,
-      cloudMidPercent: base * 0.4,
-      cloudHighPercent: 14,
-      precipitationMm: rain,
-      timeline: slices,
-    );
-  }
-
   Future<void> _buildAllCloudFields() async {
     for (var i = 0; i < _routes.length; i++) {
       await _buildCloudField(i);
@@ -272,58 +207,12 @@ class _OnboardingWeatherPayoffStepState
 
   Future<void> _buildCloudField(int routeIndex) async {
     final route = _routes[routeIndex];
-    final projected = _projectedRoutes[routeIndex];
-    final samples = <RouteCloudSample>[];
-    final positions = <Offset>[];
-
-    // Corridor: 13 stops along the projected route.
-    const corridorCount = 13;
-    for (var i = 0; i < corridorCount; i++) {
-      final progress = i / (corridorCount - 1);
-      final index = (progress * (projected.length - 1)).round();
-      samples.add(
-        _sample(
-          route,
-          progress: progress,
-          phase: progress * 5.3,
-          amplitude: 0.22,
-        ),
-      );
-      positions.add(projected[index]);
-    }
-
-    // Area grid: the rest of the square, keyed to the nearest corridor stop
-    // so off-route clouds tell the same story with lateral variety.
-    for (var gx = 0; gx < 6; gx++) {
-      for (var gy = 0; gy < 6; gy++) {
-        final position = Offset(
-          -30 + gx * (staticWeatherMapSize + 60) / 5,
-          -30 + gy * (staticWeatherMapSize + 60) / 5,
-        );
-        var nearest = 0.0;
-        var bestD2 = double.infinity;
-        for (var i = 0; i < corridorCount; i++) {
-          final index = (i / (corridorCount - 1) * (projected.length - 1))
-              .round();
-          final d = projected[index] - position;
-          final d2 = d.dx * d.dx + d.dy * d.dy;
-          if (d2 < bestD2) {
-            bestD2 = d2;
-            nearest = i / (corridorCount - 1);
-          }
-        }
-        final lateral = math.sin(position.dx * 0.013 + position.dy * 0.017);
-        samples.add(
-          _sample(
-            route,
-            progress: (nearest + 0.06 * lateral).clamp(0.0, 1.0),
-            phase: position.dx * 0.02 + position.dy * 0.011,
-            amplitude: 0.3,
-          ),
-        );
-        positions.add(position);
-      }
-    }
+    final (:samples, :positions) = route.story.build(
+      projectedRoute: _projectedRoutes[routeIndex],
+      viewportSize: staticWeatherMapSize,
+      windowStart: _windowStart,
+      windowEnd: _windowEnd,
+    );
 
     final builder = CloudFieldBuilder(
       samples: samples,

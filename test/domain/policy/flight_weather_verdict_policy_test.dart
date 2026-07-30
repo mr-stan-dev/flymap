@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
+import 'package:flymap/domain/entity/zoned_instant.dart';
 import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -126,6 +128,57 @@ void main() {
         FlightWeatherVerdictPolicy.rainRuns([sample(0.5, 0.2)]),
         isEmpty,
       );
+    });
+  });
+
+  group('isBeyondForecastHorizon', () {
+    final now = DateTime.utc(2026, 7, 30, 12);
+
+    bool beyond(FlightSchedule? schedule) =>
+        FlightWeatherVerdictPolicy.isBeyondForecastHorizon(schedule, now: now);
+
+    test('no schedule (dateless flight) is never too far', () {
+      expect(beyond(null), isFalse);
+    });
+
+    test('scheduled departure inside the horizon fetches', () {
+      expect(
+        beyond(
+          FlightSchedule(
+            travelDate: DateTime(2026, 8, 2),
+            departure: ZonedInstant(
+              utc: DateTime.utc(2026, 8, 2, 15),
+              offsetMinutes: 60,
+            ),
+          ),
+        ),
+        isFalse,
+      );
+    });
+
+    test('scheduled departure two months out is beyond', () {
+      expect(
+        beyond(
+          FlightSchedule(
+            travelDate: DateTime(2026, 9, 30),
+            departure: ZonedInstant(
+              utc: DateTime.utc(2026, 9, 30, 15),
+              offsetMinutes: 60,
+            ),
+          ),
+        ),
+        isTrue,
+      );
+    });
+
+    test('date-only schedule compares calendar days', () {
+      expect(beyond(FlightSchedule.dateOnly(DateTime(2026, 8, 6))), isFalse);
+      expect(beyond(FlightSchedule.dateOnly(DateTime(2026, 10, 1))), isTrue);
+    });
+
+    test('the seventh day itself is still inside the horizon', () {
+      expect(beyond(FlightSchedule.dateOnly(DateTime(2026, 8, 6))), isFalse);
+      expect(beyond(FlightSchedule.dateOnly(DateTime(2026, 8, 7))), isTrue);
     });
   });
 }

@@ -2306,6 +2306,18 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'tomorrow'
 	String get tomorrow => 'tomorrow';
 
+	/// en: 'Continue without weather'
+	String get continueWithoutWeather => 'Continue without weather';
+
+	/// en: 'It's too early for a reliable forecast'
+	String get forecastTooFarTitle => 'It\'s too early for a reliable forecast';
+
+	/// en: 'Weather forecasts are only dependable up to $days days ahead. We'll notify you before your flight once a reliable forecast is available.'
+	String forecastTooFarBody({required Object days}) => 'Weather forecasts are only dependable up to ${days} days ahead. We\'ll notify you before your flight once a reliable forecast is available.';
+
+	/// en: 'Notifications are off. Enable them so the forecast alert can reach you.'
+	String get notificationPermissionHint => 'Notifications are off. Enable them so the forecast alert can reach you.';
+
 	/// en: 'Clear views'
 	String get verdictClearTitle => 'Clear views';
 
@@ -2351,11 +2363,8 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Windy landing in $city ($speed m/s) — expect some bumps'
 	String windLanding({required Object city, required Object speed}) => 'Windy landing in ${city} (${speed} m/s) — expect some bumps';
 
-	/// en: 'Cloud map along your route'
-	String get proTeaserTitle => 'Cloud map along your route';
-
-	/// en: 'See where the clouds will be — and watch your plane fly the whole route above them.'
-	String get proTeaserBody => 'See where the clouds will be — and watch your plane fly the whole route above them.';
+	/// en: 'Unlock airport weather and clouds along your route'
+	String get proTeaserTitle => 'Unlock airport weather and clouds along your route';
 
 	/// en: 'Weather data: MET Norway'
 	String get attribution => 'Weather data: MET Norway';
@@ -4106,6 +4115,10 @@ extension on Translations {
 			'createFlight.weather.departureLabel' => 'Departure',
 			'createFlight.weather.arrivalLabel' => 'Arrival',
 			'createFlight.weather.tomorrow' => 'tomorrow',
+			'createFlight.weather.continueWithoutWeather' => 'Continue without weather',
+			'createFlight.weather.forecastTooFarTitle' => 'It\'s too early for a reliable forecast',
+			'createFlight.weather.forecastTooFarBody' => ({required Object days}) => 'Weather forecasts are only dependable up to ${days} days ahead. We\'ll notify you before your flight once a reliable forecast is available.',
+			'createFlight.weather.notificationPermissionHint' => 'Notifications are off. Enable them so the forecast alert can reach you.',
 			'createFlight.weather.verdictClearTitle' => 'Clear views',
 			'createFlight.weather.verdictClearBody' => 'Window seat worth it — the ground should be visible for most of the flight.',
 			'createFlight.weather.verdictPatchyTitle' => 'Patchy clouds',
@@ -4121,8 +4134,7 @@ extension on Translations {
 			'createFlight.weather.windStrong' => 'Strong wind',
 			'createFlight.weather.windTakeoff' => ({required Object city, required Object speed}) => 'Windy takeoff in ${city} (${speed} m/s) — expect some bumps',
 			'createFlight.weather.windLanding' => ({required Object city, required Object speed}) => 'Windy landing in ${city} (${speed} m/s) — expect some bumps',
-			'createFlight.weather.proTeaserTitle' => 'Cloud map along your route',
-			'createFlight.weather.proTeaserBody' => 'See where the clouds will be — and watch your plane fly the whole route above them.',
+			'createFlight.weather.proTeaserTitle' => 'Unlock airport weather and clouds along your route',
 			'createFlight.weather.attribution' => 'Weather data: MET Norway',
 			'createFlight.weather.hedge' => 'Forecasts firm up closer to departure.',
 			'createFlight.weather.share' => 'Share',
@@ -4276,11 +4288,11 @@ extension on Translations {
 			'createFlight.overview.timeline.regionType.island' => 'Island',
 			'createFlight.overview.timeline.regionType.archipelago' => 'Archipelago',
 			'createFlight.overview.timeline.regionType.peninsula' => 'Peninsula',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.coast' => 'Coast',
 			'createFlight.overview.timeline.regionType.mountainRange' => 'Mountain range',
 			'createFlight.overview.timeline.regionType.valley' => 'Valley',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.plateau' => 'Plateau',
 			'createFlight.overview.timeline.regionType.plain' => 'Plain',
 			'createFlight.overview.timeline.regionType.basin' => 'Basin',
@@ -4790,11 +4802,11 @@ extension on Translations {
 			'countries.MU' => 'Mauritius',
 			'countries.MV' => 'Maldives',
 			'countries.MW' => 'Malawi',
+			_ => null,
+		} ?? switch (path) {
 			'countries.MT' => 'Malta',
 			'countries.MX' => 'Mexico',
 			'countries.MY' => 'Malaysia',
-			_ => null,
-		} ?? switch (path) {
 			'countries.MZ' => 'Mozambique',
 			'countries.NA' => 'Namibia',
 			'countries.NC' => 'New Caledonia',

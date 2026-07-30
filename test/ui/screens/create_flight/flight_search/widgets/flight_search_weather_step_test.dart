@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flymap/data/api/mapbox_static_image_api.dart';
 import 'package:flymap/data/flight_video/video_encoder.dart';
+import 'package:flymap/data/notifications/notification_permission_service.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/share/weather_share_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
@@ -10,6 +11,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/flight_search_weather_step.dart';
@@ -22,12 +24,17 @@ void main() {
     LocaleSettings.setLocaleSync(AppLocale.en);
   });
 
-  FlightPreviewState stateWith({FlightWeather? weather, bool loading = false}) {
+  FlightPreviewState stateWith({
+    FlightWeather? weather,
+    bool loading = false,
+    FlightSchedule? schedule,
+  }) {
     return FlightPreviewState.initial().copyWith(
       step: CreateFlightStep.weather,
       flightRoute: _route(),
       flightWeather: weather,
       isWeatherLoading: loading,
+      flightSchedule: schedule,
     );
   }
 
@@ -50,10 +57,13 @@ void main() {
     );
   }
 
-  testWidgets('renders airport cards, verdict and teaser for free users', (
+  testWidgets('renders airport cards, times and verdict for Pro users', (
     tester,
   ) async {
-    await tester.pumpWidget(app(stateWith(weather: _weather())));
+    await tester.pumpWidget(
+      app(stateWith(weather: _weather()), isProUser: true),
+    );
+    await tester.pump(const Duration(milliseconds: 50));
 
     // No layout exceptions and the key content is present.
     expect(tester.takeException(), isNull);
@@ -68,13 +78,37 @@ void main() {
     );
     // Wind reads as a strength label, not a bare number.
     expect(find.textContaining('Light wind · 4 m/s'), findsNWidgets(2));
-    // The portrait map card pushes the rest below the fold — scroll in
-    // layout order.
-    await tester.scrollUntilVisible(find.text('Upgrade to Pro'), 200);
-    expect(find.text('Upgrade to Pro'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Clear views'), 200);
     expect(find.text('Clear views'), findsOneWidget);
   });
+
+  testWidgets(
+    'free flights get the blurred demo teaser without any forecast data',
+    (tester) async {
+      // No FlightWeather in state at all — the cubit never fetched it.
+      await tester.pumpWidget(app(stateWith()));
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Will you see the ground?'), findsOneWidget);
+      // Real airports on the mocked cards, behind frosted glass.
+      expect(find.textContaining('AAA'), findsOneWidget);
+      expect(find.textContaining('BBB'), findsOneWidget);
+      expect(find.byType(ImageFiltered), findsWidgets);
+      // The pitch floats on the glass; the actions sit pinned at the
+      // bottom — all visible WITHOUT scrolling.
+      expect(
+        find.text('Unlock airport weather and clouds along your route'),
+        findsOneWidget,
+      );
+      expect(find.text('Upgrade to Pro'), findsOneWidget);
+      expect(find.text('Continue without weather'), findsOneWidget);
+      // The generic Continue is replaced by the paywall anatomy, and no
+      // loading/retry UI leaks through.
+      expect(find.text('Continue'), findsNothing);
+      expect(find.text('Retry'), findsNothing);
+    },
+  );
 
   testWidgets('shows the cloud animation instead of the gate for Pro', (
     tester,
@@ -144,7 +178,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      app(stateWith(weather: _weather(isTimeEstimated: true))),
+      app(stateWith(weather: _weather(isTimeEstimated: true)), isProUser: true),
     );
 
     expect(tester.takeException(), isNull);
@@ -157,7 +191,10 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      app(stateWith(weather: _weather(rainy: true, arrivalWindMs: 12))),
+      app(
+        stateWith(weather: _weather(rainy: true, arrivalWindMs: 12)),
+        isProUser: true,
+      ),
     );
 
     // The per-region cloud/rain rows are gone — they read as contradictions
@@ -174,7 +211,9 @@ void main() {
   testWidgets('calm flights show the verdict sentence, no list', (
     tester,
   ) async {
-    await tester.pumpWidget(app(stateWith(weather: _weather())));
+    await tester.pumpWidget(
+      app(stateWith(weather: _weather()), isProUser: true),
+    );
 
     await tester.scrollUntilVisible(find.text('Clear views'), 200);
     // The verdict body sentence is the whole story when nothing is notable.
@@ -182,12 +221,73 @@ void main() {
     expect(find.textContaining('Windy'), findsNothing);
   });
 
-  testWidgets('failed load shows retry and keeps Continue', (tester) async {
-    await tester.pumpWidget(app(stateWith()));
+  testWidgets('failed load shows retry and keeps Continue for Pro', (
+    tester,
+  ) async {
+    await tester.pumpWidget(app(stateWith(), isProUser: true));
 
     expect(find.text('Retry'), findsOneWidget);
     expect(find.text('Continue'), findsOneWidget);
   });
+
+  testWidgets(
+    'far-future flights explain the forecast horizon instead of failing',
+    (tester) async {
+      final schedule = FlightSchedule.dateOnly(
+        DateTime.now().add(const Duration(days: 60)),
+      );
+      await tester.pumpWidget(
+        app(stateWith(schedule: schedule), isProUser: true),
+      );
+      await tester.pump();
+
+      expect(
+        find.text("It's too early for a reliable forecast"),
+        findsOneWidget,
+      );
+      expect(find.textContaining('7 days ahead'), findsOneWidget);
+      // Retry would be a lie — nothing failed, nothing to retry.
+      expect(find.text('Retry'), findsNothing);
+      expect(find.text('Continue without weather'), findsOneWidget);
+      expect(find.text('Continue'), findsNothing);
+      // No permission service registered -> the notification row stays
+      // hidden rather than nagging blindly.
+      expect(find.byType(Switch), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'missing notification permission shows the toggle until granted',
+    (tester) async {
+      final service = _FakeNotificationPermissionService();
+      GetIt.I.registerSingleton<NotificationPermissionService>(service);
+      addTearDown(
+        () => GetIt.I.unregister<NotificationPermissionService>(),
+      );
+
+      final schedule = FlightSchedule.dateOnly(
+        DateTime.now().add(const Duration(days: 60)),
+      );
+      await tester.pumpWidget(
+        app(stateWith(schedule: schedule), isProUser: true),
+      );
+      await tester.pump();
+
+      expect(
+        find.textContaining('Notifications are off'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byType(Switch));
+      await tester.pump();
+      await tester.pump();
+
+      // Granted via the switch: the row disappears.
+      expect(service.requested, isTrue);
+      expect(find.textContaining('Notifications are off'), findsNothing);
+      expect(find.byType(Switch), findsNothing);
+    },
+  );
 }
 
 FlightRoute _route() {
@@ -249,6 +349,22 @@ FlightWeather _weather({
     fetchedAt: DateTime.utc(2026, 7, 28, 9),
     isTimeEstimated: isTimeEstimated,
   );
+}
+
+class _FakeNotificationPermissionService
+    extends NotificationPermissionService {
+  bool granted = false;
+  bool requested = false;
+
+  @override
+  Future<bool> isGranted() async => granted;
+
+  @override
+  Future<bool> request() async {
+    requested = true;
+    granted = true;
+    return true;
+  }
 }
 
 class _NoopEncoder implements FlightVideoEncoder {
