@@ -23,7 +23,7 @@ class RoutePremiumGateInteractions {
           .hasInternetConnectivity();
       if (!hasInternet) {
         if (!context.mounted) return;
-        await _showOfflineInfoSheet(context);
+        await showOfflineInfoSheet(context);
         return;
       }
     }
@@ -41,7 +41,9 @@ class RoutePremiumGateInteractions {
     _showPaywallResultSnackbar(context, result);
   }
 
-  static Future<void> _showOfflineInfoSheet(BuildContext context) async {
+  /// Shown when a gate is tapped with no connectivity — the paywall/unlock
+  /// purchase needs the network, so explain instead of failing.
+  static Future<void> showOfflineInfoSheet(BuildContext context) async {
     final t = context.t;
     await showModalBottomSheet<void>(
       context: context,

@@ -586,6 +586,12 @@ Future<void> _pumpForInitialLoad(WidgetTester tester) async {
 }
 
 class _FakeFlightRepository implements FlightRepository {
+  @override
+  Future<bool> updateFlightAccessTier({
+    required String flightId,
+    required String accessTier,
+  }) async => true;
+
   const _FakeFlightRepository({this.flights = const []});
 
   final List<Flight> flights;

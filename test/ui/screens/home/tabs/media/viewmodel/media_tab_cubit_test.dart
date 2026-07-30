@@ -163,6 +163,12 @@ SkyCameraMediaItem _item({
 }
 
 class _FakeFlightRepository implements FlightRepository {
+  @override
+  Future<bool> updateFlightAccessTier({
+    required String flightId,
+    required String accessTier,
+  }) async => true;
+
   _FakeFlightRepository({required this.flights});
 
   final List<Flight> flights;

@@ -1005,6 +1005,12 @@ class _FakeDeleteFlightUseCase implements DeleteFlightUseCase {
 
 class _FakeFlightRepository implements FlightRepository {
   @override
+  Future<bool> updateFlightAccessTier({
+    required String flightId,
+    required String accessTier,
+  }) async => true;
+
+  @override
   Future<List<Flight>> getAllFlights() async => const [];
 
   @override

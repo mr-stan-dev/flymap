@@ -58,6 +58,20 @@ class FlightsDBService {
     return true;
   }
 
+  /// Persists a new access tier on a saved flight — used when a free flight
+  /// is unlocked after the fact (e.g. a one-time weather unlock). The already
+  /// downloaded map bundle keeps whatever it holds; only the tier flag changes.
+  Future<bool> updateFlightAccessTier(
+    String flightId,
+    String accessTier,
+  ) async {
+    final existing = await getFlightById(flightId);
+    if (existing == null) return false;
+    final updated = existing.copyWith(flightAccessTier: accessTier);
+    await saveOrUpdateFlight(updated);
+    return true;
+  }
+
   Future<bool> updateFlightMaps(String flightId, List<FlightMap> maps) async {
     final existing = await getFlightById(flightId);
     if (existing == null) return false;

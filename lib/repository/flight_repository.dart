@@ -41,6 +41,15 @@ class FlightRepository {
     );
   }
 
+  /// Marks a saved flight as a new access tier (e.g. Pro after a one-time
+  /// unlock). Returns false if the flight no longer exists.
+  Future<bool> updateFlightAccessTier({
+    required String flightId,
+    required String accessTier,
+  }) async {
+    return await _flightsService.updateFlightAccessTier(flightId, accessTier);
+  }
+
   /// Get all flights
   Future<List<Flight>> getAllFlights() async {
     return await _flightsService.getAllFlights();
