@@ -365,6 +365,7 @@
       "title": "Will you see the ground?",
       "loading": "Checking the skies along your route…",
       "loadFailed": "Couldn't load the forecast right now. You can retry or continue without it.",
+      "notDownloadedBody": "No forecast was downloaded for this flight. It needs an internet connection before you fly.",
       "departureLabel": "Departure",
       "arrivalLabel": "Arrival",
       "tomorrow": "tomorrow",
@@ -967,9 +968,9 @@
   },
   "notifications": {
     "forecastReadyTitle": "Your flight forecast is ready",
-    "forecastReadyBody": "Will you see the ground on $route? The cloud forecast for your flight is in.",
+    "forecastReadyBody": "Sun or rain at takeoff? Clear views on the way? Your first $route forecast is in.",
     "forecastUpdatedTitle": "Updated forecast for tomorrow's flight",
-    "forecastUpdatedBody": "Flying tomorrow — check the freshest cloud forecast for $route."
+    "forecastUpdatedBody": "The weather forecast for $route is available — tap to download it before you fly."
   },
   "onboarding": {
     "skip": "Skip",

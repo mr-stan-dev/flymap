@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/data/local/flight_weather_store.dart';
 import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
@@ -15,7 +16,11 @@ class FlightWeatherState extends Equatable {
   });
 
   final bool isLoading;
+
+  /// Live fetch result, or the last persisted forecast (see
+  /// [FlightWeather.fetchedAt] for its age).
   final FlightWeather? weather;
+
   final bool failed;
 
   @override
@@ -23,35 +28,71 @@ class FlightWeatherState extends Equatable {
 }
 
 /// Forecast for a SAVED flight (hub row preview + weather screen share one
-/// instance). Same access rules as the create-flight step: no API call
-/// without Pro access, none beyond the reliable horizon; fetched once per
-/// flight-screen visit unless forced.
+/// instance). Persistence-first: the last stored forecast shows instantly
+/// (that's what airplane mode gets), then a fresh fetch replaces it when
+/// allowed — same access rules as the create-flight step (no API call
+/// without Pro access, none beyond the reliable horizon) — and every
+/// successful fetch is stored back for the next offline open.
 class FlightWeatherCubit extends Cubit<FlightWeatherState> {
-  FlightWeatherCubit({required this.flight, FetchFlightWeatherUseCase? useCase})
-    : _useCase =
-          useCase ??
-          (GetIt.I.isRegistered<FetchFlightWeatherUseCase>()
-              ? GetIt.I.get<FetchFlightWeatherUseCase>()
-              : null),
-      super(const FlightWeatherState());
+  FlightWeatherCubit({
+    required this.flight,
+    FetchFlightWeatherUseCase? useCase,
+    FlightWeatherStore? store,
+  }) : _useCase =
+           useCase ??
+           (GetIt.I.isRegistered<FetchFlightWeatherUseCase>()
+               ? GetIt.I.get<FetchFlightWeatherUseCase>()
+               : null),
+       _store =
+           store ??
+           (GetIt.I.isRegistered<FlightWeatherStore>()
+               ? GetIt.I.get<FlightWeatherStore>()
+               : null),
+       super(const FlightWeatherState());
 
   static const _logger = Logger('FlightWeatherCubit');
 
+  /// A stored forecast younger than this is fresh enough to skip the
+  /// network on open.
+  static const staleAfter = Duration(hours: 6);
+
   final Flight flight;
   final FetchFlightWeatherUseCase? _useCase;
+  final FlightWeatherStore? _store;
+  bool _storeChecked = false;
 
-  bool get isBeyondHorizon => FlightWeatherVerdictPolicy.isBeyondForecastHorizon(
-    flight.schedule,
-    now: DateTime.now(),
-  );
+  bool get isBeyondHorizon =>
+      FlightWeatherVerdictPolicy.isBeyondForecastHorizon(
+        flight.schedule,
+        now: DateTime.now(),
+      );
 
-  Future<void> fetchIfNeeded({required bool hasProAccess, bool force = false}) async {
+  Future<void> fetchIfNeeded({
+    required bool hasProAccess,
+    bool force = false,
+  }) async {
+    if (!hasProAccess || state.isLoading) return;
+
+    // Stored forecast first: instant content, and the only content there
+    // is in airplane mode.
+    if (!_storeChecked) {
+      _storeChecked = true;
+      final stored = await _store?.load(flight.id);
+      if (isClosed) return;
+      if (stored != null && state.weather == null) {
+        emit(FlightWeatherState(weather: stored));
+      }
+    }
+
     final useCase = _useCase;
-    if (useCase == null || !hasProAccess || isBeyondHorizon) return;
-    if (state.isLoading) return;
-    if (!force && (state.weather != null || state.failed)) return;
+    if (useCase == null || isBeyondHorizon) return;
+    final current = state.weather;
+    final isFresh =
+        current != null &&
+        DateTime.now().difference(current.fetchedAt) < staleAfter;
+    if (!force && (isFresh || state.failed)) return;
 
-    emit(const FlightWeatherState(isLoading: true));
+    emit(FlightWeatherState(isLoading: true, weather: current));
     try {
       final weather = await useCase.call(
         route: flight.route,
@@ -59,10 +100,13 @@ class FlightWeatherCubit extends Cubit<FlightWeatherState> {
       );
       if (isClosed) return;
       emit(FlightWeatherState(weather: weather));
+      await _store?.save(flight.id, weather);
     } catch (e) {
       _logger.error('flight weather fetch failed: $e');
       if (isClosed) return;
-      emit(const FlightWeatherState(failed: true));
+      // Keep showing the stored forecast; only flag failure when there is
+      // nothing at all to show.
+      emit(FlightWeatherState(weather: current, failed: current == null));
     }
   }
 }

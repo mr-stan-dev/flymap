@@ -32,6 +32,7 @@ class WeatherForecastBody extends StatelessWidget {
     required this.isProUser,
     required this.onRetry,
     required this.onPremiumGateTap,
+    this.failedCopy,
     super.key,
   });
 
@@ -42,6 +43,10 @@ class WeatherForecastBody extends StatelessWidget {
   final bool isProUser;
   final VoidCallback onRetry;
   final VoidCallback onPremiumGateTap;
+
+  /// Overrides the generic failed-load copy — the flight screen uses it to
+  /// explain that no forecast was downloaded before takeoff.
+  final String? failedCopy;
 
   /// Beyond the reliable horizon nothing was (or should be) fetched — the
   /// body explains instead of pretending to fail. Exposed so hosts can
@@ -137,7 +142,7 @@ class WeatherForecastBody extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                t.loadFailed,
+                failedCopy ?? t.loadFailed,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),

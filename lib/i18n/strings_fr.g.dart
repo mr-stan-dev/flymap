@@ -611,9 +611,9 @@ class _TranslationsNotificationsFr extends TranslationsNotificationsEn {
 
 	// Translations
 	@override String get forecastReadyTitle => 'Vos prévisions de vol sont prêtes';
-	@override String forecastReadyBody({required Object route}) => 'Verrez-vous le sol sur ${route} ? Les prévisions de nuages de votre vol sont disponibles.';
+	@override String forecastReadyBody({required Object route}) => 'Soleil ou pluie au décollage ? Vues dégagées en route ? Vos premières prévisions pour ${route} sont là.';
 	@override String get forecastUpdatedTitle => 'Prévisions mises à jour pour votre vol de demain';
-	@override String forecastUpdatedBody({required Object route}) => 'Vous volez demain — consultez les prévisions de nuages les plus récentes pour ${route}.';
+	@override String forecastUpdatedBody({required Object route}) => 'Les prévisions météo pour ${route} sont disponibles — touchez pour les télécharger avant de voler.';
 }
 
 // Path: onboarding
@@ -965,6 +965,7 @@ class _TranslationsCreateFlightWeatherFr extends TranslationsCreateFlightWeather
 	@override String get title => 'Verrez-vous le sol ?';
 	@override String get loading => 'Vérification du ciel le long de votre itinéraire…';
 	@override String get loadFailed => 'Impossible de charger les prévisions pour le moment. Réessayez ou continuez sans elles.';
+	@override String get notDownloadedBody => 'Aucune prévision n\'a été téléchargée pour ce vol. Une connexion internet est nécessaire avant de voler.';
 	@override String get departureLabel => 'Départ';
 	@override String get arrivalLabel => 'Arrivée';
 	@override String get tomorrow => 'demain';
@@ -1974,6 +1975,7 @@ extension on TranslationsFr {
 			'createFlight.weather.title' => 'Verrez-vous le sol ?',
 			'createFlight.weather.loading' => 'Vérification du ciel le long de votre itinéraire…',
 			'createFlight.weather.loadFailed' => 'Impossible de charger les prévisions pour le moment. Réessayez ou continuez sans elles.',
+			'createFlight.weather.notDownloadedBody' => 'Aucune prévision n\'a été téléchargée pour ce vol. Une connexion internet est nécessaire avant de voler.',
 			'createFlight.weather.departureLabel' => 'Départ',
 			'createFlight.weather.arrivalLabel' => 'Arrivée',
 			'createFlight.weather.tomorrow' => 'demain',
@@ -2143,9 +2145,9 @@ extension on TranslationsFr {
 			'createFlight.overview.timeline.regionType.ocean' => 'Océan',
 			'createFlight.overview.timeline.regionType.strait' => 'Détroit',
 			'createFlight.overview.timeline.regionType.channel' => 'Canal',
-			'createFlight.overview.timeline.regionType.gulf' => 'Golfe',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.timeline.regionType.gulf' => 'Golfe',
 			'createFlight.overview.timeline.regionType.bay' => 'Baie',
 			'createFlight.overview.timeline.regionType.lake' => 'Lac',
 			'createFlight.overview.timeline.regionType.alkalineLake' => 'Lac alcalin',
@@ -2517,9 +2519,9 @@ extension on TranslationsFr {
 			'about.closingTitle' => 'Voyez le monde autrement',
 			'about.closingText' => 'Merci de l’explorer avec nous.',
 			'notifications.forecastReadyTitle' => 'Vos prévisions de vol sont prêtes',
-			'notifications.forecastReadyBody' => ({required Object route}) => 'Verrez-vous le sol sur ${route} ? Les prévisions de nuages de votre vol sont disponibles.',
+			'notifications.forecastReadyBody' => ({required Object route}) => 'Soleil ou pluie au décollage ? Vues dégagées en route ? Vos premières prévisions pour ${route} sont là.',
 			'notifications.forecastUpdatedTitle' => 'Prévisions mises à jour pour votre vol de demain',
-			'notifications.forecastUpdatedBody' => ({required Object route}) => 'Vous volez demain — consultez les prévisions de nuages les plus récentes pour ${route}.',
+			'notifications.forecastUpdatedBody' => ({required Object route}) => 'Les prévisions météo pour ${route} sont disponibles — touchez pour les télécharger avant de voler.',
 			'onboarding.skip' => 'Passer',
 			'onboarding.letsStart' => 'Commençons',
 			'onboarding.welcomeTitle' => 'Découvrez ce qu’il y a en dessous',
@@ -2657,9 +2659,9 @@ extension on TranslationsFr {
 			'countries.KZ' => 'Kazakhstan',
 			'countries.LA' => 'Laos',
 			'countries.LB' => 'Liban',
-			'countries.LK' => 'Sri Lanka',
 			_ => null,
 		} ?? switch (path) {
+			'countries.LK' => 'Sri Lanka',
 			'countries.LR' => 'Libéria',
 			'countries.LS' => 'Lesotho',
 			'countries.LT' => 'Lituanie',

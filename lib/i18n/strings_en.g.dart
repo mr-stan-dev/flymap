@@ -1411,14 +1411,14 @@ class TranslationsNotificationsEn {
 	/// en: 'Your flight forecast is ready'
 	String get forecastReadyTitle => 'Your flight forecast is ready';
 
-	/// en: 'Will you see the ground on $route? The cloud forecast for your flight is in.'
-	String forecastReadyBody({required Object route}) => 'Will you see the ground on ${route}? The cloud forecast for your flight is in.';
+	/// en: 'Sun or rain at takeoff? Clear views on the way? Your first $route forecast is in.'
+	String forecastReadyBody({required Object route}) => 'Sun or rain at takeoff? Clear views on the way? Your first ${route} forecast is in.';
 
 	/// en: 'Updated forecast for tomorrow's flight'
 	String get forecastUpdatedTitle => 'Updated forecast for tomorrow\'s flight';
 
-	/// en: 'Flying tomorrow — check the freshest cloud forecast for $route.'
-	String forecastUpdatedBody({required Object route}) => 'Flying tomorrow — check the freshest cloud forecast for ${route}.';
+	/// en: 'The weather forecast for $route is available — tap to download it before you fly.'
+	String forecastUpdatedBody({required Object route}) => 'The weather forecast for ${route} is available — tap to download it before you fly.';
 }
 
 // Path: onboarding
@@ -2343,6 +2343,9 @@ class TranslationsCreateFlightWeatherEn {
 
 	/// en: 'Couldn't load the forecast right now. You can retry or continue without it.'
 	String get loadFailed => 'Couldn\'t load the forecast right now. You can retry or continue without it.';
+
+	/// en: 'No forecast was downloaded for this flight. It needs an internet connection before you fly.'
+	String get notDownloadedBody => 'No forecast was downloaded for this flight. It needs an internet connection before you fly.';
 
 	/// en: 'Departure'
 	String get departureLabel => 'Departure';
@@ -4210,6 +4213,7 @@ extension on Translations {
 			'createFlight.weather.title' => 'Will you see the ground?',
 			'createFlight.weather.loading' => 'Checking the skies along your route…',
 			'createFlight.weather.loadFailed' => 'Couldn\'t load the forecast right now. You can retry or continue without it.',
+			'createFlight.weather.notDownloadedBody' => 'No forecast was downloaded for this flight. It needs an internet connection before you fly.',
 			'createFlight.weather.departureLabel' => 'Departure',
 			'createFlight.weather.arrivalLabel' => 'Arrival',
 			'createFlight.weather.tomorrow' => 'tomorrow',
@@ -4379,9 +4383,9 @@ extension on Translations {
 			'createFlight.overview.timeline.regionType.ocean' => 'Ocean',
 			'createFlight.overview.timeline.regionType.strait' => 'Strait',
 			'createFlight.overview.timeline.regionType.channel' => 'Channel',
-			'createFlight.overview.timeline.regionType.gulf' => 'Gulf',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.timeline.regionType.gulf' => 'Gulf',
 			'createFlight.overview.timeline.regionType.bay' => 'Bay',
 			'createFlight.overview.timeline.regionType.lake' => 'Lake',
 			'createFlight.overview.timeline.regionType.alkalineLake' => 'Alkaline lake',
@@ -4753,9 +4757,9 @@ extension on Translations {
 			'about.closingTitle' => 'See the world differently',
 			'about.closingText' => 'Thank you for exploring it with us.',
 			'notifications.forecastReadyTitle' => 'Your flight forecast is ready',
-			'notifications.forecastReadyBody' => ({required Object route}) => 'Will you see the ground on ${route}? The cloud forecast for your flight is in.',
+			'notifications.forecastReadyBody' => ({required Object route}) => 'Sun or rain at takeoff? Clear views on the way? Your first ${route} forecast is in.',
 			'notifications.forecastUpdatedTitle' => 'Updated forecast for tomorrow\'s flight',
-			'notifications.forecastUpdatedBody' => ({required Object route}) => 'Flying tomorrow — check the freshest cloud forecast for ${route}.',
+			'notifications.forecastUpdatedBody' => ({required Object route}) => 'The weather forecast for ${route} is available — tap to download it before you fly.',
 			'onboarding.skip' => 'Skip',
 			'onboarding.letsStart' => 'Let\'s start',
 			'onboarding.welcomeTitle' => 'Discover what’s below',
@@ -4893,9 +4897,9 @@ extension on Translations {
 			'countries.KZ' => 'Kazakhstan',
 			'countries.LA' => 'Lao People\'s Dem. Rep.',
 			'countries.LB' => 'Lebanon',
-			'countries.LK' => 'Sri Lanka',
 			_ => null,
 		} ?? switch (path) {
+			'countries.LK' => 'Sri Lanka',
 			'countries.LR' => 'Liberia',
 			'countries.LS' => 'Lesotho',
 			'countries.LT' => 'Lithuania',

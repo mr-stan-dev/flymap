@@ -611,9 +611,9 @@ class _TranslationsNotificationsEs extends TranslationsNotificationsEn {
 
 	// Translations
 	@override String get forecastReadyTitle => 'Tu pronóstico de vuelo está listo';
-	@override String forecastReadyBody({required Object route}) => '¿Verás el suelo en ${route}? El pronóstico de nubes de tu vuelo ya está disponible.';
+	@override String forecastReadyBody({required Object route}) => '¿Sol o lluvia en el despegue? ¿Vistas despejadas en el camino? Tu primer pronóstico de ${route} ya está aquí.';
 	@override String get forecastUpdatedTitle => 'Pronóstico actualizado para tu vuelo de mañana';
-	@override String forecastUpdatedBody({required Object route}) => 'Mañana vuelas: consulta el pronóstico de nubes más reciente para ${route}.';
+	@override String forecastUpdatedBody({required Object route}) => 'El pronóstico del tiempo para ${route} está disponible: toca para descargarlo antes de volar.';
 }
 
 // Path: onboarding
@@ -965,6 +965,7 @@ class _TranslationsCreateFlightWeatherEs extends TranslationsCreateFlightWeather
 	@override String get title => '¿Verás el suelo?';
 	@override String get loading => 'Comprobando el cielo a lo largo de tu ruta…';
 	@override String get loadFailed => 'No se pudo cargar el pronóstico ahora mismo. Reintenta o continúa sin él.';
+	@override String get notDownloadedBody => 'No se descargó ningún pronóstico para este vuelo. Necesita conexión a internet antes de volar.';
 	@override String get departureLabel => 'Salida';
 	@override String get arrivalLabel => 'Llegada';
 	@override String get tomorrow => 'mañana';
@@ -1974,6 +1975,7 @@ extension on TranslationsEs {
 			'createFlight.weather.title' => '¿Verás el suelo?',
 			'createFlight.weather.loading' => 'Comprobando el cielo a lo largo de tu ruta…',
 			'createFlight.weather.loadFailed' => 'No se pudo cargar el pronóstico ahora mismo. Reintenta o continúa sin él.',
+			'createFlight.weather.notDownloadedBody' => 'No se descargó ningún pronóstico para este vuelo. Necesita conexión a internet antes de volar.',
 			'createFlight.weather.departureLabel' => 'Salida',
 			'createFlight.weather.arrivalLabel' => 'Llegada',
 			'createFlight.weather.tomorrow' => 'mañana',
@@ -2143,9 +2145,9 @@ extension on TranslationsEs {
 			'createFlight.overview.timeline.regionType.ocean' => 'Océano',
 			'createFlight.overview.timeline.regionType.strait' => 'Estrecho',
 			'createFlight.overview.timeline.regionType.channel' => 'Canal',
-			'createFlight.overview.timeline.regionType.gulf' => 'Golfo',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.timeline.regionType.gulf' => 'Golfo',
 			'createFlight.overview.timeline.regionType.bay' => 'Bahía',
 			'createFlight.overview.timeline.regionType.lake' => 'Lago',
 			'createFlight.overview.timeline.regionType.alkalineLake' => 'Lago alcalino',
@@ -2517,9 +2519,9 @@ extension on TranslationsEs {
 			'about.closingTitle' => 'Mira el mundo de otra manera',
 			'about.closingText' => 'Gracias por explorarlo con nosotros.',
 			'notifications.forecastReadyTitle' => 'Tu pronóstico de vuelo está listo',
-			'notifications.forecastReadyBody' => ({required Object route}) => '¿Verás el suelo en ${route}? El pronóstico de nubes de tu vuelo ya está disponible.',
+			'notifications.forecastReadyBody' => ({required Object route}) => '¿Sol o lluvia en el despegue? ¿Vistas despejadas en el camino? Tu primer pronóstico de ${route} ya está aquí.',
 			'notifications.forecastUpdatedTitle' => 'Pronóstico actualizado para tu vuelo de mañana',
-			'notifications.forecastUpdatedBody' => ({required Object route}) => 'Mañana vuelas: consulta el pronóstico de nubes más reciente para ${route}.',
+			'notifications.forecastUpdatedBody' => ({required Object route}) => 'El pronóstico del tiempo para ${route} está disponible: toca para descargarlo antes de volar.',
 			'onboarding.skip' => 'Omitir',
 			'onboarding.letsStart' => 'Empecemos',
 			'onboarding.welcomeTitle' => 'Descubre lo que hay debajo',
@@ -2657,9 +2659,9 @@ extension on TranslationsEs {
 			'countries.KZ' => 'Kazajistan',
 			'countries.LA' => 'Laos',
 			'countries.LB' => 'Libano',
-			'countries.LK' => 'Sri Lanka',
 			_ => null,
 		} ?? switch (path) {
+			'countries.LK' => 'Sri Lanka',
 			'countries.LR' => 'Liberia',
 			'countries.LS' => 'Lesoto',
 			'countries.LT' => 'Lituania',

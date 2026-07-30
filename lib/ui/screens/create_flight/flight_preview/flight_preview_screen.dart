@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
+import 'package:flymap/data/local/flight_weather_store.dart';
 import 'package:flymap/data/local/route_map_image_store.dart';
 import 'package:flymap/data/notifications/flight_notification_scheduler.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
@@ -481,6 +482,15 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
       unawaited(
         GetIt.I.get<FlightNotificationScheduler>().syncForFlightId(flightId),
       );
+    }
+    // The weather-step forecast becomes the flight's offline forecast —
+    // in airplane mode it is all the weather screen has.
+    final weather = state.flightWeather;
+    if (flightId != null &&
+        flightId.isNotEmpty &&
+        weather != null &&
+        GetIt.I.isRegistered<FlightWeatherStore>()) {
+      unawaited(GetIt.I.get<FlightWeatherStore>().save(flightId, weather));
     }
     if (flightId == null || flightId.isEmpty) {
       _showSnackBar(context, context.t.preview.errorSomethingWrong);

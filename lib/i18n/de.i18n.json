@@ -365,6 +365,7 @@
       "title": "Wirst du den Boden sehen?",
       "loading": "Wir prüfen den Himmel entlang deiner Route…",
       "loadFailed": "Die Vorhersage konnte gerade nicht geladen werden. Versuche es erneut oder fahre ohne sie fort.",
+      "notDownloadedBody": "Für diesen Flug wurde keine Vorhersage heruntergeladen. Dafür ist vor dem Flug eine Internetverbindung nötig.",
       "departureLabel": "Abflug",
       "arrivalLabel": "Ankunft",
       "tomorrow": "morgen",
@@ -967,9 +968,9 @@
   },
   "notifications": {
     "forecastReadyTitle": "Deine Flugvorhersage ist da",
-    "forecastReadyBody": "Wirst du auf $route den Boden sehen? Die Wolkenvorhersage für deinen Flug ist verfügbar.",
+    "forecastReadyBody": "Sonne oder Regen beim Start? Klare Sicht unterwegs? Deine erste Vorhersage für $route ist da.",
     "forecastUpdatedTitle": "Aktualisierte Vorhersage für deinen Flug morgen",
-    "forecastUpdatedBody": "Morgen geht's los — sieh dir die frischeste Wolkenvorhersage für $route an."
+    "forecastUpdatedBody": "Die Wettervorhersage für $route ist verfügbar — tippe, um sie vor dem Flug herunterzuladen."
   },
   "onboarding": {
     "skip": "Überspringen",

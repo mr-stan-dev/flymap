@@ -42,6 +42,7 @@ import 'package:flymap/data/local/migrations/flights_db_migration_v1_to_v2.dart'
 import 'package:flymap/data/local/mappers/flight_db_mapper.dart';
 import 'package:flymap/data/mappers/route_overview_api_mapper.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
+import 'package:flymap/data/local/flight_weather_store.dart';
 import 'package:flymap/data/notifications/flight_notification_scheduler.dart';
 import 'package:flymap/data/notifications/notification_permission_service.dart';
 import 'package:flymap/repository/forecast_notification_prefs.dart';
@@ -275,6 +276,7 @@ class DiModule {
     i.registerLazySingleton<ForecastNotificationPrefs>(
       () => ForecastNotificationPrefs(),
     );
+    i.registerLazySingleton<FlightWeatherStore>(() => FlightWeatherStore());
     i.registerLazySingleton<FlightNotificationScheduler>(
       () => FlightNotificationScheduler(
         gateway: LocalScheduledNotificationsGateway(),

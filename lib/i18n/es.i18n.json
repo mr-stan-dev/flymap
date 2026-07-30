@@ -365,6 +365,7 @@
       "title": "¿Verás el suelo?",
       "loading": "Comprobando el cielo a lo largo de tu ruta…",
       "loadFailed": "No se pudo cargar el pronóstico ahora mismo. Reintenta o continúa sin él.",
+      "notDownloadedBody": "No se descargó ningún pronóstico para este vuelo. Necesita conexión a internet antes de volar.",
       "departureLabel": "Salida",
       "arrivalLabel": "Llegada",
       "tomorrow": "mañana",
@@ -967,9 +968,9 @@
   },
   "notifications": {
     "forecastReadyTitle": "Tu pronóstico de vuelo está listo",
-    "forecastReadyBody": "¿Verás el suelo en $route? El pronóstico de nubes de tu vuelo ya está disponible.",
+    "forecastReadyBody": "¿Sol o lluvia en el despegue? ¿Vistas despejadas en el camino? Tu primer pronóstico de $route ya está aquí.",
     "forecastUpdatedTitle": "Pronóstico actualizado para tu vuelo de mañana",
-    "forecastUpdatedBody": "Mañana vuelas: consulta el pronóstico de nubes más reciente para $route."
+    "forecastUpdatedBody": "El pronóstico del tiempo para $route está disponible: toca para descargarlo antes de volar."
   },
   "onboarding": {
     "skip": "Omitir",

@@ -1,3 +1,4 @@
+import 'package:flymap/data/local/flight_weather_store.dart';
 import 'package:flymap/data/local/flights_db_service.dart';
 import 'package:flymap/data/notifications/flight_notification_scheduler.dart';
 import 'package:flymap/domain/usecase/flight_assets_deleter.dart';
@@ -25,6 +26,9 @@ class DeleteFlightUseCase {
       await GetIt.I.get<FlightNotificationScheduler>().cancelForFlight(
         flightId,
       );
+    }
+    if (GetIt.I.isRegistered<FlightWeatherStore>()) {
+      await GetIt.I.get<FlightWeatherStore>().delete(flightId);
     }
     return _service.deleteFlightRecord(flightId);
   }

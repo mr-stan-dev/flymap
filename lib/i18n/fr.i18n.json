@@ -365,6 +365,7 @@
       "title": "Verrez-vous le sol ?",
       "loading": "Vérification du ciel le long de votre itinéraire…",
       "loadFailed": "Impossible de charger les prévisions pour le moment. Réessayez ou continuez sans elles.",
+      "notDownloadedBody": "Aucune prévision n'a été téléchargée pour ce vol. Une connexion internet est nécessaire avant de voler.",
       "departureLabel": "Départ",
       "arrivalLabel": "Arrivée",
       "tomorrow": "demain",
@@ -967,9 +968,9 @@
   },
   "notifications": {
     "forecastReadyTitle": "Vos prévisions de vol sont prêtes",
-    "forecastReadyBody": "Verrez-vous le sol sur $route ? Les prévisions de nuages de votre vol sont disponibles.",
+    "forecastReadyBody": "Soleil ou pluie au décollage ? Vues dégagées en route ? Vos premières prévisions pour $route sont là.",
     "forecastUpdatedTitle": "Prévisions mises à jour pour votre vol de demain",
-    "forecastUpdatedBody": "Vous volez demain — consultez les prévisions de nuages les plus récentes pour $route."
+    "forecastUpdatedBody": "Les prévisions météo pour $route sont disponibles — touchez pour les télécharger avant de voler."
   },
   "onboarding": {
     "skip": "Passer",

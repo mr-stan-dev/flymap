@@ -84,6 +84,9 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
               weather: weather,
               isLoading: state.isLoading,
               isProUser: isProUser,
+              // On a saved flight a failure means nothing was downloaded
+              // before takeoff — say that instead of a generic error.
+              failedCopy: context.t.createFlight.weather.notDownloadedBody,
               onRetry: () => unawaited(
                 context.read<FlightWeatherCubit>().fetchIfNeeded(
                   hasProAccess: _hasProAccess,

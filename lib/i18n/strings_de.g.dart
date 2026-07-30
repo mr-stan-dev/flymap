@@ -611,9 +611,9 @@ class _TranslationsNotificationsDe extends TranslationsNotificationsEn {
 
 	// Translations
 	@override String get forecastReadyTitle => 'Deine Flugvorhersage ist da';
-	@override String forecastReadyBody({required Object route}) => 'Wirst du auf ${route} den Boden sehen? Die Wolkenvorhersage für deinen Flug ist verfügbar.';
+	@override String forecastReadyBody({required Object route}) => 'Sonne oder Regen beim Start? Klare Sicht unterwegs? Deine erste Vorhersage für ${route} ist da.';
 	@override String get forecastUpdatedTitle => 'Aktualisierte Vorhersage für deinen Flug morgen';
-	@override String forecastUpdatedBody({required Object route}) => 'Morgen geht\'s los — sieh dir die frischeste Wolkenvorhersage für ${route} an.';
+	@override String forecastUpdatedBody({required Object route}) => 'Die Wettervorhersage für ${route} ist verfügbar — tippe, um sie vor dem Flug herunterzuladen.';
 }
 
 // Path: onboarding
@@ -965,6 +965,7 @@ class _TranslationsCreateFlightWeatherDe extends TranslationsCreateFlightWeather
 	@override String get title => 'Wirst du den Boden sehen?';
 	@override String get loading => 'Wir prüfen den Himmel entlang deiner Route…';
 	@override String get loadFailed => 'Die Vorhersage konnte gerade nicht geladen werden. Versuche es erneut oder fahre ohne sie fort.';
+	@override String get notDownloadedBody => 'Für diesen Flug wurde keine Vorhersage heruntergeladen. Dafür ist vor dem Flug eine Internetverbindung nötig.';
 	@override String get departureLabel => 'Abflug';
 	@override String get arrivalLabel => 'Ankunft';
 	@override String get tomorrow => 'morgen';
@@ -1974,6 +1975,7 @@ extension on TranslationsDe {
 			'createFlight.weather.title' => 'Wirst du den Boden sehen?',
 			'createFlight.weather.loading' => 'Wir prüfen den Himmel entlang deiner Route…',
 			'createFlight.weather.loadFailed' => 'Die Vorhersage konnte gerade nicht geladen werden. Versuche es erneut oder fahre ohne sie fort.',
+			'createFlight.weather.notDownloadedBody' => 'Für diesen Flug wurde keine Vorhersage heruntergeladen. Dafür ist vor dem Flug eine Internetverbindung nötig.',
 			'createFlight.weather.departureLabel' => 'Abflug',
 			'createFlight.weather.arrivalLabel' => 'Ankunft',
 			'createFlight.weather.tomorrow' => 'morgen',
@@ -2143,9 +2145,9 @@ extension on TranslationsDe {
 			'createFlight.overview.timeline.regionType.ocean' => 'Ozean',
 			'createFlight.overview.timeline.regionType.strait' => 'Meerenge',
 			'createFlight.overview.timeline.regionType.channel' => 'Kanal',
-			'createFlight.overview.timeline.regionType.gulf' => 'Golf',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.timeline.regionType.gulf' => 'Golf',
 			'createFlight.overview.timeline.regionType.bay' => 'Bucht',
 			'createFlight.overview.timeline.regionType.lake' => 'See',
 			'createFlight.overview.timeline.regionType.alkalineLake' => 'Salzsee',
@@ -2517,9 +2519,9 @@ extension on TranslationsDe {
 			'about.closingTitle' => 'Sieh die Welt mit neuen Augen',
 			'about.closingText' => 'Danke, dass du sie mit uns erkundest.',
 			'notifications.forecastReadyTitle' => 'Deine Flugvorhersage ist da',
-			'notifications.forecastReadyBody' => ({required Object route}) => 'Wirst du auf ${route} den Boden sehen? Die Wolkenvorhersage für deinen Flug ist verfügbar.',
+			'notifications.forecastReadyBody' => ({required Object route}) => 'Sonne oder Regen beim Start? Klare Sicht unterwegs? Deine erste Vorhersage für ${route} ist da.',
 			'notifications.forecastUpdatedTitle' => 'Aktualisierte Vorhersage für deinen Flug morgen',
-			'notifications.forecastUpdatedBody' => ({required Object route}) => 'Morgen geht\'s los — sieh dir die frischeste Wolkenvorhersage für ${route} an.',
+			'notifications.forecastUpdatedBody' => ({required Object route}) => 'Die Wettervorhersage für ${route} ist verfügbar — tippe, um sie vor dem Flug herunterzuladen.',
 			'onboarding.skip' => 'Überspringen',
 			'onboarding.letsStart' => 'Los geht’s',
 			'onboarding.welcomeTitle' => 'Entdecke, was unter dir liegt',
@@ -2657,9 +2659,9 @@ extension on TranslationsDe {
 			'countries.KZ' => 'Kasachstan',
 			'countries.LA' => 'Laos',
 			'countries.LB' => 'Libanon',
-			'countries.LK' => 'Sri Lanka',
 			_ => null,
 		} ?? switch (path) {
+			'countries.LK' => 'Sri Lanka',
 			'countries.LR' => 'Liberia',
 			'countries.LS' => 'Lesotho',
 			'countries.LT' => 'Litauen',

@@ -9,11 +9,13 @@ class AppDatabase {
   StoreRef<String, Map<String, dynamic>>? _flightAssetsStore;
   StoreRef<String, Map<String, dynamic>>? _skyCameraMediaStore;
   StoreRef<String, Map<String, dynamic>>? _migrationsStore;
+  StoreRef<String, Map<String, dynamic>>? _flightWeatherStore;
   static const _dbName = 'flymap.db';
   static const _flightsStoreName = 'flights';
   static const _flightAssetsStoreName = 'flight_assets';
   static const _skyCameraMediaStoreName = 'sky_camera_media';
   static const _migrationsStoreName = 'migrations';
+  static const _flightWeatherStoreName = 'flight_weather';
   static const int schemaVersion = 2;
 
   AppDatabase._();
@@ -69,6 +71,15 @@ class AppDatabase {
     return _migrationsStore!;
   }
 
+  /// Last fetched forecast per flight id — kept out of the flight record so
+  /// the (potentially few-hundred-KB) sample grid never bloats flight reads.
+  StoreRef<String, Map<String, dynamic>> get flightWeatherStore {
+    if (_flightWeatherStore == null) {
+      throw StateError('Database not initialized. Call initialize() first.');
+    }
+    return _flightWeatherStore!;
+  }
+
   Future<void> close() async {
     await _database?.close();
     _database = null;
@@ -76,6 +87,7 @@ class AppDatabase {
     _flightAssetsStore = null;
     _skyCameraMediaStore = null;
     _migrationsStore = null;
+    _flightWeatherStore = null;
   }
 
   void _initializeStores() {
@@ -85,5 +97,6 @@ class AppDatabase {
       _skyCameraMediaStoreName,
     );
     _migrationsStore = stringMapStoreFactory.store(_migrationsStoreName);
+    _flightWeatherStore = stringMapStoreFactory.store(_flightWeatherStoreName);
   }
 }
