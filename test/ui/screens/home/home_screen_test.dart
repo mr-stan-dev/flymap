@@ -12,6 +12,7 @@ import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_info.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_route_metrics.dart';
@@ -590,6 +591,12 @@ class _FakeFlightRepository implements FlightRepository {
   Future<bool> updateFlightAccessTier({
     required String flightId,
     required String accessTier,
+  }) async => true;
+
+  @override
+  Future<bool> updateFlightSchedule({
+    required String flightId,
+    required FlightSchedule schedule,
   }) async => true;
 
   const _FakeFlightRepository({this.flights = const []});

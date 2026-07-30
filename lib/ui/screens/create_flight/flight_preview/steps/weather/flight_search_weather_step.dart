@@ -15,6 +15,8 @@ class FlightSearchWeatherStep extends StatelessWidget {
     required this.onRetry,
     required this.onContinue,
     required this.onPremiumGateTap,
+    this.onPickDate,
+    this.onGoBack,
     super.key,
   });
 
@@ -23,6 +25,8 @@ class FlightSearchWeatherStep extends StatelessWidget {
   final VoidCallback onRetry;
   final VoidCallback onContinue;
   final VoidCallback onPremiumGateTap;
+  final VoidCallback? onPickDate;
+  final VoidCallback? onGoBack;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +48,8 @@ class FlightSearchWeatherStep extends StatelessWidget {
             isProUser: isProUser,
             onRetry: onRetry,
             onPremiumGateTap: onPremiumGateTap,
+            onPickDate: onPickDate,
+            onGoBack: onGoBack,
           ),
         ),
         Padding(

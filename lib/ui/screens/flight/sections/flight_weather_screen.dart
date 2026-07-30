@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/domain/entity/flight.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/flight_repository.dart';
@@ -35,6 +36,12 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
   /// reopen), but [widget.flight] is a stale snapshot, so this local flag makes
   /// the current screen treat the flight as Pro immediately.
   bool _unlocked = false;
+
+  /// A date picked in-session for a dateless flight. Overrides the stale
+  /// [widget.flight] snapshot until the flight reloads with the persisted one.
+  FlightSchedule? _pickedSchedule;
+
+  FlightSchedule? get _schedule => _pickedSchedule ?? widget.flight.schedule;
 
   bool get _hasProAccess =>
       widget.flight.hasProAccess ||
@@ -96,6 +103,35 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
     );
   }
 
+  /// Dateless approximate flight: pick a day, persist it on the flight, and
+  /// fetch. (Real flights don't get this — [onPickDate] is null for them.)
+  Future<void> _handlePickDate() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: today,
+      firstDate: today,
+      lastDate: DateTime(now.year + 1, now.month, now.day),
+    );
+    if (picked == null || !mounted) return;
+    final schedule = FlightSchedule.dateOnly(
+      DateTime(picked.year, picked.month, picked.day),
+    );
+    if (GetIt.I.isRegistered<FlightRepository>()) {
+      await GetIt.I.get<FlightRepository>().updateFlightSchedule(
+        flightId: widget.flight.id,
+        schedule: schedule,
+      );
+    }
+    if (!mounted) return;
+    setState(() => _pickedSchedule = schedule);
+    await context.read<FlightWeatherCubit>().applySchedule(
+      schedule,
+      hasProAccess: _hasProAccess,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -151,7 +187,7 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
                 Expanded(
                   child: WeatherForecastBody(
                     route: flight.route,
-                    schedule: flight.schedule,
+                    schedule: _schedule,
                     weather: weather,
                     isLoading: state.isLoading,
                     isProUser: isProUser,
@@ -165,6 +201,14 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
                       ),
                     ),
                     onPremiumGateTap: () => unawaited(_openUpgradeGate()),
+                    // Approximate flights can add a date inline; real flights
+                    // must be re-selected with a date, so no picker for them.
+                    onPickDate:
+                        (flight.operationalData?.flightNumber ?? '')
+                            .trim()
+                            .isNotEmpty
+                        ? null
+                        : () => unawaited(_handlePickDate()),
                   ),
                 ),
                 // The teaser itself is non-interactive; the free flow needs a

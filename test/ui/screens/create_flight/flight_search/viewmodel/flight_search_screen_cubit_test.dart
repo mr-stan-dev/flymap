@@ -1011,6 +1011,12 @@ class _FakeFlightRepository implements FlightRepository {
   }) async => true;
 
   @override
+  Future<bool> updateFlightSchedule({
+    required String flightId,
+    required FlightSchedule schedule,
+  }) async => true;
+
+  @override
   Future<List<Flight>> getAllFlights() async => const [];
 
   @override

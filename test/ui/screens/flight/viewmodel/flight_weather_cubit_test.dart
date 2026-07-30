@@ -63,7 +63,7 @@ FlightWeather _weather({DateTime? fetchedAt}) {
   );
 }
 
-Flight _flight() {
+Flight _flight({bool dateless = false}) {
   const departure = Airport(
     name: 'London Heathrow',
     city: 'London',
@@ -93,9 +93,9 @@ Flight _flight() {
     routeInsights: FlightInfo.empty.routeInsights,
     offlineContent: FlightInfo.empty.offlineContent,
     timestamp: FlightTimestamp(createdAt: DateTime(2026, 7, 1)),
-    schedule: FlightSchedule.dateOnly(
-      DateTime.now().add(const Duration(days: 2)),
-    ),
+    schedule: dateless
+        ? null
+        : FlightSchedule.dateOnly(DateTime.now().add(const Duration(days: 2))),
   );
 }
 
@@ -178,5 +178,40 @@ void main() {
 
     expect(useCase.calls, 0);
     expect(cubit.state.weather, isNull);
+  });
+
+  test('dateless flight skips the fetch (no today-estimate)', () async {
+    final useCase = _FakeUseCase(result: _weather());
+    final cubit = FlightWeatherCubit(
+      flight: _flight(dateless: true),
+      useCase: useCase,
+      store: _FakeStore(),
+    );
+    addTearDown(cubit.close);
+
+    await cubit.fetchIfNeeded(hasProAccess: true);
+
+    expect(useCase.calls, 0);
+    expect(cubit.state.weather, isNull);
+  });
+
+  test('applySchedule sets a date and fetches', () async {
+    final useCase = _FakeUseCase(result: _weather());
+    final store = _FakeStore();
+    final cubit = FlightWeatherCubit(
+      flight: _flight(dateless: true),
+      useCase: useCase,
+      store: store,
+    );
+    addTearDown(cubit.close);
+
+    await cubit.applySchedule(
+      FlightSchedule.dateOnly(DateTime.now().add(const Duration(days: 3))),
+      hasProAccess: true,
+    );
+
+    expect(useCase.calls, 1);
+    expect(cubit.state.weather, isNotNull);
+    expect(store.saved, isNotNull);
   });
 }

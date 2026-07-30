@@ -1,6 +1,7 @@
 import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/entity/flight_article.dart';
 import 'package:flymap/domain/entity/flight_info.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_map.dart';
 import 'package:flymap/domain/entity/flight_status.dart';
 import 'package:flymap/domain/entity/flight_timestamp.dart';
@@ -68,6 +69,19 @@ class FlightsDBService {
     final existing = await getFlightById(flightId);
     if (existing == null) return false;
     final updated = existing.copyWith(flightAccessTier: accessTier);
+    await saveOrUpdateFlight(updated);
+    return true;
+  }
+
+  /// Persists a date/schedule on a saved flight — used when a dateless flight
+  /// gets a date from the weather screen's "pick a date" prompt.
+  Future<bool> updateFlightSchedule(
+    String flightId,
+    FlightSchedule schedule,
+  ) async {
+    final existing = await getFlightById(flightId);
+    if (existing == null) return false;
+    final updated = existing.copyWith(schedule: schedule);
     await saveOrUpdateFlight(updated);
     return true;
   }

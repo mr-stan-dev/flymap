@@ -2371,6 +2371,21 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Continue without weather'
 	String get continueWithoutWeather => 'Continue without weather';
 
+	/// en: 'Add your flight date'
+	String get noDateTitle => 'Add your flight date';
+
+	/// en: 'A weather forecast isn't possible without your flight date. Pick a date to see the weather along your route.'
+	String get noDatePickBody => 'A weather forecast isn\'t possible without your flight date. Pick a date to see the weather along your route.';
+
+	/// en: 'Pick a date'
+	String get noDatePickButton => 'Pick a date';
+
+	/// en: 'A weather forecast isn't possible without your flight date. Choose a date when you select this flight to see the weather.'
+	String get noDateRealBody => 'A weather forecast isn\'t possible without your flight date. Choose a date when you select this flight to see the weather.';
+
+	/// en: 'Go back to pick a date'
+	String get noDateBackButton => 'Go back to pick a date';
+
 	/// en: 'It's too early for a reliable forecast'
 	String get forecastTooFarTitle => 'It\'s too early for a reliable forecast';
 
@@ -4233,6 +4248,11 @@ extension on Translations {
 			'createFlight.weather.arrivalLabel' => 'Arrival',
 			'createFlight.weather.tomorrow' => 'tomorrow',
 			'createFlight.weather.continueWithoutWeather' => 'Continue without weather',
+			'createFlight.weather.noDateTitle' => 'Add your flight date',
+			'createFlight.weather.noDatePickBody' => 'A weather forecast isn\'t possible without your flight date. Pick a date to see the weather along your route.',
+			'createFlight.weather.noDatePickButton' => 'Pick a date',
+			'createFlight.weather.noDateRealBody' => 'A weather forecast isn\'t possible without your flight date. Choose a date when you select this flight to see the weather.',
+			'createFlight.weather.noDateBackButton' => 'Go back to pick a date',
 			'createFlight.weather.forecastTooFarTitle' => 'It\'s too early for a reliable forecast',
 			'createFlight.weather.forecastTooFarBody' => ({required Object days}) => 'Weather forecasts are only dependable up to ${days} days ahead. We\'ll notify you before your flight once a reliable forecast is available.',
 			'createFlight.weather.notificationPermissionHint' => 'Notifications are off. Enable them so the forecast alert can reach you.',
@@ -4393,13 +4413,13 @@ extension on Translations {
 			'createFlight.overview.timeline.minuteCompactUnit' => 'm',
 			'createFlight.overview.timeline.regionType.country' => 'Country',
 			'createFlight.overview.timeline.regionType.region' => 'Region',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.state' => 'State',
 			'createFlight.overview.timeline.regionType.province' => 'Province',
 			'createFlight.overview.timeline.regionType.sea' => 'Sea',
 			'createFlight.overview.timeline.regionType.ocean' => 'Ocean',
 			'createFlight.overview.timeline.regionType.strait' => 'Strait',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.channel' => 'Channel',
 			'createFlight.overview.timeline.regionType.gulf' => 'Gulf',
 			'createFlight.overview.timeline.regionType.bay' => 'Bay',
@@ -4907,13 +4927,13 @@ extension on Translations {
 			'countries.JM' => 'Jamaica',
 			'countries.JO' => 'Jordan',
 			'countries.JP' => 'Japan',
+			_ => null,
+		} ?? switch (path) {
 			'countries.KE' => 'Kenya',
 			'countries.KG' => 'Kyrgyzstan',
 			'countries.KH' => 'Cambodia',
 			'countries.KM' => 'Comoros',
 			'countries.KP' => 'Korea, Dem. People\'s Rep. of',
-			_ => null,
-		} ?? switch (path) {
 			'countries.KR' => 'Korea, Republic of',
 			'countries.KW' => 'Kuwait',
 			'countries.KZ' => 'Kazakhstan',

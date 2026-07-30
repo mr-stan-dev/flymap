@@ -35,6 +35,8 @@ class WeatherForecastBody extends StatelessWidget {
     required this.isProUser,
     required this.onRetry,
     required this.onPremiumGateTap,
+    this.onPickDate,
+    this.onGoBack,
     this.failedCopy,
     super.key,
   });
@@ -46,6 +48,16 @@ class WeatherForecastBody extends StatelessWidget {
   final bool isProUser;
   final VoidCallback onRetry;
   final VoidCallback onPremiumGateTap;
+
+  /// Handles picking a flight date when there is none. When non-null the
+  /// no-date state shows a "pick a date" button (approximate flights, which
+  /// can take any calendar day inline); when null it just explains that a
+  /// date is needed (real flights, which must be re-selected with a date).
+  final VoidCallback? onPickDate;
+
+  /// Shortcut from the no-date state back to flight selection (where a real
+  /// flight's date is chosen). Shown only when [onPickDate] is null.
+  final VoidCallback? onGoBack;
 
   /// Overrides the generic failed-load copy — the flight screen uses it to
   /// explain that no forecast was downloaded before takeoff.
@@ -76,6 +88,12 @@ class WeatherForecastBody extends StatelessWidget {
       // Free flights never fetch the forecast: a labeled demo behind
       // glass + upgrade pitch (the host renders the upgrade actions).
       return _WeatherTeaser(route: route, onPremiumGateTap: onPremiumGateTap);
+    }
+    if (schedule == null && weather == null) {
+      // No date means no meaningful forecast — the fallback would just be
+      // today's weather. Ask for the flight date instead of pretending.
+      // (The fetch is gated on a date, so a dateless flight has no forecast.)
+      return _NoDatePrompt(onPickDate: onPickDate, onGoBack: onGoBack);
     }
     if (isBeyondHorizon(
       isProUser: isProUser,
@@ -284,6 +302,69 @@ class _ForecastNotificationToggleState
 /// through without any fake number being readable. Centered on the glass:
 /// the lock and the pitch; the host renders the upgrade actions. No
 /// weather API call ever happens for free flights.
+/// Shown for a Pro flight with no date. Approximate flights (with a
+/// [onPickDate] handler) get an inline "pick a date" button; real flights get
+/// an explanation to re-select the flight with a date, plus an optional
+/// [onGoBack] shortcut back to flight selection.
+class _NoDatePrompt extends StatelessWidget {
+  const _NoDatePrompt({this.onPickDate, this.onGoBack});
+
+  final VoidCallback? onPickDate;
+  final VoidCallback? onGoBack;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t.createFlight.weather;
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.event_rounded,
+              size: 40,
+              color: theme.colorScheme.primary,
+            ),
+            const SizedBox(height: 14),
+            Text(
+              t.noDateTitle,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              onPickDate != null ? t.noDatePickBody : t.noDateRealBody,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            if (onPickDate != null) ...[
+              const SizedBox(height: 20),
+              PrimaryButton(
+                label: t.noDatePickButton,
+                onPressed: onPickDate!,
+                expand: false,
+              ),
+            ] else if (onGoBack != null) ...[
+              const SizedBox(height: 12),
+              TextButton.icon(
+                onPressed: onGoBack,
+                icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                label: Text(t.noDateBackButton),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _WeatherTeaser extends StatelessWidget {
   const _WeatherTeaser({required this.route, required this.onPremiumGateTap});
 

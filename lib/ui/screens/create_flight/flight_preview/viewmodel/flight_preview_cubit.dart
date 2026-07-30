@@ -130,10 +130,20 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
 
   /// Fetches the weather picture for the weather step. Failure is
   /// non-blocking: the step shows a retry and Continue stays available.
+  /// Sets a date-only schedule for a dateless (approximate) flight from the
+  /// weather step's "pick a date" prompt, then fetches the forecast.
+  Future<void> applyTravelDate(DateTime date) async {
+    _emitState(state.copyWith(flightSchedule: FlightSchedule.dateOnly(date)));
+    await fetchWeather(force: true);
+  }
+
   Future<void> fetchWeather({bool force = false}) async {
     // Free flights never touch the weather API — the step shows the demo
     // teaser instead; the fetch fires the moment Pro access is unlocked.
     if (!hasEffectiveProAccess) return;
+    // No date -> the step shows a "pick a date" prompt; a dateless fetch
+    // would only produce today's weather, which is meaningless for the flight.
+    if (state.flightSchedule == null) return;
     // Beyond the reliable horizon the step explains itself — calling the
     // API for a two-months-out flight would only produce garbage.
     if (FlightWeatherVerdictPolicy.isBeyondForecastHorizon(

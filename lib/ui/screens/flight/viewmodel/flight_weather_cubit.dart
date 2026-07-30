@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/flight_weather_store.dart';
 import 'package:flymap/domain/entity/flight.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
 import 'package:flymap/domain/usecase/fetch_flight_weather_use_case.dart';
@@ -61,17 +62,35 @@ class FlightWeatherCubit extends Cubit<FlightWeatherState> {
   final FlightWeatherStore? _store;
   bool _storeChecked = false;
 
+  /// A date picked in-session for a dateless flight, overriding the flight's
+  /// (missing) schedule until the flight record reloads with the persisted one.
+  FlightSchedule? _scheduleOverride;
+  FlightSchedule? get _schedule => _scheduleOverride ?? flight.schedule;
+
   bool get isBeyondHorizon =>
       FlightWeatherVerdictPolicy.isBeyondForecastHorizon(
-        flight.schedule,
+        _schedule,
         now: DateTime.now(),
       );
+
+  /// Applies a date picked on the weather screen for a dateless flight, then
+  /// force-fetches. The caller persists the schedule on the flight record.
+  Future<void> applySchedule(
+    FlightSchedule schedule, {
+    required bool hasProAccess,
+  }) async {
+    _scheduleOverride = schedule;
+    await fetchIfNeeded(hasProAccess: hasProAccess, force: true);
+  }
 
   Future<void> fetchIfNeeded({
     required bool hasProAccess,
     bool force = false,
   }) async {
     if (!hasProAccess || state.isLoading) return;
+    // No date -> the screen shows a "pick a date" prompt; skip the fetch
+    // rather than produce a meaningless today's-weather estimate.
+    if (_schedule == null) return;
 
     // Stored forecast first: instant content, and the only content there
     // is in airplane mode.
@@ -96,7 +115,7 @@ class FlightWeatherCubit extends Cubit<FlightWeatherState> {
     try {
       final weather = await useCase.call(
         route: flight.route,
-        schedule: flight.schedule,
+        schedule: _schedule,
       );
       if (isClosed) return;
       emit(FlightWeatherState(weather: weather));

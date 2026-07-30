@@ -1,6 +1,7 @@
 import 'package:flymap/data/local/flights_db_service.dart';
 import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/entity/flight_info.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_status.dart';
 
 class FlightRepository {
@@ -48,6 +49,14 @@ class FlightRepository {
     required String accessTier,
   }) async {
     return await _flightsService.updateFlightAccessTier(flightId, accessTier);
+  }
+
+  /// Persists a date/schedule on a saved flight that was created without one.
+  Future<bool> updateFlightSchedule({
+    required String flightId,
+    required FlightSchedule schedule,
+  }) async {
+    return await _flightsService.updateFlightSchedule(flightId, schedule);
   }
 
   /// Get all flights

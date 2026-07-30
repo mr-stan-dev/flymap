@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_info.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_status.dart';
@@ -76,6 +77,12 @@ class _FakeFlightRepository implements FlightRepository {
   Future<bool> updateFlightAccessTier({
     required String flightId,
     required String accessTier,
+  }) async => true;
+
+  @override
+  Future<bool> updateFlightSchedule({
+    required String flightId,
+    required FlightSchedule schedule,
   }) async => true;
 
   _FakeFlightRepository({required this.flights});

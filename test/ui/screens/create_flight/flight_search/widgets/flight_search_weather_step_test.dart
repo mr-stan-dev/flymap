@@ -38,7 +38,12 @@ void main() {
     );
   }
 
-  Widget app(FlightPreviewState state, {bool isProUser = false}) {
+  Widget app(
+    FlightPreviewState state, {
+    bool isProUser = false,
+    VoidCallback? onPickDate,
+    VoidCallback? onGoBack,
+  }) {
     return TranslationProvider(
       child: MaterialApp(
         locale: AppLocale.en.flutterLocale,
@@ -51,6 +56,8 @@ void main() {
             onRetry: () {},
             onContinue: () {},
             onPremiumGateTap: () {},
+            onPickDate: onPickDate,
+            onGoBack: onGoBack,
           ),
         ),
       ),
@@ -224,10 +231,42 @@ void main() {
   testWidgets('failed load shows retry and keeps Continue for Pro', (
     tester,
   ) async {
-    await tester.pumpWidget(app(stateWith(), isProUser: true));
+    // A failed load implies a date was set (the fetch is gated on one);
+    // without a date the step shows the "pick a date" prompt instead.
+    final schedule = FlightSchedule.dateOnly(
+      DateTime.now().add(const Duration(days: 2)),
+    );
+    await tester.pumpWidget(
+      app(stateWith(schedule: schedule), isProUser: true),
+    );
 
     expect(find.text('Retry'), findsOneWidget);
     expect(find.text('Continue'), findsOneWidget);
+  });
+
+  testWidgets('dateless approximate flight prompts for a date', (tester) async {
+    await tester.pumpWidget(
+      app(stateWith(), isProUser: true, onPickDate: () {}),
+    );
+
+    expect(find.text('Pick a date'), findsOneWidget);
+    expect(find.text('Retry'), findsNothing);
+  });
+
+  testWidgets('dateless real flight explains and offers a go-back shortcut', (
+    tester,
+  ) async {
+    var wentBack = false;
+    await tester.pumpWidget(
+      app(stateWith(), isProUser: true, onGoBack: () => wentBack = true),
+    );
+
+    // No inline picker for real flights, just the explanation + shortcut.
+    expect(find.text('Pick a date'), findsNothing);
+    expect(find.text('Go back to pick a date'), findsOneWidget);
+
+    await tester.tap(find.text('Go back to pick a date'));
+    expect(wentBack, isTrue);
   });
 
   testWidgets(

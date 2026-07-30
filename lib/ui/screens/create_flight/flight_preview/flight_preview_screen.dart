@@ -293,6 +293,8 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
           ),
         );
       case CreateFlightStep.weather:
+        final isRealFlight =
+            (state.flightOperationalData?.flightNumber ?? '').trim().isNotEmpty;
         return FlightSearchWeatherStep(
           state: state,
           isProUser: isProUser,
@@ -306,6 +308,14 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
               subscriptionCubit: subscriptionCubit,
             ),
           ),
+          // Approximate flights can take any calendar day inline; real flights
+          // must be re-selected with a date (verified schedule), so no inline
+          // picker there — the prompt explains it and offers a shortcut back
+          // to flight selection (popping the preview returns to search).
+          onPickDate: isRealFlight
+              ? null
+              : () => unawaited(_handlePickWeatherDate(context, cubit)),
+          onGoBack: isRealFlight ? () => Navigator.of(context).pop() : null,
         );
       case CreateFlightStep.wikipediaArticles:
         return FlightSearchWikipediaArticlesStep(
@@ -395,6 +405,24 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
       routePreview: _routePreviewText(state),
       presentProPaywall: subscriptionCubit.presentPaywallFromRouteOverviewGate,
     );
+  }
+
+  /// Weather step, dateless approximate flight: pick a calendar day and let
+  /// the cubit set a date-only schedule and fetch.
+  Future<void> _handlePickWeatherDate(
+    BuildContext context,
+    FlightPreviewCubit cubit,
+  ) async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: today,
+      firstDate: today,
+      lastDate: DateTime(now.year + 1, now.month, now.day),
+    );
+    if (picked == null) return;
+    await cubit.applyTravelDate(DateTime(picked.year, picked.month, picked.day));
   }
 
   Future<void> _handleStartDownload({

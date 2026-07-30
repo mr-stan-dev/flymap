@@ -974,6 +974,11 @@ class _TranslationsCreateFlightWeatherFr extends TranslationsCreateFlightWeather
 	@override String get arrivalLabel => 'Arrivée';
 	@override String get tomorrow => 'demain';
 	@override String get continueWithoutWeather => 'Continuer sans la météo';
+	@override String get noDateTitle => 'Ajoutez la date de votre vol';
+	@override String get noDatePickBody => 'Impossible d\'afficher des prévisions sans la date de votre vol. Choisissez une date pour voir la météo le long de votre itinéraire.';
+	@override String get noDatePickButton => 'Choisir une date';
+	@override String get noDateRealBody => 'Impossible d\'afficher des prévisions sans la date de votre vol. Choisissez une date en sélectionnant ce vol pour voir la météo.';
+	@override String get noDateBackButton => 'Revenir pour choisir une date';
 	@override String get forecastTooFarTitle => 'Il est encore trop tôt pour des prévisions fiables';
 	@override String forecastTooFarBody({required Object days}) => 'Les prévisions météo ne sont fiables que jusqu\'à ${days} jours à l\'avance. Nous vous préviendrons avant votre vol dès qu\'une prévision fiable sera disponible.';
 	@override String get notificationPermissionHint => 'Les notifications sont désactivées. Activez-les pour recevoir l\'alerte de prévisions.';
@@ -1985,6 +1990,11 @@ extension on TranslationsFr {
 			'createFlight.weather.arrivalLabel' => 'Arrivée',
 			'createFlight.weather.tomorrow' => 'demain',
 			'createFlight.weather.continueWithoutWeather' => 'Continuer sans la météo',
+			'createFlight.weather.noDateTitle' => 'Ajoutez la date de votre vol',
+			'createFlight.weather.noDatePickBody' => 'Impossible d\'afficher des prévisions sans la date de votre vol. Choisissez une date pour voir la météo le long de votre itinéraire.',
+			'createFlight.weather.noDatePickButton' => 'Choisir une date',
+			'createFlight.weather.noDateRealBody' => 'Impossible d\'afficher des prévisions sans la date de votre vol. Choisissez une date en sélectionnant ce vol pour voir la météo.',
+			'createFlight.weather.noDateBackButton' => 'Revenir pour choisir une date',
 			'createFlight.weather.forecastTooFarTitle' => 'Il est encore trop tôt pour des prévisions fiables',
 			'createFlight.weather.forecastTooFarBody' => ({required Object days}) => 'Les prévisions météo ne sont fiables que jusqu\'à ${days} jours à l\'avance. Nous vous préviendrons avant votre vol dès qu\'une prévision fiable sera disponible.',
 			'createFlight.weather.notificationPermissionHint' => 'Les notifications sont désactivées. Activez-les pour recevoir l\'alerte de prévisions.',
@@ -2145,13 +2155,13 @@ extension on TranslationsFr {
 			'createFlight.overview.timeline.minuteCompactUnit' => 'm',
 			'createFlight.overview.timeline.regionType.country' => 'Pays',
 			'createFlight.overview.timeline.regionType.region' => 'Région',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.state' => 'État',
 			'createFlight.overview.timeline.regionType.province' => 'Province',
 			'createFlight.overview.timeline.regionType.sea' => 'Mer',
 			'createFlight.overview.timeline.regionType.ocean' => 'Océan',
 			'createFlight.overview.timeline.regionType.strait' => 'Détroit',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.channel' => 'Canal',
 			'createFlight.overview.timeline.regionType.gulf' => 'Golfe',
 			'createFlight.overview.timeline.regionType.bay' => 'Baie',
@@ -2659,13 +2669,13 @@ extension on TranslationsFr {
 			'countries.JM' => 'Jamaïque',
 			'countries.JO' => 'Jordanie',
 			'countries.JP' => 'Japon',
+			_ => null,
+		} ?? switch (path) {
 			'countries.KE' => 'Kenya',
 			'countries.KG' => 'Kirghizistan',
 			'countries.KH' => 'Cambodge',
 			'countries.KM' => 'Comores',
 			'countries.KP' => 'Corée du Nord',
-			_ => null,
-		} ?? switch (path) {
 			'countries.KR' => 'Corée du Sud',
 			'countries.KW' => 'Koweït',
 			'countries.KZ' => 'Kazakhstan',
