@@ -614,6 +614,10 @@ class _TranslationsNotificationsDe extends TranslationsNotificationsEn {
 	@override String forecastReadyBody({required Object route}) => 'Sonne oder Regen beim Start? Klare Sicht unterwegs? Deine erste Vorhersage für ${route} ist da.';
 	@override String get forecastUpdatedTitle => 'Aktualisierte Vorhersage für deinen Flug morgen';
 	@override String forecastUpdatedBody({required Object route}) => 'Die Wettervorhersage für ${route} ist verfügbar — tippe, um sie vor dem Flug herunterzuladen.';
+	@override String get reminderEarlyTitle => 'Dein Flug steht bevor';
+	@override String reminderEarlyBody({required Object route}) => '${route} ist nur noch wenige Tage entfernt — öffne die App und entdecke, worüber du fliegst.';
+	@override String get reminderTomorrowTitle => 'Dein Flug ist morgen';
+	@override String reminderTomorrowBody({required Object route}) => '${route} morgen — vergiss nicht, vor dem Flug deine Routenkarte anzusehen.';
 }
 
 // Path: onboarding
@@ -932,10 +936,10 @@ class _TranslationsSettingsNotificationsDe extends TranslationsSettingsNotificat
 
 	// Translations
 	@override String get title => 'Benachrichtigungen';
-	@override String get permissionOff => 'Benachrichtigungen sind aus. Aktiviere sie, um Vorhersage-Hinweise für deine Flüge zu erhalten.';
-	@override String get readyTitle => 'Vorhersage verfügbar';
+	@override String get permissionOff => 'Benachrichtigungen sind aus. Aktiviere sie, um Erinnerungen und Vorhersagen für deine Flüge zu erhalten.';
+	@override String get readyTitle => 'Frühe Erinnerung';
 	@override String get readySubtitle => '6 Tage vor dem Flug';
-	@override String get updatedTitle => 'Aktualisierte Vorhersage';
+	@override String get updatedTitle => 'Erinnerung am Vortag';
 	@override String get updatedSubtitle => 'Am Abend vor dem Flug';
 }
 
@@ -1857,10 +1861,10 @@ extension on TranslationsDe {
 			'settings.light' => 'Hell',
 			'settings.units' => 'Einheiten',
 			'settings.notifications.title' => 'Benachrichtigungen',
-			'settings.notifications.permissionOff' => 'Benachrichtigungen sind aus. Aktiviere sie, um Vorhersage-Hinweise für deine Flüge zu erhalten.',
-			'settings.notifications.readyTitle' => 'Vorhersage verfügbar',
+			'settings.notifications.permissionOff' => 'Benachrichtigungen sind aus. Aktiviere sie, um Erinnerungen und Vorhersagen für deine Flüge zu erhalten.',
+			'settings.notifications.readyTitle' => 'Frühe Erinnerung',
 			'settings.notifications.readySubtitle' => '6 Tage vor dem Flug',
-			'settings.notifications.updatedTitle' => 'Aktualisierte Vorhersage',
+			'settings.notifications.updatedTitle' => 'Erinnerung am Vortag',
 			'settings.notifications.updatedSubtitle' => 'Am Abend vor dem Flug',
 			'settings.storage' => 'Speicher',
 			'settings.storageTitle' => 'Speicher',
@@ -2524,6 +2528,10 @@ extension on TranslationsDe {
 			'notifications.forecastReadyBody' => ({required Object route}) => 'Sonne oder Regen beim Start? Klare Sicht unterwegs? Deine erste Vorhersage für ${route} ist da.',
 			'notifications.forecastUpdatedTitle' => 'Aktualisierte Vorhersage für deinen Flug morgen',
 			'notifications.forecastUpdatedBody' => ({required Object route}) => 'Die Wettervorhersage für ${route} ist verfügbar — tippe, um sie vor dem Flug herunterzuladen.',
+			'notifications.reminderEarlyTitle' => 'Dein Flug steht bevor',
+			'notifications.reminderEarlyBody' => ({required Object route}) => '${route} ist nur noch wenige Tage entfernt — öffne die App und entdecke, worüber du fliegst.',
+			'notifications.reminderTomorrowTitle' => 'Dein Flug ist morgen',
+			'notifications.reminderTomorrowBody' => ({required Object route}) => '${route} morgen — vergiss nicht, vor dem Flug deine Routenkarte anzusehen.',
 			'onboarding.skip' => 'Überspringen',
 			'onboarding.letsStart' => 'Los geht’s',
 			'onboarding.welcomeTitle' => 'Entdecke, was unter dir liegt',
@@ -2656,12 +2664,12 @@ extension on TranslationsDe {
 			'countries.KH' => 'Kambodscha',
 			'countries.KM' => 'Komoren',
 			'countries.KP' => 'Nordkorea',
+			_ => null,
+		} ?? switch (path) {
 			'countries.KR' => 'Südkorea',
 			'countries.KW' => 'Kuwait',
 			'countries.KZ' => 'Kasachstan',
 			'countries.LA' => 'Laos',
-			_ => null,
-		} ?? switch (path) {
 			'countries.LB' => 'Libanon',
 			'countries.LK' => 'Sri Lanka',
 			'countries.LR' => 'Liberia',

@@ -238,10 +238,10 @@
     "units": "Einheiten",
     "notifications": {
       "title": "Benachrichtigungen",
-      "permissionOff": "Benachrichtigungen sind aus. Aktiviere sie, um Vorhersage-Hinweise für deine Flüge zu erhalten.",
-      "readyTitle": "Vorhersage verfügbar",
+      "permissionOff": "Benachrichtigungen sind aus. Aktiviere sie, um Erinnerungen und Vorhersagen für deine Flüge zu erhalten.",
+      "readyTitle": "Frühe Erinnerung",
       "readySubtitle": "6 Tage vor dem Flug",
-      "updatedTitle": "Aktualisierte Vorhersage",
+      "updatedTitle": "Erinnerung am Vortag",
       "updatedSubtitle": "Am Abend vor dem Flug"
     },
     "storage": "Speicher",
@@ -971,7 +971,11 @@
     "forecastReadyTitle": "Deine Flugvorhersage ist da",
     "forecastReadyBody": "Sonne oder Regen beim Start? Klare Sicht unterwegs? Deine erste Vorhersage für $route ist da.",
     "forecastUpdatedTitle": "Aktualisierte Vorhersage für deinen Flug morgen",
-    "forecastUpdatedBody": "Die Wettervorhersage für $route ist verfügbar — tippe, um sie vor dem Flug herunterzuladen."
+    "forecastUpdatedBody": "Die Wettervorhersage für $route ist verfügbar — tippe, um sie vor dem Flug herunterzuladen.",
+    "reminderEarlyTitle": "Dein Flug steht bevor",
+    "reminderEarlyBody": "$route ist nur noch wenige Tage entfernt — öffne die App und entdecke, worüber du fliegst.",
+    "reminderTomorrowTitle": "Dein Flug ist morgen",
+    "reminderTomorrowBody": "$route morgen — vergiss nicht, vor dem Flug deine Routenkarte anzusehen."
   },
   "onboarding": {
     "skip": "Überspringen",

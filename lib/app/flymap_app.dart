@@ -42,10 +42,11 @@ class _FlymapAppState extends State<FlymapApp> {
     // Guarded so widget tests without DI stay unaffected.
     if (GetIt.I.isRegistered<FlightNotificationScheduler>()) {
       final scheduler = GetIt.I.get<FlightNotificationScheduler>();
-      // Forecast alerts land straight on the flight's weather section.
+      // Pro forecast alerts land straight on the flight's weather section;
+      // free reminders just open the flight (the map is the point).
       scheduler.onOpenFlight = (flight) => router.push(
         AppRouter.flightRoute,
-        extra: {'flight': flight, 'openWeather': true},
+        extra: {'flight': flight, 'openWeather': flight.hasProAccess},
       );
       WidgetsBinding.instance.addPostFrameCallback((_) {
         unawaited(() async {

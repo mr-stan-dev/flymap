@@ -238,10 +238,10 @@
     "units": "Units",
     "notifications": {
       "title": "Notifications",
-      "permissionOff": "Notifications are off. Enable them to get forecast alerts for your flights.",
-      "readyTitle": "Forecast ready",
+      "permissionOff": "Notifications are off. Enable them to get reminders and forecast alerts for your flights.",
+      "readyTitle": "Early reminder",
       "readySubtitle": "6 days before the flight",
-      "updatedTitle": "Updated forecast",
+      "updatedTitle": "Day-before reminder",
       "updatedSubtitle": "The evening before the flight"
     },
     "storage": "Storage",
@@ -971,7 +971,11 @@
     "forecastReadyTitle": "Your flight forecast is ready",
     "forecastReadyBody": "Sun or rain at takeoff? Clear views on the way? Your first $route forecast is in.",
     "forecastUpdatedTitle": "Updated forecast for tomorrow's flight",
-    "forecastUpdatedBody": "The weather forecast for $route is available — tap to download it before you fly."
+    "forecastUpdatedBody": "The weather forecast for $route is available — tap to download it before you fly.",
+    "reminderEarlyTitle": "Your flight is coming up",
+    "reminderEarlyBody": "$route is just a few days away — open the app to explore what you'll fly over.",
+    "reminderTomorrowTitle": "Your flight is tomorrow",
+    "reminderTomorrowBody": "$route tomorrow — don't forget to check your route map before you fly."
   },
   "onboarding": {
     "skip": "Skip",

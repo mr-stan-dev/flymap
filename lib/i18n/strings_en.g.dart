@@ -1419,6 +1419,18 @@ class TranslationsNotificationsEn {
 
 	/// en: 'The weather forecast for $route is available — tap to download it before you fly.'
 	String forecastUpdatedBody({required Object route}) => 'The weather forecast for ${route} is available — tap to download it before you fly.';
+
+	/// en: 'Your flight is coming up'
+	String get reminderEarlyTitle => 'Your flight is coming up';
+
+	/// en: '$route is just a few days away — open the app to explore what you'll fly over.'
+	String reminderEarlyBody({required Object route}) => '${route} is just a few days away — open the app to explore what you\'ll fly over.';
+
+	/// en: 'Your flight is tomorrow'
+	String get reminderTomorrowTitle => 'Your flight is tomorrow';
+
+	/// en: '$route tomorrow — don't forget to check your route map before you fly.'
+	String reminderTomorrowBody({required Object route}) => '${route} tomorrow — don\'t forget to check your route map before you fly.';
 }
 
 // Path: onboarding
@@ -2281,17 +2293,17 @@ class TranslationsSettingsNotificationsEn {
 	/// en: 'Notifications'
 	String get title => 'Notifications';
 
-	/// en: 'Notifications are off. Enable them to get forecast alerts for your flights.'
-	String get permissionOff => 'Notifications are off. Enable them to get forecast alerts for your flights.';
+	/// en: 'Notifications are off. Enable them to get reminders and forecast alerts for your flights.'
+	String get permissionOff => 'Notifications are off. Enable them to get reminders and forecast alerts for your flights.';
 
-	/// en: 'Forecast ready'
-	String get readyTitle => 'Forecast ready';
+	/// en: 'Early reminder'
+	String get readyTitle => 'Early reminder';
 
 	/// en: '6 days before the flight'
 	String get readySubtitle => '6 days before the flight';
 
-	/// en: 'Updated forecast'
-	String get updatedTitle => 'Updated forecast';
+	/// en: 'Day-before reminder'
+	String get updatedTitle => 'Day-before reminder';
 
 	/// en: 'The evening before the flight'
 	String get updatedSubtitle => 'The evening before the flight';
@@ -4097,10 +4109,10 @@ extension on Translations {
 			'settings.light' => 'Light',
 			'settings.units' => 'Units',
 			'settings.notifications.title' => 'Notifications',
-			'settings.notifications.permissionOff' => 'Notifications are off. Enable them to get forecast alerts for your flights.',
-			'settings.notifications.readyTitle' => 'Forecast ready',
+			'settings.notifications.permissionOff' => 'Notifications are off. Enable them to get reminders and forecast alerts for your flights.',
+			'settings.notifications.readyTitle' => 'Early reminder',
 			'settings.notifications.readySubtitle' => '6 days before the flight',
-			'settings.notifications.updatedTitle' => 'Updated forecast',
+			'settings.notifications.updatedTitle' => 'Day-before reminder',
 			'settings.notifications.updatedSubtitle' => 'The evening before the flight',
 			'settings.storage' => 'Storage',
 			'settings.storageTitle' => 'Storage',
@@ -4764,6 +4776,10 @@ extension on Translations {
 			'notifications.forecastReadyBody' => ({required Object route}) => 'Sun or rain at takeoff? Clear views on the way? Your first ${route} forecast is in.',
 			'notifications.forecastUpdatedTitle' => 'Updated forecast for tomorrow\'s flight',
 			'notifications.forecastUpdatedBody' => ({required Object route}) => 'The weather forecast for ${route} is available — tap to download it before you fly.',
+			'notifications.reminderEarlyTitle' => 'Your flight is coming up',
+			'notifications.reminderEarlyBody' => ({required Object route}) => '${route} is just a few days away — open the app to explore what you\'ll fly over.',
+			'notifications.reminderTomorrowTitle' => 'Your flight is tomorrow',
+			'notifications.reminderTomorrowBody' => ({required Object route}) => '${route} tomorrow — don\'t forget to check your route map before you fly.',
 			'onboarding.skip' => 'Skip',
 			'onboarding.letsStart' => 'Let\'s start',
 			'onboarding.welcomeTitle' => 'Discover what’s below',
@@ -4896,12 +4912,12 @@ extension on Translations {
 			'countries.KH' => 'Cambodia',
 			'countries.KM' => 'Comoros',
 			'countries.KP' => 'Korea, Dem. People\'s Rep. of',
+			_ => null,
+		} ?? switch (path) {
 			'countries.KR' => 'Korea, Republic of',
 			'countries.KW' => 'Kuwait',
 			'countries.KZ' => 'Kazakhstan',
 			'countries.LA' => 'Lao People\'s Dem. Rep.',
-			_ => null,
-		} ?? switch (path) {
 			'countries.LB' => 'Lebanon',
 			'countries.LK' => 'Sri Lanka',
 			'countries.LR' => 'Liberia',

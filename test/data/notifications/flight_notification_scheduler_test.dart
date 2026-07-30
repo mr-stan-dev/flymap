@@ -202,9 +202,11 @@ void main() {
     expect(updated.whenUtc, DateTime.utc(2026, 8, 14, 17));
     expect(ready.payload, flight.id);
     expect(ready.body, contains('LHR → FCO'));
+    // Pro flights carry the weather-forecast copy.
+    expect(ready.title.toLowerCase(), contains('forecast'));
   });
 
-  test('free-tier flights are never scheduled', () async {
+  test('free-tier flights get plain reminders, not forecast copy', () async {
     final flight = _flight(
       schedule: FlightSchedule.dateOnly(DateTime(2026, 8, 15)),
       accessTier: Flight.accessTierBasic,
@@ -212,7 +214,21 @@ void main() {
 
     await scheduler().syncForFlight(flight);
 
-    expect(gateway.scheduled, isEmpty);
+    // Same two slots and times as Pro, but the copy is a plain flight nudge
+    // with no weather wording.
+    expect(gateway.scheduled, hasLength(2));
+    final ready = gateway.scheduled.firstWhere(
+      (n) =>
+          n.id ==
+          FlightNotificationScheduler.notificationId(
+            flight.id,
+            ForecastNotificationType.forecastReady,
+          ),
+    );
+    expect(ready.whenUtc, DateTime.utc(2026, 8, 9, 9));
+    expect(ready.payload, flight.id);
+    expect(ready.body, contains('LHR → FCO'));
+    expect(ready.title.toLowerCase(), isNot(contains('forecast')));
   });
 
   test('missing permission schedules nothing', () async {

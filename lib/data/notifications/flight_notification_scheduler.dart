@@ -49,8 +49,9 @@ class LocalScheduledNotificationsGateway
   static const _details = NotificationDetails(
     android: AndroidNotificationDetails(
       _channelId,
-      'Flight forecasts',
-      channelDescription: 'Weather forecast alerts for your saved flights',
+      'Flight reminders',
+      channelDescription:
+          'Reminders and weather forecasts for your saved flights',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
     ),
@@ -178,9 +179,10 @@ class FlightNotificationScheduler {
 
     final schedule = flight.schedule;
     if (schedule == null) return;
-    // The forecast promise is a weather-feature promise: only flights
-    // created with Pro access get (and were promised) the alerts.
-    if (flight.flightAccessTier != Flight.accessTierPro) return;
+    // Every saved flight gets the two alerts at the same times. Pro flights
+    // carry the weather-forecast copy (the feature they were promised); free
+    // flights get a plain "your flight is coming up — check your map" nudge.
+    // Both obey the same permission and per-alert settings toggles.
     if (!await _permissionService.isGranted()) return;
 
     final readyEnabled = await _prefs.isReadyEnabled();
@@ -241,22 +243,31 @@ class FlightNotificationScheduler {
 
   String _title(ForecastNotificationType type, Flight flight) {
     final strings = t.notifications;
-    return switch (type) {
-      ForecastNotificationType.forecastReady => strings.forecastReadyTitle,
-      ForecastNotificationType.forecastUpdated => strings.forecastUpdatedTitle,
+    // Pro flights promise a forecast; free flights get a plain flight nudge.
+    return switch ((type, flight.hasProAccess)) {
+      (ForecastNotificationType.forecastReady, true) =>
+        strings.forecastReadyTitle,
+      (ForecastNotificationType.forecastUpdated, true) =>
+        strings.forecastUpdatedTitle,
+      (ForecastNotificationType.forecastReady, false) =>
+        strings.reminderEarlyTitle,
+      (ForecastNotificationType.forecastUpdated, false) =>
+        strings.reminderTomorrowTitle,
     };
   }
 
   String _body(ForecastNotificationType type, Flight flight) {
     final strings = t.notifications;
     final route = _routeLabel(flight);
-    return switch (type) {
-      ForecastNotificationType.forecastReady => strings.forecastReadyBody(
-        route: route,
-      ),
-      ForecastNotificationType.forecastUpdated => strings.forecastUpdatedBody(
-        route: route,
-      ),
+    return switch ((type, flight.hasProAccess)) {
+      (ForecastNotificationType.forecastReady, true) =>
+        strings.forecastReadyBody(route: route),
+      (ForecastNotificationType.forecastUpdated, true) =>
+        strings.forecastUpdatedBody(route: route),
+      (ForecastNotificationType.forecastReady, false) =>
+        strings.reminderEarlyBody(route: route),
+      (ForecastNotificationType.forecastUpdated, false) =>
+        strings.reminderTomorrowBody(route: route),
     };
   }
 
