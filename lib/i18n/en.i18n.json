@@ -236,6 +236,14 @@
     "dark": "Dark",
     "light": "Light",
     "units": "Units",
+    "notifications": {
+      "title": "Notifications",
+      "permissionOff": "Notifications are off. Enable them to get forecast alerts for your flights.",
+      "readyTitle": "Forecast ready",
+      "readySubtitle": "6 days before the flight",
+      "updatedTitle": "Updated forecast",
+      "updatedSubtitle": "The evening before the flight"
+    },
     "storage": "Storage",
     "storageTitle": "Storage",
     "storageSubtitle": "Downloaded maps and disk usage",
@@ -944,6 +952,12 @@
     "valueOfflineText": "On your device. Nothing tracked.",
     "closingTitle": "See the world differently",
     "closingText": "Thank you for exploring it with us."
+  },
+  "notifications": {
+    "forecastReadyTitle": "Your flight forecast is ready",
+    "forecastReadyBody": "Will you see the ground on $route? The cloud forecast for your flight is in.",
+    "forecastUpdatedTitle": "Updated forecast for tomorrow's flight",
+    "forecastUpdatedBody": "Flying tomorrow — check the freshest cloud forecast for $route."
   },
   "onboarding": {
     "skip": "Skip",

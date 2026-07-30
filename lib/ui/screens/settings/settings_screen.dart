@@ -11,6 +11,7 @@ import 'package:flymap/router/app_router.dart';
 
 import 'widgets/app_version_footer.dart';
 import 'widgets/leave_feedback_setting_item.dart';
+import 'widgets/notifications_settings_group.dart';
 import 'widgets/rate_us_setting_item.dart';
 import 'widgets/setting_item.dart';
 import 'widgets/settings_group_card.dart';
@@ -94,6 +95,8 @@ class SettingsContent extends StatelessWidget {
                   title: context.t.settings.units,
                   children: [UnitsSettingItem(state: state)],
                 ),
+                const SizedBox(height: 12),
+                const NotificationsSettingsGroup(),
                 const SizedBox(height: 12),
                 SettingsGroupCard(
                   title: context.t.settings.storage,

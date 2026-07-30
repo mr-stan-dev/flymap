@@ -58,6 +58,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final TranslationsShareImageEn shareImage = TranslationsShareImageEn.internal(_root);
 	late final TranslationsFlightVideoEn flightVideo = TranslationsFlightVideoEn.internal(_root);
 	late final TranslationsAboutEn about = TranslationsAboutEn.internal(_root);
+	late final TranslationsNotificationsEn notifications = TranslationsNotificationsEn.internal(_root);
 	late final TranslationsOnboardingEn onboarding = TranslationsOnboardingEn.internal(_root);
 	late final TranslationsCountriesEn countries = TranslationsCountriesEn.internal(_root);
 }
@@ -625,6 +626,8 @@ class TranslationsSettingsEn {
 
 	/// en: 'Units'
 	String get units => 'Units';
+
+	late final TranslationsSettingsNotificationsEn notifications = TranslationsSettingsNotificationsEn.internal(_root);
 
 	/// en: 'Storage'
 	String get storage => 'Storage';
@@ -1399,6 +1402,27 @@ class TranslationsAboutEn {
 
 	/// en: 'Thank you for exploring it with us.'
 	String get closingText => 'Thank you for exploring it with us.';
+}
+
+// Path: notifications
+class TranslationsNotificationsEn {
+	TranslationsNotificationsEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Your flight forecast is ready'
+	String get forecastReadyTitle => 'Your flight forecast is ready';
+
+	/// en: 'Will you see the ground on $route? The cloud forecast for your flight is in.'
+	String forecastReadyBody({required Object route}) => 'Will you see the ground on ${route}? The cloud forecast for your flight is in.';
+
+	/// en: 'Updated forecast for tomorrow's flight'
+	String get forecastUpdatedTitle => 'Updated forecast for tomorrow\'s flight';
+
+	/// en: 'Flying tomorrow — check the freshest cloud forecast for $route.'
+	String forecastUpdatedBody({required Object route}) => 'Flying tomorrow — check the freshest cloud forecast for ${route}.';
 }
 
 // Path: onboarding
@@ -2248,6 +2272,33 @@ class TranslationsLearnGeoQuizEn {
 
 	/// en: 'Description is not available yet.'
 	String get descriptionUnavailable => 'Description is not available yet.';
+}
+
+// Path: settings.notifications
+class TranslationsSettingsNotificationsEn {
+	TranslationsSettingsNotificationsEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Notifications'
+	String get title => 'Notifications';
+
+	/// en: 'Notifications are off. Enable them to get forecast alerts for your flights.'
+	String get permissionOff => 'Notifications are off. Enable them to get forecast alerts for your flights.';
+
+	/// en: 'Forecast ready'
+	String get readyTitle => 'Forecast ready';
+
+	/// en: '6 days before the flight'
+	String get readySubtitle => '6 days before the flight';
+
+	/// en: 'Updated forecast'
+	String get updatedTitle => 'Updated forecast';
+
+	/// en: 'The evening before the flight'
+	String get updatedSubtitle => 'The evening before the flight';
 }
 
 // Path: createFlight.steps
@@ -3998,6 +4049,12 @@ extension on Translations {
 			'settings.dark' => 'Dark',
 			'settings.light' => 'Light',
 			'settings.units' => 'Units',
+			'settings.notifications.title' => 'Notifications',
+			'settings.notifications.permissionOff' => 'Notifications are off. Enable them to get forecast alerts for your flights.',
+			'settings.notifications.readyTitle' => 'Forecast ready',
+			'settings.notifications.readySubtitle' => '6 days before the flight',
+			'settings.notifications.updatedTitle' => 'Updated forecast',
+			'settings.notifications.updatedSubtitle' => 'The evening before the flight',
 			'settings.storage' => 'Storage',
 			'settings.storageTitle' => 'Storage',
 			'settings.storageSubtitle' => 'Downloaded maps and disk usage',
@@ -4282,14 +4339,14 @@ extension on Translations {
 			'createFlight.overview.timeline.regionType.strait' => 'Strait',
 			'createFlight.overview.timeline.regionType.channel' => 'Channel',
 			'createFlight.overview.timeline.regionType.gulf' => 'Gulf',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.bay' => 'Bay',
 			'createFlight.overview.timeline.regionType.lake' => 'Lake',
 			'createFlight.overview.timeline.regionType.alkalineLake' => 'Alkaline lake',
 			'createFlight.overview.timeline.regionType.island' => 'Island',
 			'createFlight.overview.timeline.regionType.archipelago' => 'Archipelago',
 			'createFlight.overview.timeline.regionType.peninsula' => 'Peninsula',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.coast' => 'Coast',
 			'createFlight.overview.timeline.regionType.mountainRange' => 'Mountain range',
 			'createFlight.overview.timeline.regionType.valley' => 'Valley',
@@ -4644,6 +4701,10 @@ extension on Translations {
 			'about.valueOfflineText' => 'On your device. Nothing tracked.',
 			'about.closingTitle' => 'See the world differently',
 			'about.closingText' => 'Thank you for exploring it with us.',
+			'notifications.forecastReadyTitle' => 'Your flight forecast is ready',
+			'notifications.forecastReadyBody' => ({required Object route}) => 'Will you see the ground on ${route}? The cloud forecast for your flight is in.',
+			'notifications.forecastUpdatedTitle' => 'Updated forecast for tomorrow\'s flight',
+			'notifications.forecastUpdatedBody' => ({required Object route}) => 'Flying tomorrow — check the freshest cloud forecast for ${route}.',
 			'onboarding.skip' => 'Skip',
 			'onboarding.letsStart' => 'Let\'s start',
 			'onboarding.welcomeTitle' => 'Discover what’s below',
@@ -4792,6 +4853,8 @@ extension on Translations {
 			'countries.MD' => 'Moldova, Republic of',
 			'countries.ME' => 'Montenegro',
 			'countries.MG' => 'Madagascar',
+			_ => null,
+		} ?? switch (path) {
 			'countries.MK' => 'Macedonia, The former Yugoslav Rep. of',
 			'countries.ML' => 'Mali',
 			'countries.MM' => 'Myanmar',
@@ -4802,8 +4865,6 @@ extension on Translations {
 			'countries.MU' => 'Mauritius',
 			'countries.MV' => 'Maldives',
 			'countries.MW' => 'Malawi',
-			_ => null,
-		} ?? switch (path) {
 			'countries.MT' => 'Malta',
 			'countries.MX' => 'Mexico',
 			'countries.MY' => 'Malaysia',

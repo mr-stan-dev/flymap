@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/data/local/route_map_image_store.dart';
+import 'package:flymap/data/notifications/flight_notification_scheduler.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/domain/usecase/build_flight_route_preview_use_case.dart';
 import 'package:flymap/i18n/strings.g.dart';
@@ -472,6 +473,14 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
       ),
     );
     final flightId = state.savedFlightId;
+    // A freshly saved flight gets its forecast alerts placed right away.
+    if (flightId != null &&
+        flightId.isNotEmpty &&
+        GetIt.I.isRegistered<FlightNotificationScheduler>()) {
+      unawaited(
+        GetIt.I.get<FlightNotificationScheduler>().syncForFlightId(flightId),
+      );
+    }
     if (flightId == null || flightId.isEmpty) {
       _showSnackBar(context, context.t.preview.errorSomethingWrong);
       AppRouter.goHome(context);

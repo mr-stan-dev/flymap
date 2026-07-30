@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/data/local/airports_database.dart';
+import 'package:flymap/data/notifications/flight_notification_scheduler.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/flight_unlock_repository.dart';
 import 'package:flymap/repository/metric_units_repository.dart';
@@ -30,6 +33,25 @@ class _FlymapAppState extends State<FlymapApp> {
   late final router = AppRouter.createRouter(
     showOnboarding: widget.showOnboarding,
   );
+
+  @override
+  void initState() {
+    super.initState();
+    // Forecast notifications: hook taps to navigation, then let the
+    // scheduler heal the system schedule (reboots, time/settings changes).
+    // Guarded so widget tests without DI stay unaffected.
+    if (GetIt.I.isRegistered<FlightNotificationScheduler>()) {
+      final scheduler = GetIt.I.get<FlightNotificationScheduler>();
+      scheduler.onOpenFlight = (flight) =>
+          router.push(AppRouter.flightRoute, extra: {'flight': flight});
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        unawaited(() async {
+          await scheduler.initialize();
+          await scheduler.resyncAll();
+        }());
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -236,6 +236,14 @@
     "dark": "Sombre",
     "light": "Clair",
     "units": "Unités",
+    "notifications": {
+      "title": "Notifications",
+      "permissionOff": "Les notifications sont désactivées. Activez-les pour recevoir les alertes de prévisions de vos vols.",
+      "readyTitle": "Prévisions disponibles",
+      "readySubtitle": "6 jours avant le vol",
+      "updatedTitle": "Prévisions mises à jour",
+      "updatedSubtitle": "La veille du vol, en soirée"
+    },
     "storage": "Stockage",
     "storageTitle": "Stockage",
     "storageSubtitle": "Cartes téléchargées et espace disque",
@@ -944,6 +952,12 @@
     "valueOfflineText": "Sur votre appareil. Aucun suivi.",
     "closingTitle": "Voyez le monde autrement",
     "closingText": "Merci de l’explorer avec nous."
+  },
+  "notifications": {
+    "forecastReadyTitle": "Vos prévisions de vol sont prêtes",
+    "forecastReadyBody": "Verrez-vous le sol sur $route ? Les prévisions de nuages de votre vol sont disponibles.",
+    "forecastUpdatedTitle": "Prévisions mises à jour pour votre vol de demain",
+    "forecastUpdatedBody": "Vous volez demain — consultez les prévisions de nuages les plus récentes pour $route."
   },
   "onboarding": {
     "skip": "Passer",

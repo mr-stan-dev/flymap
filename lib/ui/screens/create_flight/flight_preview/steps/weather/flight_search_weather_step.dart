@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
+import 'package:flymap/data/notifications/flight_notification_scheduler.dart';
 import 'package:flymap/data/notifications/notification_permission_service.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
@@ -235,6 +236,10 @@ class _ForecastNotificationToggleState
     if (service == null || _requesting) return;
     setState(() => _requesting = true);
     final granted = await service.request();
+    if (granted && GetIt.I.isRegistered<FlightNotificationScheduler>()) {
+      // Alerts for already-saved flights can now actually be placed.
+      unawaited(GetIt.I.get<FlightNotificationScheduler>().resyncAll());
+    }
     if (mounted) {
       setState(() {
         _granted = granted;

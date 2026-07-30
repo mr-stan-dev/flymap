@@ -42,7 +42,9 @@ import 'package:flymap/data/local/migrations/flights_db_migration_v1_to_v2.dart'
 import 'package:flymap/data/local/mappers/flight_db_mapper.dart';
 import 'package:flymap/data/mappers/route_overview_api_mapper.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
+import 'package:flymap/data/notifications/flight_notification_scheduler.dart';
 import 'package:flymap/data/notifications/notification_permission_service.dart';
+import 'package:flymap/repository/forecast_notification_prefs.dart';
 import 'package:flymap/data/wiki/wikipedia_article_client.dart';
 import 'package:flymap/data/wiki/wikimedia_api_client.dart';
 import 'package:flymap/data/wiki/wikidata_wikipedia_preview_repository.dart';
@@ -269,6 +271,19 @@ class DiModule {
     );
     i.registerLazySingleton<NotificationPermissionService>(
       () => NotificationPermissionService(),
+    );
+    i.registerLazySingleton<ForecastNotificationPrefs>(
+      () => ForecastNotificationPrefs(),
+    );
+    i.registerLazySingleton<FlightNotificationScheduler>(
+      () => FlightNotificationScheduler(
+        gateway: LocalScheduledNotificationsGateway(),
+        timezoneService: i.get<AirportTimezoneService>(),
+        permissionService: i.get<NotificationPermissionService>(),
+        prefs: i.get<ForecastNotificationPrefs>(),
+        flightRepository: i.get<FlightRepository>(),
+        analytics: i.get<AppAnalytics>(),
+      ),
     );
     i.registerLazySingleton<AppLocationClient>(
       () => GeolocatorAppLocationClient(),

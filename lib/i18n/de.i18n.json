@@ -236,6 +236,14 @@
     "dark": "Dunkel",
     "light": "Hell",
     "units": "Einheiten",
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "permissionOff": "Benachrichtigungen sind aus. Aktiviere sie, um Vorhersage-Hinweise für deine Flüge zu erhalten.",
+      "readyTitle": "Vorhersage verfügbar",
+      "readySubtitle": "6 Tage vor dem Flug",
+      "updatedTitle": "Aktualisierte Vorhersage",
+      "updatedSubtitle": "Am Abend vor dem Flug"
+    },
     "storage": "Speicher",
     "storageTitle": "Speicher",
     "storageSubtitle": "Heruntergeladene Karten und Speicherverbrauch",
@@ -944,6 +952,12 @@
     "valueOfflineText": "Auf deinem Gerät. Nichts wird getrackt.",
     "closingTitle": "Sieh die Welt mit neuen Augen",
     "closingText": "Danke, dass du sie mit uns erkundest."
+  },
+  "notifications": {
+    "forecastReadyTitle": "Deine Flugvorhersage ist da",
+    "forecastReadyBody": "Wirst du auf $route den Boden sehen? Die Wolkenvorhersage für deinen Flug ist verfügbar.",
+    "forecastUpdatedTitle": "Aktualisierte Vorhersage für deinen Flug morgen",
+    "forecastUpdatedBody": "Morgen geht's los — sieh dir die frischeste Wolkenvorhersage für $route an."
   },
   "onboarding": {
     "skip": "Überspringen",

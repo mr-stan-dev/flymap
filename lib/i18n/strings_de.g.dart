@@ -54,6 +54,7 @@ class TranslationsDe extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _TranslationsShareImageDe shareImage = _TranslationsShareImageDe._(_root);
 	@override late final _TranslationsFlightVideoDe flightVideo = _TranslationsFlightVideoDe._(_root);
 	@override late final _TranslationsAboutDe about = _TranslationsAboutDe._(_root);
+	@override late final _TranslationsNotificationsDe notifications = _TranslationsNotificationsDe._(_root);
 	@override late final _TranslationsOnboardingDe onboarding = _TranslationsOnboardingDe._(_root);
 	@override late final _TranslationsCountriesDe countries = _TranslationsCountriesDe._(_root);
 }
@@ -281,6 +282,7 @@ class _TranslationsSettingsDe extends TranslationsSettingsEn {
 	@override String get dark => 'Dunkel';
 	@override String get light => 'Hell';
 	@override String get units => 'Einheiten';
+	@override late final _TranslationsSettingsNotificationsDe notifications = _TranslationsSettingsNotificationsDe._(_root);
 	@override String get storage => 'Speicher';
 	@override String get storageTitle => 'Speicher';
 	@override String get storageSubtitle => 'Heruntergeladene Karten und Speicherverbrauch';
@@ -602,6 +604,19 @@ class _TranslationsAboutDe extends TranslationsAboutEn {
 	@override String get closingText => 'Danke, dass du sie mit uns erkundest.';
 }
 
+// Path: notifications
+class _TranslationsNotificationsDe extends TranslationsNotificationsEn {
+	_TranslationsNotificationsDe._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get forecastReadyTitle => 'Deine Flugvorhersage ist da';
+	@override String forecastReadyBody({required Object route}) => 'Wirst du auf ${route} den Boden sehen? Die Wolkenvorhersage für deinen Flug ist verfügbar.';
+	@override String get forecastUpdatedTitle => 'Aktualisierte Vorhersage für deinen Flug morgen';
+	@override String forecastUpdatedBody({required Object route}) => 'Morgen geht\'s los — sieh dir die frischeste Wolkenvorhersage für ${route} an.';
+}
+
 // Path: onboarding
 class _TranslationsOnboardingDe extends TranslationsOnboardingEn {
 	_TranslationsOnboardingDe._(TranslationsDe root) : this._root = root, super.internal(root);
@@ -908,6 +923,21 @@ class _TranslationsLearnGeoQuizDe extends TranslationsLearnGeoQuizEn {
 	@override String get quizGeographyOtherTitle => 'Weitere';
 	@override String get quizGeographyOtherSubtitle => 'Buchten, Meerengen, Golfe, Wüsten und mehr';
 	@override String get descriptionUnavailable => 'Beschreibung ist noch nicht verfügbar.';
+}
+
+// Path: settings.notifications
+class _TranslationsSettingsNotificationsDe extends TranslationsSettingsNotificationsEn {
+	_TranslationsSettingsNotificationsDe._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Benachrichtigungen';
+	@override String get permissionOff => 'Benachrichtigungen sind aus. Aktiviere sie, um Vorhersage-Hinweise für deine Flüge zu erhalten.';
+	@override String get readyTitle => 'Vorhersage verfügbar';
+	@override String get readySubtitle => '6 Tage vor dem Flug';
+	@override String get updatedTitle => 'Aktualisierte Vorhersage';
+	@override String get updatedSubtitle => 'Am Abend vor dem Flug';
 }
 
 // Path: createFlight.steps
@@ -1804,6 +1834,12 @@ extension on TranslationsDe {
 			'settings.dark' => 'Dunkel',
 			'settings.light' => 'Hell',
 			'settings.units' => 'Einheiten',
+			'settings.notifications.title' => 'Benachrichtigungen',
+			'settings.notifications.permissionOff' => 'Benachrichtigungen sind aus. Aktiviere sie, um Vorhersage-Hinweise für deine Flüge zu erhalten.',
+			'settings.notifications.readyTitle' => 'Vorhersage verfügbar',
+			'settings.notifications.readySubtitle' => '6 Tage vor dem Flug',
+			'settings.notifications.updatedTitle' => 'Aktualisierte Vorhersage',
+			'settings.notifications.updatedSubtitle' => 'Am Abend vor dem Flug',
 			'settings.storage' => 'Speicher',
 			'settings.storageTitle' => 'Speicher',
 			'settings.storageSubtitle' => 'Heruntergeladene Karten und Speicherverbrauch',
@@ -2088,14 +2124,14 @@ extension on TranslationsDe {
 			'createFlight.overview.timeline.regionType.strait' => 'Meerenge',
 			'createFlight.overview.timeline.regionType.channel' => 'Kanal',
 			'createFlight.overview.timeline.regionType.gulf' => 'Golf',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.bay' => 'Bucht',
 			'createFlight.overview.timeline.regionType.lake' => 'See',
 			'createFlight.overview.timeline.regionType.alkalineLake' => 'Salzsee',
 			'createFlight.overview.timeline.regionType.island' => 'Insel',
 			'createFlight.overview.timeline.regionType.archipelago' => 'Archipel',
 			'createFlight.overview.timeline.regionType.peninsula' => 'Halbinsel',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.timeline.regionType.coast' => 'Küste',
 			'createFlight.overview.timeline.regionType.mountainRange' => 'Gebirge',
 			'createFlight.overview.timeline.regionType.valley' => 'Tal',
@@ -2450,6 +2486,10 @@ extension on TranslationsDe {
 			'about.valueOfflineText' => 'Auf deinem Gerät. Nichts wird getrackt.',
 			'about.closingTitle' => 'Sieh die Welt mit neuen Augen',
 			'about.closingText' => 'Danke, dass du sie mit uns erkundest.',
+			'notifications.forecastReadyTitle' => 'Deine Flugvorhersage ist da',
+			'notifications.forecastReadyBody' => ({required Object route}) => 'Wirst du auf ${route} den Boden sehen? Die Wolkenvorhersage für deinen Flug ist verfügbar.',
+			'notifications.forecastUpdatedTitle' => 'Aktualisierte Vorhersage für deinen Flug morgen',
+			'notifications.forecastUpdatedBody' => ({required Object route}) => 'Morgen geht\'s los — sieh dir die frischeste Wolkenvorhersage für ${route} an.',
 			'onboarding.skip' => 'Überspringen',
 			'onboarding.letsStart' => 'Los geht’s',
 			'onboarding.welcomeTitle' => 'Entdecke, was unter dir liegt',
@@ -2598,6 +2638,8 @@ extension on TranslationsDe {
 			'countries.MD' => 'Moldau',
 			'countries.ME' => 'Montenegro',
 			'countries.MG' => 'Madagaskar',
+			_ => null,
+		} ?? switch (path) {
 			'countries.MK' => 'Nordmazedonien',
 			'countries.ML' => 'Mali',
 			'countries.MM' => 'Myanmar',
@@ -2608,8 +2650,6 @@ extension on TranslationsDe {
 			'countries.MU' => 'Mauritius',
 			'countries.MV' => 'Malediven',
 			'countries.MW' => 'Malawi',
-			_ => null,
-		} ?? switch (path) {
 			'countries.MT' => 'Malta',
 			'countries.MX' => 'Mexiko',
 			'countries.MY' => 'Malaysia',
