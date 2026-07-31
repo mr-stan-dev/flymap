@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flymap/data/api/mapbox_static_image_api.dart';
 import 'package:flymap/data/flight_video/video_encoder.dart';
 import 'package:flymap/data/local/route_map_image_store.dart';
@@ -29,6 +30,8 @@ class WeatherShareService {
 
   static const int _cloudFrameCount = 24;
   static const int _cloudFieldResolution = 180;
+  static const String _brandLogoAssetPath =
+      'assets/images/logo_new_with_text_white.png';
   static const int _videoFps = 24;
   static const double _videoSeconds = 8;
   static const int _videoBitrate = 8 * 1000 * 1000;
@@ -129,12 +132,22 @@ class WeatherShareService {
       _logger.error('share map fetch failed: $e');
     }
 
+    ui.Image? logoImage;
+    try {
+      final logoData = await rootBundle.load(_brandLogoAssetPath);
+      logoImage = await decodeImageFromList(logoData.buffer.asUint8List());
+    } catch (e) {
+      // Text watermark fallback still brands the card.
+      _logger.error('share logo load failed: $e');
+    }
+
     return WeatherShareRenderer(
       data: data,
       projectedRoute: projectedRoute,
       cloudFrames: cloudFrames,
       routeKm: route.displayDistanceKm.toDouble(),
       mapImage: mapImage,
+      logoImage: logoImage,
     );
   }
 
@@ -143,6 +156,7 @@ class WeatherShareService {
       frame.dispose();
     }
     renderer.mapImage?.dispose();
+    renderer.logoImage?.dispose();
   }
 
   /// Renders the static story card; returns the PNG file path.

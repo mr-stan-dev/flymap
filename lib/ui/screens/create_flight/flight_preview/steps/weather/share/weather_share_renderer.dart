@@ -68,6 +68,7 @@ class WeatherShareRenderer {
     required this.cloudFrames,
     required this.routeKm,
     this.mapImage,
+    this.logoImage,
   });
 
   static const double width = 1080;
@@ -84,6 +85,9 @@ class WeatherShareRenderer {
   /// Satellite map for the hero region (retina, ~1080px); gradient
   /// fallback when null.
   final ui.Image? mapImage;
+
+  /// White brand logo drawn as the corner watermark; text fallback when null.
+  final ui.Image? logoImage;
 
   /// Renders one frame. [pixelRatio] scales the OUTPUT resolution without
   /// touching the layout (video frames render at a fraction of the card's
@@ -295,22 +299,52 @@ class WeatherShareRenderer {
     );
   }
 
+  /// Brand watermark, bottom-right — the white logo asset (matching the
+  /// flight-video and sky-camera share cards), with a text fallback.
   void _drawWatermark(Canvas canvas) {
+    const padding = 32.0;
+    final logo = logoImage;
+    if (logo != null && logo.width > 0 && logo.height > 0) {
+      // Height-constrained so it tucks into the strip below the verdict
+      // banner (which spans the card's full bottom width) instead of
+      // clipping it.
+      const targetHeight = 58.0;
+      final targetWidth = targetHeight * logo.width / logo.height;
+      canvas.drawImageRect(
+        logo,
+        Rect.fromLTWH(0, 0, logo.width.toDouble(), logo.height.toDouble()),
+        Rect.fromLTWH(
+          width - targetWidth - padding,
+          height - targetHeight - padding,
+          targetWidth,
+          targetHeight,
+        ),
+        Paint()
+          ..filterQuality = FilterQuality.high
+          ..color = const Color(0xF2FFFFFF),
+      );
+      return;
+    }
+
     final painter = TextPainter(
       text: TextSpan(
         text: data.watermark,
         style: const TextStyle(
-          color: Colors.white54,
+          color: Color(0xBFFFFFFF),
           fontSize: 34,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 2,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1,
+          shadows: [Shadow(color: Color(0x99000000), blurRadius: 4)],
         ),
       ),
       textDirection: TextDirection.ltr,
     )..layout();
     painter.paint(
       canvas,
-      Offset((width - painter.width) / 2, height - 68 - painter.height),
+      Offset(
+        width - painter.width - padding,
+        height - painter.height - padding,
+      ),
     );
   }
 
