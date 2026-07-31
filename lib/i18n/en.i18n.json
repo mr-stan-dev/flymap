@@ -242,7 +242,9 @@
       "readyTitle": "Early reminder",
       "readySubtitle": "6 days before the flight",
       "updatedTitle": "Day-before reminder",
-      "updatedSubtitle": "The evening before the flight"
+      "updatedSubtitle": "The evening before the flight",
+      "summaryOn": "On",
+      "summaryOff": "Off"
     },
     "storage": "Storage",
     "storageTitle": "Storage",
@@ -980,7 +982,7 @@
     "reminderEarlyTitle": "Your flight is coming up",
     "reminderEarlyBody": "$route is just a few days away — open the app to explore what you'll fly over.",
     "reminderTomorrowTitle": "Your flight is tomorrow",
-    "reminderTomorrowBody": "$route tomorrow — don't forget to check your route map before you fly."
+    "reminderTomorrowBody": "$route tomorrow — don't forget to open the app in the air and explore everything you fly over."
   },
   "onboarding": {
     "skip": "Skip",

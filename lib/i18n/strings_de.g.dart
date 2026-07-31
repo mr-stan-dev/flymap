@@ -617,7 +617,7 @@ class _TranslationsNotificationsDe extends TranslationsNotificationsEn {
 	@override String get reminderEarlyTitle => 'Dein Flug steht bevor';
 	@override String reminderEarlyBody({required Object route}) => '${route} ist nur noch wenige Tage entfernt — öffne die App und entdecke, worüber du fliegst.';
 	@override String get reminderTomorrowTitle => 'Dein Flug ist morgen';
-	@override String reminderTomorrowBody({required Object route}) => '${route} morgen — vergiss nicht, vor dem Flug deine Routenkarte anzusehen.';
+	@override String reminderTomorrowBody({required Object route}) => '${route} morgen — vergiss nicht, die App im Flug zu öffnen und alles zu entdecken, was du überfliegst.';
 }
 
 // Path: onboarding
@@ -941,6 +941,8 @@ class _TranslationsSettingsNotificationsDe extends TranslationsSettingsNotificat
 	@override String get readySubtitle => '6 Tage vor dem Flug';
 	@override String get updatedTitle => 'Erinnerung am Vortag';
 	@override String get updatedSubtitle => 'Am Abend vor dem Flug';
+	@override String get summaryOn => 'Ein';
+	@override String get summaryOff => 'Aus';
 }
 
 // Path: createFlight.steps
@@ -1871,6 +1873,8 @@ extension on TranslationsDe {
 			'settings.notifications.readySubtitle' => '6 Tage vor dem Flug',
 			'settings.notifications.updatedTitle' => 'Erinnerung am Vortag',
 			'settings.notifications.updatedSubtitle' => 'Am Abend vor dem Flug',
+			'settings.notifications.summaryOn' => 'Ein',
+			'settings.notifications.summaryOff' => 'Aus',
 			'settings.storage' => 'Speicher',
 			'settings.storageTitle' => 'Speicher',
 			'settings.storageSubtitle' => 'Heruntergeladene Karten und Speicherverbrauch',
@@ -2153,10 +2157,10 @@ extension on TranslationsDe {
 			'createFlight.overview.timeline.minuteUnit' => 'Min',
 			'createFlight.overview.timeline.hourCompactUnit' => 'Std',
 			'createFlight.overview.timeline.minuteCompactUnit' => 'Min',
-			'createFlight.overview.timeline.regionType.country' => 'Land',
-			'createFlight.overview.timeline.regionType.region' => 'Region',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.timeline.regionType.country' => 'Land',
+			'createFlight.overview.timeline.regionType.region' => 'Region',
 			'createFlight.overview.timeline.regionType.state' => 'Bundesland',
 			'createFlight.overview.timeline.regionType.province' => 'Provinz',
 			'createFlight.overview.timeline.regionType.sea' => 'Meer',
@@ -2541,7 +2545,7 @@ extension on TranslationsDe {
 			'notifications.reminderEarlyTitle' => 'Dein Flug steht bevor',
 			'notifications.reminderEarlyBody' => ({required Object route}) => '${route} ist nur noch wenige Tage entfernt — öffne die App und entdecke, worüber du fliegst.',
 			'notifications.reminderTomorrowTitle' => 'Dein Flug ist morgen',
-			'notifications.reminderTomorrowBody' => ({required Object route}) => '${route} morgen — vergiss nicht, vor dem Flug deine Routenkarte anzusehen.',
+			'notifications.reminderTomorrowBody' => ({required Object route}) => '${route} morgen — vergiss nicht, die App im Flug zu öffnen und alles zu entdecken, was du überfliegst.',
 			'onboarding.skip' => 'Überspringen',
 			'onboarding.letsStart' => 'Los geht’s',
 			'onboarding.welcomeTitle' => 'Entdecke, was unter dir liegt',
@@ -2667,10 +2671,10 @@ extension on TranslationsDe {
 			'countries.IS' => 'Island',
 			'countries.IT' => 'Italien',
 			'countries.JM' => 'Jamaika',
-			'countries.JO' => 'Jordanien',
-			'countries.JP' => 'Japan',
 			_ => null,
 		} ?? switch (path) {
+			'countries.JO' => 'Jordanien',
+			'countries.JP' => 'Japan',
 			'countries.KE' => 'Kenia',
 			'countries.KG' => 'Kirgisistan',
 			'countries.KH' => 'Kambodscha',

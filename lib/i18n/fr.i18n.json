@@ -242,7 +242,9 @@
       "readyTitle": "Rappel anticipé",
       "readySubtitle": "6 jours avant le vol",
       "updatedTitle": "Rappel de la veille",
-      "updatedSubtitle": "La veille du vol, en soirée"
+      "updatedSubtitle": "La veille du vol, en soirée",
+      "summaryOn": "Activées",
+      "summaryOff": "Désactivées"
     },
     "storage": "Stockage",
     "storageTitle": "Stockage",
@@ -980,7 +982,7 @@
     "reminderEarlyTitle": "Votre vol approche",
     "reminderEarlyBody": "$route est dans quelques jours — ouvrez l'app pour découvrir ce que vous survolerez.",
     "reminderTomorrowTitle": "Votre vol est demain",
-    "reminderTomorrowBody": "$route demain — n'oubliez pas de consulter la carte de votre itinéraire avant de voler."
+    "reminderTomorrowBody": "$route demain — n'oubliez pas d'ouvrir l'app en vol et d'explorer tout ce que vous survolez."
   },
   "onboarding": {
     "skip": "Passer",

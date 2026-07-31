@@ -242,7 +242,9 @@
       "readyTitle": "Frühe Erinnerung",
       "readySubtitle": "6 Tage vor dem Flug",
       "updatedTitle": "Erinnerung am Vortag",
-      "updatedSubtitle": "Am Abend vor dem Flug"
+      "updatedSubtitle": "Am Abend vor dem Flug",
+      "summaryOn": "Ein",
+      "summaryOff": "Aus"
     },
     "storage": "Speicher",
     "storageTitle": "Speicher",
@@ -980,7 +982,7 @@
     "reminderEarlyTitle": "Dein Flug steht bevor",
     "reminderEarlyBody": "$route ist nur noch wenige Tage entfernt — öffne die App und entdecke, worüber du fliegst.",
     "reminderTomorrowTitle": "Dein Flug ist morgen",
-    "reminderTomorrowBody": "$route morgen — vergiss nicht, vor dem Flug deine Routenkarte anzusehen."
+    "reminderTomorrowBody": "$route morgen — vergiss nicht, die App im Flug zu öffnen und alles zu entdecken, was du überfliegst."
   },
   "onboarding": {
     "skip": "Überspringen",

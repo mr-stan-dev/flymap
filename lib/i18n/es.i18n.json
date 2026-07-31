@@ -242,7 +242,9 @@
       "readyTitle": "Recordatorio anticipado",
       "readySubtitle": "6 días antes del vuelo",
       "updatedTitle": "Recordatorio de la víspera",
-      "updatedSubtitle": "La tarde anterior al vuelo"
+      "updatedSubtitle": "La tarde anterior al vuelo",
+      "summaryOn": "Activadas",
+      "summaryOff": "Desactivadas"
     },
     "storage": "Almacenamiento",
     "storageTitle": "Almacenamiento",
@@ -980,7 +982,7 @@
     "reminderEarlyTitle": "Tu vuelo se acerca",
     "reminderEarlyBody": "$route está a solo unos días — abre la app para descubrir qué sobrevolarás.",
     "reminderTomorrowTitle": "Tu vuelo es mañana",
-    "reminderTomorrowBody": "$route mañana — no olvides revisar el mapa de tu ruta antes de volar."
+    "reminderTomorrowBody": "$route mañana — no olvides abrir la app en el aire y explorar todo lo que sobrevuelas."
   },
   "onboarding": {
     "skip": "Omitir",
