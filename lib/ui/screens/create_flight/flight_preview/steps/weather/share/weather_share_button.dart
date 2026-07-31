@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -126,6 +129,17 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
       if (!mounted) return;
       Navigator.of(context, rootNavigator: true).pop();
       await Share.shareXFiles([XFile(path)], sharePositionOrigin: origin);
+      // Firebase-only volume metric; fire-and-forget so it can't affect the
+      // share result.
+      if (GetIt.I.isRegistered<AppAnalytics>()) {
+        unawaited(
+          GetIt.I.get<AppAnalytics>().log(
+            WeatherShareEvent(
+              asVideo ? WeatherShareFormat.video : WeatherShareFormat.image,
+            ),
+          ),
+        );
+      }
     } catch (e) {
       _logger.error('weather share failed: $e');
       if (mounted) {

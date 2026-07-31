@@ -22,6 +22,19 @@ void main() {
       });
     });
 
+    test('weather share events are Firebase-only with image/video names', () {
+      const image = WeatherShareEvent(WeatherShareFormat.image);
+      const video = WeatherShareEvent(WeatherShareFormat.video);
+
+      expect(image.firebaseEventName, 'share_weather_image');
+      expect(video.firebaseEventName, 'share_weather_video');
+      expect(image.firebaseParameters, isEmpty);
+      // Firebase-only: not a PostHog event, so the PostHog sink drops it.
+      expect(image, isA<FirebaseAnalyticsEvent>());
+      expect(image, isNot(isA<PostHogAnalyticsEvent>()));
+      expect(video, isNot(isA<PostHogAnalyticsEvent>()));
+    });
+
     test('flight_opened has stable coarse route properties', () {
       const event = FlightOpenedEvent(
         routeSource: FlightRouteSource.fr24Historical,
