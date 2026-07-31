@@ -2359,6 +2359,9 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Checking the skies along your route…'
 	String get loading => 'Checking the skies along your route…';
 
+	/// en: 'Loading clouds…'
+	String get cloudsLoading => 'Loading clouds…';
+
 	/// en: 'Couldn't load the forecast right now. You can retry or continue without it.'
 	String get loadFailed => 'Couldn\'t load the forecast right now. You can retry or continue without it.';
 
@@ -4250,6 +4253,7 @@ extension on Translations {
 			'createFlight.steps.weatherTitle' => 'Flight weather',
 			'createFlight.weather.title' => 'Will you see the ground?',
 			'createFlight.weather.loading' => 'Checking the skies along your route…',
+			'createFlight.weather.cloudsLoading' => 'Loading clouds…',
 			'createFlight.weather.loadFailed' => 'Couldn\'t load the forecast right now. You can retry or continue without it.',
 			'createFlight.weather.notDownloadedBody' => 'No forecast was downloaded for this flight. It needs an internet connection before you fly.',
 			'createFlight.weather.departureLabel' => 'Departure',
@@ -4418,9 +4422,9 @@ extension on Translations {
 			'createFlight.overview.timeline.alsoAroundThisTime' => 'Also around same time:',
 			'createFlight.overview.timeline.minuteUnit' => 'min',
 			'createFlight.overview.timeline.hourCompactUnit' => 'h',
-			'createFlight.overview.timeline.minuteCompactUnit' => 'm',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.timeline.minuteCompactUnit' => 'm',
 			'createFlight.overview.timeline.regionType.country' => 'Country',
 			'createFlight.overview.timeline.regionType.region' => 'Region',
 			'createFlight.overview.timeline.regionType.state' => 'State',
@@ -4932,9 +4936,9 @@ extension on Translations {
 			'countries.IR' => 'Iran, Islamic Rep. of',
 			'countries.IS' => 'Iceland',
 			'countries.IT' => 'Italy',
-			'countries.JM' => 'Jamaica',
 			_ => null,
 		} ?? switch (path) {
+			'countries.JM' => 'Jamaica',
 			'countries.JO' => 'Jordan',
 			'countries.JP' => 'Japan',
 			'countries.KE' => 'Kenya',

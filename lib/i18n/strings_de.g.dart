@@ -970,6 +970,7 @@ class _TranslationsCreateFlightWeatherDe extends TranslationsCreateFlightWeather
 	// Translations
 	@override String get title => 'Wirst du den Boden sehen?';
 	@override String get loading => 'Wir prüfen den Himmel entlang deiner Route…';
+	@override String get cloudsLoading => 'Wolken werden geladen…';
 	@override String get loadFailed => 'Die Vorhersage konnte gerade nicht geladen werden. Versuche es erneut oder fahre ohne sie fort.';
 	@override String get notDownloadedBody => 'Für diesen Flug wurde keine Vorhersage heruntergeladen. Dafür ist vor dem Flug eine Internetverbindung nötig.';
 	@override String get departureLabel => 'Abflug';
@@ -1988,6 +1989,7 @@ extension on TranslationsDe {
 			'createFlight.steps.weatherTitle' => 'Flugwetter',
 			'createFlight.weather.title' => 'Wirst du den Boden sehen?',
 			'createFlight.weather.loading' => 'Wir prüfen den Himmel entlang deiner Route…',
+			'createFlight.weather.cloudsLoading' => 'Wolken werden geladen…',
 			'createFlight.weather.loadFailed' => 'Die Vorhersage konnte gerade nicht geladen werden. Versuche es erneut oder fahre ohne sie fort.',
 			'createFlight.weather.notDownloadedBody' => 'Für diesen Flug wurde keine Vorhersage heruntergeladen. Dafür ist vor dem Flug eine Internetverbindung nötig.',
 			'createFlight.weather.departureLabel' => 'Abflug',
@@ -2156,9 +2158,9 @@ extension on TranslationsDe {
 			'createFlight.overview.timeline.alsoAroundThisTime' => 'Auch ungefähr zur gleichen Zeit:',
 			'createFlight.overview.timeline.minuteUnit' => 'Min',
 			'createFlight.overview.timeline.hourCompactUnit' => 'Std',
-			'createFlight.overview.timeline.minuteCompactUnit' => 'Min',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.timeline.minuteCompactUnit' => 'Min',
 			'createFlight.overview.timeline.regionType.country' => 'Land',
 			'createFlight.overview.timeline.regionType.region' => 'Region',
 			'createFlight.overview.timeline.regionType.state' => 'Bundesland',
@@ -2670,9 +2672,9 @@ extension on TranslationsDe {
 			'countries.IR' => 'Iran',
 			'countries.IS' => 'Island',
 			'countries.IT' => 'Italien',
-			'countries.JM' => 'Jamaika',
 			_ => null,
 		} ?? switch (path) {
+			'countries.JM' => 'Jamaika',
 			'countries.JO' => 'Jordanien',
 			'countries.JP' => 'Japan',
 			'countries.KE' => 'Kenia',

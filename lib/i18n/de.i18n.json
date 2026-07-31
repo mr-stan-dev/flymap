@@ -366,6 +366,7 @@
     "weather": {
       "title": "Wirst du den Boden sehen?",
       "loading": "Wir prüfen den Himmel entlang deiner Route…",
+      "cloudsLoading": "Wolken werden geladen…",
       "loadFailed": "Die Vorhersage konnte gerade nicht geladen werden. Versuche es erneut oder fahre ohne sie fort.",
       "notDownloadedBody": "Für diesen Flug wurde keine Vorhersage heruntergeladen. Dafür ist vor dem Flug eine Internetverbindung nötig.",
       "departureLabel": "Abflug",

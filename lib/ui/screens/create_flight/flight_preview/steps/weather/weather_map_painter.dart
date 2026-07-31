@@ -18,6 +18,7 @@ class WeatherMapPainter extends CustomPainter {
     required this.arrivalCode,
     required this.showClouds,
     required this.planeProgress,
+    this.cloudOpacity = 1.0,
   });
 
   /// Offsets in the square viewport space; scaled to canvas size in paint.
@@ -31,6 +32,11 @@ class WeatherMapPainter extends CustomPainter {
   final bool showClouds;
   final double? planeProgress;
 
+  /// 0..1 fade for the cloud layer — frames arrive a beat after the map
+  /// (background rasterization), so the card fades them in instead of
+  /// popping. Route/plane/labels are never faded.
+  final double cloudOpacity;
+
   @override
   void paint(Canvas canvas, Size size) {
     if (projectedRoute.length < 2) return;
@@ -39,7 +45,7 @@ class WeatherMapPainter extends CustomPainter {
         .map((p) => p * scale)
         .toList(growable: false);
 
-    if (showClouds) _drawClouds(canvas, size);
+    if (showClouds && cloudOpacity > 0) _drawClouds(canvas, size);
 
     final path = ShareImagePainter.buildRoutePath(
       routePoints,
@@ -148,7 +154,9 @@ class WeatherMapPainter extends CustomPainter {
         first,
         src,
         rect,
-        Paint()..filterQuality = FilterQuality.high,
+        Paint()
+          ..filterQuality = FilterQuality.high
+          ..color = Colors.white.withValues(alpha: cloudOpacity),
       );
       return;
     }
@@ -164,10 +172,10 @@ class WeatherMapPainter extends CustomPainter {
     final dst = rect.inflate(14);
     final paint = Paint()
       ..filterQuality = FilterQuality.high
-      ..color = Colors.white.withValues(alpha: 1 - blend);
+      ..color = Colors.white.withValues(alpha: (1 - blend) * cloudOpacity);
     canvas.drawImageRect(cloudFrames[index], src, dst, paint);
     paint
-      ..color = Colors.white.withValues(alpha: blend)
+      ..color = Colors.white.withValues(alpha: blend * cloudOpacity)
       ..blendMode = BlendMode.plus;
     canvas.drawImageRect(cloudFrames[index + 1], src, dst, paint);
     canvas.restore();
@@ -239,5 +247,6 @@ class WeatherMapPainter extends CustomPainter {
   bool shouldRepaint(WeatherMapPainter oldDelegate) =>
       oldDelegate.planeProgress != planeProgress ||
       oldDelegate.showClouds != showClouds ||
-      oldDelegate.cloudFrames != cloudFrames;
+      oldDelegate.cloudFrames != cloudFrames ||
+      oldDelegate.cloudOpacity != cloudOpacity;
 }

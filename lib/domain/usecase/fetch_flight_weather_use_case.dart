@@ -33,6 +33,13 @@ class FetchFlightWeatherUseCase {
   /// Grid spacing (in the square map-card viewport) for the full-card
   /// cloud field; grid cells the corridor already covers are skipped.
   static const double areaGridSpacingPx = 95;
+
+  /// Ring of extra samples around each airport (N/E/S/W at this radius).
+  /// The airport anchor alone loses the field's normalized nearest-neighbor
+  /// vote to corridor/ocean samples hundreds of km away; a ring of real
+  /// nearby data turns "lone anchor" into local consensus, so a front
+  /// sitting over the airport survives interpolation (the LHR->JFK bug).
+  static const double airportRingKm = 50;
   static const int _maxConcurrentRequests = 6;
 
   final MetNorwayApi _api;
@@ -88,6 +95,12 @@ class FetchFlightWeatherUseCase {
           routeProgress: point.routeProgress,
           isAreaSample: areaPoints.contains(point),
         ),
+      // Airport rings render with the field (area samples) but never enter
+      // the verdict/segment logic, which reads corridor samples only.
+      for (final point in _airportRingPoints(route.departure.latLon))
+        _PointRequest(point, departureUtc, routeProgress: 0, isAreaSample: true),
+      for (final point in _airportRingPoints(route.arrival.latLon))
+        _PointRequest(point, arrivalUtc, routeProgress: 1, isAreaSample: true),
     ]);
 
     final departureForecast = _nearest(results[0]);
@@ -98,33 +111,44 @@ class FetchFlightWeatherUseCase {
 
     final samples = <RouteCloudSample>[];
     final areaSamples = <RouteCloudSample>[];
+
+    // Anchor the cloud field AT the two airports using the forecasts already
+    // fetched for the cards. Without these the field has no data point at the
+    // airport (endpoints are otherwise excluded from the corridor), so the map
+    // could look clear over an airport its card shows as cloudy/rainy.
+    final departureSample = _buildCloudSample(
+      results[0],
+      progress: 0,
+      timeUtc: departureUtc,
+      windowStart: windowStart,
+      windowEnd: windowEnd,
+    );
+    if (departureSample != null) samples.add(departureSample);
+    final arrivalSample = _buildCloudSample(
+      results[1],
+      progress: 1,
+      timeUtc: arrivalUtc,
+      windowStart: windowStart,
+      windowEnd: windowEnd,
+    );
+    if (arrivalSample != null) samples.add(arrivalSample);
+
     for (final result in results.skip(2)) {
-      final forecast = _nearest(result);
       final progress = result.request.routeProgress;
-      if (forecast == null || progress == null) continue;
-      final sample = RouteCloudSample(
-        routeProgress: progress,
-        latLon: result.request.latLon,
+      if (progress == null) continue;
+      final sample = _buildCloudSample(
+        result,
+        progress: progress,
         timeUtc: result.request.targetTimeUtc,
-        cloudLowPercent: forecast.cloudLowPercent ?? 0,
-        cloudMidPercent: forecast.cloudMidPercent ?? 0,
-        cloudHighPercent: forecast.cloudHighPercent ?? 0,
-        precipitationMm: forecast.precipitationMm,
-        timeline: [
-          for (final slice in result.series)
-            if (!slice.timeUtc.isBefore(windowStart) &&
-                !slice.timeUtc.isAfter(windowEnd))
-              CloudTimeSlice(
-                timeUtc: slice.timeUtc,
-                cloudLowPercent: slice.cloudLowPercent ?? 0,
-                cloudMidPercent: slice.cloudMidPercent ?? 0,
-                cloudHighPercent: slice.cloudHighPercent ?? 0,
-                precipitationMm: slice.precipitationMm ?? 0,
-              ),
-        ],
+        windowStart: windowStart,
+        windowEnd: windowEnd,
       );
+      if (sample == null) continue;
       (result.request.isAreaSample ? areaSamples : samples).add(sample);
     }
+    // Corridor samples must stay in route order — the verdict/segment logic
+    // and the field's centerline both assume ascending progress.
+    samples.sort((a, b) => a.routeProgress.compareTo(b.routeProgress));
     _logger.log(
       'weather fetched: samples=${samples.length}/${points.length} '
       'area=${areaSamples.length}/${areaPoints.length} '
@@ -143,6 +167,96 @@ class FetchFlightWeatherUseCase {
       fetchedAt: DateTime.now(),
       isTimeEstimated: isTimeEstimated,
     );
+  }
+
+  /// Builds one cloud-field sample from a fetched point: the overhead-time
+  /// cloud values plus a within-window timeline for the animation.
+  /// Returns null when the point returned no usable forecast.
+  RouteCloudSample? _buildCloudSample(
+    _PointResult result, {
+    required double progress,
+    required DateTime timeUtc,
+    required DateTime windowStart,
+    required DateTime windowEnd,
+  }) {
+    final forecast = _nearest(result);
+    if (forecast == null) return null;
+    // Bracket the window with the nearest entry on each side. Beyond ~2.5
+    // days out the provider is 6-HOURLY, so the flight window often contains
+    // a single entry — the animation would freeze on that one slice and the
+    // map could contradict the airport cards, which read the entry nearest
+    // to STD/STA (possibly the excluded one). Brackets guarantee >=2 slices
+    // so hiddenAt() interpolates through the flight instead of clamping.
+    MetNorwayForecastPoint? before;
+    MetNorwayForecastPoint? after;
+    final inWindow = <MetNorwayForecastPoint>[];
+    for (final slice in result.series) {
+      if (slice.timeUtc.isBefore(windowStart)) {
+        if (before == null || slice.timeUtc.isAfter(before.timeUtc)) {
+          before = slice;
+        }
+      } else if (slice.timeUtc.isAfter(windowEnd)) {
+        if (after == null || slice.timeUtc.isBefore(after.timeUtc)) {
+          after = slice;
+        }
+      } else {
+        inWindow.add(slice);
+      }
+    }
+    return RouteCloudSample(
+      routeProgress: progress,
+      latLon: result.request.latLon,
+      timeUtc: timeUtc,
+      cloudLowPercent: forecast.cloudLowPercent ?? 0,
+      cloudMidPercent: forecast.cloudMidPercent ?? 0,
+      cloudHighPercent: forecast.cloudHighPercent ?? 0,
+      precipitationMm: forecast.precipitationMm,
+      timeline: [
+        for (final slice in [
+          if (before != null) before,
+          ...inWindow,
+          if (after != null) after,
+        ])
+          CloudTimeSlice(
+            timeUtc: slice.timeUtc,
+            cloudLowPercent: slice.cloudLowPercent ?? 0,
+            cloudMidPercent: slice.cloudMidPercent ?? 0,
+            cloudHighPercent: slice.cloudHighPercent ?? 0,
+            precipitationMm: slice.precipitationMm ?? 0,
+          ),
+      ],
+    );
+  }
+
+  /// N/E/S/W points [airportRingKm] from [center].
+  List<LatLng> _airportRingPoints(LatLng center) {
+    const kmPerDegreeLat = 111.0;
+    final dLat = airportRingKm / kmPerDegreeLat;
+    // Longitude degrees shrink toward the poles; floor the cosine so polar
+    // airports don't fling ring points across half the map.
+    final cosLat = math.max(
+      0.2,
+      math.cos(center.latitude * math.pi / 180).abs(),
+    );
+    final dLon = airportRingKm / (kmPerDegreeLat * cosLat);
+    double clampLat(double lat) => math.max(-89.0, math.min(89.0, lat));
+    return [
+      LatLng(clampLat(center.latitude + dLat), center.longitude),
+      LatLng(clampLat(center.latitude - dLat), center.longitude),
+      LatLng(center.latitude, _wrapLon(center.longitude + dLon)),
+      LatLng(center.latitude, _wrapLon(center.longitude - dLon)),
+    ];
+  }
+
+  static double _wrapLon(double lon) {
+    var next = lon;
+    while (next > 180) {
+      next -= 360;
+    }
+    while (next < -180) {
+      next += 360;
+    }
+    return next;
   }
 
   /// Sparse grid over the map card's viewport (the same square framing the

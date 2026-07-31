@@ -366,6 +366,7 @@
     "weather": {
       "title": "Verrez-vous le sol ?",
       "loading": "Vérification du ciel le long de votre itinéraire…",
+      "cloudsLoading": "Chargement des nuages…",
       "loadFailed": "Impossible de charger les prévisions pour le moment. Réessayez ou continuez sans elles.",
       "notDownloadedBody": "Aucune prévision n'a été téléchargée pour ce vol. Une connexion internet est nécessaire avant de voler.",
       "departureLabel": "Départ",

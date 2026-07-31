@@ -366,6 +366,7 @@
     "weather": {
       "title": "¿Verás el suelo?",
       "loading": "Comprobando el cielo a lo largo de tu ruta…",
+      "cloudsLoading": "Cargando nubes…",
       "loadFailed": "No se pudo cargar el pronóstico ahora mismo. Reintenta o continúa sin él.",
       "notDownloadedBody": "No se descargó ningún pronóstico para este vuelo. Necesita conexión a internet antes de volar.",
       "departureLabel": "Salida",

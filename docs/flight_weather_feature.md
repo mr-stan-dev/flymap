@@ -117,6 +117,11 @@ verdict + per-segment values for the Pro breakdown.
 
 ## 5. Providers (decision + rationale)
 
+> **2026-07-31:** §13 adds a verified cloud-map fidelity ladder (renderer
+> fixes shipped → Open-Meteo batch grid → free backend grids) that
+> supersedes the switch-timing notes below; this section remains the
+> original rationale.
+
 **Start free: MET Norway Locationforecast 2.0 (api.met.no)** — free **including
 commercial use** (public service; CC-BY-style attribution + a unique
 `User-Agent` identifying the app are mandatory, ~20 req/s soft limit — be
@@ -294,6 +299,10 @@ Two things preserve the value without the dread:
   skies" good-news line; Open-Meteo switch if volume warrants.
 - **Phase 3** — post-flight observed replay + share stamp (needs a historical
   source — Open-Meteo archive or ERA5); NASA GIBS satellite replay experiment.
+- **2026-07-31:** the cloud-map fidelity ladder in §13 refines this: its
+  Phase A (renderer fixes) is shipped; its Phase B (Open-Meteo batch grid)
+  is the concrete form of the "Open-Meteo switch"; its Phase C (free
+  backend grids) supersedes the "ECMWF/GFS GRIBs" endgame note in §5.
 
 ## 11. Forecast-availability notifications (IMPLEMENTED Jul 30 2026)
 
@@ -351,3 +360,118 @@ Mechanics (`FlightNotificationScheduler` + `LocalScheduledNotificationsGateway`)
 - A rendering mock of the cloud grid (corridor-only, low/mid/high plies,
   scrubber, per-segment verdicts) was built July 2026 to validate the visual
   direction before implementation.
+
+## 13. Cloud-map fidelity — investigation & upgrade ladder (2026-07-31)
+
+Trigger: LHR→JFK (dep Aug 6) showed the JFK card with heavy rain (1.8 mm/h)
+while the map rendered JFK clear, and the cloud layer read as blurred yet
+pixelated. The full pipeline was reproduced outside the app against live MET
+data (report: claude.ai/code/artifact/2a83332e-965f-4dc1-bc7d-37132b1ce0cb).
+**The forecast was right — MET said 91.4% hidden ground + heavy rain at JFK
+12Z; the renderer erased it.** Three stacked causes, all verified numerically:
+
+1. **Interpolation dilution.** The field's normalized 8-nearest Gaussian
+   blend at σ=75 px is a ~750 km blur at transatlantic zoom; the JFK anchor
+   kept only a 0.17 weight and 91.4% blended down to 47.3%.
+2. **Threshold suppression.** The narrow coverage-threshold transition
+   rendered the diluted mid value as scattered wisps; whatever pulled below
+   ~40% collapsed to nothing (and produced near-binary edges → the crawling
+   pixel staircases after the ~6-7× device upscale).
+3. **Timeline collapse.** Beyond ~2.5 days MET is 6-hourly, so the
+   [STD−1h, STA+1h] timeline window held exactly ONE entry (12:00Z): all 24
+   animation frames were identical, and the departure end showed 12Z clouds
+   while the LHR card read the 06Z entry — the sunny-card/cloudy-map flip of
+   the same bug. (Also: cards describe a next_6_hours BLOCK vs the map's
+   instant fractions, and rain only tinted existing cloud pixels, so
+   rain-with-thin-instant-cloud rendered as nothing.)
+
+**Windy/Ventusky ground truth (verified):** their cloud layers are the raw
+NWP fields — ECMWF HRES 9 km, GFS 22 km, ICON 13 km — bicubic-interpolated
+client-side with a tuned colormap (Windy: "below 50% almost invisibly").
+No procedural noise, no satellite in the forecast layer. The recognizable
+swirls are data density; ~60 corridor/area points cannot draw a front, and
+no shader can fake it. Neither is licensable for Flymap (Windy Map API =
+€990/yr JS embed, WebView-only, weather apps refused; Ventusky: no API).
+
+### Phase A — renderer & consistency fixes (SHIPPED 2026-07-31, $0)
+
+- **Bracketed timelines**: the timeline now always includes the nearest
+  entry beyond each window edge → ≥2 slices even at 6-hourly horizons; the
+  animation interpolates through the flight and both airport ends agree
+  with their cards by construction.
+- **Local blend**: σ 75→30 px, plus a ring of 4 extra samples ~50 km around
+  each airport (fetched like any point, stored as areaSamples so the
+  verdict — corridor-only — is untouched). Anchors are local consensus now,
+  not lone outvoted voices. ~+8 requests/flight.
+- **Softer alpha ramp**: threshold transition widened 0.35→0.60 (kills the
+  near-binary edges), max cloud alpha 0.8→0.85.
+- **Rain floor + violet ramp** (follow-up, same day): precipitation keeps
+  its own translucent alpha floor (≥ 0.38·rain) independent of instant
+  cloud cover, and RECOLORS the deck along a blue→violet intensity ramp
+  (drizzle = cool blue wash, heavy = saturated violet core — the
+  Windy/Ventusky precipitation convention). The first cut darkened toward
+  slate instead, which was invisible against the dark satellite map.
+- **Sharper field off-thread**: card field 180→270 px (~2 px/cell), frames
+  rasterized via Isolate.run (static helper — an instance-method closure
+  drags the State/ticker into the isolate message and is rejected).
+- **Cloud loading state** (follow-up, same day): off-thread frames land a
+  beat after the map, so the card now fades the cloud layer in (550 ms,
+  `cloudOpacity` on the painter — route/plane never fade) and shows a
+  small "Loading clouds…" pill top-right until frames arrive
+  (`cloudsLoading` i18n ×4). Rasterization failure hides the pill and
+  degrades to a cloudless card.
+
+Honest ceiling: consistent, softer, animated — still art-directed blobs.
+Structure needs data (below).
+
+### Phase B — real structure: Open-Meteo batch grid (~$29/mo, next)
+
+The §5 "upgrade when proven" switch, with verified mechanics (Jul 2026):
+
+- **API Standard $29/mo, 1M weighted calls**; multi-coordinate batches up to
+  ~1,000 coords/call, billed roughly per location — budget a grid as its
+  point count. Free tier is contractually **non-commercial only** — closed
+  to a subscription app. Attribution "Weather data by Open-Meteo.com"
+  (CC-BY 4.0) is mandatory.
+- Per flight: ~0.7–1° grid over the card bbox (≈300–600 points, 1–2 calls),
+  hourly out to 16 days, into the existing provider-agnostic bundle schema.
+  ~1,500–3,000 flights/month fit Standard.
+- **Pin ONE model** (`icon_seamless` or `gfs_seamless`) for spatial
+  consistency — default best_match mixes models per point. Their
+  low/mid/high bands are native; ECMWF-sourced bands are RH-approximated.
+  Use `cell_selection=nearest` over ocean. `format=flatbuffers` exists if
+  JSON parse cost ever matters.
+- Render at that density Windy-style: smooth (bicubic-ish) interpolation +
+  colormap with <50% nearly invisible; keep noise only for sub-grid
+  texture. Cards/verdict can stay on MET or migrate too (one provider, one
+  attribution).
+
+### Phase C — free backend grid pipeline (endgame, $0 marginal)
+
+The §5 "ECMWF/GFS GRIBs" endgame, now much easier than raw GRIB handling.
+Scheduled backend job caches per model-run; a callable crops a per-flight
+grid (few KB) into the same bundle schema. Verified sources:
+
+- **NOAA GFS via NOMADS grib filter**: server-side bbox subsetting with
+  LCDC/MCDC/HCDC/TCDC at 0.25° (filter on the cloud-layer levels — TCDC
+  also exists per isobar), hourly→f120 then 3-hourly→f384; a 30°×30° box ×
+  4 vars ≈ 145 KB per timestep. Policy: 120 hits/min/IP + 10 s waits in
+  loops — backend only, never from clients. Public domain. Bulk-robust
+  alternative: NODD S3 (`noaa-gfs-bdp-pds`) `.idx` byte-range reads
+  (~0.6–0.9 MB per global cloud message).
+- **Open-Meteo S3 open data** (`s3://openmeteo`, CC-BY 4.0):
+  `data_spatial/<model>/<run>/<timestep>.om` whole-domain grids (~7-day
+  retention), cloud-native chunked format with readers in Python/Rust/
+  Swift/TS — no GRIB decoding at all.
+- **ECMWF open data** (0.25°, CC-BY 4.0): byte-range by field but no bbox;
+  **IFS carries total cloud only — low/mid/high exist only in AIFS**
+  (~1.3 MB per global message). 9 km open tier announced for "later 2026".
+
+Rejected (priced Jul 2026): forecast raster tiles — OWM Maps 2.0 ≈$600/mo
+(Professional), Tomorrow.io contact-sales, meteoblue €2,400/yr, Xweather
+£240/mo WebGL SDK — wrong cost/shape vs the offline bundle. RainViewer is
+personal/educational-only and winding down. Satellite is observation-only
+(no forecast satellite exists anywhere): for the v3 post-flight replay use
+NASA GIBS GeoColor 10-min (~45 min lag, **no Europe/Africa 10-min layer**),
+EUMETSAT rendered imagery (CC-BY 4.0), or NOAA GMGSI hourly global mosaic
+(no restrictions).

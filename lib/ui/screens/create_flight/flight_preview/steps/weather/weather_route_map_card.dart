@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:isolate';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -49,17 +50,26 @@ class WeatherRouteMapCard extends StatefulWidget {
 }
 
 class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   /// Cloud-field frames spanning the flight; crossfaded by plane progress.
   static const int _cloudFrameCount = 24;
 
-  /// ~3 viewport px per field cell — fine enough that the upscaled lattice
-  /// stays invisible on tall phone screens.
-  static const int _cloudFieldResolution = 180;
+  /// ~2 viewport px per field cell — fine enough that the upscaled lattice
+  /// stays invisible on tall phone screens. Affordable because the frames
+  /// rasterize on a background isolate, not the UI thread.
+  static const int _cloudFieldResolution = 270;
 
   late final AnimationController _plane = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 10),
+  );
+
+  /// Fades the cloud layer in once its frames land — they arrive a beat
+  /// after the map image (background rasterization), and without the fade
+  /// the layer pops in like a glitch.
+  late final AnimationController _cloudFade = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 550),
   );
 
   late final List<LatLng> _routePoints;
@@ -68,6 +78,10 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
   late final List<RouteCloudSample> _cloudSamples;
   late final List<Offset> _projectedSamples;
   List<ui.Image> _cloudFrames = const [];
+
+  /// True when rasterization threw — hides the loading chip so it can't
+  /// spin forever; the card just stays cloudless (map still works).
+  bool _cloudBuildFailed = false;
   Uint8List? _mapBytes;
 
   /// True once the static map fetch definitively failed (offline, no DI) —
@@ -124,8 +138,9 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
     _fetchMapImage();
   }
 
-  /// Rasterizes the samples into continuous cloud frames off the hot path;
-  /// the painter draws whatever is ready (nothing until then).
+  /// Rasterizes the samples into continuous cloud frames on a background
+  /// isolate (the field is pure math over plain data); the painter draws
+  /// whatever is ready (nothing until then).
   Future<void> _buildCloudField() async {
     if (_cloudSamples.isEmpty) return;
     final corridor = widget.samples;
@@ -143,18 +158,21 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
       fieldWidth: _cloudFieldResolution,
       fieldHeight: _cloudFieldResolution,
     );
-    // Lazy generator + a yield per frame: the raster work spreads across
-    // event-loop turns instead of one long jank.
+    final frameCount = end.isAfter(start) ? _cloudFrameCount : 1;
+    final List<Uint8List> buffers;
+    try {
+      buffers = await _rasterizeFrames(builder, frameCount, start, end);
+    } catch (_) {
+      // Degrade silently to a cloudless card — the map and route still
+      // carry the step; the chip must not spin forever.
+      if (mounted) setState(() => _cloudBuildFailed = true);
+      return;
+    }
     final images = <ui.Image>[];
-    for (final buffer in builder.buildFrameBuffers(
-      frameCount: end.isAfter(start) ? _cloudFrameCount : 1,
-      start: start,
-      end: end,
-    )) {
+    for (final buffer in buffers) {
       images.add(
         await _decodeRgba(buffer, builder.fieldWidth, builder.fieldHeight),
       );
-      await Future<void>.delayed(Duration.zero);
     }
     if (!mounted) {
       for (final image in images) {
@@ -163,6 +181,24 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
       return;
     }
     setState(() => _cloudFrames = images);
+    _cloudFade.forward();
+  }
+
+  /// Static on purpose: an instance-method closure links the State (with
+  /// its ticker) into the isolate message via the captured context and
+  /// [Isolate.run] rejects it as unsendable — a static scope holds only the
+  /// plain-data arguments.
+  static Future<List<Uint8List>> _rasterizeFrames(
+    CloudFieldBuilder builder,
+    int frameCount,
+    DateTime start,
+    DateTime end,
+  ) {
+    return Isolate.run(
+      () => builder
+          .buildFrameBuffers(frameCount: frameCount, start: start, end: end)
+          .toList(growable: false),
+    );
   }
 
   Future<ui.Image> _decodeRgba(Uint8List rgba, int width, int height) {
@@ -215,6 +251,7 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
   @override
   void dispose() {
     _plane.dispose();
+    _cloudFade.dispose();
     for (final image in _cloudFrames) {
       image.dispose();
     }
@@ -295,7 +332,7 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
                 decoration: BoxDecoration(color: Color(0x1F000000)),
               ),
               AnimatedBuilder(
-                animation: _plane,
+                animation: Listenable.merge([_plane, _cloudFade]),
                 builder: (context, _) => CustomPaint(
                   painter: WeatherMapPainter(
                     projectedRoute: _projectedRoute,
@@ -307,7 +344,24 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
                     planeProgress: showWeather
                         ? Curves.easeInOutSine.transform(_plane.value)
                         : null,
+                    cloudOpacity: Curves.easeOut.transform(_cloudFade.value),
                   ),
+                ),
+              ),
+              // While the cloud field rasterizes, say so — the map lands
+              // first and silent late-arriving clouds read as a glitch.
+              Positioned(
+                top: 10,
+                right: 10,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child:
+                      showWeather &&
+                          _cloudFrames.isEmpty &&
+                          !_cloudBuildFailed &&
+                          _cloudSamples.isNotEmpty
+                      ? const _CloudsLoadingChip()
+                      : const SizedBox.shrink(),
                 ),
               ),
             ],
@@ -347,6 +401,43 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Tiny status pill in the card corner while the cloud field rasterizes —
+/// the map and route land first, and this names the one thing still coming.
+class _CloudsLoadingChip extends StatelessWidget {
+  const _CloudsLoadingChip();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xB3000000),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(
+            width: 11,
+            height: 11,
+            child: CircularProgressIndicator(
+              strokeWidth: 1.8,
+              color: Colors.white70,
+            ),
+          ),
+          const SizedBox(width: 7),
+          Text(
+            context.t.createFlight.weather.cloudsLoading,
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: Colors.white),
+          ),
+        ],
       ),
     );
   }

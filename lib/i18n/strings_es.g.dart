@@ -970,6 +970,7 @@ class _TranslationsCreateFlightWeatherEs extends TranslationsCreateFlightWeather
 	// Translations
 	@override String get title => '¿Verás el suelo?';
 	@override String get loading => 'Comprobando el cielo a lo largo de tu ruta…';
+	@override String get cloudsLoading => 'Cargando nubes…';
 	@override String get loadFailed => 'No se pudo cargar el pronóstico ahora mismo. Reintenta o continúa sin él.';
 	@override String get notDownloadedBody => 'No se descargó ningún pronóstico para este vuelo. Necesita conexión a internet antes de volar.';
 	@override String get departureLabel => 'Salida';
@@ -1988,6 +1989,7 @@ extension on TranslationsEs {
 			'createFlight.steps.weatherTitle' => 'Clima del vuelo',
 			'createFlight.weather.title' => '¿Verás el suelo?',
 			'createFlight.weather.loading' => 'Comprobando el cielo a lo largo de tu ruta…',
+			'createFlight.weather.cloudsLoading' => 'Cargando nubes…',
 			'createFlight.weather.loadFailed' => 'No se pudo cargar el pronóstico ahora mismo. Reintenta o continúa sin él.',
 			'createFlight.weather.notDownloadedBody' => 'No se descargó ningún pronóstico para este vuelo. Necesita conexión a internet antes de volar.',
 			'createFlight.weather.departureLabel' => 'Salida',
@@ -2156,9 +2158,9 @@ extension on TranslationsEs {
 			'createFlight.overview.timeline.alsoAroundThisTime' => 'También por este momento:',
 			'createFlight.overview.timeline.minuteUnit' => 'min',
 			'createFlight.overview.timeline.hourCompactUnit' => 'h',
-			'createFlight.overview.timeline.minuteCompactUnit' => 'm',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.timeline.minuteCompactUnit' => 'm',
 			'createFlight.overview.timeline.regionType.country' => 'País',
 			'createFlight.overview.timeline.regionType.region' => 'Región',
 			'createFlight.overview.timeline.regionType.state' => 'Estado',
@@ -2670,9 +2672,9 @@ extension on TranslationsEs {
 			'countries.IR' => 'Iran',
 			'countries.IS' => 'Islandia',
 			'countries.IT' => 'Italia',
-			'countries.JM' => 'Jamaica',
 			_ => null,
 		} ?? switch (path) {
+			'countries.JM' => 'Jamaica',
 			'countries.JO' => 'Jordania',
 			'countries.JP' => 'Japon',
 			'countries.KE' => 'Kenia',

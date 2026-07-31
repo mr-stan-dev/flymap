@@ -126,10 +126,19 @@ class MetNorwayApi {
     final next1h = data['next_1_hours'];
     final next6h = data['next_6_hours'];
     final next = next1h is Map ? next1h : (next6h is Map ? next6h : null);
+    // Beyond ~2-3 days MET only has 6-hourly steps, so precipitation_amount is
+    // a 6-HOUR TOTAL. Normalize it to an approximate mm/h so it reads as an
+    // intensity (comparable to the 1h value) instead of a scary accumulation
+    // shown as if it were instantaneous rain right now.
+    final isSixHourBlock = next1h is! Map && next6h is Map;
     final nextDetails = next is Map ? next['details'] : null;
     final nextSummary = next is Map ? next['summary'] : null;
 
     double? toDouble(dynamic raw) => raw is num ? raw.toDouble() : null;
+
+    final rawPrecip = nextDetails is Map
+        ? toDouble(nextDetails['precipitation_amount'])
+        : null;
 
     return MetNorwayForecastPoint(
       timeUtc: time.toUtc(),
@@ -139,9 +148,9 @@ class MetNorwayApi {
       cloudLowPercent: toDouble(detailsMap['cloud_area_fraction_low']),
       cloudMidPercent: toDouble(detailsMap['cloud_area_fraction_medium']),
       cloudHighPercent: toDouble(detailsMap['cloud_area_fraction_high']),
-      precipitationMm: nextDetails is Map
-          ? toDouble(nextDetails['precipitation_amount'])
-          : null,
+      precipitationMm: isSixHourBlock && rawPrecip != null
+          ? rawPrecip / 6
+          : rawPrecip,
       symbolCode: nextSummary is Map
           ? (nextSummary['symbol_code'] as String?)
           : null,

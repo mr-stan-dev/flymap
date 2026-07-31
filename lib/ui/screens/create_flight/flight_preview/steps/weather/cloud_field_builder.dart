@@ -39,12 +39,15 @@ class CloudFieldBuilder {
   /// heavy weights produces angular seams where the neighbor set switches.
   static const int _neighborCount = 8;
 
-  /// Gaussian falloff radius for neighbor weights, in viewport px (~the
-  /// area-grid spacing).
-  static const double _weightSigmaPx = 75;
+  /// Gaussian falloff radius for neighbor weights, in viewport px (~⅓ of
+  /// the area-grid spacing). Was 75: on long routes that is a synoptic-scale
+  /// blur — a 90%-cloud airport anchor averaged with clear ocean samples
+  /// hundreds of km away rendered as near-clear (the LHR→JFK bug). 30 keeps
+  /// the blend local so real structure (fronts, clear pockets) survives.
+  static const double _weightSigmaPx = 30;
 
   /// Semi-transparent by design: even solid overcast keeps the map visible.
-  static const double _maxCloudAlpha = 0.8;
+  static const double _maxCloudAlpha = 0.85;
 
   /// Noise-mask drift per frame, in viewport px — crossfading two adjacent
   /// frames then reads as cloud motion, not just density morphing.
@@ -105,9 +108,12 @@ class CloudFieldBuilder {
 
         // Coverage-as-threshold: the density decides how much of the noise
         // "passes" — 0 stays perfectly clear, partial cover turns patchy,
-        // full cover approaches a solid (but still translucent) deck.
+        // full cover approaches a solid (but still translucent) deck. The
+        // wide transition band (0.60, was 0.35) matters: a narrow band
+        // makes near-binary edges within 1-2 field cells, which the
+        // device upscale turns into crawling pixel staircases.
         final edge = 1.02 - hidden * 1.2;
-        final raw = ((noise - edge) / 0.35).clamp(0.0, 1.0);
+        final raw = ((noise - edge) / 0.60).clamp(0.0, 1.0);
         final cloud = raw * raw * (3 - 2 * raw);
         // Noise keeps modulating alpha even where the threshold saturates:
         // a full deck stays textured and drifts with the noise instead of
@@ -116,17 +122,28 @@ class CloudFieldBuilder {
         // Thin high cirrus: a faint noise-textured veil over everything.
         final veil = (high * (0.16 + 0.14 * noise)).clamp(0.0, 0.3);
         alpha = (alpha + veil * (1 - alpha)).clamp(0.0, 0.85);
+        // Rain keeps its own translucent floor: at 6-hourly horizons a
+        // precip block can outpace the instant cloud fraction, and rain
+        // that renders as nothing contradicts a rainy airport card.
+        alpha = math.max(alpha, rain * 0.38);
 
         // Dense cores shade slightly gray — depth, like a real deck seen
         // from above; thin cover stays white.
         final brightness = 1.0 - 0.15 * cloud * (0.4 + 0.6 * noise);
 
-        // Rain darkens the cloud toward a cool slate blue: red drops the
-        // most, blue the least, so wet cores read as rain, not dirt.
-        final darken = 1.0 - 0.45 * rain;
-        final red = brightness * darken * (1.0 - 0.18 * rain);
-        final green = brightness * darken * (1.0 - 0.08 * rain);
-        final blue = brightness * darken;
+        // Rain RECOLORS the deck instead of darkening it: an intensity
+        // ramp from cool blue (drizzle) to saturated blue-violet (heavy),
+        // the Windy/Ventusky precipitation convention. Hue contrast reads
+        // both inside white cloud and over the dark map, where the old
+        // slate darkening disappeared entirely. Noise keeps wet cores
+        // textured instead of flat.
+        final mix = rain * (0.65 + 0.30 * noise);
+        final rainRed = 0.44 + 0.20 * rain;
+        final rainGreen = 0.60 - 0.26 * rain;
+        const rainBlue = 0.95;
+        final red = brightness * (1 - mix) + rainRed * mix;
+        final green = brightness * (1 - mix) + rainGreen * mix;
+        final blue = brightness * (1 - mix) + rainBlue * mix;
 
         // PREMULTIPLIED: decodeImageFromPixels treats rgba8888 as premul,
         // so straight-alpha data (RGB=255) blows out to solid white.

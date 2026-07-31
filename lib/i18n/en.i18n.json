@@ -366,6 +366,7 @@
     "weather": {
       "title": "Will you see the ground?",
       "loading": "Checking the skies along your route…",
+      "cloudsLoading": "Loading clouds…",
       "loadFailed": "Couldn't load the forecast right now. You can retry or continue without it.",
       "notDownloadedBody": "No forecast was downloaded for this flight. It needs an internet connection before you fly.",
       "departureLabel": "Departure",

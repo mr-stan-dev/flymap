@@ -108,7 +108,7 @@ void main() {
     expect(cloudy, greaterThan(0), reason: 'cloud cores expected');
   });
 
-  test('rain darkens and cool-tints the cloud cores', () {
+  test('rain recolors cloud cores along the blue-violet ramp', () {
     Uint8List frame(double precip) => _builder([
       for (var i = 0; i < 6; i++)
         _sample(progress: i / 5, hidden: 100, precip: precip),
@@ -117,18 +117,47 @@ void main() {
     final dry = frame(0);
     final rainy = frame(5);
 
-    var dryRed = 0, rainyRed = 0, rainyBlue = 0, rainyAlpha = 0, dryAlpha = 0;
+    var dryRed = 0, dryBlue = 0, dryAlpha = 0;
+    var rainyRed = 0, rainyGreen = 0, rainyBlue = 0, rainyAlpha = 0;
     for (var i = 0; i < dry.length; i += 4) {
       dryRed += dry[i];
+      dryBlue += dry[i + 2];
       dryAlpha += dry[i + 3];
       rainyRed += rainy[i];
+      rainyGreen += rainy[i + 1];
       rainyBlue += rainy[i + 2];
       rainyAlpha += rainy[i + 3];
     }
-    // Same coverage, but rain-darkened...
-    expect(rainyAlpha, dryAlpha);
-    expect(rainyRed, lessThan(dryRed * 0.6));
-    // ...with a cool tint: blue stays above red.
+    // Rain never thins the deck — thin noise spots gain a rain wash, the
+    // rest keeps its coverage...
+    expect(rainyAlpha, greaterThanOrEqualTo(dryAlpha));
+    // ...and the wet core turns violet: blue on top, green lowest, red
+    // between — a chromatic shift, not the old grey darkening (which was
+    // invisible over the dark map).
     expect(rainyBlue, greaterThan(rainyRed));
+    expect(rainyRed, greaterThan(rainyGreen));
+    // Dry cloud is neutral grey (blue ~ red); rain opens a wide gap —
+    // at least 8/255 mean per pixel.
+    final pixels = dry.length ~/ 4;
+    expect(rainyBlue - rainyRed, greaterThan((dryBlue - dryRed) + 8 * pixels));
+  });
+
+  test('rain stays visible even where instant cloud cover is zero', () {
+    // 6-hourly horizons can forecast a rain block while the instant cloud
+    // fraction is still low; the airport card then shows rain and the map
+    // must not render clear air (the invisible-rain half of the JFK bug).
+    final frame = _builder([
+      for (var i = 0; i < 6; i++)
+        _sample(progress: i / 5, hidden: 0, precip: 3),
+    ]).buildFrameBuffers(frameCount: 1, start: start, end: start).single;
+
+    final mean = _meanAlpha(frame);
+    expect(mean, greaterThan(0.25), reason: 'rain wash expected');
+    var red = 0, blue = 0;
+    for (var i = 0; i < frame.length; i += 4) {
+      red += frame[i];
+      blue += frame[i + 2];
+    }
+    expect(blue, greaterThan(red), reason: 'rain wash reads violet, not white');
   });
 }
