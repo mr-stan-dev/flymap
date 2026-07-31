@@ -284,7 +284,7 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
             isProUser: isProUser,
           ),
           onPremiumGateTap: () => unawaited(
-            _handleUpgradeToProFromOverview(
+            _handleUpgradeToProFromCreateStep(
               context: context,
               cubit: cubit,
               state: state,
@@ -301,11 +301,12 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
           onRetry: () => unawaited(cubit.fetchWeather(force: true)),
           onContinue: cubit.continueFromWeather,
           onPremiumGateTap: () => unawaited(
-            _handleUpgradeToProFromOverview(
+            _handleUpgradeToProFromCreateStep(
               context: context,
               cubit: cubit,
               state: state,
               subscriptionCubit: subscriptionCubit,
+              source: PaywallSource.weatherGate,
             ),
           ),
           // Approximate flights can take any calendar day inline; real flights
@@ -369,11 +370,14 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
     );
   }
 
-  Future<void> _handleUpgradeToProFromOverview({
+  /// Shared by the overview and weather steps of flight creation; [source]
+  /// tags which gate the upgrade came from (the paywall itself is identical).
+  Future<void> _handleUpgradeToProFromCreateStep({
     required BuildContext context,
     required FlightPreviewCubit cubit,
     required FlightPreviewState state,
     required SubscriptionCubit subscriptionCubit,
+    PaywallSource source = PaywallSource.routeOverviewGate,
   }) async {
     if (subscriptionCubit.state.isPro) {
       return;
@@ -381,14 +385,14 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
     await showFlightUnlockGateSheet(
       context: context,
       subscriptionCubit: subscriptionCubit,
-      source: PaywallSource.routeOverviewGate,
+      source: source,
       onUnlockActivated: () async {
         await cubit.enablePendingFlightUnlock();
         if (context.mounted) {
           await maybeShowRouteUpgradeChoiceSheet(
             context: context,
             cubit: cubit,
-            source: PaywallSource.routeOverviewGate,
+            source: source,
           );
         }
       },
@@ -398,12 +402,13 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
           await maybeShowRouteUpgradeChoiceSheet(
             context: context,
             cubit: cubit,
-            source: PaywallSource.routeOverviewGate,
+            source: source,
           );
         }
       },
       routePreview: _routePreviewText(state),
-      presentProPaywall: subscriptionCubit.presentPaywallFromRouteOverviewGate,
+      presentProPaywall: () =>
+          subscriptionCubit.presentPaywallForSource(source: source),
     );
   }
 

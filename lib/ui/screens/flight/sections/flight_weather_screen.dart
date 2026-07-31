@@ -71,11 +71,11 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
     await showFlightUnlockGateSheet(
       context: context,
       subscriptionCubit: subscriptionCubit,
-      source: PaywallSource.routeTimelineGate,
+      source: PaywallSource.weatherGate,
       routePreview:
           '${route.departure.displayCode} → ${route.arrival.displayCode}',
       presentProPaywall: () => subscriptionCubit.presentPaywallForSource(
-        source: PaywallSource.routeTimelineGate,
+        source: PaywallSource.weatherGate,
       ),
       // One-time unlock: persist this flight as Pro so it stays unlocked, then
       // fetch the forecast in place.

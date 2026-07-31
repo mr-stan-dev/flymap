@@ -37,6 +37,10 @@ enum PaywallSource {
 
   /// User opened paywall from locked real route gate.
   realRouteGate,
+
+  /// User opened paywall from the flight weather feature — the create-flight
+  /// weather-step teaser or the saved-flight weather screen.
+  weatherGate,
 }
 
 extension PaywallSourceAnalyticsValue on PaywallSource {
@@ -55,6 +59,7 @@ extension PaywallSourceAnalyticsValue on PaywallSource {
       PaywallSource.routeTimelineGate => 'route_timeline_gate',
       PaywallSource.geoAwarenessGate => 'geo_awareness_gate',
       PaywallSource.realRouteGate => 'real_route_gate',
+      PaywallSource.weatherGate => 'weather_gate',
     };
   }
 }
