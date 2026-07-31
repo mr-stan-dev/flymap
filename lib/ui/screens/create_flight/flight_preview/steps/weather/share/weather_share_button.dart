@@ -26,6 +26,7 @@ class WeatherShareButton extends StatefulWidget {
     required this.verdictEmoji,
     required this.verdictTitle,
     this.flightNumber,
+    this.flightId,
     super.key,
   });
 
@@ -34,6 +35,12 @@ class WeatherShareButton extends StatefulWidget {
   final String verdictEmoji;
   final String verdictTitle;
   final String? flightNumber;
+
+  /// Saved flight id, when sharing a stored flight. Lets the renderer pull the
+  /// map base from the per-flight offline cache so the shared image/video
+  /// still shows the satellite map in airplane mode. Null in the creation
+  /// flow (no saved flight yet), where the base is fetched live.
+  final String? flightId;
 
   @override
   State<WeatherShareButton> createState() => _WeatherShareButtonState();
@@ -108,6 +115,7 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
         route: widget.route,
         weather: widget.weather,
         data: _shareData(),
+        flightId: widget.flightId,
       );
       final path = asVideo
           ? await service.exportVideo(

@@ -199,7 +199,11 @@ class DiModule {
       () => FetchFlightWeatherUseCase(api: i.get(), timezoneService: i.get()),
     );
     i.registerLazySingleton<WeatherShareService>(
-      () => WeatherShareService(mapApi: i.get(), encoder: i.get()),
+      () => WeatherShareService(
+        mapApi: i.get(),
+        encoder: i.get(),
+        imageStore: i.get(),
+      ),
     );
     i.registerLazySingleton<FlightRoutePreviewApi>(
       () => FlightRoutePreviewApi(),

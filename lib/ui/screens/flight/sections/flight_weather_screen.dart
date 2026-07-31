@@ -176,6 +176,9 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
                       verdictEmoji: emoji,
                       verdictTitle: title,
                       flightNumber: flight.operationalData?.flightNumber,
+                      // Saved flight: share pulls the map base from the
+                      // offline cache so airplane-mode shares keep the map.
+                      flightId: flight.id,
                     );
                   },
                 ),

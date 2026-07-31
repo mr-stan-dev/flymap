@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/data/api/mapbox_static_image_api.dart';
 import 'package:flymap/data/flight_video/video_encoder.dart';
+import 'package:flymap/data/local/route_map_image_store.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
@@ -21,6 +22,29 @@ class _FakePathProviderPlatform extends PathProviderPlatform {
 
   @override
   Future<String?> getTemporaryPath() async => temporaryPath;
+}
+
+/// Records which flight the share asked to cache, and returns no file so the
+/// test needs no on-disk image — enough to prove the routing.
+class _RecordingImageStore extends RouteMapImageStore {
+  _RecordingImageStore()
+    : super(
+        api: MapboxStaticImageApi(
+          httpClient: MockClient((_) async => http.Response('unused', 500)),
+          accessToken: 'test',
+        ),
+      );
+
+  String? requestedFlightId;
+
+  @override
+  Future<File?> getOrFetchWeatherImage({
+    required String flightId,
+    required List<LatLng> routePoints,
+  }) async {
+    requestedFlightId = flightId;
+    return null;
+  }
 }
 
 class _FakeEncoder implements FlightVideoEncoder {
@@ -214,5 +238,36 @@ void main() {
     expect(encoder.finished, isTrue);
     expect(encoder.aborted, isFalse);
     expect(path, endsWith('.mp4'));
+  });
+
+  test('a saved flight shares from the offline cache, not the network',
+      () async {
+    // Regression: the share fetched the map base from the network, so an
+    // airplane-mode share of a saved flight lost the satellite map. With a
+    // flightId it must go through the per-flight cache instead.
+    var networkCalled = false;
+    final store = _RecordingImageStore();
+    final shareService = WeatherShareService(
+      mapApi: MapboxStaticImageApi(
+        httpClient: MockClient((_) async {
+          networkCalled = true;
+          return http.Response('nope', 500);
+        }),
+        accessToken: 'test',
+      ),
+      encoder: _FakeEncoder(),
+      imageStore: store,
+    );
+
+    final renderer = await shareService.buildRenderer(
+      route: _route(),
+      weather: _weather(),
+      data: _data,
+      flightId: 'flight-1',
+    );
+    shareService.disposeRenderer(renderer);
+
+    expect(store.requestedFlightId, 'flight-1');
+    expect(networkCalled, isFalse, reason: 'cache path, no live fetch');
   });
 }

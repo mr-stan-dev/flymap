@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flymap/data/api/mapbox_static_image_api.dart';
 import 'package:flymap/data/flight_video/video_encoder.dart';
+import 'package:flymap/data/local/route_map_image_store.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/logger.dart';
@@ -21,8 +22,10 @@ class WeatherShareService {
   WeatherShareService({
     required MapboxStaticImageApi mapApi,
     required FlightVideoEncoder encoder,
+    RouteMapImageStore? imageStore,
   }) : _mapApi = mapApi,
-       _encoder = encoder;
+       _encoder = encoder,
+       _imageStore = imageStore;
 
   static const int _cloudFrameCount = 24;
   static const int _cloudFieldResolution = 180;
@@ -37,6 +40,7 @@ class WeatherShareService {
 
   final MapboxStaticImageApi _mapApi;
   final FlightVideoEncoder _encoder;
+  final RouteMapImageStore? _imageStore;
   final _logger = const Logger('WeatherShareService');
 
   /// Prepares all drawable assets. The returned renderer's images belong to
@@ -45,6 +49,7 @@ class WeatherShareService {
     required FlightRoute route,
     required FlightWeather weather,
     required WeatherShareData data,
+    String? flightId,
   }) async {
     final waypoints = route.waypointLatLngs;
     final routePoints = waypoints.length >= 2
@@ -95,12 +100,27 @@ class WeatherShareService {
     ui.Image? mapImage;
     try {
       // 540 logical at @2x retina = a sharp ~1080px hero.
-      final bytes = await _mapApi.fetchStaticMapImage(
-        center: viewport.center,
-        zoom: viewport.zoom,
-        width: staticWeatherMapSize.toInt(),
-        height: staticWeatherMapSize.toInt(),
-      );
+      Uint8List? bytes;
+      final store = _imageStore;
+      if (flightId != null && store != null) {
+        // Saved flight: reuse the per-flight cached base the card uses
+        // (fetched online at download). A cache hit renders the real map in
+        // airplane mode, where a live fetch fails; the viewport matches the
+        // card's, so the shared base is identical to what's on screen.
+        final file = await store.getOrFetchWeatherImage(
+          flightId: flightId,
+          routePoints: routePoints,
+        );
+        if (file != null) bytes = await file.readAsBytes();
+      } else {
+        // Creation flow (no saved flight yet): fetch the base live.
+        bytes = await _mapApi.fetchStaticMapImage(
+          center: viewport.center,
+          zoom: viewport.zoom,
+          width: staticWeatherMapSize.toInt(),
+          height: staticWeatherMapSize.toInt(),
+        );
+      }
       if (bytes != null) {
         mapImage = await decodeImageFromList(bytes);
       }
