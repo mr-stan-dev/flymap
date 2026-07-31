@@ -5,7 +5,6 @@ import 'package:flymap/data/notifications/flight_notification_scheduler.dart';
 import 'package:flymap/data/notifications/notification_permission_service.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/forecast_notification_prefs.dart';
-import 'package:flymap/ui/screens/settings/widgets/settings_group_card.dart';
 import 'package:get_it/get_it.dart';
 
 /// Settings card for the forecast alerts: shows the system permission
@@ -113,8 +112,10 @@ class _NotificationsSettingsGroupState extends State<NotificationsSettingsGroup>
     final theme = Theme.of(context);
     final togglesEnabled = _permissionGranted == true;
 
-    return SettingsGroupCard(
-      title: strings.title,
+    // Rendered on the dedicated Notifications screen; the app bar carries the
+    // title, so no section card here.
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (_permissionGranted == false)
           ListTile(

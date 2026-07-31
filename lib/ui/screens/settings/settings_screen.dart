@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flymap/ui/screens/settings/debug/debug_settings_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
@@ -11,7 +13,7 @@ import 'package:flymap/router/app_router.dart';
 
 import 'widgets/app_version_footer.dart';
 import 'widgets/leave_feedback_setting_item.dart';
-import 'widgets/notifications_settings_group.dart';
+import 'widgets/notifications_setting_item.dart';
 import 'widgets/rate_us_setting_item.dart';
 import 'widgets/setting_item.dart';
 import 'widgets/settings_group_card.dart';
@@ -96,7 +98,10 @@ class SettingsContent extends StatelessWidget {
                   children: [UnitsSettingItem(state: state)],
                 ),
                 const SizedBox(height: 12),
-                const NotificationsSettingsGroup(),
+                SettingsGroupCard(
+                  title: context.t.settings.notifications.title,
+                  children: const [NotificationsSettingItem()],
+                ),
                 const SizedBox(height: 12),
                 SettingsGroupCard(
                   title: context.t.settings.storage,
@@ -152,6 +157,24 @@ class SettingsContent extends StatelessWidget {
                     ),
                   ],
                 ),
+                if (kDebugMode) ...[
+                  const SizedBox(height: 12),
+                  SettingsGroupCard(
+                    title: 'Debug',
+                    children: [
+                      SettingItem(
+                        title: 'Debug',
+                        subtitle: 'Notification test & dev tools',
+                        leading: const Icon(Icons.bug_report_outlined),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const DebugSettingsScreen(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const AppVersionFooter(),
               ],
             );
