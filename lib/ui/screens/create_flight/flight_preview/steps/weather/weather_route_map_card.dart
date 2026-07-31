@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flymap/data/api/mapbox_static_image_api.dart';
+import 'package:flymap/data/local/route_map_image_store.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/i18n/strings.g.dart';
@@ -29,6 +30,7 @@ class WeatherRouteMapCard extends StatefulWidget {
     this.areaSamples = const <RouteCloudSample>[],
     required this.isProUser,
     this.isDemo = false,
+    this.flightId,
     super.key,
   });
 
@@ -39,6 +41,13 @@ class WeatherRouteMapCard extends StatefulWidget {
   /// the whole picture instead of a corridor-only band.
   final List<RouteCloudSample> areaSamples;
   final bool isProUser;
+
+  /// Saved flight this card belongs to, when there is one. Its presence
+  /// routes the satellite base through [RouteMapImageStore]'s per-flight disk
+  /// cache (populated online at download), so the map still shows in airplane
+  /// mode. Null during flight creation — no saved flight yet, so the card
+  /// fetches the base live.
+  final String? flightId;
 
   /// Teaser mode for free users: ignores [samples] and animates the canned
   /// [DemoCloudStory.generic] over the route, with an EXAMPLE badge and no
@@ -214,13 +223,42 @@ class _WeatherRouteMapCardState extends State<WeatherRouteMapCard>
   }
 
   Future<void> _fetchMapImage() async {
-    // Guarded lookup so widget tests (no DI, no network) fall back to the
-    // gradient background instead of crashing.
     // Demo mode sits behind the teaser blur — don't spend a Mapbox call on
-    // imagery nobody can see; the bundled onboarding map stands in. The DI
-    // guard keeps widget tests (no DI, no network) on the gradient. Both
-    // run synchronously from initState, before the first build.
-    if (widget.isDemo || !GetIt.I.isRegistered<MapboxStaticImageApi>()) {
+    // imagery nobody can see; the bundled onboarding map stands in.
+    if (widget.isDemo) {
+      _mapFailed = true;
+      return;
+    }
+    // Saved flight: read the satellite base from the per-flight disk cache
+    // (fetched online at download). This is the only path that works in
+    // airplane mode — a cache hit returns without touching the network; a
+    // miss on a legacy flight opened online fetches and caches for next time.
+    final flightId = widget.flightId;
+    if (flightId != null && GetIt.I.isRegistered<RouteMapImageStore>()) {
+      try {
+        final file = await GetIt.I
+            .get<RouteMapImageStore>()
+            .getOrFetchWeatherImage(
+              flightId: flightId,
+              routePoints: _routePoints,
+            );
+        final bytes = file == null ? null : await file.readAsBytes();
+        if (!mounted) return;
+        setState(() {
+          if (bytes == null || bytes.isEmpty) {
+            _mapFailed = true;
+          } else {
+            _mapBytes = bytes;
+          }
+        });
+      } catch (_) {
+        if (mounted) setState(() => _mapFailed = true);
+      }
+      return;
+    }
+    // Flight creation (no saved flight yet) or tests without DI: fetch the
+    // base live, falling back to the gradient when there's no network/DI.
+    if (!GetIt.I.isRegistered<MapboxStaticImageApi>()) {
       _mapFailed = true;
       return;
     }

@@ -59,6 +59,35 @@ class RouteMapImageStore {
     );
   }
 
+  /// Deterministic weather-card viewport — the weather map card recomputes
+  /// this to project the route over the cached image, so it MUST match
+  /// WeatherRouteMapCard exactly (square, default padding).
+  static StaticMapViewport weatherViewport(List<LatLng> points) {
+    return StaticRouteMap.buildViewport(
+      points: points,
+      width: staticWeatherMapSize,
+      height: staticWeatherMapSize,
+    );
+  }
+
+  /// Clean satellite base for the flight-weather map card. Fetched online at
+  /// download time and read back in airplane mode — the weather screen's map
+  /// is otherwise blank offline (the clouds render from persisted data, but
+  /// the base image is network-only).
+  Future<File?> getOrFetchWeatherImage({
+    required String flightId,
+    required List<LatLng> routePoints,
+  }) {
+    if (routePoints.length < 2) return Future.value(null);
+    return _getOrFetch(
+      flightId: flightId,
+      suffix: 'weather',
+      viewport: weatherViewport(routePoints),
+      width: staticWeatherMapSize.toInt(),
+      height: staticWeatherMapSize.toInt(),
+    );
+  }
+
   /// The share flow passes its own viewport and canvas size so the fetched
   /// bytes are exactly what a direct API call would have returned.
   Future<File?> getOrFetchShareBase({
@@ -145,7 +174,7 @@ class RouteMapImageStore {
       final docs = await getApplicationDocumentsDirectory();
       final dir = Directory(p.join(docs.path, _dirName));
       if (!await dir.exists()) return;
-      for (final suffix in const ['card', 'share']) {
+      for (final suffix in const ['card', 'share', 'weather']) {
         final file = File(p.join(dir.path, _fileName(flightId, suffix)));
         if (await file.exists()) await file.delete();
       }

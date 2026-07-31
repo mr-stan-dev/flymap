@@ -37,7 +37,9 @@ class WeatherForecastBody extends StatelessWidget {
     required this.onPremiumGateTap,
     this.onPickDate,
     this.onGoBack,
+    this.onRefresh,
     this.failedCopy,
+    this.flightId,
     super.key,
   });
 
@@ -49,6 +51,11 @@ class WeatherForecastBody extends StatelessWidget {
   final VoidCallback onRetry;
   final VoidCallback onPremiumGateTap;
 
+  /// Saved flight id, when this body shows a stored flight (the weather
+  /// screen). Threaded to the map card so its satellite base comes from the
+  /// per-flight offline cache. Null in the creation flow (no saved flight).
+  final String? flightId;
+
   /// Handles picking a flight date when there is none. When non-null the
   /// no-date state shows a "pick a date" button (approximate flights, which
   /// can take any calendar day inline); when null it just explains that a
@@ -58,6 +65,11 @@ class WeatherForecastBody extends StatelessWidget {
   /// Shortcut from the no-date state back to flight selection (where a real
   /// flight's date is chosen). Shown only when [onPickDate] is null.
   final VoidCallback? onGoBack;
+
+  /// Pull-to-refresh on the loaded forecast: forces a fresh fetch (the 6h
+  /// cache only governs the automatic refresh on open). Enabled only when the
+  /// host provides it.
+  final Future<void> Function()? onRefresh;
 
   /// Overrides the generic failed-load copy — the flight screen uses it to
   /// explain that no forecast was downloaded before takeoff.
@@ -183,6 +195,8 @@ class WeatherForecastBody extends StatelessWidget {
       weather: weather,
       isProUser: isProUser,
       onPremiumGateTap: onPremiumGateTap,
+      onRefresh: onRefresh,
+      flightId: flightId,
     );
   }
 }
@@ -525,12 +539,16 @@ class _WeatherContent extends StatelessWidget {
     required this.weather,
     required this.isProUser,
     required this.onPremiumGateTap,
+    this.onRefresh,
+    this.flightId,
   });
 
   final FlightRoute? route;
   final FlightWeather weather;
   final bool isProUser;
   final VoidCallback onPremiumGateTap;
+  final Future<void> Function()? onRefresh;
+  final String? flightId;
 
   @override
   Widget build(BuildContext context) {
@@ -539,7 +557,11 @@ class _WeatherContent extends StatelessWidget {
     final verdict = FlightWeatherVerdictPolicy.overallVerdict(weather.samples);
     final route = this.route;
 
-    return ListView(
+    final list = ListView(
+      // Always scrollable so pull-to-refresh works even when the content fits.
+      physics: onRefresh == null
+          ? null
+          : const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       children: [
         Text(t.title, style: theme.textTheme.titleLarge),
@@ -580,6 +602,7 @@ class _WeatherContent extends StatelessWidget {
             samples: weather.samples,
             areaSamples: weather.areaSamples,
             isProUser: isProUser,
+            flightId: flightId,
           ),
           if (!isProUser) ...[
             const SizedBox(height: 10),
@@ -608,6 +631,10 @@ class _WeatherContent extends StatelessWidget {
         ),
       ],
     );
+
+    final refresh = onRefresh;
+    if (refresh == null) return list;
+    return RefreshIndicator(onRefresh: refresh, child: list);
   }
 
   /// True when the arrival's local calendar date is one day after the

@@ -33,9 +33,10 @@ class DownloadFlowDelegate {
   final FlightRepository _flightRepository;
   final RouteMapImageStore? _routeMapImageStore;
 
-  /// Best-effort, fire-and-forget: fetch the home card's map thumbnail while
-  /// the flight is being created (network is guaranteed here). Only flights
-  /// created after this feature get a thumbnail — there is no backfill.
+  /// Best-effort, fire-and-forget: fetch the home card's map thumbnail and
+  /// the weather card's satellite base while the flight is being created
+  /// (network is guaranteed here). Only flights created after each feature
+  /// get their cached image — there is no backfill.
   void _prefetchCardMapImage({
     required String flightId,
     required FlightRoute route,
@@ -48,6 +49,11 @@ class DownloadFlowDelegate {
         : [route.departure.latLon, route.arrival.latLon];
     unawaited(
       store.getOrFetchCardImage(flightId: flightId, routePoints: points),
+    );
+    // The weather screen is often opened in airplane mode; without this its
+    // map base is blank offline (only the clouds render from stored data).
+    unawaited(
+      store.getOrFetchWeatherImage(flightId: flightId, routePoints: points),
     );
   }
 

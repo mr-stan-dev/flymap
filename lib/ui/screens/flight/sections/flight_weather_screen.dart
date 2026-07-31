@@ -191,6 +191,9 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
                     weather: weather,
                     isLoading: state.isLoading,
                     isProUser: isProUser,
+                    // Saved flight: the card's satellite base comes from the
+                    // per-flight offline cache so it shows in airplane mode.
+                    flightId: flight.id,
                     // On a saved flight a failure means nothing was downloaded
                     // before takeoff — say that instead of a generic error.
                     failedCopy: context.t.createFlight.weather.notDownloadedBody,
@@ -201,6 +204,14 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
                       ),
                     ),
                     onPremiumGateTap: () => unawaited(_openUpgradeGate()),
+                    // Pull-to-refresh forces a fresh fetch, bypassing the 6h
+                    // cache that governs the automatic on-open refresh.
+                    onRefresh: isProUser
+                        ? () => context.read<FlightWeatherCubit>().fetchIfNeeded(
+                            hasProAccess: true,
+                            force: true,
+                          )
+                        : null,
                     // Approximate flights can add a date inline; real flights
                     // must be re-selected with a date, so no picker for them.
                     onPickDate:
