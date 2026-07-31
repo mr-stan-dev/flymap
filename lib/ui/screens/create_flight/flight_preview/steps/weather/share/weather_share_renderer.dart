@@ -12,8 +12,6 @@ class WeatherShareData {
     required this.subtitle,
     required this.departure,
     required this.arrival,
-    required this.verdictEmoji,
-    required this.verdictTitle,
     required this.watermark,
   });
 
@@ -24,8 +22,6 @@ class WeatherShareData {
   final String subtitle;
   final WeatherShareAirport departure;
   final WeatherShareAirport arrival;
-  final String verdictEmoji;
-  final String verdictTitle;
 
   /// "flymap.app"
   final String watermark;
@@ -39,6 +35,7 @@ class WeatherShareAirport {
     required this.emoji,
     required this.temperatureText,
     this.timeText,
+    this.windText,
   });
 
   /// "DEPARTURE" / "ARRIVAL".
@@ -53,6 +50,9 @@ class WeatherShareAirport {
   /// Local wall-clock ("16:10"); null for date-only flights — the noon
   /// estimate is never displayed.
   final String? timeText;
+
+  /// "💨 12 m/s"; null when wind is unknown.
+  final String? windText;
 }
 
 /// Renders the shareable weather story card (1080x1920) fully offscreen:
@@ -102,7 +102,6 @@ class WeatherShareRenderer {
     _drawHeader(canvas);
     _drawAirportCards(canvas);
     _drawMap(canvas, progress);
-    _drawVerdict(canvas);
     _drawWatermark(canvas);
 
     final picture = recorder.endRecording();
@@ -130,7 +129,7 @@ class WeatherShareRenderer {
     _text(
       canvas,
       data.headline,
-      const Offset(_margin, 96),
+      const Offset(_margin, 120),
       fontSize: 72,
       fontWeight: FontWeight.w800,
       color: Colors.white,
@@ -139,7 +138,7 @@ class WeatherShareRenderer {
     _text(
       canvas,
       data.subtitle,
-      const Offset(_margin, 196),
+      const Offset(_margin, 214),
       fontSize: 40,
       fontWeight: FontWeight.w600,
       color: ShareImagePainter.routeColor,
@@ -148,8 +147,8 @@ class WeatherShareRenderer {
   }
 
   void _drawAirportCards(Canvas canvas) {
-    const top = 288.0;
-    const cardHeight = 296.0;
+    const top = 320.0;
+    const cardHeight = 360.0;
     const gap = 24.0;
     const cardWidth = (width - 2 * _margin - gap) / 2;
     _drawAirportCard(
@@ -176,7 +175,6 @@ class WeatherShareRenderer {
     );
     const pad = 28.0;
     final x = rect.left + pad;
-    var y = rect.top + pad;
     final innerWidth = rect.width - 2 * pad;
 
     final labelLine = airport.timeText == null
@@ -185,56 +183,70 @@ class WeatherShareRenderer {
     _text(
       canvas,
       labelLine,
-      Offset(x, y),
+      Offset(x, rect.top + 34),
       fontSize: 26,
       fontWeight: FontWeight.w600,
       color: Colors.white60,
       letterSpacing: 1.2,
       maxWidth: innerWidth,
     );
-    y += 44;
+
     _text(
       canvas,
       airport.code,
-      Offset(x, y),
+      Offset(x, rect.top + 92),
       fontSize: 56,
       fontWeight: FontWeight.w800,
       color: Colors.white,
       maxWidth: innerWidth,
     );
-    y += 72;
+
     _text(
       canvas,
       airport.city,
-      Offset(x, y),
-      fontSize: 28,
+      Offset(x, rect.top + 170),
+      fontSize: 26,
       color: Colors.white60,
       maxWidth: innerWidth,
     );
 
-    // Emoji + temperature anchored to the card bottom.
-    final rowY = rect.bottom - pad - 92;
+    // Weather emoji + temperature.
+    final rowY = rect.top + 222;
     final emojiWidth = _text(
       canvas,
       airport.emoji,
       Offset(x, rowY),
-      fontSize: 76,
+      fontSize: 56,
       maxWidth: innerWidth,
     );
     _text(
       canvas,
       airport.temperatureText,
-      Offset(x + emojiWidth + 20, rowY + 8),
-      fontSize: 64,
+      Offset(x + emojiWidth + 18, rowY + 4),
+      fontSize: 50,
       fontWeight: FontWeight.w700,
       color: Colors.white,
-      maxWidth: innerWidth - emojiWidth - 20,
+      maxWidth: innerWidth - emojiWidth - 18,
     );
+
+    // Wind (below the temperature).
+    final wind = airport.windText;
+    if (wind != null) {
+      _text(
+        canvas,
+        wind,
+        Offset(x, rect.top + 300),
+        fontSize: 26,
+        fontWeight: FontWeight.w600,
+        color: Colors.white70,
+        maxWidth: innerWidth,
+      );
+    }
   }
 
   void _drawMap(Canvas canvas, double progress) {
     const mapSize = width - 2 * _margin;
-    const rect = Rect.fromLTWH(_margin, 632, mapSize, mapSize);
+    const rect = Rect.fromLTWH(_margin, 750, mapSize, mapSize);
     final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(36));
 
     canvas.save();
@@ -273,30 +285,6 @@ class WeatherShareRenderer {
       planeProgress: progress,
     ).paint(canvas, const Size(mapSize, mapSize));
     canvas.restore();
-  }
-
-  void _drawVerdict(Canvas canvas) {
-    const rect = Rect.fromLTWH(_margin, 1700, width - 2 * _margin, 116);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(rect, const Radius.circular(28)),
-      Paint()..color = ShareImagePainter.routeColor.withValues(alpha: 0.14),
-    );
-    final emojiWidth = _text(
-      canvas,
-      data.verdictEmoji,
-      Offset(rect.left + 32, rect.top + 26),
-      fontSize: 56,
-      maxWidth: rect.width,
-    );
-    _text(
-      canvas,
-      data.verdictTitle,
-      Offset(rect.left + 32 + emojiWidth + 24, rect.top + 32),
-      fontSize: 46,
-      fontWeight: FontWeight.w700,
-      color: Colors.white,
-      maxWidth: rect.width - emojiWidth - 88,
-    );
   }
 
   /// Brand watermark, bottom-right — the white logo asset (matching the
@@ -338,6 +326,7 @@ class WeatherShareRenderer {
         ),
       ),
       textDirection: TextDirection.ltr,
+      textScaler: TextScaler.noScaling,
     )..layout();
     painter.paint(
       canvas,
@@ -372,6 +361,9 @@ class WeatherShareRenderer {
       maxLines: 1,
       ellipsis: '…',
       textDirection: TextDirection.ltr,
+      // Fixed size — the card must never follow the device's font-scale
+      // accessibility setting (this is a rendered image/video, not live UI).
+      textScaler: TextScaler.noScaling,
     )..layout(maxWidth: maxWidth);
     painter.paint(canvas, offset);
     return painter.width;

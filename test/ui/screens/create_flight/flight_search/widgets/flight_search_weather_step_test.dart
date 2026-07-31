@@ -154,8 +154,6 @@ void main() {
                 WeatherShareButton(
                   route: _route(),
                   weather: _weather(),
-                  verdictEmoji: '☀️',
-                  verdictTitle: 'Clear views',
                 ),
               ],
             ),

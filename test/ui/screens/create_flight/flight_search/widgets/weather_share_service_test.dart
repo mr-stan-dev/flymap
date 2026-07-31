@@ -157,8 +157,6 @@ const _data = WeatherShareData(
     emoji: '⛅',
     temperatureText: '21°',
   ),
-  verdictEmoji: '☁️',
-  verdictTitle: 'Cloud carpet below',
   watermark: 'flymap.app',
 );
 

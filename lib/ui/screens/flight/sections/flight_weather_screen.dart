@@ -6,7 +6,6 @@ import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/data/notifications/flight_notification_scheduler.dart';
 import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
-import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/flight_unlock_repository.dart';
@@ -179,26 +178,13 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
             title: Text(context.t.createFlight.steps.weatherTitle),
             actions: [
               if (isProUser && weather != null && weather.samples.isNotEmpty)
-                Builder(
-                  builder: (context) {
-                    final verdict = FlightWeatherVerdictPolicy.overallVerdict(
-                      weather.samples,
-                    );
-                    final (emoji, title, _) = verdictPresentation(
-                      verdict,
-                      context.t.createFlight.weather,
-                    );
-                    return WeatherShareButton(
-                      route: flight.route,
-                      weather: weather,
-                      verdictEmoji: emoji,
-                      verdictTitle: title,
-                      flightNumber: flight.operationalData?.flightNumber,
-                      // Saved flight: share pulls the map base from the
-                      // offline cache so airplane-mode shares keep the map.
-                      flightId: flight.id,
-                    );
-                  },
+                WeatherShareButton(
+                  route: flight.route,
+                  weather: weather,
+                  flightNumber: flight.operationalData?.flightNumber,
+                  // Saved flight: share pulls the map base from the offline
+                  // cache so airplane-mode shares keep the map.
+                  flightId: flight.id,
                 ),
             ],
           ),

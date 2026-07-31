@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
+import 'package:flymap/domain/policy/domestic_route_policy.dart';
+import 'package:flymap/ui/screens/flight_video/rendering/region_highlight_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/domain/entity/units.dart';
@@ -26,8 +28,6 @@ class WeatherShareButton extends StatefulWidget {
   const WeatherShareButton({
     required this.route,
     required this.weather,
-    required this.verdictEmoji,
-    required this.verdictTitle,
     this.flightNumber,
     this.flightId,
     super.key,
@@ -35,8 +35,6 @@ class WeatherShareButton extends StatefulWidget {
 
   final FlightRoute route;
   final FlightWeather weather;
-  final String verdictEmoji;
-  final String verdictTitle;
   final String? flightNumber;
 
   /// Saved flight id, when sharing a stored flight. Lets the renderer pull the
@@ -192,8 +190,26 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
         context.read<SettingsCubit>().state.dateDisplayFormat,
       ),
     );
+    // Country flags in the headline for cross-border flights only — same rule
+    // as the other share cards.
+    final crossBorder = !DomesticRoutePolicy.isDomestic(
+      originCountryCode: route.departure.countryCode,
+      destinationCountryCode: route.arrival.countryCode,
+    );
+    final depFlag = crossBorder
+        ? RegionHighlightModel.flagEmoji(route.departure.countryCode)
+        : null;
+    final arrFlag = crossBorder
+        ? RegionHighlightModel.flagEmoji(route.arrival.countryCode)
+        : null;
+    final depCode = depFlag == null
+        ? route.departure.displayCode
+        : '$depFlag ${route.departure.displayCode}';
+    final arrCode = arrFlag == null
+        ? route.arrival.displayCode
+        : '$arrFlag ${route.arrival.displayCode}';
     return WeatherShareData(
-      headline: '${route.departure.displayCode} → ${route.arrival.displayCode}',
+      headline: '$depCode → $arrCode',
       subtitle: flightNumber.isEmpty ? date : '$flightNumber · $date',
       departure: _airport(
         t.departureLabel,
@@ -211,8 +227,6 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
         weather.isTimeEstimated,
         tempUnit,
       ),
-      verdictEmoji: widget.verdictEmoji,
-      verdictTitle: widget.verdictTitle,
       watermark: 'flymap.app',
     );
   }
@@ -226,6 +240,7 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
     TemperatureUnit tempUnit,
   ) {
     final temperature = weather.temperatureC;
+    final wind = weather.windSpeedMs;
     return WeatherShareAirport(
       label: label,
       code: code,
@@ -237,6 +252,7 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
       timeText: isTimeEstimated
           ? null
           : TravelDateFormatUtils.formatTime(weather.timeLocal),
+      windText: wind == null ? null : '💨 ${wind.round()} m/s',
     );
   }
 }
