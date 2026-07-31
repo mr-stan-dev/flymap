@@ -31,6 +31,14 @@ abstract class ScheduledNotificationsGateway {
     required String payload,
   });
 
+  /// Fires a notification immediately (used only by the debug preview).
+  Future<void> showNow({
+    required int id,
+    required String title,
+    required String body,
+    required String payload,
+  });
+
   Future<void> cancel(int id);
 }
 
@@ -54,6 +62,7 @@ class LocalScheduledNotificationsGateway
           'Reminders and weather forecasts for your saved flights',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
+      icon: 'ic_stat_notification',
     ),
     iOS: DarwinNotificationDetails(),
   );
@@ -65,7 +74,7 @@ class LocalScheduledNotificationsGateway
     // Permission is owned by NotificationPermissionService — never
     // auto-request from plugin init.
     const settings = InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      android: AndroidInitializationSettings('ic_stat_notification'),
       iOS: DarwinInitializationSettings(
         requestAlertPermission: false,
         requestBadgePermission: false,
@@ -101,6 +110,42 @@ class LocalScheduledNotificationsGateway
       scheduledDate: tz.TZDateTime.from(whenUtc, tz.UTC),
       notificationDetails: _details,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      payload: payload,
+    );
+  }
+
+  /// Preview fires while the app is in the foreground; iOS needs explicit
+  /// present flags to show a banner then (unlike the backgrounded scheduled
+  /// alerts, which use the default [_details]).
+  static const _previewDetails = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _channelId,
+      'Flight reminders',
+      channelDescription:
+          'Reminders and weather forecasts for your saved flights',
+      importance: Importance.defaultImportance,
+      priority: Priority.defaultPriority,
+      icon: 'ic_stat_notification',
+    ),
+    iOS: DarwinNotificationDetails(
+      presentAlert: true,
+      presentBanner: true,
+      presentSound: true,
+    ),
+  );
+
+  @override
+  Future<void> showNow({
+    required int id,
+    required String title,
+    required String body,
+    required String payload,
+  }) async {
+    await _plugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: _previewDetails,
       payload: payload,
     );
   }
@@ -211,8 +256,12 @@ class FlightNotificationScheduler {
       try {
         await _gateway.schedule(
           id: notificationId(flight.id, planned.type),
-          title: _title(planned.type, flight),
-          body: _body(planned.type, flight),
+          title: _title(planned.type, isPro: flight.hasProAccess),
+          body: _body(
+            planned.type,
+            isPro: flight.hasProAccess,
+            route: _routeLabel(flight),
+          ),
           whenUtc: whenUtc,
           payload: flight.id,
         );
@@ -241,10 +290,10 @@ class FlightNotificationScheduler {
       '${flight.route.departure.displayCode} → '
       '${flight.route.arrival.displayCode}';
 
-  String _title(ForecastNotificationType type, Flight flight) {
+  String _title(ForecastNotificationType type, {required bool isPro}) {
     final strings = t.notifications;
     // Pro flights promise a forecast; free flights get a plain flight nudge.
-    return switch ((type, flight.hasProAccess)) {
+    return switch ((type, isPro)) {
       (ForecastNotificationType.forecastReady, true) =>
         strings.forecastReadyTitle,
       (ForecastNotificationType.forecastUpdated, true) =>
@@ -256,10 +305,13 @@ class FlightNotificationScheduler {
     };
   }
 
-  String _body(ForecastNotificationType type, Flight flight) {
+  String _body(
+    ForecastNotificationType type, {
+    required bool isPro,
+    required String route,
+  }) {
     final strings = t.notifications;
-    final route = _routeLabel(flight);
-    return switch ((type, flight.hasProAccess)) {
+    return switch ((type, isPro)) {
       (ForecastNotificationType.forecastReady, true) =>
         strings.forecastReadyBody(route: route),
       (ForecastNotificationType.forecastUpdated, true) =>
@@ -269,6 +321,23 @@ class FlightNotificationScheduler {
       (ForecastNotificationType.forecastUpdated, false) =>
         strings.reminderTomorrowBody(route: route),
     };
+  }
+
+  /// DEBUG ONLY: fires the given alert immediately (with the flight's real
+  /// tier + route copy, deep-linking to it) so its appearance can be previewed
+  /// without waiting for the scheduled date. Negative ids keep it clear of the
+  /// deterministic scheduled ids.
+  Future<void> sendPreview(Flight flight, ForecastNotificationType type) async {
+    await _gateway.showNow(
+      id: -1 - type.index,
+      title: _title(type, isPro: flight.hasProAccess),
+      body: _body(
+        type,
+        isPro: flight.hasProAccess,
+        route: _routeLabel(flight),
+      ),
+      payload: flight.id,
+    );
   }
 
   void _handleTap(String? payload) {

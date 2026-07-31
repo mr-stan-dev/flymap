@@ -63,6 +63,26 @@ class _FakeGateway implements ScheduledNotificationsGateway {
     );
   }
 
+  final shown = <_RecordedNotification>[];
+
+  @override
+  Future<void> showNow({
+    required int id,
+    required String title,
+    required String body,
+    required String payload,
+  }) async {
+    shown.add(
+      _RecordedNotification(
+        id: id,
+        title: title,
+        body: body,
+        whenUtc: DateTime.utc(2000),
+        payload: payload,
+      ),
+    );
+  }
+
   @override
   Future<void> cancel(int id) async {
     cancelled.add(id);
@@ -229,6 +249,24 @@ void main() {
     expect(ready.payload, flight.id);
     expect(ready.body, contains('LHR → FCO'));
     expect(ready.title.toLowerCase(), isNot(contains('forecast')));
+  });
+
+  test('sendPreview fires immediately with the flight copy and payload',
+      () async {
+    final flight = _flight(
+      schedule: FlightSchedule.dateOnly(DateTime(2026, 8, 15)),
+    );
+
+    await scheduler().sendPreview(
+      flight,
+      ForecastNotificationType.forecastReady,
+    );
+
+    // Shown now (not scheduled), carries the route copy and deep-link payload.
+    expect(gateway.scheduled, isEmpty);
+    expect(gateway.shown, hasLength(1));
+    expect(gateway.shown.single.payload, flight.id);
+    expect(gateway.shown.single.body, contains('LHR → FCO'));
   });
 
   test('missing permission schedules nothing', () async {
