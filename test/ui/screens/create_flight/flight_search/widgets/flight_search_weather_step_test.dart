@@ -64,7 +64,7 @@ void main() {
     );
   }
 
-  testWidgets('renders airport cards, times and verdict for Pro users', (
+  testWidgets('renders airport cards and times for Pro users', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -85,8 +85,6 @@ void main() {
     );
     // Wind reads as a strength label, not a bare number.
     expect(find.textContaining('Light wind · 4 m/s'), findsNWidgets(2));
-    await tester.scrollUntilVisible(find.text('Clear views'), 200);
-    expect(find.text('Clear views'), findsOneWidget);
   });
 
   testWidgets(
@@ -192,40 +190,6 @@ void main() {
     // 10:00 local = the noon-ish estimate; the clock must not be shown.
     expect(find.textContaining('10:00', findRichText: true), findsNothing);
     expect(find.textContaining('(tomorrow)'), findsNothing);
-  });
-
-  testWidgets('verdict card lists only wind warnings, no region breakdown', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      app(
-        stateWith(weather: _weather(rainy: true, arrivalWindMs: 12)),
-        isProUser: true,
-      ),
-    );
-
-    // The per-region cloud/rain rows are gone — they read as contradictions
-    // on real forecasts. Only the landing wind warning remains.
-    await tester.scrollUntilVisible(
-      find.textContaining('Windy landing'),
-      200,
-    );
-    expect(find.textContaining('Windy landing in B-city'), findsOneWidget);
-    expect(find.textContaining('Rain mid-flight'), findsNothing);
-    expect(find.textContaining('after takeoff'), findsNothing);
-  });
-
-  testWidgets('calm flights show the verdict sentence, no list', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      app(stateWith(weather: _weather()), isProUser: true),
-    );
-
-    await tester.scrollUntilVisible(find.text('Clear views'), 200);
-    // The verdict body sentence is the whole story when nothing is notable.
-    expect(find.textContaining('Window seat worth it'), findsOneWidget);
-    expect(find.textContaining('Windy'), findsNothing);
   });
 
   testWidgets('failed load shows retry and keeps Continue for Pro', (

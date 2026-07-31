@@ -554,7 +554,6 @@ class _WeatherContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.t.createFlight.weather;
     final theme = Theme.of(context);
-    final verdict = FlightWeatherVerdictPolicy.overallVerdict(weather.samples);
     final route = this.route;
 
     final list = ListView(
@@ -613,14 +612,6 @@ class _WeatherContent extends StatelessWidget {
             ),
           ],
         ],
-        if (weather.samples.isNotEmpty) ...[
-          const SizedBox(height: 14),
-          _VerdictBanner(
-            verdict: verdict,
-            expectationItems: _expectationItems(context),
-            smoothSkies: FlightWeatherVerdictPolicy.isCalmAndClear(weather),
-          ),
-        ],
         const SizedBox(height: 14),
         Text(
           '${t.updatedAt(time: TravelDateFormatUtils.formatTime(weather.fetchedAt))}'
@@ -648,61 +639,11 @@ class _WeatherContent extends StatelessWidget {
         1;
   }
 
-  /// Wind warnings only, in flight order: a windy takeoff opens the list,
-  /// a windy landing closes it; calm stays silent (the card gauges say so).
-  ///
-  /// Deliberately NOT a per-region cloud/rain breakdown: real forecasts
-  /// oscillate, so long routes produced 6-8 rows, and the coarse place
-  /// vocabulary collapsed distinct stretches into identical labels
-  /// ("before landing" x3) that read as contradictions. The map is the
-  /// honest picture of that variability; text at this granularity isn't.
-  List<ExpectationItem> _expectationItems(BuildContext context) {
-    final t = context.t.createFlight.weather;
-    final route = this.route;
-    final departureWind = weather.departure.windSpeedMs;
-    final arrivalWind = weather.arrival.windSpeedMs;
-    final windyDeparture =
-        departureWind != null && departureWind >= windyThresholdMs;
-    final windyArrival = arrivalWind != null && arrivalWind >= windyThresholdMs;
-
-    return [
-      if (windyDeparture)
-        ExpectationItem(
-          '💨',
-          t.windTakeoff(
-            city: _windPlace(route?.departure.city, route?.departure.displayCode),
-            speed: '${departureWind.round()}',
-          ),
-        ),
-      if (windyArrival)
-        ExpectationItem(
-          '💨',
-          t.windLanding(
-            city: _windPlace(route?.arrival.city, route?.arrival.displayCode),
-            speed: '${arrivalWind.round()}',
-          ),
-        ),
-    ];
-  }
-
-  String _windPlace(String? city, String? code) {
-    final trimmed = city?.trim() ?? '';
-    if (trimmed.isNotEmpty) return trimmed;
-    return code ?? '';
-  }
 }
 
-/// One row of the verdict card's timeline list.
-class ExpectationItem {
-  const ExpectationItem(this.emoji, this.text);
-
-  final String emoji;
-  final String text;
-}
-
-/// Wind bands (m/s) shared by the airport-card indicator and the verdict
-/// timeline: below [breezyThresholdMs] reads as calm/light (smooth ride),
-/// from [windyThresholdMs] it is worth a warning.
+/// Wind bands (m/s) for the airport-card wind indicator: below
+/// [breezyThresholdMs] reads as calm/light (smooth ride), from
+/// [windyThresholdMs] it is worth a warning.
 const double breezyThresholdMs = 5;
 const double windyThresholdMs = 8;
 const double strongWindThresholdMs = 14;
@@ -954,110 +895,8 @@ class _WindIndicator extends StatelessWidget {
   }
 }
 
-class _VerdictBanner extends StatelessWidget {
-  const _VerdictBanner({
-    required this.verdict,
-    this.expectationItems = const <ExpectationItem>[],
-    this.smoothSkies = false,
-  });
-
-  final WindowVerdict verdict;
-
-  /// Timeline-ordered key points; when present they replace the generic
-  /// body sentence — a scannable list instead of a prose paragraph.
-  final List<ExpectationItem> expectationItems;
-
-  /// Good-news-only: appends a "calm, clear skies" line when the ride and the
-  /// view both look benign. Silent otherwise — never a bad-weather warning.
-  final bool smoothSkies;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.t.createFlight.weather;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final (emoji, title, body) = verdictPresentation(verdict, t);
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: colorScheme.primaryContainer.withValues(alpha: 0.45),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(emoji, style: const TextStyle(fontSize: 24)),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (expectationItems.isEmpty) ...[
-            const SizedBox(height: 4),
-            Text(body, style: theme.textTheme.bodyMedium),
-            if (smoothSkies) ...[
-              const SizedBox(height: 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    width: 24,
-                    child: Text('✨', style: TextStyle(fontSize: 15)),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      t.smoothSkies,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ] else
-            for (final item in expectationItems) ...[
-              const SizedBox(height: 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 24,
-                    child: Text(
-                      item.emoji,
-                      style: const TextStyle(fontSize: 15),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      item.text,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-        ],
-      ),
-    );
-  }
-}
-
-/// (emoji, title, body) for a window verdict — shared by the banner and
-/// the weather share card.
+/// (emoji, title, body) for a window verdict — used by the weather share
+/// card, the home flight card, and the flight hub.
 (String, String, String) verdictPresentation(WindowVerdict verdict, dynamic t) {
   return switch (verdict) {
     WindowVerdict.clearViews => ('☀️', t.verdictClearTitle, t.verdictClearBody),
