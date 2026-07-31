@@ -273,6 +273,10 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
     GpsData? data,
     bool resetGeoState = false,
   }) {
+    // A GPS position can still surface after the screen is popped: close()
+    // stops the provider without awaiting, so an already-queued update fires
+    // this callback on a closed cubit. Guard the sole GPS emit path.
+    if (isClosed) return;
     final current = state is FlightScreenLoaded
         ? state as FlightScreenLoaded
         : null;
@@ -333,9 +337,11 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
     _gpsCheckTimer?.cancel();
-    _gpsProvider.stop();
+    // Await so the position stream is torn down before super.close(); a
+    // straggler update would otherwise emit on a closed cubit.
+    await _gpsProvider.stop();
     return super.close();
   }
 }

@@ -54,6 +54,17 @@ class AppRouter {
   static const String settingsHistoryRoute = '/settings/history';
   static const String learnArticleRoute = '/learn/article';
 
+  /// Redirect target for the flight route: [homeRoute] when a [Flight] isn't
+  /// present in `extra` (e.g. a notification deep link whose flight lookup
+  /// failed), else null (proceed). Guards the only route that requires a
+  /// non-null Flight in extra, so a malformed navigation redirects home
+  /// instead of throwing a null-cast TypeError.
+  @visibleForTesting
+  static String? flightRouteRedirectTarget(Object? extra) {
+    if (extra is Map<String, dynamic> && extra['flight'] is Flight) return null;
+    return homeRoute;
+  }
+
   /// Create the router configuration
   static GoRouter createRouter({required bool showOnboarding}) {
     return GoRouter(
@@ -159,10 +170,15 @@ class AppRouter {
         GoRoute(
           path: flightRoute,
           name: 'flight',
+          // Requires a Flight in extra (a deep link whose flight lookup failed
+          // could arrive without one). Redirect home instead of crashing on a
+          // null cast — this was the only route not guarding its extra.
+          redirect: (context, state) =>
+              flightRouteRedirectTarget(state.extra),
           builder: (context, state) {
-            final extra = state.extra as Map<String, dynamic>?;
-            final flight = extra?['flight'] as Flight;
-            final openWeather = extra?['openWeather'] == true;
+            final extra = state.extra! as Map<String, dynamic>;
+            final flight = extra['flight']! as Flight;
+            final openWeather = extra['openWeather'] == true;
 
             return FlightScreen(flight: flight, openWeather: openWeather);
           },

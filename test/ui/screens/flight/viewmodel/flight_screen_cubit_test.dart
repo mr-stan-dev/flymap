@@ -20,6 +20,39 @@ import 'package:latlong2/latlong.dart';
 
 void main() {
   group('FlightScreenCubit GPS handling', () {
+    test('a GPS update after close does not emit on a closed cubit', () async {
+      final gpsProvider = _FakeGpsDataProvider();
+      final cubit = FlightScreenCubit(
+        flight: _buildFlight(status: FlightStatus.inProgress),
+        deleteFlightUseCase: _NoopDeleteFlightUseCase(),
+        completeFlightUseCase: _NoopCompleteFlightUseCase(),
+        startFlightUseCase: _FakeStartFlightUseCase(result: true),
+        gpsProvider: gpsProvider,
+        geoAwarenessEngine: const GeoAwarenessEngine(),
+        nowProvider: () => DateTime.utc(2026, 1, 1, 12),
+        enableGpsCheckTimer: false,
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      await cubit.close();
+
+      // A position can still surface after the screen is popped (stop() isn't
+      // instantaneous). The guard must swallow it, not throw "emit after
+      // close".
+      expect(
+        () => gpsProvider.emit(
+          GpsStatus.gpsActive,
+          data: const GpsData(
+            latitude: 51,
+            longitude: 0.1,
+            speed: SpeedValue(800, 'km/h'),
+            accuracy: 12,
+          ),
+        ),
+        returnsNormally,
+      );
+    });
+
     test('preserves last fix and stale GPS data while searching', () async {
       var now = DateTime.utc(2026, 1, 1, 12, 0, 0);
       final gpsProvider = _FakeGpsDataProvider();

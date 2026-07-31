@@ -167,7 +167,6 @@ class DiModule {
       () => FlightsDbMigrationRunner(
         database: i.get(),
         migrations: i.get<List<FlightsDbMigration>>(),
-        connectivityChecker: i.get(),
         crashlytics: i.get(),
       ),
     );

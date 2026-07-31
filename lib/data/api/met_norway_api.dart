@@ -62,10 +62,12 @@ class MetNorwayApi {
       'lat': latLon.latitude.toStringAsFixed(4),
       'lon': latLon.longitude.toStringAsFixed(4),
     });
-    final response = await _httpClient.get(
-      uri,
-      headers: const {'User-Agent': _userAgent},
-    );
+    // A flight fans out ~30 of these; without a timeout one stalled request
+    // (connected-but-not-responding Wi-Fi) hangs the whole weather step. The
+    // use case treats a throw as "point unavailable" and carries on.
+    final response = await _httpClient
+        .get(uri, headers: const {'User-Agent': _userAgent})
+        .timeout(const Duration(seconds: 12));
     if (response.statusCode != 200 && response.statusCode != 203) {
       _logger.error('met.no ${response.statusCode} for $uri');
       throw http.ClientException(

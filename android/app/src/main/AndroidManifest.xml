@@ -21,7 +21,15 @@
     <application
         android:label="Flymap"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"><!--
+        Off deliberately: the flights DB (flightAccessTier) and the
+        SharedPreferences one-time-unlock counter are the source of truth for
+        paid entitlements, so backing them up lets adb backup/restore or a
+        device transfer spoof them. Offline maps are large (past the 25 MB
+        auto-backup quota) and re-downloadable, so little is lost. Full
+        entitlement integrity still wants server-side (RevenueCat) validation
+        of the client tier on launch. -->
         <meta-data
             android:name="com.posthog.posthog.AUTO_INIT"
             android:value="false" />

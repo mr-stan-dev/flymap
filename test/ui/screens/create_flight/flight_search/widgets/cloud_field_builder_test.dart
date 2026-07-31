@@ -108,7 +108,7 @@ void main() {
     expect(cloudy, greaterThan(0), reason: 'cloud cores expected');
   });
 
-  test('rain recolors cloud cores along the blue-violet ramp', () {
+  test('rain recolors cloud cores along the steel-blue-to-navy ramp', () {
     Uint8List frame(double precip) => _builder([
       for (var i = 0; i < 6; i++)
         _sample(progress: i / 5, hidden: 100, precip: precip),
@@ -131,11 +131,11 @@ void main() {
     // Rain never thins the deck — thin noise spots gain a rain wash, the
     // rest keeps its coverage...
     expect(rainyAlpha, greaterThanOrEqualTo(dryAlpha));
-    // ...and the wet core turns violet: blue on top, green lowest, red
-    // between — a chromatic shift, not the old grey darkening (which was
-    // invisible over the dark map).
-    expect(rainyBlue, greaterThan(rainyRed));
-    expect(rainyRed, greaterThan(rainyGreen));
+    // ...and the wet core turns navy blue: blue dominant, red lowest, green
+    // between — a natural rain hue (not violet), and not the old grey
+    // darkening that was invisible over the dark map.
+    expect(rainyBlue, greaterThan(rainyGreen));
+    expect(rainyGreen, greaterThan(rainyRed));
     // Dry cloud is neutral grey (blue ~ red); rain opens a wide gap —
     // at least 8/255 mean per pixel.
     final pixels = dry.length ~/ 4;

@@ -1,6 +1,5 @@
 import 'package:flymap/data/local/app_database.dart';
 import 'package:flymap/data/local/migrations/flights_db_migration.dart';
-import 'package:flymap/data/network/connectivity_checker.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/logger.dart';
 import 'package:sembast/sembast.dart';
@@ -9,28 +8,24 @@ class FlightsDbMigrationRunner {
   FlightsDbMigrationRunner({
     required AppDatabase database,
     required List<FlightsDbMigration> migrations,
-    required ConnectivityChecker connectivityChecker,
     required AppCrashlytics crashlytics,
   }) : _database = database,
        _migrations = migrations,
-       _connectivityChecker = connectivityChecker,
        _crashlytics = crashlytics;
 
   static const String _metaRecordKey = 'flights_db_schema';
 
   final AppDatabase _database;
   final List<FlightsDbMigration> _migrations;
-  final ConnectivityChecker _connectivityChecker;
   final AppCrashlytics _crashlytics;
   final Logger _logger = const Logger('FlightsDbMigrationRunner');
 
+  // Runs unconditionally: schema migrations are purely local (they only move
+  // data between sembast stores), so gating on connectivity meant offline
+  // updaters never advanced their schema — and it added a socket probe to the
+  // cold-start path. Network-dependent backfills, if ever added, must gate
+  // themselves, not the whole runner.
   Future<void> migrateIfNeeded() async {
-    final hasInternet = await _connectivityChecker.hasInternetConnectivity();
-    if (!hasInternet) {
-      _logger.log('Skipping flights DB migration: no internet connectivity');
-      return;
-    }
-
     try {
       final db = _database.database;
       final currentVersion = await _readCurrentVersion(db);

@@ -126,21 +126,25 @@ class CloudFieldBuilder {
         // precip block can outpace the instant cloud fraction, and rain
         // that renders as nothing contradicts a rainy airport card.
         alpha = math.max(alpha, rain * 0.38);
+        // Heavy rain reads as a denser deck — let the wettest cores push
+        // past the usual translucent cap so the ground is more hidden under
+        // heavy rain (quadratic, so only heavy rain thickens).
+        alpha = (alpha + 0.12 * rain * rain).clamp(0.0, 0.92);
 
         // Dense cores shade slightly gray — depth, like a real deck seen
         // from above; thin cover stays white.
         final brightness = 1.0 - 0.15 * cloud * (0.4 + 0.6 * noise);
 
-        // Rain RECOLORS the deck instead of darkening it: an intensity
-        // ramp from cool blue (drizzle) to saturated blue-violet (heavy),
-        // the Windy/Ventusky precipitation convention. Hue contrast reads
-        // both inside white cloud and over the dark map, where the old
-        // slate darkening disappeared entirely. Noise keeps wet cores
-        // textured instead of flat.
+        // Rain RECOLORS the deck instead of darkening it: an intensity ramp
+        // from steel blue (drizzle) to deep navy (heavy). Blue stays dominant
+        // with red kept lowest, so it reads as natural rain — never the neon
+        // violet that a near-equal red+blue produces. Hue contrast still
+        // carries over the dark map, where the old slate darkening
+        // disappeared. Noise keeps wet cores textured instead of flat.
         final mix = rain * (0.65 + 0.30 * noise);
-        final rainRed = 0.44 + 0.20 * rain;
-        final rainGreen = 0.60 - 0.26 * rain;
-        const rainBlue = 0.95;
+        final rainRed = 0.26 - 0.14 * rain;
+        final rainGreen = 0.42 - 0.18 * rain;
+        final rainBlue = 0.72 - 0.14 * rain;
         final red = brightness * (1 - mix) + rainRed * mix;
         final green = brightness * (1 - mix) + rainGreen * mix;
         final blue = brightness * (1 - mix) + rainBlue * mix;

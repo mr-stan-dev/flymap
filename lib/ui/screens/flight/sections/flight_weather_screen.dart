@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/network/connectivity_checker.dart';
+import 'package:flymap/data/notifications/flight_notification_scheduler.dart';
 import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/policy/flight_weather_verdict_policy.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/flight_repository.dart';
+import 'package:flymap/repository/flight_unlock_repository.dart';
 import 'package:flymap/subscription/paywall_source.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/flight_unlock_gate_sheet.dart';
@@ -90,6 +92,13 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
         accessTier: Flight.accessTierPro,
       );
     }
+    // Spend the one-time-unlock credit. The gate sheet either used an existing
+    // credit or just purchased one (+1 balance); either way this flight
+    // consumes exactly one — the create-flight download path consumes too.
+    // Without this, a single credit unlocks unlimited saved flights.
+    if (GetIt.I.isRegistered<FlightUnlockRepository>()) {
+      await GetIt.I.get<FlightUnlockRepository>().consumeUnlock();
+    }
     if (!mounted) return;
     setState(() => _unlocked = true);
     await _fetchForecast();
@@ -122,6 +131,15 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
       await GetIt.I.get<FlightRepository>().updateFlightSchedule(
         flightId: widget.flight.id,
         schedule: schedule,
+      );
+    }
+    // Now that the flight has a date, schedule its forecast notifications —
+    // the create-flight flow does this on save. Without it, a dateless flight
+    // dated here gets no alerts until the next cold-start resync (and any
+    // alert whose fire time has already passed by then is lost).
+    if (GetIt.I.isRegistered<FlightNotificationScheduler>()) {
+      await GetIt.I.get<FlightNotificationScheduler>().syncForFlightId(
+        widget.flight.id,
       );
     }
     if (!mounted) return;
