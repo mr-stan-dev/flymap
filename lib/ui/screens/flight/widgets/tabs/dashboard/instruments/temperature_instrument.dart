@@ -33,19 +33,8 @@ class TemperatureInstrument extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              PanelLabel(context.t.flight.dashboard.outsideAirApprox),
-              const SizedBox(width: 8),
-              Spacer(),
-              Icon(
-                Icons.ac_unit_rounded,
-                color: palette.secondaryText,
-                size: 20,
-              ),
-            ],
-          ),
+          // Top-right is left free for the info button overlay.
+          PanelLabel(context.t.flight.dashboard.outsideAirApprox),
           const SizedBox(height: 2),
           if (!available) ...[
             const SizedBox(height: 8),

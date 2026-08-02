@@ -4,6 +4,7 @@ import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/dashboard_panel.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/gps_live_status_card.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/motion/flight_motion_section.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/telemetry_searching_overlay.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/shared/tab_state_placeholder.dart';
 
@@ -99,6 +100,10 @@ class _LoadedDashboardTab extends StatelessWidget {
               )
             else
               FlightDashboardPanel(state: state),
+            const SizedBox(height: 12),
+            // G-force + cabin pressure are secondary, and work without a GPS
+            // fix, so they sit at the very bottom of the dashboard.
+            const FlightMotionSection(),
           ],
         ),
       ),

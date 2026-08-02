@@ -1437,6 +1437,21 @@ class _TranslationsFlightDashboardDe extends TranslationsFlightDashboardEn {
 	@override String get covered => 'Zurückgelegt';
 	@override String get remaining => 'Verbleibend';
 	@override String get total => 'Gesamt';
+	@override String get gForce => 'G-Kraft';
+	@override String get gForcePeakLabel => 'MAX.';
+	@override String get cabinPressure => 'Kabinendruck';
+	@override String cabinPressureLikeAltitude({required Object altitude}) => 'Fühlt sich an wie ${altitude}';
+	@override String get cabinPressureCruise => 'Reiseflug';
+	@override String get cabinPressureSeaLevel => 'Meereshöhe';
+	@override String get metricInfoGotIt => 'Verstanden';
+	@override String get gForceInfoBody => 'Wie schwer du dich gerade fühlst, gemessen von deinem Telefon. 1,0 g ist normales Gewicht; über 1 g steigt es, wenn das Flugzeug hochzieht oder aufsetzt, und darunter fällt es, wenn du über eine Bö schwebst.';
+	@override String get cabinPressureInfoBody => 'Der Luftdruck in der Kabine. Verkehrsflugzeuge halten ihn angenehm, aber dünner als auf Meereshöhe – etwa wie auf einem Berg –, weshalb deine Ohren beim Druckwechsel knacken.';
+	@override String get groundSpeedInfoBody => 'Wie schnell sich das Flugzeug über den Boden bewegt, per GPS. Sie unterscheidet sich von der Fluggeschwindigkeit der Piloten, weil Rücken- und Gegenwind das Flugzeug schneller oder langsamer vorantreiben.';
+	@override String get altitudeInfoBody => 'Die Höhe des Flugzeugs über dem Meeresspiegel, per GPS. Verkehrsflugzeuge fliegen meist um 10–12 km, über den meisten Wolken und dem Wetter.';
+	@override String get headingInfoBody => 'Die Himmelsrichtung, in die das Flugzeug zeigt, aus deinem GPS-Kurs. 0° ist Norden, 90° Osten, 180° Süden und 270° Westen.';
+	@override String get temperatureInfoBody => 'Eine Schätzung der Außentemperatur anhand deiner Höhe. Sie fällt stark mit der Höhe – im Reiseflug oft um -50 °C, selbst über einem warmen Land.';
+	@override String get cabinPressureEnableBody => 'Erlaube den Bewegungszugriff, um den Luftdruck in der Kabine zu sehen.';
+	@override String get cabinPressureEnableButton => 'Aktivieren';
 }
 
 // Path: flight.upcoming
@@ -2388,6 +2403,21 @@ extension on TranslationsDe {
 			'flight.dashboard.covered' => 'Zurückgelegt',
 			'flight.dashboard.remaining' => 'Verbleibend',
 			'flight.dashboard.total' => 'Gesamt',
+			'flight.dashboard.gForce' => 'G-Kraft',
+			'flight.dashboard.gForcePeakLabel' => 'MAX.',
+			'flight.dashboard.cabinPressure' => 'Kabinendruck',
+			'flight.dashboard.cabinPressureLikeAltitude' => ({required Object altitude}) => 'Fühlt sich an wie ${altitude}',
+			'flight.dashboard.cabinPressureCruise' => 'Reiseflug',
+			'flight.dashboard.cabinPressureSeaLevel' => 'Meereshöhe',
+			'flight.dashboard.metricInfoGotIt' => 'Verstanden',
+			'flight.dashboard.gForceInfoBody' => 'Wie schwer du dich gerade fühlst, gemessen von deinem Telefon. 1,0 g ist normales Gewicht; über 1 g steigt es, wenn das Flugzeug hochzieht oder aufsetzt, und darunter fällt es, wenn du über eine Bö schwebst.',
+			'flight.dashboard.cabinPressureInfoBody' => 'Der Luftdruck in der Kabine. Verkehrsflugzeuge halten ihn angenehm, aber dünner als auf Meereshöhe – etwa wie auf einem Berg –, weshalb deine Ohren beim Druckwechsel knacken.',
+			'flight.dashboard.groundSpeedInfoBody' => 'Wie schnell sich das Flugzeug über den Boden bewegt, per GPS. Sie unterscheidet sich von der Fluggeschwindigkeit der Piloten, weil Rücken- und Gegenwind das Flugzeug schneller oder langsamer vorantreiben.',
+			'flight.dashboard.altitudeInfoBody' => 'Die Höhe des Flugzeugs über dem Meeresspiegel, per GPS. Verkehrsflugzeuge fliegen meist um 10–12 km, über den meisten Wolken und dem Wetter.',
+			'flight.dashboard.headingInfoBody' => 'Die Himmelsrichtung, in die das Flugzeug zeigt, aus deinem GPS-Kurs. 0° ist Norden, 90° Osten, 180° Süden und 270° Westen.',
+			'flight.dashboard.temperatureInfoBody' => 'Eine Schätzung der Außentemperatur anhand deiner Höhe. Sie fällt stark mit der Höhe – im Reiseflug oft um -50 °C, selbst über einem warmen Land.',
+			'flight.dashboard.cabinPressureEnableBody' => 'Erlaube den Bewegungszugriff, um den Luftdruck in der Kabine zu sehen.',
+			'flight.dashboard.cabinPressureEnableButton' => 'Aktivieren',
 			'flight.upcoming.mapTitle' => 'Starte deine Flugreise',
 			'flight.upcoming.mapSubtitle' => 'Starte die Live-Verfolgung, sobald dein Flug beginnt',
 			'flight.upcoming.dashboardTitle' => 'Starte deine Flugreise',
@@ -2657,6 +2687,8 @@ extension on TranslationsDe {
 			'countries.GQ' => 'Äquatorialguinea',
 			'countries.GR' => 'Griechenland',
 			'countries.GT' => 'Guatemala',
+			_ => null,
+		} ?? switch (path) {
 			'countries.GW' => 'Guinea-Bissau',
 			'countries.GY' => 'Guyana',
 			'countries.HK' => 'Hongkong, China',
@@ -2672,8 +2704,6 @@ extension on TranslationsDe {
 			'countries.IR' => 'Iran',
 			'countries.IS' => 'Island',
 			'countries.IT' => 'Italien',
-			_ => null,
-		} ?? switch (path) {
 			'countries.JM' => 'Jamaika',
 			'countries.JO' => 'Jordanien',
 			'countries.JP' => 'Japan',

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flymap/domain/entity/gps_data.dart';
 import 'package:flymap/domain/entity/units.dart';
 import 'package:flymap/domain/policy/flight_phase_policy.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/metric_units_repository.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/instruments/altitude_instrument.dart';
@@ -11,6 +12,7 @@ import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/instruments/comp
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/instruments/instrument_telemetry.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/instruments/speed_instrument.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/instruments/temperature_instrument.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/metric_info.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/metric_row.dart';
 import 'package:flymap/utils/speed_unit_utils.dart';
 
@@ -59,13 +61,18 @@ class _FlightInstrumentClusterState extends State<FlightInstrumentCluster> {
       altitudeDeltaMeters: _altitudeDeltaM,
     );
 
+    final t = context.t.flight.dashboard;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        GroundSpeedInstrument(
-          telemetry: telemetry,
-          speedTrend: _speedTrend,
-          phase: phase,
+        MetricInfoSection(
+          title: t.groundSpeed,
+          body: t.groundSpeedInfoBody,
+          child: GroundSpeedInstrument(
+            telemetry: telemetry,
+            speedTrend: _speedTrend,
+            phase: phase,
+          ),
         ),
         const SizedBox(height: DsSpacing.sm),
         LayoutBuilder(
@@ -76,9 +83,13 @@ class _FlightInstrumentClusterState extends State<FlightInstrumentCluster> {
                 Expanded(
                   child: SizedBox(
                     height: 200,
-                    child: AltitudeInstrument(
-                      telemetry: telemetry,
-                      trend: _altitudeTrend,
+                    child: MetricInfoSection(
+                      title: t.altitudeMsl,
+                      body: t.altitudeInfoBody,
+                      child: AltitudeInstrument(
+                        telemetry: telemetry,
+                        trend: _altitudeTrend,
+                      ),
                     ),
                   ),
                 ),
@@ -86,7 +97,11 @@ class _FlightInstrumentClusterState extends State<FlightInstrumentCluster> {
                 Expanded(
                   child: SizedBox(
                     height: 200,
-                    child: CompassInstrument(telemetry: telemetry),
+                    child: MetricInfoSection(
+                      title: t.headingPanel,
+                      body: t.headingInfoBody,
+                      child: CompassInstrument(telemetry: telemetry),
+                    ),
                   ),
                 ),
               ],
@@ -94,9 +109,13 @@ class _FlightInstrumentClusterState extends State<FlightInstrumentCluster> {
           },
         ),
         const SizedBox(height: DsSpacing.sm),
-        TemperatureInstrument(
-          telemetry: telemetry,
-          temperatureUnit: _temperatureUnit,
+        MetricInfoSection(
+          title: t.outsideAirApprox,
+          body: t.temperatureInfoBody,
+          child: TemperatureInstrument(
+            telemetry: telemetry,
+            temperatureUnit: _temperatureUnit,
+          ),
         ),
       ],
     );

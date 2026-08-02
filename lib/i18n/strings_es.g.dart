@@ -1437,6 +1437,21 @@ class _TranslationsFlightDashboardEs extends TranslationsFlightDashboardEn {
 	@override String get covered => 'Recorrido';
 	@override String get remaining => 'Restante';
 	@override String get total => 'Total';
+	@override String get gForce => 'Fuerza G';
+	@override String get gForcePeakLabel => 'MÁX.';
+	@override String get cabinPressure => 'Presión de cabina';
+	@override String cabinPressureLikeAltitude({required Object altitude}) => 'Como estar a ${altitude}';
+	@override String get cabinPressureCruise => 'Crucero';
+	@override String get cabinPressureSeaLevel => 'Nivel del mar';
+	@override String get metricInfoGotIt => 'Entendido';
+	@override String get gForceInfoBody => 'Lo pesado que te sientes ahora mismo, medido por tu teléfono. 1,0 g es el peso normal; sube por encima de 1 g cuando el avión asciende o aterriza, y baja cuando flotas sobre una turbulencia.';
+	@override String get cabinPressureInfoBody => 'La presión del aire dentro de la cabina. Los aviones la mantienen cómoda pero más ligera que a nivel del mar —parecida a la de una montaña—, por eso se te destapan los oídos cuando cambia.';
+	@override String get groundSpeedInfoBody => 'La velocidad del avión respecto al suelo, según el GPS. Difiere de la velocidad del aire que usan los pilotos, porque el viento de cola o de frente empuja al avión más rápido o más lento.';
+	@override String get altitudeInfoBody => 'La altura del avión sobre el nivel del mar, según el GPS. Los aviones suelen volar en crucero a unos 10–12 km, por encima de la mayoría de las nubes y el clima.';
+	@override String get headingInfoBody => 'La dirección de la brújula hacia la que apunta el avión, según tu rumbo GPS. 0° es norte, 90° este, 180° sur y 270° oeste.';
+	@override String get temperatureInfoBody => 'Una estimación de la temperatura exterior a partir de tu altitud. Baja mucho con la altura: a menudo unos -50 °C en crucero, incluso sobre un país cálido.';
+	@override String get cabinPressureEnableBody => 'Permite el acceso al movimiento para ver la presión del aire en la cabina.';
+	@override String get cabinPressureEnableButton => 'Activar';
 }
 
 // Path: flight.upcoming
@@ -2388,6 +2403,21 @@ extension on TranslationsEs {
 			'flight.dashboard.covered' => 'Recorrido',
 			'flight.dashboard.remaining' => 'Restante',
 			'flight.dashboard.total' => 'Total',
+			'flight.dashboard.gForce' => 'Fuerza G',
+			'flight.dashboard.gForcePeakLabel' => 'MÁX.',
+			'flight.dashboard.cabinPressure' => 'Presión de cabina',
+			'flight.dashboard.cabinPressureLikeAltitude' => ({required Object altitude}) => 'Como estar a ${altitude}',
+			'flight.dashboard.cabinPressureCruise' => 'Crucero',
+			'flight.dashboard.cabinPressureSeaLevel' => 'Nivel del mar',
+			'flight.dashboard.metricInfoGotIt' => 'Entendido',
+			'flight.dashboard.gForceInfoBody' => 'Lo pesado que te sientes ahora mismo, medido por tu teléfono. 1,0 g es el peso normal; sube por encima de 1 g cuando el avión asciende o aterriza, y baja cuando flotas sobre una turbulencia.',
+			'flight.dashboard.cabinPressureInfoBody' => 'La presión del aire dentro de la cabina. Los aviones la mantienen cómoda pero más ligera que a nivel del mar —parecida a la de una montaña—, por eso se te destapan los oídos cuando cambia.',
+			'flight.dashboard.groundSpeedInfoBody' => 'La velocidad del avión respecto al suelo, según el GPS. Difiere de la velocidad del aire que usan los pilotos, porque el viento de cola o de frente empuja al avión más rápido o más lento.',
+			'flight.dashboard.altitudeInfoBody' => 'La altura del avión sobre el nivel del mar, según el GPS. Los aviones suelen volar en crucero a unos 10–12 km, por encima de la mayoría de las nubes y el clima.',
+			'flight.dashboard.headingInfoBody' => 'La dirección de la brújula hacia la que apunta el avión, según tu rumbo GPS. 0° es norte, 90° este, 180° sur y 270° oeste.',
+			'flight.dashboard.temperatureInfoBody' => 'Una estimación de la temperatura exterior a partir de tu altitud. Baja mucho con la altura: a menudo unos -50 °C en crucero, incluso sobre un país cálido.',
+			'flight.dashboard.cabinPressureEnableBody' => 'Permite el acceso al movimiento para ver la presión del aire en la cabina.',
+			'flight.dashboard.cabinPressureEnableButton' => 'Activar',
 			'flight.upcoming.mapTitle' => 'Empieza tu viaje en vuelo',
 			'flight.upcoming.mapSubtitle' => 'Inicia el seguimiento en vivo cuando comience tu vuelo',
 			'flight.upcoming.dashboardTitle' => 'Empieza tu viaje en vuelo',
@@ -2657,6 +2687,8 @@ extension on TranslationsEs {
 			'countries.GQ' => 'Guinea Ecuatorial',
 			'countries.GR' => 'Grecia',
 			'countries.GT' => 'Guatemala',
+			_ => null,
+		} ?? switch (path) {
 			'countries.GW' => 'Guinea-Bisau',
 			'countries.GY' => 'Guyana',
 			'countries.HK' => 'Hong Kong, China',
@@ -2672,8 +2704,6 @@ extension on TranslationsEs {
 			'countries.IR' => 'Iran',
 			'countries.IS' => 'Islandia',
 			'countries.IT' => 'Italia',
-			_ => null,
-		} ?? switch (path) {
 			'countries.JM' => 'Jamaica',
 			'countries.JO' => 'Jordania',
 			'countries.JP' => 'Japon',

@@ -1437,6 +1437,21 @@ class _TranslationsFlightDashboardFr extends TranslationsFlightDashboardEn {
 	@override String get covered => 'Parcouru';
 	@override String get remaining => 'Restant';
 	@override String get total => 'Total';
+	@override String get gForce => 'Force G';
+	@override String get gForcePeakLabel => 'MAX';
+	@override String get cabinPressure => 'Pression cabine';
+	@override String cabinPressureLikeAltitude({required Object altitude}) => 'Comme à ${altitude}';
+	@override String get cabinPressureCruise => 'Croisière';
+	@override String get cabinPressureSeaLevel => 'Niveau de la mer';
+	@override String get metricInfoGotIt => 'Compris';
+	@override String get gForceInfoBody => 'À quel point vous vous sentez lourd en ce moment, mesuré par votre téléphone. 1,0 g correspond au poids normal ; ça monte au-dessus de 1 g quand l\'avion cabre ou se pose, et ça descend quand vous flottez au-dessus d\'une turbulence.';
+	@override String get cabinPressureInfoBody => 'La pression de l\'air dans la cabine. Les avions la gardent confortable mais plus faible qu\'au niveau de la mer — comme en montagne —, c\'est pourquoi vos oreilles se débouchent quand elle change.';
+	@override String get groundSpeedInfoBody => 'La vitesse de l\'avion par rapport au sol, d\'après le GPS. Elle diffère de la vitesse air que suivent les pilotes, car les vents arrière ou de face poussent l\'avion plus ou moins vite.';
+	@override String get altitudeInfoBody => 'La hauteur de l\'avion au-dessus du niveau de la mer, d\'après le GPS. Les avions de ligne croisent en général vers 10–12 km, au-dessus de la plupart des nuages et de la météo.';
+	@override String get headingInfoBody => 'La direction de la boussole vers laquelle pointe l\'avion, d\'après votre cap GPS. 0° c\'est le nord, 90° l\'est, 180° le sud et 270° l\'ouest.';
+	@override String get temperatureInfoBody => 'Une estimation de la température extérieure à partir de votre altitude. Elle chute fortement avec l\'altitude — souvent autour de -50 °C en croisière, même au-dessus d\'un pays chaud.';
+	@override String get cabinPressureEnableBody => 'Autorisez l\'accès au mouvement pour voir la pression de l\'air dans la cabine.';
+	@override String get cabinPressureEnableButton => 'Activer';
 }
 
 // Path: flight.upcoming
@@ -2388,6 +2403,21 @@ extension on TranslationsFr {
 			'flight.dashboard.covered' => 'Parcouru',
 			'flight.dashboard.remaining' => 'Restant',
 			'flight.dashboard.total' => 'Total',
+			'flight.dashboard.gForce' => 'Force G',
+			'flight.dashboard.gForcePeakLabel' => 'MAX',
+			'flight.dashboard.cabinPressure' => 'Pression cabine',
+			'flight.dashboard.cabinPressureLikeAltitude' => ({required Object altitude}) => 'Comme à ${altitude}',
+			'flight.dashboard.cabinPressureCruise' => 'Croisière',
+			'flight.dashboard.cabinPressureSeaLevel' => 'Niveau de la mer',
+			'flight.dashboard.metricInfoGotIt' => 'Compris',
+			'flight.dashboard.gForceInfoBody' => 'À quel point vous vous sentez lourd en ce moment, mesuré par votre téléphone. 1,0 g correspond au poids normal ; ça monte au-dessus de 1 g quand l\'avion cabre ou se pose, et ça descend quand vous flottez au-dessus d\'une turbulence.',
+			'flight.dashboard.cabinPressureInfoBody' => 'La pression de l\'air dans la cabine. Les avions la gardent confortable mais plus faible qu\'au niveau de la mer — comme en montagne —, c\'est pourquoi vos oreilles se débouchent quand elle change.',
+			'flight.dashboard.groundSpeedInfoBody' => 'La vitesse de l\'avion par rapport au sol, d\'après le GPS. Elle diffère de la vitesse air que suivent les pilotes, car les vents arrière ou de face poussent l\'avion plus ou moins vite.',
+			'flight.dashboard.altitudeInfoBody' => 'La hauteur de l\'avion au-dessus du niveau de la mer, d\'après le GPS. Les avions de ligne croisent en général vers 10–12 km, au-dessus de la plupart des nuages et de la météo.',
+			'flight.dashboard.headingInfoBody' => 'La direction de la boussole vers laquelle pointe l\'avion, d\'après votre cap GPS. 0° c\'est le nord, 90° l\'est, 180° le sud et 270° l\'ouest.',
+			'flight.dashboard.temperatureInfoBody' => 'Une estimation de la température extérieure à partir de votre altitude. Elle chute fortement avec l\'altitude — souvent autour de -50 °C en croisière, même au-dessus d\'un pays chaud.',
+			'flight.dashboard.cabinPressureEnableBody' => 'Autorisez l\'accès au mouvement pour voir la pression de l\'air dans la cabine.',
+			'flight.dashboard.cabinPressureEnableButton' => 'Activer',
 			'flight.upcoming.mapTitle' => 'Commencez votre voyage',
 			'flight.upcoming.mapSubtitle' => 'Lancez le suivi en direct quand votre vol commence',
 			'flight.upcoming.dashboardTitle' => 'Commencez votre voyage',
@@ -2657,6 +2687,8 @@ extension on TranslationsFr {
 			'countries.GQ' => 'Guinée équatoriale',
 			'countries.GR' => 'Grèce',
 			'countries.GT' => 'Guatemala',
+			_ => null,
+		} ?? switch (path) {
 			'countries.GW' => 'Guinée-Bissau',
 			'countries.GY' => 'Guyana',
 			'countries.HK' => 'Hong Kong, Chine',
@@ -2672,8 +2704,6 @@ extension on TranslationsFr {
 			'countries.IR' => 'Iran',
 			'countries.IS' => 'Islande',
 			'countries.IT' => 'Italie',
-			_ => null,
-		} ?? switch (path) {
 			'countries.JM' => 'Jamaïque',
 			'countries.JO' => 'Jordanie',
 			'countries.JP' => 'Japon',

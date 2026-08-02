@@ -806,7 +806,22 @@
       "routeProgress": "Progression sur l’itinéraire",
       "covered": "Parcouru",
       "remaining": "Restant",
-      "total": "Total"
+      "total": "Total",
+      "gForce": "Force G",
+      "gForcePeakLabel": "MAX",
+      "cabinPressure": "Pression cabine",
+      "cabinPressureLikeAltitude": "Comme à $altitude",
+      "cabinPressureCruise": "Croisière",
+      "cabinPressureSeaLevel": "Niveau de la mer",
+      "metricInfoGotIt": "Compris",
+      "gForceInfoBody": "À quel point vous vous sentez lourd en ce moment, mesuré par votre téléphone. 1,0 g correspond au poids normal ; ça monte au-dessus de 1 g quand l'avion cabre ou se pose, et ça descend quand vous flottez au-dessus d'une turbulence.",
+      "cabinPressureInfoBody": "La pression de l'air dans la cabine. Les avions la gardent confortable mais plus faible qu'au niveau de la mer — comme en montagne —, c'est pourquoi vos oreilles se débouchent quand elle change.",
+      "groundSpeedInfoBody": "La vitesse de l'avion par rapport au sol, d'après le GPS. Elle diffère de la vitesse air que suivent les pilotes, car les vents arrière ou de face poussent l'avion plus ou moins vite.",
+      "altitudeInfoBody": "La hauteur de l'avion au-dessus du niveau de la mer, d'après le GPS. Les avions de ligne croisent en général vers 10–12 km, au-dessus de la plupart des nuages et de la météo.",
+      "headingInfoBody": "La direction de la boussole vers laquelle pointe l'avion, d'après votre cap GPS. 0° c'est le nord, 90° l'est, 180° le sud et 270° l'ouest.",
+      "temperatureInfoBody": "Une estimation de la température extérieure à partir de votre altitude. Elle chute fortement avec l'altitude — souvent autour de -50 °C en croisière, même au-dessus d'un pays chaud.",
+      "cabinPressureEnableBody": "Autorisez l'accès au mouvement pour voir la pression de l'air dans la cabine.",
+      "cabinPressureEnableButton": "Activer"
     },
     "upcoming": {
       "mapTitle": "Commencez votre voyage",

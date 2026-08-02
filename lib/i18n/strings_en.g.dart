@@ -3466,6 +3466,51 @@ class TranslationsFlightDashboardEn {
 
 	/// en: 'Total'
 	String get total => 'Total';
+
+	/// en: 'G-force'
+	String get gForce => 'G-force';
+
+	/// en: 'PEAK'
+	String get gForcePeakLabel => 'PEAK';
+
+	/// en: 'Cabin pressure'
+	String get cabinPressure => 'Cabin pressure';
+
+	/// en: 'Feels like $altitude'
+	String cabinPressureLikeAltitude({required Object altitude}) => 'Feels like ${altitude}';
+
+	/// en: 'Cruise'
+	String get cabinPressureCruise => 'Cruise';
+
+	/// en: 'Sea level'
+	String get cabinPressureSeaLevel => 'Sea level';
+
+	/// en: 'Got it'
+	String get metricInfoGotIt => 'Got it';
+
+	/// en: 'How heavy you feel right now, measured by your phone. 1.0 g is normal weight; it rises above 1 g when the plane pulls up or touches down, and dips below when you float over a bump.'
+	String get gForceInfoBody => 'How heavy you feel right now, measured by your phone. 1.0 g is normal weight; it rises above 1 g when the plane pulls up or touches down, and dips below when you float over a bump.';
+
+	/// en: 'The air pressure inside the cabin. Airliners keep it comfortable but thinner than at sea level — about what you'd feel on a mountain — which is why your ears pop as it changes.'
+	String get cabinPressureInfoBody => 'The air pressure inside the cabin. Airliners keep it comfortable but thinner than at sea level — about what you\'d feel on a mountain — which is why your ears pop as it changes.';
+
+	/// en: 'How fast the plane moves over the ground, from GPS. It differs from the airspeed pilots watch, because tailwinds and headwinds push the plane along faster or slower.'
+	String get groundSpeedInfoBody => 'How fast the plane moves over the ground, from GPS. It differs from the airspeed pilots watch, because tailwinds and headwinds push the plane along faster or slower.';
+
+	/// en: 'The plane's height above sea level, from GPS. Airliners usually cruise near 10–12 km, above most clouds and weather.'
+	String get altitudeInfoBody => 'The plane\'s height above sea level, from GPS. Airliners usually cruise near 10–12 km, above most clouds and weather.';
+
+	/// en: 'The compass direction the plane is pointing, from your GPS course. 0° is north, 90° east, 180° south and 270° west.'
+	String get headingInfoBody => 'The compass direction the plane is pointing, from your GPS course. 0° is north, 90° east, 180° south and 270° west.';
+
+	/// en: 'An estimate of the outside air temperature from your altitude. It falls steeply with height — often around -50 °C at cruise, even over a warm country.'
+	String get temperatureInfoBody => 'An estimate of the outside air temperature from your altitude. It falls steeply with height — often around -50 °C at cruise, even over a warm country.';
+
+	/// en: 'Allow motion access to see the air pressure inside the cabin.'
+	String get cabinPressureEnableBody => 'Allow motion access to see the air pressure inside the cabin.';
+
+	/// en: 'Enable'
+	String get cabinPressureEnableButton => 'Enable';
 }
 
 // Path: flight.upcoming
@@ -4652,6 +4697,21 @@ extension on Translations {
 			'flight.dashboard.covered' => 'Covered',
 			'flight.dashboard.remaining' => 'Remaining',
 			'flight.dashboard.total' => 'Total',
+			'flight.dashboard.gForce' => 'G-force',
+			'flight.dashboard.gForcePeakLabel' => 'PEAK',
+			'flight.dashboard.cabinPressure' => 'Cabin pressure',
+			'flight.dashboard.cabinPressureLikeAltitude' => ({required Object altitude}) => 'Feels like ${altitude}',
+			'flight.dashboard.cabinPressureCruise' => 'Cruise',
+			'flight.dashboard.cabinPressureSeaLevel' => 'Sea level',
+			'flight.dashboard.metricInfoGotIt' => 'Got it',
+			'flight.dashboard.gForceInfoBody' => 'How heavy you feel right now, measured by your phone. 1.0 g is normal weight; it rises above 1 g when the plane pulls up or touches down, and dips below when you float over a bump.',
+			'flight.dashboard.cabinPressureInfoBody' => 'The air pressure inside the cabin. Airliners keep it comfortable but thinner than at sea level — about what you\'d feel on a mountain — which is why your ears pop as it changes.',
+			'flight.dashboard.groundSpeedInfoBody' => 'How fast the plane moves over the ground, from GPS. It differs from the airspeed pilots watch, because tailwinds and headwinds push the plane along faster or slower.',
+			'flight.dashboard.altitudeInfoBody' => 'The plane\'s height above sea level, from GPS. Airliners usually cruise near 10–12 km, above most clouds and weather.',
+			'flight.dashboard.headingInfoBody' => 'The compass direction the plane is pointing, from your GPS course. 0° is north, 90° east, 180° south and 270° west.',
+			'flight.dashboard.temperatureInfoBody' => 'An estimate of the outside air temperature from your altitude. It falls steeply with height — often around -50 °C at cruise, even over a warm country.',
+			'flight.dashboard.cabinPressureEnableBody' => 'Allow motion access to see the air pressure inside the cabin.',
+			'flight.dashboard.cabinPressureEnableButton' => 'Enable',
 			'flight.upcoming.mapTitle' => 'Begin your flight journey',
 			'flight.upcoming.mapSubtitle' => 'Start live tracking once your flight begins',
 			'flight.upcoming.dashboardTitle' => 'Begin your flight journey',
@@ -4921,6 +4981,8 @@ extension on Translations {
 			'countries.GQ' => 'Equatorial Guinea',
 			'countries.GR' => 'Greece',
 			'countries.GT' => 'Guatemala',
+			_ => null,
+		} ?? switch (path) {
 			'countries.GW' => 'Guinea-Bissau',
 			'countries.GY' => 'Guyana',
 			'countries.HK' => 'Hong Kong, China',
@@ -4936,8 +4998,6 @@ extension on Translations {
 			'countries.IR' => 'Iran, Islamic Rep. of',
 			'countries.IS' => 'Iceland',
 			'countries.IT' => 'Italy',
-			_ => null,
-		} ?? switch (path) {
 			'countries.JM' => 'Jamaica',
 			'countries.JO' => 'Jordan',
 			'countries.JP' => 'Japan',

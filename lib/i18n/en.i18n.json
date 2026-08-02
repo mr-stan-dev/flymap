@@ -806,7 +806,22 @@
       "routeProgress": "Route progress",
       "covered": "Covered",
       "remaining": "Remaining",
-      "total": "Total"
+      "total": "Total",
+      "gForce": "G-force",
+      "gForcePeakLabel": "PEAK",
+      "cabinPressure": "Cabin pressure",
+      "cabinPressureLikeAltitude": "Feels like $altitude",
+      "cabinPressureCruise": "Cruise",
+      "cabinPressureSeaLevel": "Sea level",
+      "metricInfoGotIt": "Got it",
+      "gForceInfoBody": "How heavy you feel right now, measured by your phone. 1.0 g is normal weight; it rises above 1 g when the plane pulls up or touches down, and dips below when you float over a bump.",
+      "cabinPressureInfoBody": "The air pressure inside the cabin. Airliners keep it comfortable but thinner than at sea level — about what you'd feel on a mountain — which is why your ears pop as it changes.",
+      "groundSpeedInfoBody": "How fast the plane moves over the ground, from GPS. It differs from the airspeed pilots watch, because tailwinds and headwinds push the plane along faster or slower.",
+      "altitudeInfoBody": "The plane's height above sea level, from GPS. Airliners usually cruise near 10–12 km, above most clouds and weather.",
+      "headingInfoBody": "The compass direction the plane is pointing, from your GPS course. 0° is north, 90° east, 180° south and 270° west.",
+      "temperatureInfoBody": "An estimate of the outside air temperature from your altitude. It falls steeply with height — often around -50 °C at cruise, even over a warm country.",
+      "cabinPressureEnableBody": "Allow motion access to see the air pressure inside the cabin.",
+      "cabinPressureEnableButton": "Enable"
     },
     "upcoming": {
       "mapTitle": "Begin your flight journey",

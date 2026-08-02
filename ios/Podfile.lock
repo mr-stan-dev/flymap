@@ -120,6 +120,8 @@ PODS:
     - PromisesSwift (~> 2.1)
   - FirebaseSharedSwift (12.14.0)
   - Flutter (1.0.0)
+  - flutter_local_notifications (0.0.1):
+    - Flutter
   - flutter_quick_video_encoder (0.0.1):
     - Flutter
   - FMDB (2.7.12):
@@ -209,6 +211,8 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - permission_handler_apple (9.4.8):
+    - Flutter
   - PostHog (3.60.0)
   - posthog_flutter (0.0.1):
     - Flutter
@@ -232,6 +236,8 @@ PODS:
   - RevenueCat (5.66.0)
   - RevenueCatUI (5.66.0):
     - RevenueCat (= 5.66.0)
+  - sensors_plus (0.0.1):
+    - Flutter
   - share_plus (0.0.1):
     - Flutter
   - shared_preferences_foundation (0.0.1):
@@ -258,6 +264,7 @@ DEPENDENCIES:
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_crashlytics (from `.symlinks/plugins/firebase_crashlytics/ios`)
   - Flutter (from `Flutter`)
+  - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_quick_video_encoder (from `.symlinks/plugins/flutter_quick_video_encoder/ios`)
   - FMDB
   - gal (from `.symlinks/plugins/gal/darwin`)
@@ -267,9 +274,11 @@ DEPENDENCIES:
   - maplibre_gl (from `.symlinks/plugins/maplibre_gl/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - posthog_flutter (from `.symlinks/plugins/posthog_flutter/darwin`)
   - purchases_flutter (from `.symlinks/plugins/purchases_flutter/ios`)
   - purchases_ui_flutter (from `.symlinks/plugins/purchases_ui_flutter/ios`)
+  - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
@@ -330,6 +339,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_crashlytics/ios"
   Flutter:
     :path: Flutter
+  flutter_local_notifications:
+    :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_quick_video_encoder:
     :path: ".symlinks/plugins/flutter_quick_video_encoder/ios"
   gal:
@@ -346,12 +357,16 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
   posthog_flutter:
     :path: ".symlinks/plugins/posthog_flutter/darwin"
   purchases_flutter:
     :path: ".symlinks/plugins/purchases_flutter/ios"
   purchases_ui_flutter:
     :path: ".symlinks/plugins/purchases_ui_flutter/ios"
+  sensors_plus:
+    :path: ".symlinks/plugins/sensors_plus/ios"
   share_plus:
     :path: ".symlinks/plugins/share_plus/ios"
   shared_preferences_foundation:
@@ -391,6 +406,7 @@ SPEC CHECKSUMS:
   FirebaseSessions: c9e7b7829265454f08cb68f7f8a6650c9b221bd4
   FirebaseSharedSwift: 7c659ebf23afdc1e60a05df72a07ad7349f5758f
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  flutter_local_notifications: 643a3eda1ce1c0599413ca31672536d423dee214
   flutter_quick_video_encoder: c012b1523f40093feeffa90cebfe71b32b7b6d25
   FMDB: 728731dd336af3936ce00f91d9d8495f5718a0e6
   gal: baecd024ebfd13c441269ca7404792a7152fde89
@@ -407,6 +423,7 @@ SPEC CHECKSUMS:
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  permission_handler_apple: 92d754bbaa7361d436db2d6c3c1c2a0fdcec462e
   PostHog: b2a7f1163346a693294fa2b316ba81c071769e9c
   posthog_flutter: 343db84a70d44b12fa0fe2fc35bbb58098074bd4
   PromisesObjC: 752c3227f599e3467650e47ea36f433eeb10c273
@@ -418,6 +435,7 @@ SPEC CHECKSUMS:
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
   RevenueCat: a3cf721ad8b1b56a930d748a40342aba16c09bbb
   RevenueCatUI: 1091be7f4e7eb6068bc0c78d470af3a2a19d3a49
+  sensors_plus: 6a11ed0c2e1d0bd0b20b4029d3bad27d96e0c65b
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
@@ -425,6 +443,6 @@ SPEC CHECKSUMS:
   video_player_avfoundation: 3453f792138786248960ca029747fcd9f318ef52
   webview_flutter_wkwebview: 8ebf4fded22593026f7dbff1fbff31ea98573c8d
 
-PODFILE CHECKSUM: 75984468aebe71a000be3974dccc6e9390ccc9e1
+PODFILE CHECKSUM: 1c1a460e98d89f2e76ed48984e9cdf869f110e99
 
 COCOAPODS: 1.16.2

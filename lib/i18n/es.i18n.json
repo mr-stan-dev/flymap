@@ -806,7 +806,22 @@
       "routeProgress": "Progreso de la ruta",
       "covered": "Recorrido",
       "remaining": "Restante",
-      "total": "Total"
+      "total": "Total",
+      "gForce": "Fuerza G",
+      "gForcePeakLabel": "MÁX.",
+      "cabinPressure": "Presión de cabina",
+      "cabinPressureLikeAltitude": "Como estar a $altitude",
+      "cabinPressureCruise": "Crucero",
+      "cabinPressureSeaLevel": "Nivel del mar",
+      "metricInfoGotIt": "Entendido",
+      "gForceInfoBody": "Lo pesado que te sientes ahora mismo, medido por tu teléfono. 1,0 g es el peso normal; sube por encima de 1 g cuando el avión asciende o aterriza, y baja cuando flotas sobre una turbulencia.",
+      "cabinPressureInfoBody": "La presión del aire dentro de la cabina. Los aviones la mantienen cómoda pero más ligera que a nivel del mar —parecida a la de una montaña—, por eso se te destapan los oídos cuando cambia.",
+      "groundSpeedInfoBody": "La velocidad del avión respecto al suelo, según el GPS. Difiere de la velocidad del aire que usan los pilotos, porque el viento de cola o de frente empuja al avión más rápido o más lento.",
+      "altitudeInfoBody": "La altura del avión sobre el nivel del mar, según el GPS. Los aviones suelen volar en crucero a unos 10–12 km, por encima de la mayoría de las nubes y el clima.",
+      "headingInfoBody": "La dirección de la brújula hacia la que apunta el avión, según tu rumbo GPS. 0° es norte, 90° este, 180° sur y 270° oeste.",
+      "temperatureInfoBody": "Una estimación de la temperatura exterior a partir de tu altitud. Baja mucho con la altura: a menudo unos -50 °C en crucero, incluso sobre un país cálido.",
+      "cabinPressureEnableBody": "Permite el acceso al movimiento para ver la presión del aire en la cabina.",
+      "cabinPressureEnableButton": "Activar"
     },
     "upcoming": {
       "mapTitle": "Empieza tu viaje en vuelo",

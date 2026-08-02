@@ -806,7 +806,22 @@
       "routeProgress": "Routenfortschritt",
       "covered": "Zurückgelegt",
       "remaining": "Verbleibend",
-      "total": "Gesamt"
+      "total": "Gesamt",
+      "gForce": "G-Kraft",
+      "gForcePeakLabel": "MAX.",
+      "cabinPressure": "Kabinendruck",
+      "cabinPressureLikeAltitude": "Fühlt sich an wie $altitude",
+      "cabinPressureCruise": "Reiseflug",
+      "cabinPressureSeaLevel": "Meereshöhe",
+      "metricInfoGotIt": "Verstanden",
+      "gForceInfoBody": "Wie schwer du dich gerade fühlst, gemessen von deinem Telefon. 1,0 g ist normales Gewicht; über 1 g steigt es, wenn das Flugzeug hochzieht oder aufsetzt, und darunter fällt es, wenn du über eine Bö schwebst.",
+      "cabinPressureInfoBody": "Der Luftdruck in der Kabine. Verkehrsflugzeuge halten ihn angenehm, aber dünner als auf Meereshöhe – etwa wie auf einem Berg –, weshalb deine Ohren beim Druckwechsel knacken.",
+      "groundSpeedInfoBody": "Wie schnell sich das Flugzeug über den Boden bewegt, per GPS. Sie unterscheidet sich von der Fluggeschwindigkeit der Piloten, weil Rücken- und Gegenwind das Flugzeug schneller oder langsamer vorantreiben.",
+      "altitudeInfoBody": "Die Höhe des Flugzeugs über dem Meeresspiegel, per GPS. Verkehrsflugzeuge fliegen meist um 10–12 km, über den meisten Wolken und dem Wetter.",
+      "headingInfoBody": "Die Himmelsrichtung, in die das Flugzeug zeigt, aus deinem GPS-Kurs. 0° ist Norden, 90° Osten, 180° Süden und 270° Westen.",
+      "temperatureInfoBody": "Eine Schätzung der Außentemperatur anhand deiner Höhe. Sie fällt stark mit der Höhe – im Reiseflug oft um -50 °C, selbst über einem warmen Land.",
+      "cabinPressureEnableBody": "Erlaube den Bewegungszugriff, um den Luftdruck in der Kabine zu sehen.",
+      "cabinPressureEnableButton": "Aktivieren"
     },
     "upcoming": {
       "mapTitle": "Starte deine Flugreise",
