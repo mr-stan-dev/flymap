@@ -1,11 +1,12 @@
 import 'dart:math' as math;
 import 'dart:ui' show Offset;
 
-import 'package:flymap/data/api/met_norway_api.dart';
 import 'package:flymap/data/local/airport_timezone_service.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
+import 'package:flymap/domain/entity/weather_attribution.dart';
+import 'package:flymap/domain/provider/weather_forecast_provider.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/ui/map/map_utils.dart';
 import 'package:flymap/ui/screens/share_flight/utils/static_route_map.dart';
@@ -15,15 +16,18 @@ import 'package:latlong2/latlong.dart' show LatLng;
 /// forecasts at both airports (at STD/STA) plus ~15-20 cloud samples along
 /// the route, each at the moment the plane is over that point.
 ///
-/// Total: 2 + sampleCount requests to api.met.no per flight — few enough
-/// that no cache is needed (decision 2026-07-28); requests run with limited
-/// concurrency to stay polite.
+/// A full picture contains 2 airport + 5–20 corridor + up to ~36 area-grid
+/// + 8 airport-ring locations (typically ~45–58 points). They are sent in one
+/// provider-neutral batch. Caching and upstream transport policy belong to the
+/// injected [WeatherForecastProvider].
 class FetchFlightWeatherUseCase {
   FetchFlightWeatherUseCase({
-    required MetNorwayApi api,
+    required WeatherForecastProvider provider,
     AirportTimezoneService? timezoneService,
-  }) : _api = api,
-       _timezoneService = timezoneService;
+    DateTime Function()? now,
+  }) : _provider = provider,
+       _timezoneService = timezoneService,
+       _now = now ?? DateTime.now;
 
   /// One sample roughly every this many km along the route.
   static const double sampleSpacingKm = 75;
@@ -40,16 +44,19 @@ class FetchFlightWeatherUseCase {
   /// nearby data turns "lone anchor" into local consensus, so a front
   /// sitting over the airport survives interpolation (the LHR->JFK bug).
   static const double airportRingKm = 50;
-  static const int _maxConcurrentRequests = 6;
-
-  final MetNorwayApi _api;
+  final WeatherForecastProvider _provider;
   final AirportTimezoneService? _timezoneService;
+  final DateTime Function() _now;
   final _logger = const Logger('FetchFlightWeatherUseCase');
 
   Future<FlightWeather> call({
     required FlightRoute route,
     FlightSchedule? schedule,
   }) async {
+    if (schedule != null &&
+        schedule.timePrecision == FlightScheduleTimePrecision.dateOnly) {
+      throw const WeatherDepartureTimeRequiredException();
+    }
     // Airport-timezone fallback needs the airports CSV loaded.
     await _timezoneService?.ensureReady();
     final (departureUtc, isTimeEstimated) = _departureUtc(route, schedule);
@@ -81,27 +88,44 @@ class FetchFlightWeatherUseCase {
     // evolution — the provider response contains it anyway.
     final windowStart = departureUtc.subtract(const Duration(hours: 1));
     final windowEnd = arrivalUtc.add(const Duration(hours: 1));
-    final results = await _fetchAll([
+    final requests = <_PointRequest>[
       _PointRequest(route.departure.latLon, departureUtc),
       _PointRequest(route.arrival.latLon, arrivalUtc),
-      for (final point in [...points, ...areaPoints])
+      for (final point in points)
         _PointRequest(
           point.latLon,
           departureUtc.add(
-            Duration(
-              minutes: (blockMinutes * point.routeProgress).round(),
-            ),
+            Duration(minutes: (blockMinutes * point.routeProgress).round()),
           ),
           routeProgress: point.routeProgress,
-          isAreaSample: areaPoints.contains(point),
+        ),
+      for (final point in areaPoints)
+        _PointRequest(
+          point.latLon,
+          departureUtc.add(
+            Duration(minutes: (blockMinutes * point.routeProgress).round()),
+          ),
+          routeProgress: point.routeProgress,
+          isAreaSample: true,
         ),
       // Airport rings render with the field (area samples) but never enter
       // the verdict/segment logic, which reads corridor samples only.
       for (final point in _airportRingPoints(route.departure.latLon))
-        _PointRequest(point, departureUtc, routeProgress: 0, isAreaSample: true),
+        _PointRequest(
+          point,
+          departureUtc,
+          routeProgress: 0,
+          isAreaSample: true,
+        ),
       for (final point in _airportRingPoints(route.arrival.latLon))
         _PointRequest(point, arrivalUtc, routeProgress: 1, isAreaSample: true),
-    ]);
+    ];
+    final batch = await _fetchAll(
+      requests,
+      windowStart: windowStart,
+      windowEnd: windowEnd,
+    );
+    final results = batch.results;
 
     final departureForecast = _nearest(results[0]);
     final arrivalForecast = _nearest(results[1]);
@@ -164,8 +188,9 @@ class FetchFlightWeatherUseCase {
       arrival: _airportWeather(arrivalForecast, arrivalUtc, arrivalOffset),
       samples: samples,
       areaSamples: areaSamples,
-      fetchedAt: DateTime.now(),
+      fetchedAt: batch.retrievedAtUtc,
       isTimeEstimated: isTimeEstimated,
+      attribution: batch.attribution,
     );
   }
 
@@ -187,9 +212,9 @@ class FetchFlightWeatherUseCase {
     // map could contradict the airport cards, which read the entry nearest
     // to STD/STA (possibly the excluded one). Brackets guarantee >=2 slices
     // so hiddenAt() interpolates through the flight instead of clamping.
-    MetNorwayForecastPoint? before;
-    MetNorwayForecastPoint? after;
-    final inWindow = <MetNorwayForecastPoint>[];
+    WeatherForecastPoint? before;
+    WeatherForecastPoint? after;
+    final inWindow = <WeatherForecastPoint>[];
     for (final slice in result.series) {
       if (slice.timeUtc.isBefore(windowStart)) {
         if (before == null || slice.timeUtc.isAfter(before.timeUtc)) {
@@ -282,12 +307,16 @@ class FetchFlightWeatherUseCase {
     );
 
     final grid = <({LatLng latLon, double routeProgress})>[];
-    for (var x = areaGridSpacingPx / 2;
-        x < viewport.width;
-        x += areaGridSpacingPx) {
-      for (var y = areaGridSpacingPx / 2;
-          y < viewport.height;
-          y += areaGridSpacingPx) {
+    for (
+      var x = areaGridSpacingPx / 2;
+      x < viewport.width;
+      x += areaGridSpacingPx
+    ) {
+      for (
+        var y = areaGridSpacingPx / 2;
+        y < viewport.height;
+        y += areaGridSpacingPx
+      ) {
         final pixel = Offset(x, y);
         // Skip cells the corridor band already covers; remember the nearest
         // route point's progress for the overhead time either way.
@@ -301,47 +330,52 @@ class FetchFlightWeatherUseCase {
           }
         }
         if (nearestDistance < areaGridSpacingPx * 0.7) continue;
-        grid.add(
-          (
-            latLon: StaticRouteMap.unproject(
-              viewport: viewport,
-              point: pixel,
-            ),
-            routeProgress: nearestProgress,
-          ),
-        );
+        grid.add((
+          latLon: StaticRouteMap.unproject(viewport: viewport, point: pixel),
+          routeProgress: nearestProgress,
+        ));
       }
     }
     return grid;
   }
 
-  /// STD when a schedule pick provided one; otherwise midday on the travel
-  /// date (or "in two hours" for dateless flights) flagged as an estimate.
-  /// "Midday" is true departure-airport noon when its timezone is known,
-  /// else device-local noon.
+  /// Provider STD when known; otherwise the user-supplied approximate local
+  /// time, flagged as an estimate. Estimated
+  /// targets are clamped to 30 minutes from now so choosing Today late in the
+  /// day never collapses the entire animation onto past/current forecast data.
   (DateTime, bool) _departureUtc(FlightRoute route, FlightSchedule? schedule) {
     final scheduled = schedule?.departure?.utc;
     if (scheduled != null) return (scheduled, false);
     final travelDate = schedule?.travelDate;
     if (travelDate != null) {
-      final airportNoon = _timezoneService?.localTimeToUtc(
+      final approximate = schedule?.approximateDepartureTime;
+      if (approximate == null) {
+        throw const WeatherDepartureTimeRequiredException();
+      }
+      final hour = approximate.hour;
+      final minute = approximate.minute;
+      final airportTime = _timezoneService?.localTimeToUtc(
         route.departure,
         travelDate,
+        hour: hour,
+        minute: minute,
       );
-      if (airportNoon != null) return (airportNoon, true);
-      final localNoon = DateTime(
+      final localTime = DateTime(
         travelDate.year,
         travelDate.month,
         travelDate.day,
-        12,
+        hour,
+        minute,
       );
-      return (localNoon.toUtc(), true);
+      final candidate = airportTime ?? localTime.toUtc();
+      final minimum = _now().toUtc().add(const Duration(minutes: 30));
+      return (candidate.isBefore(minimum) ? minimum : candidate, true);
     }
-    return (DateTime.now().toUtc().add(const Duration(hours: 2)), true);
+    return (_now().toUtc().add(const Duration(hours: 2)), true);
   }
 
   AirportWeather _airportWeather(
-    MetNorwayForecastPoint forecast,
+    WeatherForecastPoint forecast,
     DateTime timeUtc,
     int utcOffsetMinutes,
   ) {
@@ -365,9 +399,10 @@ class FetchFlightWeatherUseCase {
         ? route.waypointLatLngs
         : [route.departure.latLon, route.arrival.latLon];
     final distanceKm = math.max(1.0, route.distanceInKm);
-    final sampleCount = (distanceKm / sampleSpacingKm)
-        .round()
-        .clamp(minSamples, maxSamples);
+    final sampleCount = (distanceKm / sampleSpacingKm).round().clamp(
+      minSamples,
+      maxSamples,
+    );
 
     // Cumulative distances along the polyline for progress-accurate
     // interpolation.
@@ -398,49 +433,86 @@ class FetchFlightWeatherUseCase {
           : ((target - segmentStart) / segmentLength).clamp(0.0, 1.0);
       final a = polyline[segment - 1];
       final b = polyline[segment];
-      points.add(
-        (
-          latLon: LatLng(
-            a.latitude + (b.latitude - a.latitude) * t,
-            a.longitude + (b.longitude - a.longitude) * t,
-          ),
-          routeProgress: progress,
+      points.add((
+        latLon: LatLng(
+          a.latitude + (b.latitude - a.latitude) * t,
+          a.longitude + (b.longitude - a.longitude) * t,
         ),
-      );
+        routeProgress: progress,
+      ));
     }
     return points;
   }
 
-  Future<List<_PointResult>> _fetchAll(List<_PointRequest> requests) async {
-    final results = List<_PointResult?>.filled(requests.length, null);
-    for (var start = 0; start < requests.length; start += _maxConcurrentRequests) {
-      final end = math.min(start + _maxConcurrentRequests, requests.length);
-      await Future.wait([
-        for (var i = start; i < end; i++)
-          _fetchOne(requests[i]).then((result) => results[i] = result),
-      ]);
-    }
-    return results.whereType<_PointResult>().toList(growable: false);
-  }
-
-  Future<_PointResult> _fetchOne(_PointRequest request) async {
+  Future<_FlightPointBatch> _fetchAll(
+    List<_PointRequest> requests, {
+    required DateTime windowStart,
+    required DateTime windowEnd,
+  }) async {
     try {
-      final series = await _api.forecastSeries(request.latLon);
-      return _PointResult(request, series);
+      final batch = await _provider.forecastBatch(
+        requests: [
+          for (final request in requests)
+            WeatherForecastRequest(
+              coordinate: request.latLon,
+              targetTimeUtc: request.targetTimeUtc,
+            ),
+        ],
+        windowStartUtc: windowStart,
+        windowEndUtc: windowEnd,
+      );
+      if (batch.seriesByRequest.length != requests.length) {
+        throw const FormatException('Weather batch response count mismatch');
+      }
+      return _FlightPointBatch(
+        results: [
+          for (var index = 0; index < requests.length; index++)
+            _PointResult(requests[index], batch.seriesByRequest[index]),
+        ],
+        retrievedAtUtc: batch.retrievedAtUtc,
+        attribution: batch.attribution,
+      );
     } catch (e) {
-      _logger.error('weather point failed: $e');
-      return _PointResult(request, const []);
+      _logger.error('weather batch failed: $e');
+      return _FlightPointBatch(
+        results: [
+          for (final request in requests) _PointResult(request, const []),
+        ],
+        retrievedAtUtc: _now().toUtc(),
+        attribution: WeatherAttribution.metNorway,
+      );
     }
   }
 
-  MetNorwayForecastPoint? _nearest(_PointResult result) {
-    return MetNorwayApi.nearestTo(result.series, result.request.targetTimeUtc);
+  WeatherForecastPoint? _nearest(_PointResult result) {
+    WeatherForecastPoint? best;
+    Duration? bestDistance;
+    for (final point in result.series) {
+      final distance = point.timeUtc
+          .difference(result.request.targetTimeUtc)
+          .abs();
+      if (bestDistance == null || distance < bestDistance) {
+        bestDistance = distance;
+        best = point;
+      }
+    }
+    if (best == null || bestDistance == null || bestDistance.inHours > 12) {
+      return null;
+    }
+    return best;
   }
 }
 
 /// Both airport forecasts missing — nothing meaningful to show.
 class WeatherUnavailableException implements Exception {
   const WeatherUnavailableException();
+}
+
+/// A calendar date without a departure time cannot identify a meaningful
+/// forecast instant. Callers must collect a precise local time or stay
+/// explicitly dateless.
+class WeatherDepartureTimeRequiredException implements Exception {
+  const WeatherDepartureTimeRequiredException();
 }
 
 class _PointRequest {
@@ -461,5 +533,17 @@ class _PointResult {
   const _PointResult(this.request, this.series);
 
   final _PointRequest request;
-  final List<MetNorwayForecastPoint> series;
+  final List<WeatherForecastPoint> series;
+}
+
+class _FlightPointBatch {
+  const _FlightPointBatch({
+    required this.results,
+    required this.retrievedAtUtc,
+    required this.attribution,
+  });
+
+  final List<_PointResult> results;
+  final DateTime retrievedAtUtc;
+  final WeatherAttribution attribution;
 }

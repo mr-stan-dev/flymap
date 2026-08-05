@@ -55,7 +55,7 @@ class _FoundRouteSearchViewState extends State<_FoundRouteSearchView> {
     });
   }
 
-  void _continueToOverview(FlightSummary flight) {
+  Future<void> _continueToOverview(FlightSummary flight) async {
     final state = widget.state;
     final departure = flight.departure ?? state.selectedDeparture;
     final arrival = flight.arrival ?? state.selectedArrival;
@@ -64,6 +64,16 @@ class _FoundRouteSearchViewState extends State<_FoundRouteSearchView> {
         .trim()
         .toUpperCase();
     if (departure == null || arrival == null || number.isEmpty) return;
+    final schedule = _dateSelection?.schedule;
+    if (schedule != null) {
+      final shouldContinue =
+          await FlightNotificationPermissionPrompt.showIfEligible(
+            context: context,
+            schedule: schedule,
+            departure: departure,
+          );
+      if (!mounted || !shouldContinue) return;
+    }
     final screen = context
         .findAncestorStateOfType<_RealRouteAirportSearchScreenState>();
     AppRouter.goToFlightOverview(
@@ -72,7 +82,7 @@ class _FoundRouteSearchViewState extends State<_FoundRouteSearchView> {
       arrival: arrival,
       flightNumber: number,
       fr24Id: _dateSelection?.fr24Id ?? flight.fr24Id,
-      schedule: _dateSelection?.schedule,
+      schedule: schedule,
       hasPendingFlightUnlock: screen?.widget.hasPendingFlightUnlock ?? false,
     );
   }

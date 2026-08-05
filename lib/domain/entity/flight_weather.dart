@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flymap/domain/entity/weather_attribution.dart';
 import 'package:latlong2/latlong.dart';
 
 /// Surface forecast at one airport around the scheduled local time.
@@ -23,11 +24,10 @@ class AirportWeather extends Equatable {
   final double? precipitationMm;
   final double? cloudCoverPercent;
 
-  /// MET Norway symbol code (e.g. "partlycloudy_day") — maps to an icon.
+  /// Flymap condition code (e.g. "partlycloudy_day") — maps to an icon.
   final String? symbolCode;
 
-  DateTime get timeLocal =>
-      timeUtc.add(Duration(minutes: utcOffsetMinutes));
+  DateTime get timeLocal => timeUtc.add(Duration(minutes: utcOffsetMinutes));
 
   @override
   List<Object?> get props => [
@@ -167,6 +167,7 @@ class FlightWeather extends Equatable {
     this.areaSamples = const <RouteCloudSample>[],
     required this.fetchedAt,
     required this.isTimeEstimated,
+    this.attribution = WeatherAttribution.metNorway,
   });
 
   final AirportWeather departure;
@@ -181,9 +182,18 @@ class FlightWeather extends Equatable {
   /// the verdict — decoration honesty only.
   final List<RouteCloudSample> areaSamples;
   final DateTime fetchedAt;
+  final WeatherAttribution attribution;
 
-  /// True when no scheduled departure time was known and overhead times are
-  /// midday/now estimates — the UI shows an "estimate" badge.
+  /// Shared threshold for automatic foreground refresh and compact summary
+  /// surfaces. Older forecasts may still be useful offline, but must not be
+  /// presented as a current verdict without opening the weather experience.
+  static const freshnessWindow = Duration(hours: 6);
+
+  bool isFreshAt(DateTime now) => now.difference(fetchedAt) < freshnessWindow;
+
+  /// True when no provider-scheduled departure was known and overhead times
+  /// use a user-supplied approximate time, midday, or now. The UI keeps the
+  /// clocks visible and labels them as estimates.
   final bool isTimeEstimated;
 
   @override
@@ -194,5 +204,6 @@ class FlightWeather extends Equatable {
     areaSamples,
     fetchedAt,
     isTimeEstimated,
+    attribution,
   ];
 }

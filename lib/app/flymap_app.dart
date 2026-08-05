@@ -29,7 +29,7 @@ class FlymapApp extends StatefulWidget {
   State<FlymapApp> createState() => _FlymapAppState();
 }
 
-class _FlymapAppState extends State<FlymapApp> {
+class _FlymapAppState extends State<FlymapApp> with WidgetsBindingObserver {
   late final router = AppRouter.createRouter(
     showOnboarding: widget.showOnboarding,
   );
@@ -37,6 +37,7 @@ class _FlymapAppState extends State<FlymapApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Forecast notifications: hook taps to navigation, then let the
     // scheduler heal the system schedule (reboots, time/settings changes).
     // Guarded so widget tests without DI stay unaffected.
@@ -46,7 +47,10 @@ class _FlymapAppState extends State<FlymapApp> {
       // free reminders just open the flight (the map is the point).
       scheduler.onOpenFlight = (flight) => router.push(
         AppRouter.flightRoute,
-        extra: {'flight': flight, 'openWeather': flight.hasProAccess},
+        extra: {
+          'flight': flight,
+          'openWeather': scheduler.hasEffectiveProAccess(flight),
+        },
       );
       WidgetsBinding.instance.addPostFrameCallback((_) {
         unawaited(() async {
@@ -55,6 +59,21 @@ class _FlymapAppState extends State<FlymapApp> {
         }());
       });
     }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed ||
+        !GetIt.I.isRegistered<FlightNotificationScheduler>()) {
+      return;
+    }
+    unawaited(GetIt.I.get<FlightNotificationScheduler>().handleAppResumed());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override

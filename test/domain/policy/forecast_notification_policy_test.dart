@@ -2,6 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/policy/forecast_notification_policy.dart';
 
+FlightSchedule _legacyDateOnly(DateTime date) =>
+    FlightSchedule(travelDate: DateTime(date.year, date.month, date.day));
+
 void main() {
   group('ForecastNotificationPolicy', () {
     test('no schedule plans nothing', () {
@@ -10,7 +13,7 @@ void main() {
 
     test('plans ready at T-6d 10:00 and updated at T-1d 18:00', () {
       final planned = ForecastNotificationPolicy.planFor(
-        FlightSchedule.dateOnly(DateTime(2026, 8, 10)),
+        _legacyDateOnly(DateTime(2026, 8, 10)),
       );
 
       expect(planned, hasLength(2));
@@ -26,7 +29,7 @@ void main() {
 
     test('calendar math crosses month boundaries', () {
       final planned = ForecastNotificationPolicy.planFor(
-        FlightSchedule.dateOnly(DateTime(2026, 8, 3)),
+        _legacyDateOnly(DateTime(2026, 8, 3)),
       );
 
       final ready = planned.firstWhere(

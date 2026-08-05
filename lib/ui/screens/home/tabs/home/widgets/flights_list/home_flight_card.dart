@@ -249,6 +249,7 @@ class _SavedFlightCardBody extends StatefulWidget {
 
 class _SavedFlightCardBodyState extends State<_SavedFlightCardBody> {
   WindowVerdict? _verdict;
+  bool _verdictEstimated = false;
 
   @override
   void initState() {
@@ -261,6 +262,7 @@ class _SavedFlightCardBodyState extends State<_SavedFlightCardBody> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.flight.id != widget.flight.id) {
       _verdict = null;
+      _verdictEstimated = false;
       _loadVerdict();
     }
   }
@@ -275,9 +277,15 @@ class _SavedFlightCardBodyState extends State<_SavedFlightCardBody> {
     final weather = await GetIt.I.get<FlightWeatherStore>().load(
       widget.flight.id,
     );
-    if (!mounted || weather == null || weather.samples.isEmpty) return;
+    if (!mounted ||
+        weather == null ||
+        weather.samples.isEmpty ||
+        !weather.isFreshAt(DateTime.now())) {
+      return;
+    }
     setState(() {
       _verdict = FlightWeatherVerdictPolicy.overallVerdict(weather.samples);
+      _verdictEstimated = weather.isTimeEstimated;
     });
   }
 
@@ -320,7 +328,11 @@ class _SavedFlightCardBodyState extends State<_SavedFlightCardBody> {
                 icon: Icons.event_rounded,
                 text: widget.travelDateLabel!,
               ),
-            if (verdict != null) _WeatherVerdictChip(verdict: verdict),
+            if (verdict != null)
+              _WeatherVerdictChip(
+                verdict: verdict,
+                isEstimated: _verdictEstimated,
+              ),
             MetaPill(icon: Icons.route, text: widget.distance),
             if (widget.duration != null)
               MetaPill(icon: Icons.schedule_rounded, text: widget.duration!),
@@ -345,9 +357,10 @@ class _SavedFlightCardBodyState extends State<_SavedFlightCardBody> {
 /// label ("☀️ Clear views"), matching [MetaPill]'s shape via its emoji
 /// leading. Only rendered when a forecast is stored for an upcoming flight.
 class _WeatherVerdictChip extends StatelessWidget {
-  const _WeatherVerdictChip({required this.verdict});
+  const _WeatherVerdictChip({required this.verdict, required this.isEstimated});
 
   final WindowVerdict verdict;
+  final bool isEstimated;
 
   @override
   Widget build(BuildContext context) {
@@ -357,7 +370,9 @@ class _WeatherVerdictChip extends StatelessWidget {
     );
     return MetaPill(
       leading: Text(emoji, style: const TextStyle(fontSize: 12)),
-      text: title,
+      text: isEstimated
+          ? '$title · ${context.t.createFlight.weather.estimatedShort}'
+          : title,
     );
   }
 }

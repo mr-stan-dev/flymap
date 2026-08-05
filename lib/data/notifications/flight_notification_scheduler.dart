@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flymap/analytics/app_analytics.dart';
@@ -11,6 +12,7 @@ import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/forecast_notification_prefs.dart';
+import 'package:flymap/repository/subscription_repository.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 /// The slice of the notifications plugin the scheduler needs — an
@@ -165,6 +167,7 @@ class FlightNotificationScheduler {
     required NotificationPermissionService permissionService,
     required ForecastNotificationPrefs prefs,
     required FlightRepository flightRepository,
+    SubscriptionRepository? subscriptionRepository,
     AppAnalytics? analytics,
     DateTime Function()? now,
   }) : _gateway = gateway,
@@ -172,6 +175,7 @@ class FlightNotificationScheduler {
        _permissionService = permissionService,
        _prefs = prefs,
        _flightRepository = flightRepository,
+       _subscriptionRepository = subscriptionRepository,
        _analytics = analytics,
        _now = now ?? DateTime.now;
 
@@ -182,21 +186,64 @@ class FlightNotificationScheduler {
   final NotificationPermissionService _permissionService;
   final ForecastNotificationPrefs _prefs;
   final FlightRepository _flightRepository;
+  final SubscriptionRepository? _subscriptionRepository;
   final AppAnalytics? _analytics;
   final DateTime Function() _now;
+  StreamSubscription<bool>? _proStatusSubscription;
+  bool? _lastPermissionGranted;
+  bool? _lastGlobalPro;
 
   /// Set by the app shell once navigation exists; receives the flight a
   /// tapped notification points at.
   void Function(Flight flight)? onOpenFlight;
 
-  /// Stable per-flight, distinct per type, positive 32-bit.
+  /// Stable per-flight, distinct per type, positive signed 32-bit.
+  ///
+  /// Dart's Object.hashCode is intentionally not stable between process
+  /// executions, so it cannot identify notifications that must be cancelled
+  /// after an app restart or upgrade. FNV-1a is tiny, deterministic and ample
+  /// for the small number of scheduled flights on one device.
   static int notificationId(String flightId, ForecastNotificationType type) =>
-      ((flightId.hashCode & 0x3fffffff) << 1) | type.index;
+      ((_stableHash(flightId) & 0x3fffffff) << 1) | type.index;
+
+  static int _stableHash(String value) {
+    var hash = 0x811c9dc5;
+    for (final byte in utf8.encode(value)) {
+      hash ^= byte;
+      hash = (hash * 0x01000193) & 0xffffffff;
+    }
+    return hash;
+  }
 
   Future<void> initialize() async {
     await _gateway.initialize(onNotificationTapped: _handleTap);
+    _lastPermissionGranted = await _permissionService.isGranted();
+    final subscriptionRepository = _subscriptionRepository;
+    if (subscriptionRepository != null && _proStatusSubscription == null) {
+      // Resolve cached/current entitlement before consuming a cold-start
+      // notification payload, so an existing Basic flight opens weather for
+      // a global Pro subscriber instead of racing subscription startup.
+      try {
+        await subscriptionRepository.initialize();
+      } catch (e) {
+        _logger.error('subscription initialization failed: $e');
+      }
+      _lastGlobalPro = subscriptionRepository.currentStatus.isPro;
+      _proStatusSubscription = subscriptionRepository.statusStream
+          .map((status) => status.isPro)
+          .listen(_handleGlobalProChanged);
+    }
     final launchPayload = await _gateway.takeLaunchPayload();
     if (launchPayload != null) _handleTap(launchPayload);
+  }
+
+  /// Called by the app lifecycle. Covers the permanently-denied flow where
+  /// the user grants permission in system settings rather than in-app.
+  Future<void> handleAppResumed() async {
+    final granted = await _permissionService.isGranted();
+    final wasGranted = _lastPermissionGranted;
+    _lastPermissionGranted = granted;
+    if (granted && wasGranted != true) await resyncAll();
   }
 
   /// Re-derives the whole system schedule from the saved flights — used on
@@ -204,6 +251,7 @@ class FlightNotificationScheduler {
   /// flips.
   Future<void> resyncAll() async {
     try {
+      _lastPermissionGranted = await _permissionService.isGranted();
       final flights = await _flightRepository.getAllFlights();
       for (final flight in flights) {
         await syncForFlight(flight);
@@ -230,8 +278,15 @@ class FlightNotificationScheduler {
     // Both obey the same permission and per-alert settings toggles.
     if (!await _permissionService.isGranted()) return;
 
+    // Scheduling can run during the first frame, concurrently with settings
+    // startup. Resolve the airport database here rather than assuming another
+    // feature won that race; otherwise local wall clocks silently fall back to
+    // the device timezone.
+    await _timezoneService.ensureReady();
+
     final readyEnabled = await _prefs.isReadyEnabled();
     final updatedEnabled = await _prefs.isUpdatedEnabled();
+    final isPro = hasEffectiveProAccess(flight);
     final now = _now().toUtc();
 
     for (final planned in ForecastNotificationPolicy.planFor(schedule)) {
@@ -256,12 +311,8 @@ class FlightNotificationScheduler {
       try {
         await _gateway.schedule(
           id: notificationId(flight.id, planned.type),
-          title: _title(planned.type, isPro: flight.hasProAccess),
-          body: _body(
-            planned.type,
-            isPro: flight.hasProAccess,
-            route: _routeLabel(flight),
-          ),
+          title: _title(planned.type, isPro: isPro),
+          body: _body(planned.type, isPro: isPro, route: _routeLabel(flight)),
           whenUtc: whenUtc,
           payload: flight.id,
         );
@@ -289,6 +340,10 @@ class FlightNotificationScheduler {
   String _routeLabel(Flight flight) =>
       '${flight.route.departure.displayCode} → '
       '${flight.route.arrival.displayCode}';
+
+  bool hasEffectiveProAccess(Flight flight) =>
+      flight.hasProAccess ||
+      (_subscriptionRepository?.currentStatus.isPro ?? false);
 
   String _title(ForecastNotificationType type, {required bool isPro}) {
     final strings = t.notifications;
@@ -328,14 +383,11 @@ class FlightNotificationScheduler {
   /// without waiting for the scheduled date. Negative ids keep it clear of the
   /// deterministic scheduled ids.
   Future<void> sendPreview(Flight flight, ForecastNotificationType type) async {
+    final isPro = hasEffectiveProAccess(flight);
     await _gateway.showNow(
       id: -1 - type.index,
-      title: _title(type, isPro: flight.hasProAccess),
-      body: _body(
-        type,
-        isPro: flight.hasProAccess,
-        route: _routeLabel(flight),
-      ),
+      title: _title(type, isPro: isPro),
+      body: _body(type, isPro: isPro, route: _routeLabel(flight)),
       payload: flight.id,
     );
   }
@@ -353,5 +405,11 @@ class FlightNotificationScheduler {
         _logger.error('open from notification failed: $e');
       }
     }());
+  }
+
+  void _handleGlobalProChanged(bool isPro) {
+    if (_lastGlobalPro == isPro) return;
+    _lastGlobalPro = isPro;
+    unawaited(resyncAll());
   }
 }

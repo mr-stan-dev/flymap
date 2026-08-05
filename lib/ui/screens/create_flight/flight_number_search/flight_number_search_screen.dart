@@ -5,6 +5,7 @@ import 'package:flymap/domain/usecase/search_flights_by_number_use_case.dart';
 import 'package:flymap/domain/usecase/search_upcoming_flights_by_number_use_case.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/ui/screens/create_flight/travel_date/flight_notification_permission_prompt.dart';
 import 'package:flymap/ui/screens/create_flight/travel_date/travel_date_section.dart';
 import 'package:flymap/ui/screens/create_flight/widgets/compact_flight_strip.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
@@ -42,7 +43,7 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
   TravelDateSelection? _dateSelection;
   bool _dateBusy = false;
 
-  void _continueToOverview(FlightSummary candidate) {
+  Future<void> _continueToOverview(FlightSummary candidate) async {
     final departure = candidate.departure;
     final arrival = candidate.arrival;
     if (departure == null || arrival == null) return;
@@ -50,13 +51,23 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
         .replaceAll(RegExp(r'\s+'), '')
         .trim()
         .toUpperCase();
+    final schedule = _dateSelection?.schedule;
+    if (schedule != null) {
+      final shouldContinue =
+          await FlightNotificationPermissionPrompt.showIfEligible(
+            context: context,
+            schedule: schedule,
+            departure: departure,
+          );
+      if (!mounted || !shouldContinue) return;
+    }
     AppRouter.goToFlightOverview(
       context,
       departure: departure,
       arrival: arrival,
       flightNumber: number,
       fr24Id: _dateSelection?.fr24Id ?? candidate.fr24Id,
-      schedule: _dateSelection?.schedule,
+      schedule: schedule,
       hasPendingFlightUnlock: widget.hasPendingFlightUnlock,
     );
   }

@@ -35,6 +35,7 @@ class _FakeUseCase implements FetchFlightWeatherUseCase {
   FlightWeather? result;
   Object? error;
   int calls = 0;
+  FlightSchedule? receivedSchedule;
 
   @override
   Future<FlightWeather> call({
@@ -42,6 +43,7 @@ class _FakeUseCase implements FetchFlightWeatherUseCase {
     FlightSchedule? schedule,
   }) async {
     calls++;
+    receivedSchedule = schedule;
     if (error != null) throw error!;
     return result!;
   }
@@ -95,7 +97,9 @@ Flight _flight({bool dateless = false}) {
     timestamp: FlightTimestamp(createdAt: DateTime(2026, 7, 1)),
     schedule: dateless
         ? null
-        : FlightSchedule.dateOnly(DateTime.now().add(const Duration(days: 2))),
+        : FlightSchedule(
+            travelDate: DateTime.now().add(const Duration(days: 2)),
+          ),
   );
 }
 
@@ -132,6 +136,23 @@ void main() {
     expect(useCase.calls, 0);
   });
 
+  test('shared freshness rule expires forecasts after six hours', () {
+    final now = DateTime.utc(2026, 8, 3, 12);
+
+    expect(
+      _weather(
+        fetchedAt: now.subtract(const Duration(hours: 5, minutes: 59)),
+      ).isFreshAt(now),
+      isTrue,
+    );
+    expect(
+      _weather(
+        fetchedAt: now.subtract(FlightWeather.freshnessWindow),
+      ).isFreshAt(now),
+      isFalse,
+    );
+  });
+
   test('stale stored forecast refreshes and stores the new fetch', () async {
     final fresh = _weather();
     final store = _FakeStore()
@@ -165,6 +186,32 @@ void main() {
     expect(cubit.state.failed, isTrue);
   });
 
+  test('failed automatic fetch retries after the cooldown', () async {
+    var now = DateTime.now();
+    final useCase = _FakeUseCase(error: StateError('offline'));
+    final cubit = FlightWeatherCubit(
+      flight: _flight(),
+      useCase: useCase,
+      store: _FakeStore(),
+      now: () => now,
+    );
+    addTearDown(cubit.close);
+
+    await cubit.fetchIfNeeded(hasProAccess: true);
+    await cubit.fetchIfNeeded(hasProAccess: true);
+    expect(useCase.calls, 1);
+
+    now = now.add(FlightWeatherCubit.retryCooldown);
+    useCase
+      ..error = null
+      ..result = _weather(fetchedAt: now);
+    await cubit.fetchIfNeeded(hasProAccess: true);
+
+    expect(useCase.calls, 2);
+    expect(cubit.state.weather, isNotNull);
+    expect(cubit.state.failed, isFalse);
+  });
+
   test('no Pro access never touches store or network', () async {
     final useCase = _FakeUseCase(result: _weather());
     final cubit = FlightWeatherCubit(
@@ -195,23 +242,60 @@ void main() {
     expect(cubit.state.weather, isNull);
   });
 
-  test('applySchedule sets a date and fetches', () async {
+  test('past flight loads stored data but never retries the network', () async {
     final useCase = _FakeUseCase(result: _weather());
     final store = _FakeStore();
     final cubit = FlightWeatherCubit(
-      flight: _flight(dateless: true),
+      flight: _flight().copyWith(
+        schedule: FlightSchedule(
+          travelDate: DateTime.now().subtract(const Duration(days: 1)),
+        ),
+      ),
       useCase: useCase,
       store: store,
     );
     addTearDown(cubit.close);
 
-    await cubit.applySchedule(
-      FlightSchedule.dateOnly(DateTime.now().add(const Duration(days: 3))),
-      hasProAccess: true,
-    );
+    await cubit.fetchIfNeeded(hasProAccess: true, force: true);
 
-    expect(useCase.calls, 1);
-    expect(cubit.state.weather, isNotNull);
-    expect(store.saved, isNotNull);
+    expect(useCase.calls, 0);
+    expect(cubit.state.failed, isFalse);
   });
+
+  test(
+    'applySchedule uses a complete manual date and time and fetches',
+    () async {
+      final useCase = _FakeUseCase(result: _weather());
+      final store = _FakeStore();
+      final cubit = FlightWeatherCubit(
+        flight: _flight(dateless: true),
+        useCase: useCase,
+        store: store,
+      );
+      addTearDown(cubit.close);
+
+      final selectedDate = DateTime.now().add(const Duration(days: 3));
+      await cubit.applySchedule(
+        FlightSchedule.approximate(
+          selectedDate,
+          departureTime: const ApproximateDepartureTime(hour: 14, minute: 35),
+        ),
+        hasProAccess: true,
+      );
+
+      expect(useCase.calls, 1);
+      expect(
+        useCase.receivedSchedule?.timePrecision,
+        FlightScheduleTimePrecision.approximateTime,
+      );
+      expect(
+        useCase.receivedSchedule?.travelDate,
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day),
+      );
+      expect(useCase.receivedSchedule?.approximateDepartureTime?.hour, 14);
+      expect(useCase.receivedSchedule?.approximateDepartureTime?.minute, 35);
+      expect(cubit.state.weather, isNotNull);
+      expect(store.saved, isNotNull);
+    },
+  );
 }

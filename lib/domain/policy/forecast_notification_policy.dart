@@ -5,7 +5,7 @@ enum ForecastNotificationType {
   /// The flight just entered the reliable forecast horizon.
   forecastReady,
 
-  /// Near-departure refresh with the sharpest data.
+  /// Day-before reminder to open Flymap for the latest forecast.
   forecastUpdated,
 }
 
@@ -36,8 +36,8 @@ class ForecastNotificationPolicy {
   static const int readyDaysBefore = 6;
   static const int readyLocalHour = 10;
 
-  /// "Updated forecast": the evening before the flight — late enough for
-  /// the freshest data, and it covers early-morning departures too.
+  /// Day-before reminder: the evening before the flight, covering
+  /// early-morning departures without claiming a background refresh occurred.
   static const int updatedDaysBefore = 1;
   static const int updatedLocalHour = 18;
 

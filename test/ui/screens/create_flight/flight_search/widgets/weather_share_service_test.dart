@@ -143,20 +143,32 @@ const _data = WeatherShareData(
   headline: 'BRS → KRK',
   subtitle: 'FR6221 · Aug 3',
   departure: WeatherShareAirport(
-    label: 'Departure',
     code: 'BRS',
     city: 'Bristol',
+    countryCode: 'GB',
+    countryFlag: '🇬🇧',
     emoji: '⛅',
     temperatureText: '21°',
     timeText: '10:00',
+    utcOffsetText: 'GMT+2',
+    dateText: 'Mon, Aug 3',
+    windText: 'Light wind · 4 m/s',
+    windFilledBars: 1,
   ),
   arrival: WeatherShareAirport(
-    label: 'Arrival',
     code: 'KRK',
     city: 'Krakow',
+    countryCode: 'PL',
+    countryFlag: '🇵🇱',
     emoji: '⛅',
     temperatureText: '21°',
+    timeText: '10:00',
+    utcOffsetText: 'GMT+2',
+    dateText: 'Mon, Aug 3',
   ),
+  attribution:
+      'MET Norway data · Flymap visualization · CC BY 4.0\n'
+      'creativecommons.org/licenses/by/4.0',
   watermark: 'flymap.app',
 );
 
@@ -219,11 +231,7 @@ void main() {
       data: _data,
     );
 
-    final path = await shareService.exportVideo(
-      renderer,
-      fps: 5,
-      seconds: 1,
-    );
+    final path = await shareService.exportVideo(renderer, fps: 5, seconds: 1);
     shareService.disposeRenderer(renderer);
 
     // Video renders at 2/3 scale for speed; layout is unchanged.
@@ -238,34 +246,36 @@ void main() {
     expect(path, endsWith('.mp4'));
   });
 
-  test('a saved flight shares from the offline cache, not the network',
-      () async {
-    // Regression: the share fetched the map base from the network, so an
-    // airplane-mode share of a saved flight lost the satellite map. With a
-    // flightId it must go through the per-flight cache instead.
-    var networkCalled = false;
-    final store = _RecordingImageStore();
-    final shareService = WeatherShareService(
-      mapApi: MapboxStaticImageApi(
-        httpClient: MockClient((_) async {
-          networkCalled = true;
-          return http.Response('nope', 500);
-        }),
-        accessToken: 'test',
-      ),
-      encoder: _FakeEncoder(),
-      imageStore: store,
-    );
+  test(
+    'a saved flight shares from the offline cache, not the network',
+    () async {
+      // Regression: the share fetched the map base from the network, so an
+      // airplane-mode share of a saved flight lost the satellite map. With a
+      // flightId it must go through the per-flight cache instead.
+      var networkCalled = false;
+      final store = _RecordingImageStore();
+      final shareService = WeatherShareService(
+        mapApi: MapboxStaticImageApi(
+          httpClient: MockClient((_) async {
+            networkCalled = true;
+            return http.Response('nope', 500);
+          }),
+          accessToken: 'test',
+        ),
+        encoder: _FakeEncoder(),
+        imageStore: store,
+      );
 
-    final renderer = await shareService.buildRenderer(
-      route: _route(),
-      weather: _weather(),
-      data: _data,
-      flightId: 'flight-1',
-    );
-    shareService.disposeRenderer(renderer);
+      final renderer = await shareService.buildRenderer(
+        route: _route(),
+        weather: _weather(),
+        data: _data,
+        flightId: 'flight-1',
+      );
+      shareService.disposeRenderer(renderer);
 
-    expect(store.requestedFlightId, 'flight-1');
-    expect(networkCalled, isFalse, reason: 'cache path, no live fetch');
-  });
+      expect(store.requestedFlightId, 'flight-1');
+      expect(networkCalled, isFalse, reason: 'cache path, no live fetch');
+    },
+  );
 }

@@ -7,7 +7,6 @@ import 'package:flymap/data/local/airport_timezone_service.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_summary.dart';
-import 'package:flymap/domain/entity/zoned_instant.dart';
 import 'package:flymap/domain/usecase/search_upcoming_flights_by_number_use_case.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
@@ -18,9 +17,8 @@ import 'package:flymap/utils/travel_date_format_utils.dart';
 import 'package:get_it/get_it.dart';
 
 /// What the user chose on the date section. [schedule] is null for the
-/// EXPLICIT "no date yet" choice; otherwise at least a calendar date,
-/// upgraded to the provider-verified schedule when the exact-day check
-/// found the flight (then [fr24Id] carries the dated leg's recording).
+/// EXPLICIT "no date yet" choice; otherwise an exact provider schedule or a
+/// manual date-and-time (then [fr24Id] carries the dated leg's recording).
 /// The host's Continue stays disabled until a selection exists — skipping
 /// the date is a conscious tap, never a default.
 class TravelDateSelection {
@@ -76,8 +74,8 @@ class TravelDateSection extends StatefulWidget {
   final VoidCallback? onStripTap;
   final Widget? stripTrailing;
 
-  /// Fired with the current choice: null = no date picked; date-only
-  /// immediately on pick; upgraded to the verified schedule when found.
+  /// Fired with the current valid choice: null while no complete choice is
+  /// available; upgraded to the verified schedule when found.
   final ValueChanged<TravelDateSelection?> onSelectionChanged;
 
   /// True while the exact-day verification runs — disable Continue.
@@ -151,10 +149,10 @@ class _TravelDateSectionState extends State<TravelDateSection> {
       _checked = false;
       _checkFailed = false;
     });
-    // A picked date is at least a date-only schedule from the first moment.
-    widget.onSelectionChanged(
-      TravelDateSelection(schedule: FlightSchedule.dateOnly(date)),
-    );
+    // A calendar date alone is deliberately incomplete. Continue remains
+    // disabled until the provider finds an exact schedule or the user enters
+    // a precise local departure time.
+    widget.onSelectionChanged(null);
     unawaited(_verifyDate(date));
   }
 
@@ -179,9 +177,10 @@ class _TravelDateSectionState extends State<TravelDateSection> {
     setState(() => _time = picked);
     final date = _date;
     if (date != null && _verifiedSelection == null) {
-      widget.onSelectionChanged(
-        TravelDateSelection(schedule: _manualSchedule(date)),
-      );
+      final schedule = _manualSchedule(date);
+      if (schedule != null) {
+        widget.onSelectionChanged(TravelDateSelection(schedule: schedule));
+      }
     }
   }
 
@@ -200,7 +199,7 @@ class _TravelDateSectionState extends State<TravelDateSection> {
   }
 
   /// Checks the provider for departures on exactly [date]; a match attaches
-  /// the real schedule silently, a miss stays honest date-only.
+  /// the real schedule silently; a miss requires a manual departure time.
   Future<void> _verifyDate(DateTime date) async {
     // Guarded for widget tests without DI.
     if (!GetIt.I.isRegistered<SearchUpcomingFlightsByNumberUseCase>()) return;
@@ -267,9 +266,12 @@ class _TravelDateSectionState extends State<TravelDateSection> {
             );
     });
     widget.onBusyChanged(false);
+    final manualSchedule = _manualSchedule(date);
     widget.onSelectionChanged(
       _verifiedSelection ??
-          TravelDateSelection(schedule: _manualSchedule(date)),
+          (manualSchedule == null
+              ? null
+              : TravelDateSelection(schedule: manualSchedule)),
     );
   }
 
@@ -318,27 +320,16 @@ class _TravelDateSectionState extends State<TravelDateSection> {
     };
   }
 
-  /// Manual date (+ optional time): the time is wall-clock at the departure
-  /// airport, converted through the airport's timezone — same shape as a
-  /// provider schedule.
-  FlightSchedule _manualSchedule(DateTime date) {
+  /// Manual date and time: keep the user-supplied wall clock
+  /// separate from the provider-only scheduled departure invariant.
+  FlightSchedule? _manualSchedule(DateTime date) {
     final time = _time;
-    final service = _timezoneService;
-    if (time == null || service == null) {
-      return FlightSchedule.dateOnly(date);
-    }
-    final utc = service.localTimeToUtc(
-      widget.departure,
+    if (time == null || _timezoneService == null) return null;
+    return FlightSchedule.approximate(
       date,
-      hour: time.hour,
-      minute: time.minute,
-    );
-    if (utc == null) return FlightSchedule.dateOnly(date);
-    return FlightSchedule(
-      travelDate: DateTime(date.year, date.month, date.day),
-      departure: ZonedInstant(
-        utc: utc,
-        offsetMinutes: service.utcOffsetMinutes(widget.departure, utc),
+      departureTime: ApproximateDepartureTime(
+        hour: time.hour,
+        minute: time.minute,
       ),
     );
   }

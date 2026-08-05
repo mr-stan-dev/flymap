@@ -4,6 +4,7 @@ import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
+import 'package:flymap/ui/screens/create_flight/travel_date/flight_notification_permission_prompt.dart';
 import 'package:flymap/ui/screens/settings/date_display_format_context.dart';
 import 'package:flymap/utils/travel_date_format_utils.dart';
 
@@ -20,10 +21,10 @@ class TravelDatePickArgs {
 }
 
 /// Dedicated "When are you flying?" step for APPROXIMATE flights only —
-/// a plain Today..+6 calendar grid plus a custom date; there is no
+/// a plain Today..+3 calendar grid plus a custom date; there is no
 /// schedule to verify. Real flights pick their date inline on the search
-/// screens via TravelDateSection. The dateless escape hatch stays — a date
-/// is never required.
+/// screens via TravelDateSection. A dated choice always includes a precise
+/// departure time; the dateless escape hatch remains the only alternative.
 class TravelDatePickScreen extends StatefulWidget {
   const TravelDatePickScreen({required this.args, super.key});
 
@@ -34,12 +35,13 @@ class TravelDatePickScreen extends StatefulWidget {
 }
 
 class _TravelDatePickScreenState extends State<TravelDatePickScreen> {
-  static const int _windowDays = 7;
+  static const int _windowDays = 4;
 
   late final List<DateTime> _options;
   int? _selectedIndex;
   DateTime? _customDate;
   bool _customSelected = false;
+  TimeOfDay? _specificDepartureTime;
 
   @override
   void initState() {
@@ -65,7 +67,10 @@ class _TravelDatePickScreenState extends State<TravelDatePickScreen> {
     return switch (daysAway) {
       0 => dateT.today,
       1 => dateT.tomorrow,
-      _ => TravelDateFormatUtils.formatShortDate(date, context.dateDisplayFormat),
+      _ => TravelDateFormatUtils.formatShortDate(
+        date,
+        context.dateDisplayFormat,
+      ),
     };
   }
 
@@ -85,14 +90,33 @@ class _TravelDatePickScreenState extends State<TravelDatePickScreen> {
     });
   }
 
-  void _continue({required bool withoutDate}) {
+  Future<void> _continue({required bool withoutDate}) async {
     FlightSchedule? schedule;
     if (!withoutDate) {
+      DateTime? date;
       if (_customSelected && _customDate != null) {
-        schedule = FlightSchedule.dateOnly(_customDate!);
+        date = _customDate;
       } else if (_selectedIndex != null) {
-        schedule = FlightSchedule.dateOnly(_options[_selectedIndex!]);
+        date = _options[_selectedIndex!];
       }
+      final specificTime = _specificDepartureTime;
+      if (date == null || specificTime == null) return;
+      schedule = FlightSchedule.approximate(
+        date,
+        departureTime: ApproximateDepartureTime(
+          hour: specificTime.hour,
+          minute: specificTime.minute,
+        ),
+      );
+    }
+    if (schedule != null) {
+      final shouldContinue =
+          await FlightNotificationPermissionPrompt.showIfEligible(
+            context: context,
+            schedule: schedule,
+            departure: widget.args.departure,
+          );
+      if (!mounted || !shouldContinue) return;
     }
     AppRouter.goToFlightOverview(
       context,
@@ -105,6 +129,16 @@ class _TravelDatePickScreenState extends State<TravelDatePickScreen> {
     );
   }
 
+  Future<void> _pickSpecificDepartureTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime:
+          _specificDepartureTime ?? const TimeOfDay(hour: 12, minute: 0),
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _specificDepartureTime = picked);
+  }
+
   @override
   Widget build(BuildContext context) {
     final dateT = context.t.createFlight.travelDate;
@@ -112,7 +146,8 @@ class _TravelDatePickScreenState extends State<TravelDatePickScreen> {
     final routeLabel =
         '${widget.args.departure.displayCode} → '
         '${widget.args.arrival.displayCode}';
-    final canContinue = _selectedIndex != null || _customSelected;
+    final hasSelectedDate = _selectedIndex != null || _customSelected;
+    final canContinue = hasSelectedDate && _specificDepartureTime != null;
 
     return Scaffold(
       appBar: AppBar(title: Text(context.t.home.newFlight)),
@@ -169,18 +204,47 @@ class _TravelDatePickScreenState extends State<TravelDatePickScreen> {
                       isSelected: _customSelected,
                       onTap: _pickCustomDate,
                     ),
+                    const SizedBox(height: 22),
+                    Text(
+                      dateT.departureTimeTitle,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      hasSelectedDate
+                          ? dateT.departureTimeHint
+                          : dateT.departureTimePickDateFirst,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        ChoiceChip(
+                          avatar: const Icon(Icons.schedule_rounded, size: 18),
+                          label: Text(
+                            _specificDepartureTime == null
+                                ? dateT.setDepartureTime
+                                : dateT.departureTimeSelected(
+                                    time: _formatTime(_specificDepartureTime!),
+                                  ),
+                          ),
+                          selected: _specificDepartureTime != null,
+                          showCheckmark: false,
+                          onSelected: hasSelectedDate
+                              ? (_) => _pickSpecificDepartureTime()
+                              : null,
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TertiaryButton(
-                  label: dateT.skipDate,
-                  onPressed: () => _continue(withoutDate: true),
-                  expand: false,
-                ),
-              ),
-              const SizedBox(height: 8),
               SizedBox(
                 width: double.infinity,
                 child: PrimaryButton(
@@ -190,10 +254,26 @@ class _TravelDatePickScreenState extends State<TravelDatePickScreen> {
                       : null,
                 ),
               ),
+              const SizedBox(height: 4),
+              Align(
+                alignment: Alignment.center,
+                child: TertiaryButton(
+                  label: dateT.skipDateTimeScreen,
+                  onPressed: () => _continue(withoutDate: true),
+                  expand: false,
+                  compact: true,
+                ),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  String _formatTime(TimeOfDay time) {
+    return TravelDateFormatUtils.formatTime(
+      DateTime(2000, 1, 1, time.hour, time.minute),
     );
   }
 }

@@ -9,6 +9,7 @@ import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/repository/onboarding_repository.dart';
 import 'package:flymap/repository/recent_airports_repository.dart';
 import 'package:flymap/router/app_router.dart';
+import 'package:flymap/ui/screens/create_flight/travel_date/flight_notification_permission_prompt.dart';
 import 'package:flymap/ui/screens/create_flight/travel_date/travel_date_section.dart';
 import 'package:flymap/ui/screens/create_flight/widgets/compact_flight_strip.dart';
 import 'package:flymap/ui/design_system/design_system.dart';

@@ -39,6 +39,7 @@ class FlightWeatherCubit extends Cubit<FlightWeatherState> {
     required this.flight,
     FetchFlightWeatherUseCase? useCase,
     FlightWeatherStore? store,
+    DateTime Function()? now,
   }) : _useCase =
            useCase ??
            (GetIt.I.isRegistered<FetchFlightWeatherUseCase>()
@@ -49,18 +50,19 @@ class FlightWeatherCubit extends Cubit<FlightWeatherState> {
            (GetIt.I.isRegistered<FlightWeatherStore>()
                ? GetIt.I.get<FlightWeatherStore>()
                : null),
+       _now = now ?? DateTime.now,
        super(const FlightWeatherState());
 
   static const _logger = Logger('FlightWeatherCubit');
 
-  /// A stored forecast younger than this is fresh enough to skip the
-  /// network on open.
-  static const staleAfter = Duration(hours: 6);
+  static const retryCooldown = Duration(minutes: 1);
 
   final Flight flight;
   final FetchFlightWeatherUseCase? _useCase;
   final FlightWeatherStore? _store;
+  final DateTime Function() _now;
   bool _storeChecked = false;
+  DateTime? _lastFailedAt;
 
   /// A date picked in-session for a dateless flight, overriding the flight's
   /// (missing) schedule until the flight record reloads with the persisted one.
@@ -70,8 +72,11 @@ class FlightWeatherCubit extends Cubit<FlightWeatherState> {
   bool get isBeyondHorizon =>
       FlightWeatherVerdictPolicy.isBeyondForecastHorizon(
         _schedule,
-        now: DateTime.now(),
+        now: _now(),
       );
+
+  bool get isPast =>
+      FlightWeatherVerdictPolicy.isInPast(_schedule, now: _now());
 
   /// Applies a date picked on the weather screen for a dateless flight, then
   /// force-fetches. The caller persists the schedule on the flight record.
@@ -104,12 +109,13 @@ class FlightWeatherCubit extends Cubit<FlightWeatherState> {
     }
 
     final useCase = _useCase;
-    if (useCase == null || isBeyondHorizon) return;
+    if (useCase == null || isPast || isBeyondHorizon) return;
     final current = state.weather;
-    final isFresh =
-        current != null &&
-        DateTime.now().difference(current.fetchedAt) < staleAfter;
-    if (!force && (isFresh || state.failed)) return;
+    final isFresh = current?.isFreshAt(_now()) ?? false;
+    final failedAt = _lastFailedAt;
+    final retryCoolingDown =
+        failedAt != null && _now().difference(failedAt) < retryCooldown;
+    if (!force && (isFresh || retryCoolingDown)) return;
 
     emit(FlightWeatherState(isLoading: true, weather: current));
     try {
@@ -118,11 +124,13 @@ class FlightWeatherCubit extends Cubit<FlightWeatherState> {
         schedule: _schedule,
       );
       if (isClosed) return;
+      _lastFailedAt = null;
       emit(FlightWeatherState(weather: weather));
       await _store?.save(flight.id, weather);
     } catch (e) {
       _logger.error('flight weather fetch failed: $e');
       if (isClosed) return;
+      _lastFailedAt = _now();
       // Keep showing the stored forecast; only flag failure when there is
       // nothing at all to show.
       emit(FlightWeatherState(weather: current, failed: current == null));

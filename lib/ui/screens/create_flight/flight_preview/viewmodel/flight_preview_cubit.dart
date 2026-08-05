@@ -130,10 +130,21 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
 
   /// Fetches the weather picture for the weather step. Failure is
   /// non-blocking: the step shows a retry and Continue stays available.
-  /// Sets a date-only schedule for a dateless (approximate) flight from the
-  /// weather step's "pick a date" prompt, then fetches the forecast.
-  Future<void> applyTravelDate(DateTime date) async {
-    _emitState(state.copyWith(flightSchedule: FlightSchedule.dateOnly(date)));
+  /// Sets a complete manual schedule for a dateless approximate flight from
+  /// the weather step, then fetches the forecast.
+  Future<void> applyTravelDateAndTime(
+    DateTime date, {
+    required int hour,
+    required int minute,
+  }) async {
+    _emitState(
+      state.copyWith(
+        flightSchedule: FlightSchedule.approximate(
+          date,
+          departureTime: ApproximateDepartureTime(hour: hour, minute: minute),
+        ),
+      ),
+    );
     await fetchWeather(force: true);
   }
 
@@ -141,15 +152,20 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     // Free flights never touch the weather API — the step shows the demo
     // teaser instead; the fetch fires the moment Pro access is unlocked.
     if (!hasEffectiveProAccess) return;
-    // No date -> the step shows a "pick a date" prompt; a dateless fetch
-    // would only produce today's weather, which is meaningless for the flight.
-    if (state.flightSchedule == null) return;
+    // Neither dateless nor legacy date-only flights have a meaningful
+    // forecast instant. The UI asks for a complete date and time instead.
+    final schedule = state.flightSchedule;
+    if (schedule == null ||
+        schedule.timePrecision == FlightScheduleTimePrecision.dateOnly) {
+      return;
+    }
     // Beyond the reliable horizon the step explains itself — calling the
     // API for a two-months-out flight would only produce garbage.
-    if (FlightWeatherVerdictPolicy.isBeyondForecastHorizon(
-      state.flightSchedule,
-      now: DateTime.now(),
-    )) {
+    if (FlightWeatherVerdictPolicy.isInPast(schedule, now: DateTime.now()) ||
+        FlightWeatherVerdictPolicy.isBeyondForecastHorizon(
+          schedule,
+          now: DateTime.now(),
+        )) {
       return;
     }
     final useCase = _fetchFlightWeatherUseCase;
@@ -163,10 +179,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
 
     _emitState(state.copyWith(isWeatherLoading: true, weatherFailed: false));
     try {
-      final weather = await useCase.call(
-        route: route,
-        schedule: state.flightSchedule,
-      );
+      final weather = await useCase.call(route: route, schedule: schedule);
       if (isClosed) return;
       _emitState(
         state.copyWith(isWeatherLoading: false, flightWeather: weather),
@@ -239,13 +252,13 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
 
   Future<void> refreshPoisForPro() async {
     _applyPoisForSubscriptionTier(state.allRoutePois, isProUser: true);
-    _fetchWeatherIfOnWeatherStep();
+    _prefetchWeatherIfEligible();
   }
 
-  /// Upgrading from the weather teaser swaps in the real forecast without
-  /// leaving the step.
-  void _fetchWeatherIfOnWeatherStep() {
-    if (state.step == CreateFlightStep.weather) unawaited(fetchWeather());
+  /// Starts as soon as both route and entitlement are available. [fetchWeather]
+  /// owns all remaining guards and deduplicates the weather-step request.
+  void _prefetchWeatherIfEligible() {
+    if (state.flightRoute != null) unawaited(fetchWeather());
   }
 
   Future<void> syncPoisForCurrentAccessTier() async {
@@ -258,7 +271,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   Future<void> enablePendingFlightUnlock() async {
     _emitState(state.copyWith(hasPendingFlightUnlock: true));
     await syncPoisForCurrentAccessTier();
-    _fetchWeatherIfOnWeatherStep();
+    _prefetchWeatherIfEligible();
   }
 
   Future<void> clearPendingFlightUnlock() async {

@@ -9,12 +9,12 @@ import 'package:flymap/auth/app_auth_repository.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics_initializer.dart';
 import 'package:flymap/data/api/feedback_api.dart';
+import 'package:flymap/data/api/firebase_weather_forecast_api.dart';
 import 'package:flymap/data/api/flight_info_api.dart';
 import 'package:flymap/data/api/flight_number_search_api.dart';
 import 'package:flymap/data/api/upcoming_flight_search_api.dart';
 import 'package:flymap/data/api/mapbox_env_config.dart';
 import 'package:flymap/data/api/flight_route_preview_api.dart';
-import 'package:flymap/data/api/met_norway_api.dart';
 import 'package:flymap/data/api/flight_route_search_api.dart';
 import 'package:flymap/data/api/mapbox_raster_tile_api.dart';
 import 'package:flymap/data/api/mapbox_static_image_api.dart';
@@ -25,6 +25,7 @@ import 'package:flymap/data/api/flight_info_api_mapper.dart';
 import 'package:flymap/data/gps_data_provider.dart';
 import 'package:flymap/data/map_asset_cache_service.dart';
 import 'package:flymap/data/local/airport_timezone_service.dart';
+import 'package:flymap/domain/provider/weather_forecast_provider.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/share/weather_share_service.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/data/local/airlines_database.dart';
@@ -190,12 +191,17 @@ class DiModule {
       () => UpcomingFlightSearchApi(),
     );
     i.registerLazySingleton<FlightRouteSearchApi>(() => FlightRouteSearchApi());
-    i.registerLazySingleton<MetNorwayApi>(() => MetNorwayApi());
+    i.registerLazySingleton<WeatherForecastProvider>(
+      () => FirebaseWeatherForecastApi(),
+    );
     i.registerLazySingleton<AirportTimezoneService>(
       () => AirportTimezoneService(airportsDatabase: i.get()),
     );
     i.registerLazySingleton<FetchFlightWeatherUseCase>(
-      () => FetchFlightWeatherUseCase(api: i.get(), timezoneService: i.get()),
+      () => FetchFlightWeatherUseCase(
+        provider: i.get(),
+        timezoneService: i.get(),
+      ),
     );
     i.registerLazySingleton<WeatherShareService>(
       () => WeatherShareService(
@@ -287,6 +293,7 @@ class DiModule {
         permissionService: i.get<NotificationPermissionService>(),
         prefs: i.get<ForecastNotificationPrefs>(),
         flightRepository: i.get<FlightRepository>(),
+        subscriptionRepository: i.get<SubscriptionRepository>(),
         analytics: i.get<AppAnalytics>(),
       ),
     );

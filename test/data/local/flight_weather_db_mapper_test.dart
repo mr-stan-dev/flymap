@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/data/local/mappers/flight_weather_db_mapper.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
+import 'package:flymap/domain/entity/weather_attribution.dart';
 import 'package:latlong2/latlong.dart';
 
 void main() {
@@ -52,6 +53,12 @@ void main() {
       ],
       fetchedAt: DateTime.utc(2026, 8, 2, 18, 5),
       isTimeEstimated: true,
+      attribution: const WeatherAttribution(
+        providerName: 'Weather Co',
+        providerUrl: 'https://weather.example',
+        licenseName: 'Example license',
+        licenseUrl: 'https://weather.example/license',
+      ),
     );
 
     final restored = mapper.fromDb(mapper.toDb(weather));

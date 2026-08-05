@@ -42,9 +42,21 @@ void main() {
     expect(find.text('Check the weather for your flight'), findsOneWidget);
     // Unmistakably an advertisement, not the user's flight.
     expect(find.text('EXAMPLE'), findsOneWidget);
-    expect(find.text('LHR → FCO'), findsOneWidget);
-    expect(find.text('LAX → JFK'), findsOneWidget);
-    expect(find.text('BER → DXB'), findsOneWidget);
+    expect(find.text('LHR'), findsOneWidget);
+    expect(find.text('FCO'), findsOneWidget);
+    expect(find.text('LAX'), findsOneWidget);
+    expect(find.text('JFK'), findsOneWidget);
+    expect(find.text('BER'), findsOneWidget);
+    expect(find.text('DXB'), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_forward_rounded), findsNWidgets(3));
+
+    final departureCenter = tester.getCenter(find.text('LHR'));
+    final arrowCenter = tester.getCenter(
+      find.byKey(const ValueKey('onboarding-weather-route-arrow-LHR-FCO')),
+    );
+    final arrivalCenter = tester.getCenter(find.text('FCO'));
+    expect(arrowCenter.dy, closeTo(departureCenter.dy, 0.5));
+    expect(arrowCenter.dy, closeTo(arrivalCenter.dy, 0.5));
     expect(_mapAsset('lhr_fco'), findsOneWidget);
     expect(find.byType(CustomPaint), findsWidgets);
   });
@@ -53,8 +65,8 @@ void main() {
     await tester.pumpWidget(_app());
     await tester.pump(const Duration(milliseconds: 100));
 
-    await tester.scrollUntilVisible(find.text('LAX → JFK'), 200);
-    await tester.tap(find.text('LAX → JFK'));
+    await tester.scrollUntilVisible(find.text('LAX'), 200);
+    await tester.tap(find.text('LAX'));
     // Rebuild, run the switcher animations, then the removal frame.
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));

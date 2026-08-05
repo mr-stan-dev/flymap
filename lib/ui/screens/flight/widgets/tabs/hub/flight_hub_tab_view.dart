@@ -231,6 +231,9 @@ class _FlightBoardingCard extends StatelessWidget {
     final operational = flight.operationalData;
     final flightNumber = operational?.flightNumber.trim() ?? '';
     final airline = operational?.airlineName?.trim() ?? '';
+    final departureTime = TravelDateFormatUtils.formatScheduleDepartureTime(
+      schedule,
+    );
 
     final scheduleParts = <String>[
       if (schedule != null)
@@ -238,8 +241,7 @@ class _FlightBoardingCard extends StatelessWidget {
           schedule.travelDate,
           context.dateDisplayFormat,
         ),
-      if (schedule?.departureLocal != null)
-        TravelDateFormatUtils.formatTime(schedule!.departureLocal!),
+      if (departureTime != null) departureTime,
       if (flightNumber.isNotEmpty) flightNumber,
     ];
 
@@ -454,6 +456,13 @@ class _WeatherSectionRow extends StatelessWidget {
         if (!hasProAccess) {
           subtitle = t.weatherLocked;
           icon = Icons.lock_rounded;
+        } else if (weather == null &&
+            FlightWeatherVerdictPolicy.isInPast(
+              flight.schedule,
+              now: DateTime.now(),
+            )) {
+          subtitle = weatherStrings.pastForecastTitle;
+          icon = Icons.history_rounded;
         } else if (FlightWeatherVerdictPolicy.isBeyondForecastHorizon(
           flight.schedule,
           now: DateTime.now(),
@@ -472,7 +481,8 @@ class _WeatherSectionRow extends StatelessWidget {
           );
           subtitle =
               '$emoji $title · '
-              '${weatherStrings.updatedAt(time: TravelDateFormatUtils.formatTime(weather.fetchedAt))}';
+              '${weather.isTimeEstimated ? '${weatherStrings.estimatedShort} · ' : ''}'
+              '${TravelDateFormatUtils.formatForecastFreshness(weather.fetchedAt, context.dateDisplayFormat)}';
         } else {
           subtitle = t.weatherCheck;
         }

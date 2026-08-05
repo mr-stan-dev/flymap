@@ -19,6 +19,7 @@ import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_route_metrics.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_status.dart';
+import 'package:flymap/domain/entity/weather_attribution.dart';
 import 'package:flymap/domain/entity/flight_waypoint.dart';
 import 'package:flymap/domain/entity/route_overview.dart';
 import 'package:flymap/domain/entity/route_region.dart';
@@ -27,6 +28,7 @@ import 'package:flymap/domain/entity/route_timeline.dart';
 import 'package:flymap/domain/entity/user_flight_prefs.dart';
 import 'package:flymap/domain/entity/wiki_article_candidate.dart';
 import 'package:flymap/domain/policy/poi_limits_policy.dart';
+import 'package:flymap/domain/provider/weather_forecast_provider.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/flight_unlock_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
@@ -45,6 +47,7 @@ import 'package:flymap/domain/usecase/get_wiki_articles_use_case.dart';
 import 'package:flymap/domain/usecase/delete_flight_use_case.dart';
 import 'package:flymap/domain/usecase/build_flight_route_preview_use_case.dart';
 import 'package:flymap/domain/usecase/get_route_overview_use_case.dart';
+import 'package:flymap/domain/usecase/fetch_flight_weather_use_case.dart';
 import 'package:flymap/repository/flight_search_repository.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -344,6 +347,79 @@ void main() {
     });
 
     test(
+      'preparePreview prefetches weather for an existing Pro user',
+      () async {
+        subscriptionRepository.isPro = true;
+        final weatherProvider = _CountingWeatherForecastProvider();
+        final weatherCubit = _TestFlightPreviewCubit(
+          departure: _route().departure,
+          arrival: _route().arrival,
+          schedule: _tomorrowAtNoon(),
+          fetchFlightWeatherUseCase: FetchFlightWeatherUseCase(
+            provider: weatherProvider,
+          ),
+          connectivityChecker: connectivityChecker,
+          getRouteOverviewUseCase: routeOverviewUseCase,
+          buildFlightRoutePreviewUseCase: _FakeBuildFlightRoutePreviewUseCase(),
+          downloadMapUseCase: mapUseCase,
+          downloadRegionWikiArticlesUseCase: regionWikiDownloadUseCase,
+          downloadWikipediaArticlesUseCase: wikiDownloadUseCase,
+          getWikiArticlesUseCase: _FakeGetWikiArticlesUseCase(),
+          userFlightPrefsRepository: _FakeUserFlightPrefsRepository(),
+          flightRepository: _FakeFlightRepository(),
+          subscriptionRepository: subscriptionRepository,
+          flightUnlockRepository: flightUnlockRepository,
+          deleteFlightUseCase: _FakeDeleteFlightUseCase(),
+          analytics: _FakeAppAnalytics(),
+          crashlytics: _FakeAppCrashlytics(),
+        );
+        addTearDown(weatherCubit.close);
+
+        await weatherCubit.preparePreview();
+        await Future<void>.delayed(Duration.zero);
+
+        expect(weatherProvider.calls, 1);
+        expect(weatherCubit.state.flightWeather, isNotNull);
+        expect(weatherCubit.state.step, CreateFlightStep.overview);
+      },
+    );
+
+    test('preparePreview prefetches weather for an unlocked flight', () async {
+      subscriptionRepository.isPro = false;
+      final weatherProvider = _CountingWeatherForecastProvider();
+      final weatherCubit = _TestFlightPreviewCubit(
+        departure: _route().departure,
+        arrival: _route().arrival,
+        schedule: _tomorrowAtNoon(),
+        hasPendingFlightUnlock: true,
+        fetchFlightWeatherUseCase: FetchFlightWeatherUseCase(
+          provider: weatherProvider,
+        ),
+        connectivityChecker: connectivityChecker,
+        getRouteOverviewUseCase: routeOverviewUseCase,
+        buildFlightRoutePreviewUseCase: _FakeBuildFlightRoutePreviewUseCase(),
+        downloadMapUseCase: mapUseCase,
+        downloadRegionWikiArticlesUseCase: regionWikiDownloadUseCase,
+        downloadWikipediaArticlesUseCase: wikiDownloadUseCase,
+        getWikiArticlesUseCase: _FakeGetWikiArticlesUseCase(),
+        userFlightPrefsRepository: _FakeUserFlightPrefsRepository(),
+        flightRepository: _FakeFlightRepository(),
+        subscriptionRepository: subscriptionRepository,
+        flightUnlockRepository: flightUnlockRepository,
+        deleteFlightUseCase: _FakeDeleteFlightUseCase(),
+        analytics: _FakeAppAnalytics(),
+        crashlytics: _FakeAppCrashlytics(),
+      );
+      addTearDown(weatherCubit.close);
+
+      await weatherCubit.preparePreview();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(weatherProvider.calls, 1);
+      expect(weatherCubit.state.flightWeather, isNotNull);
+    });
+
+    test(
       'real flight without a recorded track falls back to a generated route',
       () async {
         final route = _route();
@@ -385,29 +461,31 @@ void main() {
       },
     );
 
-    test('back from wiki steps through weather and preserves pending unlock',
-        () async {
-      final pois = _routePoiSummaries(120);
-      cubit.setStateForTest(
-        cubit.state.copyWith(
-          step: CreateFlightStep.wikipediaArticles,
-          allRoutePois: pois,
-          flightInfo: cubit.state.flightInfo.copyWith(
-            poi: pois.take(10).toList(growable: false),
+    test(
+      'back from wiki steps through weather and preserves pending unlock',
+      () async {
+        final pois = _routePoiSummaries(120);
+        cubit.setStateForTest(
+          cubit.state.copyWith(
+            step: CreateFlightStep.wikipediaArticles,
+            allRoutePois: pois,
+            flightInfo: cubit.state.flightInfo.copyWith(
+              poi: pois.take(10).toList(growable: false),
+            ),
+            hasPendingFlightUnlock: true,
           ),
-          hasPendingFlightUnlock: true,
-        ),
-      );
+        );
 
-      final backFromWiki = await cubit.handleBackAction();
-      expect(backFromWiki, isFalse);
-      expect(cubit.state.step, CreateFlightStep.weather);
+        final backFromWiki = await cubit.handleBackAction();
+        expect(backFromWiki, isFalse);
+        expect(cubit.state.step, CreateFlightStep.weather);
 
-      final backFromWeather = await cubit.handleBackAction();
-      expect(backFromWeather, isFalse);
-      expect(cubit.state.step, CreateFlightStep.overview);
-      expect(cubit.state.hasPendingFlightUnlock, isTrue);
-    });
+        final backFromWeather = await cubit.handleBackAction();
+        expect(backFromWeather, isFalse);
+        expect(cubit.state.step, CreateFlightStep.overview);
+        expect(cubit.state.hasPendingFlightUnlock, isTrue);
+      },
+    );
 
     test('pro tier POI cap uses policy max', () async {
       subscriptionRepository.isPro = true;
@@ -731,6 +809,9 @@ class _TestFlightPreviewCubit extends FlightPreviewCubit {
     required super.departure,
     required super.arrival,
     super.flightNumber,
+    super.schedule,
+    super.fetchFlightWeatherUseCase,
+    super.hasPendingFlightUnlock,
     required super.connectivityChecker,
     required super.getRouteOverviewUseCase,
     required super.buildFlightRoutePreviewUseCase,
@@ -748,6 +829,47 @@ class _TestFlightPreviewCubit extends FlightPreviewCubit {
   }) : super(autoPrepare: false);
 
   void setStateForTest(FlightPreviewState state) => emit(state);
+}
+
+FlightSchedule _tomorrowAtNoon() {
+  final tomorrow = DateTime.now().add(const Duration(days: 1));
+  return FlightSchedule.approximate(
+    DateTime(tomorrow.year, tomorrow.month, tomorrow.day),
+    departureTime: const ApproximateDepartureTime(hour: 12, minute: 0),
+  );
+}
+
+class _CountingWeatherForecastProvider implements WeatherForecastProvider {
+  int calls = 0;
+
+  @override
+  Future<WeatherForecastBatch> forecastBatch({
+    required List<WeatherForecastRequest> requests,
+    required DateTime windowStartUtc,
+    required DateTime windowEndUtc,
+  }) async {
+    calls++;
+    return WeatherForecastBatch(
+      seriesByRequest: [
+        for (final request in requests)
+          [
+            WeatherForecastPoint(
+              timeUtc: request.targetTimeUtc,
+              temperatureC: 18,
+              windSpeedMs: 3,
+              cloudCoverPercent: 25,
+              cloudLowPercent: 10,
+              cloudMidPercent: 10,
+              cloudHighPercent: 5,
+              precipitationMm: 0,
+              symbolCode: 'fair_day',
+            ),
+          ],
+      ],
+      retrievedAtUtc: DateTime.now().toUtc(),
+      attribution: WeatherAttribution.metNorway,
+    );
+  }
 }
 
 class _FakeConnectivityChecker implements ConnectivityChecker {
@@ -815,7 +937,6 @@ class _UnusedFlightSearchRepository implements FlightSearchRepository {
   }) {
     throw UnimplementedError();
   }
-
 
   @override
   Future<List<FlightSummary>> searchFlightsByNumber(String flightNumber) {
@@ -1142,5 +1263,8 @@ class _FakeFlightUnlockRepository implements FlightUnlockRepository {
 }
 
 class _TestFirebaseFunctionsException extends FirebaseFunctionsException {
-  _TestFirebaseFunctionsException({required super.code, required super.message});
+  _TestFirebaseFunctionsException({
+    required super.code,
+    required super.message,
+  });
 }

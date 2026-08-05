@@ -1,4 +1,5 @@
 import 'package:flymap/domain/entity/flight_weather.dart';
+import 'package:flymap/domain/entity/weather_attribution.dart';
 import 'package:latlong2/latlong.dart';
 
 /// JSON persistence for a fetched forecast — the full picture including
@@ -15,6 +16,12 @@ class FlightWeatherDbMapper {
       'areaSamples': [for (final s in weather.areaSamples) _sampleToDb(s)],
       'fetchedAt': weather.fetchedAt.toIso8601String(),
       'isTimeEstimated': weather.isTimeEstimated,
+      'attribution': {
+        'providerName': weather.attribution.providerName,
+        'providerUrl': weather.attribution.providerUrl,
+        'licenseName': weather.attribution.licenseName,
+        'licenseUrl': weather.attribution.licenseUrl,
+      },
     };
   }
 
@@ -32,6 +39,26 @@ class FlightWeatherDbMapper {
       ],
       fetchedAt: DateTime.parse(map['fetchedAt'] as String),
       isTimeEstimated: map['isTimeEstimated'] == true,
+      attribution: _attributionFromDb(map['attribution']),
+    );
+  }
+
+  WeatherAttribution _attributionFromDb(Object? raw) {
+    if (raw is! Map) return WeatherAttribution.metNorway;
+    final map = Map<String, dynamic>.from(raw);
+    return WeatherAttribution(
+      providerName:
+          map['providerName'] as String? ??
+          WeatherAttribution.metNorway.providerName,
+      providerUrl:
+          map['providerUrl'] as String? ??
+          WeatherAttribution.metNorway.providerUrl,
+      licenseName:
+          map['licenseName'] as String? ??
+          WeatherAttribution.metNorway.licenseName,
+      licenseUrl:
+          map['licenseUrl'] as String? ??
+          WeatherAttribution.metNorway.licenseUrl,
     );
   }
 

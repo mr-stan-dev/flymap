@@ -17,8 +17,10 @@ import 'package:flymap/utils/unit_format_utils.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_route_map_card.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_symbols.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_wind_presentation.dart';
 import 'package:flymap/utils/travel_date_format_utils.dart';
 import 'package:get_it/get_it.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// The complete weather forecast experience, shared by the create-flight
 /// weather step and the flight screen's weather section: Pro forecast
@@ -56,10 +58,8 @@ class WeatherForecastBody extends StatelessWidget {
   /// per-flight offline cache. Null in the creation flow (no saved flight).
   final String? flightId;
 
-  /// Handles picking a flight date when there is none. When non-null the
-  /// no-date state shows a "pick a date" button (approximate flights, which
-  /// can take any calendar day inline); when null it just explains that a
-  /// date is needed (real flights, which must be re-selected with a date).
+  /// Handles picking a complete flight date and time when there is none.
+  /// When null, the prompt explains that a real flight must be re-selected.
   final VoidCallback? onPickDate;
 
   /// Shortcut from the no-date state back to flight selection (where a real
@@ -91,6 +91,16 @@ class WeatherForecastBody extends StatelessWidget {
         );
   }
 
+  static bool isPast({
+    required bool isProUser,
+    required FlightWeather? weather,
+    required FlightSchedule? schedule,
+  }) {
+    return isProUser &&
+        weather == null &&
+        FlightWeatherVerdictPolicy.isInPast(schedule, now: DateTime.now());
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = context.t.createFlight.weather;
@@ -101,11 +111,45 @@ class WeatherForecastBody extends StatelessWidget {
       // glass + upgrade pitch (the host renders the upgrade actions).
       return _WeatherTeaser(route: route, onPremiumGateTap: onPremiumGateTap);
     }
-    if (schedule == null && weather == null) {
-      // No date means no meaningful forecast — the fallback would just be
-      // today's weather. Ask for the flight date instead of pretending.
-      // (The fetch is gated on a date, so a dateless flight has no forecast.)
+    if ((schedule == null ||
+            schedule?.timePrecision == FlightScheduleTimePrecision.dateOnly) &&
+        weather == null) {
+      // A date without a departure time is no more meaningful than no date:
+      // both states require one complete manual date-and-time choice.
       return _NoDatePrompt(onPickDate: onPickDate, onGoBack: onGoBack);
+    }
+    if (isPast(isProUser: isProUser, weather: weather, schedule: schedule)) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.history_rounded,
+                size: 40,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(height: 14),
+              Text(
+                t.pastForecastTitle,
+                textAlign: TextAlign.center,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                t.pastForecastBody,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
     if (isBeyondHorizon(
       isProUser: isProUser,
@@ -127,9 +171,9 @@ class WeatherForecastBody extends StatelessWidget {
               Text(
                 t.forecastTooFarTitle,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
@@ -317,7 +361,7 @@ class _ForecastNotificationToggleState
 /// the lock and the pitch; the host renders the upgrade actions. No
 /// weather API call ever happens for free flights.
 /// Shown for a Pro flight with no date. Approximate flights (with a
-/// [onPickDate] handler) get an inline "pick a date" button; real flights get
+/// [onPickDate] handler) get an inline date-and-time picker; real flights get
 /// an explanation to re-select the flight with a date, plus an optional
 /// [onGoBack] shortcut back to flight selection.
 class _NoDatePrompt extends StatelessWidget {
@@ -426,31 +470,11 @@ class _WeatherTeaser extends StatelessWidget {
                   Text(t.title, style: theme.textTheme.titleLarge),
                   if (route != null) ...[
                     const SizedBox(height: 14),
-                    IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            child: _AirportWeatherCard(
-                              code: route.departure.displayCode,
-                              city: route.departure.city,
-                              countryCode: route.departure.countryCode,
-                              weather: _demoDeparture,
-                              showTime: false,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _AirportWeatherCard(
-                              code: route.arrival.displayCode,
-                              city: route.arrival.city,
-                              countryCode: route.arrival.countryCode,
-                              weather: _demoArrival,
-                              showTime: false,
-                            ),
-                          ),
-                        ],
-                      ),
+                    _AirportWeatherCards(
+                      route: route,
+                      departure: _demoDeparture,
+                      arrival: _demoArrival,
+                      showTime: false,
                     ),
                     const SizedBox(height: 14),
                     // Square map shrunk to whatever height remains, so the
@@ -558,45 +582,25 @@ class _WeatherContent extends StatelessWidget {
 
     final list = ListView(
       // Always scrollable so pull-to-refresh works even when the content fits.
-      physics: onRefresh == null
-          ? null
-          : const AlwaysScrollableScrollPhysics(),
+      physics: onRefresh == null ? null : const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       children: [
         Text(t.title, style: theme.textTheme.titleLarge),
         const SizedBox(height: 14),
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: _AirportWeatherCard(
-                  code: route?.departure.displayCode ?? '',
-                  city: route?.departure.city ?? '',
-                  countryCode: route?.departure.countryCode ?? '',
-                  weather: weather.departure,
-                  showTime: !weather.isTimeEstimated,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _AirportWeatherCard(
-                  code: route?.arrival.displayCode ?? '',
-                  city: route?.arrival.city ?? '',
-                  countryCode: route?.arrival.countryCode ?? '',
-                  weather: weather.arrival,
-                  showTime: !weather.isTimeEstimated,
-                  // Derived from the noon estimate when no time is known —
-                  // a guess, so it is not shown either.
-                  isNextDay: _arrivalIsNextDay && !weather.isTimeEstimated,
-                ),
-              ),
-            ],
-          ),
+        _AirportWeatherCards(
+          route: route,
+          departure: weather.departure,
+          arrival: weather.arrival,
+          arrivalIsNextDay: _arrivalIsNextDay,
         ),
         if (route != null && weather.samples.isNotEmpty) ...[
           const SizedBox(height: 14),
           WeatherRouteMapCard(
+            // The card owns decoded ui.Images and async rasterization state.
+            // A newly fetched immutable forecast must get a fresh State so
+            // airport cards, verdict and animation can never describe
+            // different forecast generations.
+            key: ObjectKey(weather),
             route: route,
             samples: weather.samples,
             areaSamples: weather.areaSamples,
@@ -611,13 +615,39 @@ class _WeatherContent extends StatelessWidget {
               onPressed: onPremiumGateTap,
             ),
           ],
+          const SizedBox(height: 10),
+          _WeatherVerdictChip(weather: weather),
         ],
         const SizedBox(height: 14),
         Text(
-          '${t.updatedAt(time: TravelDateFormatUtils.formatTime(weather.fetchedAt))}'
-          ' · ${t.hedge}\n${t.attribution}',
+          '${TravelDateFormatUtils.formatForecastFreshness(weather.fetchedAt, context.dateDisplayFormat)}'
+          ' · ${t.hedge}',
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+          ),
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton(
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.only(top: 2),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              alignment: Alignment.centerLeft,
+              textStyle: theme.textTheme.bodySmall,
+            ),
+            onPressed: () => unawaited(
+              launchUrl(
+                Uri.parse(weather.attribution.licenseUrl),
+                mode: LaunchMode.externalApplication,
+              ),
+            ),
+            child: Text(
+              t.attribution(
+                provider: weather.attribution.providerName,
+                license: weather.attribution.licenseName,
+              ),
+            ),
           ),
         ),
       ],
@@ -638,15 +668,124 @@ class _WeatherContent extends StatelessWidget {
         ).difference(dateOnly(weather.departure.timeLocal)).inDays ==
         1;
   }
-
 }
 
-/// Wind bands (m/s) for the airport-card wind indicator: below
-/// [breezyThresholdMs] reads as calm/light (smooth ride), from
-/// [windyThresholdMs] it is worth a warning.
-const double breezyThresholdMs = 5;
-const double windyThresholdMs = 8;
-const double strongWindThresholdMs = 14;
+/// Keeps the two airport summaries side-by-side while each card has enough
+/// room, then switches to a vertical layout for narrow windows and large
+/// accessibility text. The breakpoint is based on the actual content width,
+/// so split-screen and tablet configurations behave like their visible size.
+class _AirportWeatherCards extends StatelessWidget {
+  const _AirportWeatherCards({
+    required this.route,
+    required this.departure,
+    required this.arrival,
+    this.showTime = true,
+    this.arrivalIsNextDay = false,
+  });
+
+  final FlightRoute? route;
+  final AirportWeather departure;
+  final AirportWeather arrival;
+  final bool showTime;
+  final bool arrivalIsNextDay;
+
+  static const double _minimumTwoColumnWidth = 340;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final labelScale = MediaQuery.textScalerOf(context).scale(14) / 14;
+        final stackCards =
+            constraints.maxWidth < _minimumTwoColumnWidth || labelScale > 1.2;
+
+        Widget card({required bool departureCard}) {
+          final airport = departureCard ? route?.departure : route?.arrival;
+          return _AirportWeatherCard(
+            key: ValueKey(
+              departureCard
+                  ? 'departure-airport-weather-card'
+                  : 'arrival-airport-weather-card',
+            ),
+            code: airport?.displayCode ?? '',
+            city: airport?.city ?? '',
+            countryCode: airport?.countryCode ?? '',
+            weather: departureCard ? departure : arrival,
+            showTime: showTime,
+            isNextDay: !departureCard && arrivalIsNextDay,
+            fillAvailableHeight: !stackCards,
+          );
+        }
+
+        if (stackCards) {
+          return Column(
+            key: const ValueKey('airport-weather-cards-column'),
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              card(departureCard: true),
+              const SizedBox(height: 12),
+              card(departureCard: false),
+            ],
+          );
+        }
+
+        return IntrinsicHeight(
+          child: Row(
+            key: const ValueKey('airport-weather-cards-row'),
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: card(departureCard: true)),
+              const SizedBox(width: 12),
+              Expanded(child: card(departureCard: false)),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _WeatherVerdictChip extends StatelessWidget {
+  const _WeatherVerdictChip({required this.weather});
+
+  final FlightWeather weather;
+
+  @override
+  Widget build(BuildContext context) {
+    final verdict = FlightWeatherVerdictPolicy.overallVerdict(weather.samples);
+    final (emoji, title, _) = verdictPresentation(
+      verdict,
+      context.t.createFlight.weather,
+    );
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Align(
+      key: const ValueKey('weather-verdict-chip'),
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: colors.primaryContainer.withValues(alpha: 0.65),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 14)),
+            const SizedBox(width: 5),
+            Text(
+              title,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colors.onPrimaryContainer,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _AirportWeatherCard extends StatelessWidget {
   const _AirportWeatherCard({
@@ -656,6 +795,8 @@ class _AirportWeatherCard extends StatelessWidget {
     required this.weather,
     this.showTime = true,
     this.isNextDay = false,
+    this.fillAvailableHeight = true,
+    super.key,
   });
 
   final String code;
@@ -663,12 +804,15 @@ class _AirportWeatherCard extends StatelessWidget {
   final String countryCode;
   final AirportWeather weather;
 
-  /// False when the flight has no scheduled time — the internal noon
-  /// estimate must never be displayed as a departure time.
+  /// False only for intentionally obscured demo cards.
   final bool showTime;
 
   /// Arrival lands on the day after departure — mark it "(tomorrow)".
   final bool isNextDay;
+
+  /// Side-by-side cards receive a shared finite height and can pin wind to
+  /// the bottom. Stacked cards size naturally, so they must not use a Spacer.
+  final bool fillAvailableHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -677,6 +821,10 @@ class _AirportWeatherCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final temperature = weather.temperatureC;
     final flagCode = countryCode.trim().toUpperCase();
+    final formattedTime = TravelDateFormatUtils.formatTime(weather.timeLocal);
+    final utcOffsetLabel = TravelDateFormatUtils.formatUtcOffset(
+      weather.utcOffsetMinutes,
+    );
 
     var dateLine = TravelDateFormatUtils.formatShortDate(
       weather.timeLocal,
@@ -704,44 +852,56 @@ class _AirportWeatherCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
+                flex: 2,
                 child: Text(
                   code,
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.fade,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  if (showTime)
-                    Text.rich(
-                      TextSpan(
-                        text: TravelDateFormatUtils.formatTime(
-                          weather.timeLocal,
-                        ),
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                        children: [
-                          if (_utcOffsetLabel != null)
-                            TextSpan(
-                              text: ' ${_utcOffsetLabel!}',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.w500,
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    if (showTime)
+                      Text.rich(
+                        TextSpan(
+                          text: formattedTime,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                          children: [
+                            if (utcOffsetLabel != null)
+                              TextSpan(
+                                text: ' $utcOffsetLabel',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.end,
+                      ),
+                    Text(
+                      dateLine,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
-                  Text(
-                    dateLine,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -763,7 +923,7 @@ class _AirportWeatherCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     flagCode.length == 2 ? '$city · $flagCode' : city,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
@@ -781,23 +941,32 @@ class _AirportWeatherCard extends StatelessWidget {
                   weather.cloudCoverPercent,
                 ),
                 style: const TextStyle(fontSize: 30),
+                textScaler: TextScaler.noScaling,
               ),
               const SizedBox(width: 10),
-              Text(
-                temperature == null
-                    ? '–'
-                    : UnitFormatUtils.formatTemperatureValue(
-                        temperature,
-                        context.temperatureUnit,
-                      ),
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
+              Flexible(
+                child: Text(
+                  temperature == null
+                      ? '–'
+                      : UnitFormatUtils.formatTemperatureValue(
+                          temperature,
+                          context.temperatureUnit,
+                        ),
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
+                  softWrap: false,
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
           ),
-          const Spacer(),
-          const SizedBox(height: 8),
+          if (fillAvailableHeight)
+            const Spacer()
+          else
+            const SizedBox(height: 16),
+          if (fillAvailableHeight) const SizedBox(height: 8),
           if (weather.windSpeedMs != null)
             _WindIndicator(speedMs: weather.windSpeedMs!),
           if ((weather.precipitationMm ?? 0) > 0) ...[
@@ -823,25 +992,8 @@ class _AirportWeatherCard extends StatelessWidget {
       ),
     );
   }
-
-  /// "GMT+2" / "GMT+5:30" from the forecast's UTC offset. Omitted at offset
-  /// zero: the entity uses 0 for "unknown", so a bare time is more honest
-  /// than a possibly-wrong "GMT".
-  String? get _utcOffsetLabel {
-    final minutes = weather.utcOffsetMinutes;
-    if (minutes == 0) return null;
-    final sign = minutes < 0 ? '-' : '+';
-    final absolute = minutes.abs();
-    final hours = absolute ~/ 60;
-    final rest = absolute % 60;
-    final restText = rest == 0 ? '' : ':${rest.toString().padLeft(2, '0')}';
-    return 'GMT$sign$hours$restText';
-  }
 }
 
-/// Wind strength at a glance: three signal-style bars fill and warm up in
-/// color as the wind picks up, next to a qualitative label and the m/s
-/// value — "is my drink safe on the tray" beats a bare number.
 class _WindIndicator extends StatelessWidget {
   const _WindIndicator({required this.speedMs});
 
@@ -853,12 +1005,11 @@ class _WindIndicator extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final (label, filledBars, Color? accent) = switch (speedMs) {
-      < 2 => (t.windCalm, 1, null),
-      < breezyThresholdMs => (t.windLight, 1, null),
-      < windyThresholdMs => (t.windBreezy, 2, null),
-      < strongWindThresholdMs => (t.windWindy, 3, Colors.amber.shade800),
-      _ => (t.windStrong, 3, Colors.deepOrange.shade600),
+    final presentation = weatherWindPresentation(speedMs, t);
+    final accent = switch (presentation.tone) {
+      WeatherWindTone.normal => null,
+      WeatherWindTone.warning => Colors.amber.shade800,
+      WeatherWindTone.strong => Colors.deepOrange.shade600,
     };
     final color = accent ?? colorScheme.onSurfaceVariant;
 
@@ -872,7 +1023,7 @@ class _WindIndicator extends StatelessWidget {
               height: 6 + bar * 3,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(1.5),
-                color: bar < filledBars
+                color: bar < presentation.filledBars
                     ? color
                     : colorScheme.onSurfaceVariant.withValues(alpha: 0.25),
               ),
@@ -881,7 +1032,7 @@ class _WindIndicator extends StatelessWidget {
         const SizedBox(width: 4),
         Expanded(
           child: Text(
-            '$label · ${speedMs.round()} m/s',
+            '${presentation.label} · ${speedMs.round()} m/s',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.labelSmall?.copyWith(

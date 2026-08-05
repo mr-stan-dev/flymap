@@ -291,8 +291,9 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
           ),
         );
       case CreateFlightStep.weather:
-        final isRealFlight =
-            (state.flightOperationalData?.flightNumber ?? '').trim().isNotEmpty;
+        final isRealFlight = (state.flightOperationalData?.flightNumber ?? '')
+            .trim()
+            .isNotEmpty;
         return FlightSearchWeatherStep(
           state: state,
           isProUser: isProUser,
@@ -307,10 +308,8 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
               source: PaywallSource.weatherGate,
             ),
           ),
-          // Approximate flights can take any calendar day inline; real flights
-          // must be re-selected with a date (verified schedule), so no inline
-          // picker there — the prompt explains it and offers a shortcut back
-          // to flight selection (popping the preview returns to search).
+          // Approximate flights can take a complete manual date and time
+          // inline; real flights must be re-selected with a verified schedule.
           onPickDate: isRealFlight
               ? null
               : () => unawaited(_handlePickWeatherDate(context, cubit)),
@@ -410,8 +409,8 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
     );
   }
 
-  /// Weather step, dateless approximate flight: pick a calendar day and let
-  /// the cubit set a date-only schedule and fetch.
+  /// Weather step, dateless approximate flight: collect date and time as one
+  /// complete choice. Cancelling either picker leaves the flight dateless.
   Future<void> _handlePickWeatherDate(
     BuildContext context,
     FlightPreviewCubit cubit,
@@ -425,7 +424,17 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
       lastDate: DateTime(now.year + 1, now.month, now.day),
     );
     if (picked == null) return;
-    await cubit.applyTravelDate(DateTime(picked.year, picked.month, picked.day));
+    if (!context.mounted) return;
+    final time = await showTimePicker(
+      context: context,
+      initialTime: const TimeOfDay(hour: 12, minute: 0),
+    );
+    if (time == null) return;
+    await cubit.applyTravelDateAndTime(
+      DateTime(picked.year, picked.month, picked.day),
+      hour: time.hour,
+      minute: time.minute,
+    );
   }
 
   Future<void> _handleStartDownload({
@@ -586,9 +595,7 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
         weather.samples.isEmpty) {
       return const [];
     }
-    return [
-      WeatherShareButton(route: route, weather: weather),
-    ];
+    return [WeatherShareButton(route: route, weather: weather)];
   }
 
   _ProAccessInfo? _proAccessInfo(

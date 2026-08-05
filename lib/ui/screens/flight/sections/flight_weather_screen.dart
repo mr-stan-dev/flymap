@@ -38,8 +38,9 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
   /// the current screen treat the flight as Pro immediately.
   bool _unlocked = false;
 
-  /// A date picked in-session for a dateless flight. Overrides the stale
-  /// [widget.flight] snapshot until the flight reloads with the persisted one.
+  /// A date and precise departure time picked in-session for a dateless flight.
+  /// Overrides the stale [widget.flight] snapshot until the flight reloads with
+  /// the persisted one.
   FlightSchedule? _pickedSchedule;
 
   FlightSchedule? get _schedule => _pickedSchedule ?? widget.flight.schedule;
@@ -111,20 +112,34 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
     );
   }
 
-  /// Dateless approximate flight: pick a day, persist it on the flight, and
-  /// fetch. (Real flights don't get this — [onPickDate] is null for them.)
+  /// Dateless approximate flight: collect date and departure time as one
+  /// complete choice, persist it, and fetch. Cancelling either picker leaves
+  /// the flight unchanged. Real flights do not get this action.
   Future<void> _handlePickDate() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+    final existingDate = _schedule?.travelDate;
+    final initialDate = existingDate != null && !existingDate.isBefore(today)
+        ? existingDate
+        : today;
     final picked = await showDatePicker(
       context: context,
-      initialDate: today,
+      initialDate: initialDate,
       firstDate: today,
       lastDate: DateTime(now.year + 1, now.month, now.day),
     );
     if (picked == null || !mounted) return;
-    final schedule = FlightSchedule.dateOnly(
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: const TimeOfDay(hour: 12, minute: 0),
+    );
+    if (pickedTime == null || !mounted) return;
+    final schedule = FlightSchedule.approximate(
       DateTime(picked.year, picked.month, picked.day),
+      departureTime: ApproximateDepartureTime(
+        hour: pickedTime.hour,
+        minute: pickedTime.minute,
+      ),
     );
     if (GetIt.I.isRegistered<FlightRepository>()) {
       await GetIt.I.get<FlightRepository>().updateFlightSchedule(
@@ -132,10 +147,9 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
         schedule: schedule,
       );
     }
-    // Now that the flight has a date, schedule its forecast notifications —
-    // the create-flight flow does this on save. Without it, a dateless flight
-    // dated here gets no alerts until the next cold-start resync (and any
-    // alert whose fire time has already passed by then is lost).
+    // Now that the flight has a complete date and time, schedule its forecast
+    // notifications. Without this, it gets no alerts until the next cold-start
+    // resync (and an alert whose fire time already passed is lost).
     if (GetIt.I.isRegistered<FlightNotificationScheduler>()) {
       await GetIt.I.get<FlightNotificationScheduler>().syncForFlightId(
         widget.flight.id,
@@ -203,7 +217,8 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
                     flightId: flight.id,
                     // On a saved flight a failure means nothing was downloaded
                     // before takeoff — say that instead of a generic error.
-                    failedCopy: context.t.createFlight.weather.notDownloadedBody,
+                    failedCopy:
+                        context.t.createFlight.weather.notDownloadedBody,
                     onRetry: () => unawaited(
                       context.read<FlightWeatherCubit>().fetchIfNeeded(
                         hasProAccess: _hasProAccess,
@@ -214,10 +229,9 @@ class _FlightWeatherScreenState extends State<FlightWeatherScreen> {
                     // Pull-to-refresh forces a fresh fetch, bypassing the 6h
                     // cache that governs the automatic on-open refresh.
                     onRefresh: isProUser
-                        ? () => context.read<FlightWeatherCubit>().fetchIfNeeded(
-                            hasProAccess: true,
-                            force: true,
-                          )
+                        ? () => context
+                              .read<FlightWeatherCubit>()
+                              .fetchIfNeeded(hasProAccess: true, force: true)
                         : null,
                     // Approximate flights can add a date inline; real flights
                     // must be re-selected with a date, so no picker for them.

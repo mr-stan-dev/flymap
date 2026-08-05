@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_map_painter.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_wind_presentation.dart';
 import 'package:flymap/ui/screens/share_flight/widgets/map/share_image_painter.dart';
 
 /// Everything the share card needs as plain strings — resolved from i18n
@@ -12,6 +13,7 @@ class WeatherShareData {
     required this.subtitle,
     required this.departure,
     required this.arrival,
+    required this.attribution,
     required this.watermark,
   });
 
@@ -23,36 +25,50 @@ class WeatherShareData {
   final WeatherShareAirport departure;
   final WeatherShareAirport arrival;
 
+  /// Provider credit, transformation disclosure and license URL. It is burned
+  /// into every exported image/video because those files travel outside the
+  /// app and must remain attributable on their own.
+  final String attribution;
+
   /// "flymap.app"
   final String watermark;
 }
 
 class WeatherShareAirport {
   const WeatherShareAirport({
-    required this.label,
     required this.code,
     required this.city,
+    required this.countryCode,
+    required this.countryFlag,
     required this.emoji,
     required this.temperatureText,
-    this.timeText,
+    required this.timeText,
+    required this.dateText,
+    this.utcOffsetText,
     this.windText,
+    this.windFilledBars = 0,
+    this.windTone = WeatherWindTone.normal,
+    this.precipitationText,
   });
 
-  /// "DEPARTURE" / "ARRIVAL".
-  final String label;
   final String code;
   final String city;
+  final String countryCode;
+  final String countryFlag;
   final String emoji;
 
   /// "21°" (dash when unknown).
   final String temperatureText;
 
-  /// Local wall-clock ("16:10"); null for date-only flights — the noon
-  /// estimate is never displayed.
-  final String? timeText;
+  final String timeText;
+  final String dateText;
+  final String? utcOffsetText;
 
-  /// "💨 12 m/s"; null when wind is unknown.
+  /// Same qualitative label and value as the live airport card.
   final String? windText;
+  final int windFilledBars;
+  final WeatherWindTone windTone;
+  final String? precipitationText;
 }
 
 /// Renders the shareable weather story card (1080x1920) fully offscreen:
@@ -102,6 +118,7 @@ class WeatherShareRenderer {
     _drawHeader(canvas);
     _drawAirportCards(canvas);
     _drawMap(canvas, progress);
+    _drawAttribution(canvas);
     _drawWatermark(canvas);
 
     final picture = recorder.endRecording();
@@ -148,7 +165,7 @@ class WeatherShareRenderer {
 
   void _drawAirportCards(Canvas canvas) {
     const top = 320.0;
-    const cardHeight = 360.0;
+    const cardHeight = 390.0;
     const gap = 24.0;
     const cardWidth = (width - 2 * _margin - gap) / 2;
     _drawAirportCard(
@@ -169,77 +186,146 @@ class WeatherShareRenderer {
   }
 
   void _drawAirportCard(Canvas canvas, WeatherShareAirport airport, Rect rect) {
+    final card = RRect.fromRectAndRadius(rect, const Radius.circular(32));
+    canvas.drawRRect(card, Paint()..color = const Color(0xFF292929));
     canvas.drawRRect(
-      RRect.fromRectAndRadius(rect, const Radius.circular(28)),
-      Paint()..color = Colors.white.withValues(alpha: 0.08),
+      card,
+      Paint()
+        ..color = const Color(0xFF4A4A4A)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
     );
     const pad = 28.0;
     final x = rect.left + pad;
     final innerWidth = rect.width - 2 * pad;
+    final right = rect.right - pad;
 
-    final labelLine = airport.timeText == null
-        ? airport.label.toUpperCase()
-        : '${airport.label.toUpperCase()} · ${airport.timeText}';
-    _text(
-      canvas,
-      labelLine,
-      Offset(x, rect.top + 34),
-      fontSize: 26,
-      fontWeight: FontWeight.w600,
-      color: Colors.white60,
-      letterSpacing: 1.2,
-      maxWidth: innerWidth,
-    );
-
+    // Same hierarchy as the live card: airport code left; local time, offset
+    // and date right. Left/right position already communicates departure and
+    // arrival, so the exported cards do not add extra captions.
     _text(
       canvas,
       airport.code,
-      Offset(x, rect.top + 92),
-      fontSize: 56,
+      Offset(x, rect.top + 28),
+      fontSize: 32,
       fontWeight: FontWeight.w800,
-      color: Colors.white,
-      maxWidth: innerWidth,
+      color: const Color(0xFFE7E7E7),
+      maxWidth: innerWidth * 0.4,
+    );
+    _timeTextRight(
+      canvas,
+      time: airport.timeText,
+      utcOffset: airport.utcOffsetText,
+      right: right,
+      top: rect.top + 28,
+      maxWidth: innerWidth * 0.6,
+    );
+    _textRight(
+      canvas,
+      airport.dateText,
+      right: right,
+      top: rect.top + 62,
+      fontSize: 22,
+      color: const Color(0xFF9B9B9B),
+      maxWidth: innerWidth * 0.65,
     );
 
+    final hasFlag = airport.countryFlag.isNotEmpty;
+    final flagWidth = hasFlag
+        ? _text(
+            canvas,
+            airport.countryFlag,
+            Offset(x, rect.top + 92),
+            fontSize: 24,
+            maxWidth: 40,
+          )
+        : 0.0;
+    final locationInset = hasFlag ? flagWidth + 10 : 0.0;
     _text(
       canvas,
-      airport.city,
-      Offset(x, rect.top + 170),
-      fontSize: 26,
-      color: Colors.white60,
-      maxWidth: innerWidth,
+      airport.countryCode.isEmpty
+          ? airport.city
+          : '${airport.city} · ${airport.countryCode}',
+      Offset(x + locationInset, rect.top + 94),
+      fontSize: 22,
+      color: const Color(0xFF9B9B9B),
+      maxWidth: innerWidth - locationInset,
     );
 
-    // Weather emoji + temperature.
-    final rowY = rect.top + 222;
+    final rowY = rect.top + 142;
     final emojiWidth = _text(
       canvas,
       airport.emoji,
       Offset(x, rowY),
-      fontSize: 56,
+      fontSize: 60,
       maxWidth: innerWidth,
     );
     _text(
       canvas,
       airport.temperatureText,
       Offset(x + emojiWidth + 18, rowY + 4),
-      fontSize: 50,
+      fontSize: 56,
       fontWeight: FontWeight.w700,
-      color: Colors.white,
+      color: const Color(0xFFE7E7E7),
       maxWidth: innerWidth - emojiWidth - 18,
     );
 
-    // Wind (below the temperature).
     final wind = airport.windText;
     if (wind != null) {
+      final windColor = switch (airport.windTone) {
+        WeatherWindTone.normal => const Color(0xFF9B9B9B),
+        WeatherWindTone.warning => Colors.amber.shade800,
+        WeatherWindTone.strong => Colors.deepOrange.shade600,
+      };
+      const windTop = 300.0;
+      for (var bar = 0; bar < 3; bar++) {
+        final barHeight = 12.0 + bar * 6;
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromLTWH(
+              x + bar * 10,
+              rect.top + windTop + 24 - barHeight,
+              6,
+              barHeight,
+            ),
+            const Radius.circular(3),
+          ),
+          Paint()
+            ..color = bar < airport.windFilledBars
+                ? windColor
+                : const Color(0x409B9B9B),
+        );
+      }
       _text(
         canvas,
         wind,
-        Offset(x, rect.top + 300),
-        fontSize: 26,
-        fontWeight: FontWeight.w600,
-        color: Colors.white70,
-        maxWidth: innerWidth,
+        Offset(x + 38, rect.top + windTop + 1),
+        fontSize: 22,
+        fontWeight: airport.windTone == WeatherWindTone.normal
+            ? FontWeight.w400
+            : FontWeight.w700,
+        color: windColor,
+        maxWidth: innerWidth - 38,
+      );
+    }
+
+    final precipitation = airport.precipitationText;
+    if (precipitation != null) {
+      final iconWidth = _text(
+        canvas,
+        '☂',
+        Offset(x, rect.top + 340),
+        fontSize: 22,
+        color: const Color(0xFF9B9B9B),
+        maxWidth: 30,
+      );
+      _text(
+        canvas,
+        precipitation,
+        Offset(x + iconWidth + 8, rect.top + 341),
+        fontSize: 22,
+        color: const Color(0xFF9B9B9B),
+        maxWidth: innerWidth - iconWidth - 8,
       );
     }
   }
@@ -335,6 +421,88 @@ class WeatherShareRenderer {
         height - painter.height - padding,
       ),
     );
+  }
+
+  void _drawAttribution(Canvas canvas) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: data.attribution,
+        style: const TextStyle(
+          color: Color(0xBFFFFFFF),
+          fontSize: 20,
+          fontWeight: FontWeight.w500,
+          height: 1.25,
+        ),
+      ),
+      maxLines: 2,
+      ellipsis: '…',
+      textDirection: TextDirection.ltr,
+      textScaler: TextScaler.noScaling,
+    )..layout(maxWidth: 700);
+    painter.paint(canvas, Offset(_margin, height - painter.height - 34));
+  }
+
+  void _timeTextRight(
+    Canvas canvas, {
+    required String time,
+    required String? utcOffset,
+    required double right,
+    required double top,
+    required double maxWidth,
+  }) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: time,
+        style: const TextStyle(
+          color: Color(0xFFE7E7E7),
+          fontSize: 24,
+          fontWeight: FontWeight.w700,
+        ),
+        children: [
+          if (utcOffset != null)
+            TextSpan(
+              text: ' $utcOffset',
+              style: const TextStyle(
+                color: Color(0xFF9B9B9B),
+                fontSize: 22,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+        ],
+      ),
+      maxLines: 1,
+      ellipsis: '…',
+      textDirection: TextDirection.ltr,
+      textScaler: TextScaler.noScaling,
+    )..layout(maxWidth: maxWidth);
+    painter.paint(canvas, Offset(right - painter.width, top));
+  }
+
+  void _textRight(
+    Canvas canvas,
+    String text, {
+    required double right,
+    required double top,
+    required double fontSize,
+    required double maxWidth,
+    FontWeight fontWeight = FontWeight.w400,
+    Color color = Colors.white,
+  }) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(
+          color: color,
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+        ),
+      ),
+      maxLines: 1,
+      ellipsis: '…',
+      textDirection: TextDirection.ltr,
+      textScaler: TextScaler.noScaling,
+    )..layout(maxWidth: maxWidth);
+    painter.paint(canvas, Offset(right - painter.width, top));
   }
 
   /// Draws a single line, ellipsized to [maxWidth]; returns painted width.

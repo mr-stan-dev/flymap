@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/data/local/airport_timezone_service.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/domain/entity/airport.dart';
+import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_summary.dart';
 import 'package:flymap/domain/entity/zoned_instant.dart';
 import 'package:flymap/domain/usecase/search_upcoming_flights_by_number_use_case.dart';
@@ -229,9 +230,9 @@ void main() {
     );
     expect(find.byType(FlightSummaryCard), findsNothing);
     expect(find.text('Change date'), findsOneWidget);
-    // Still a usable date-only selection.
-    expect(selection?.schedule?.departure, isNull);
-    expect(selection?.schedule?.travelDate, isNotNull);
+    // A provider miss leaves the date incomplete until a precise manual time
+    // is entered; it must never become a silent noon schedule.
+    expect(selection, isNull);
 
     await tester.tap(find.text('Change date'));
     await tester.pumpAndSettle();
@@ -278,7 +279,7 @@ void main() {
   });
 
   testWidgets(
-    'manual date offers optional time when the airport timezone is known',
+    'manual date requires a precise time when the airport timezone is known',
     (tester) async {
       GetIt.I.registerSingleton<AirportTimezoneService>(
         AirportTimezoneService(
@@ -288,21 +289,31 @@ void main() {
         ),
       );
       addTearDown(() => GetIt.I.unregister<AirportTimezoneService>());
+      TravelDateSelection? selection;
 
-      await tester.pumpWidget(_app());
+      await tester.pumpWidget(
+        _app(onSelectionChanged: (value) => selection = value),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Today'));
       await tester.pumpAndSettle();
 
-      // No verify DI: date-only state with the manual time fallback.
-      expect(find.text('Add departure time (optional)'), findsOneWidget);
-      await tester.tap(find.text('Add departure time (optional)'));
+      // No verify DI: the calendar date alone is not a valid selection.
+      expect(selection, isNull);
+      expect(find.text('Add departure time'), findsOneWidget);
+      await tester.tap(find.text('Add departure time'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
 
       expect(find.textContaining('Departure time ·'), findsOneWidget);
+      expect(selection?.schedule?.departure, isNull);
+      expect(
+        selection?.schedule?.timePrecision,
+        FlightScheduleTimePrecision.approximateTime,
+      );
+      expect(selection?.schedule?.approximateDepartureTime?.hour, 12);
     },
   );
 }

@@ -1414,11 +1414,11 @@ class TranslationsNotificationsEn {
 	/// en: 'Sun or rain at takeoff? Clear views on the way? Your first $route forecast is in.'
 	String forecastReadyBody({required Object route}) => 'Sun or rain at takeoff? Clear views on the way? Your first ${route} forecast is in.';
 
-	/// en: 'Updated forecast for tomorrow's flight'
-	String get forecastUpdatedTitle => 'Updated forecast for tomorrow\'s flight';
+	/// en: 'Your flight is tomorrow'
+	String get forecastUpdatedTitle => 'Your flight is tomorrow';
 
-	/// en: 'The weather forecast for $route is available — tap to download it before you fly.'
-	String forecastUpdatedBody({required Object route}) => 'The weather forecast for ${route} is available — tap to download it before you fly.';
+	/// en: '$route — open Flymap for the latest forecast.'
+	String forecastUpdatedBody({required Object route}) => '${route} — open Flymap for the latest forecast.';
 
 	/// en: 'Your flight is coming up'
 	String get reminderEarlyTitle => 'Your flight is coming up';
@@ -2380,14 +2380,14 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Continue without weather'
 	String get continueWithoutWeather => 'Continue without weather';
 
-	/// en: 'Add your flight date'
-	String get noDateTitle => 'Add your flight date';
+	/// en: 'Add your flight date & time'
+	String get noDateTitle => 'Add your flight date & time';
 
-	/// en: 'A weather forecast isn't possible without your flight date. Pick a date to see the weather along your route.'
-	String get noDatePickBody => 'A weather forecast isn\'t possible without your flight date. Pick a date to see the weather along your route.';
+	/// en: 'A weather forecast needs both your flight date and departure time.'
+	String get noDatePickBody => 'A weather forecast needs both your flight date and departure time.';
 
-	/// en: 'Pick a date'
-	String get noDatePickButton => 'Pick a date';
+	/// en: 'Pick date & time'
+	String get noDatePickButton => 'Pick date & time';
 
 	/// en: 'A weather forecast isn't possible without your flight date. Choose a date when you select this flight to see the weather.'
 	String get noDateRealBody => 'A weather forecast isn\'t possible without your flight date. Choose a date when you select this flight to see the weather.';
@@ -2400,6 +2400,12 @@ class TranslationsCreateFlightWeatherEn {
 
 	/// en: 'Weather forecasts are only dependable up to $days days ahead. We'll notify you before your flight once a reliable forecast is available.'
 	String forecastTooFarBody({required Object days}) => 'Weather forecasts are only dependable up to ${days} days ahead. We\'ll notify you before your flight once a reliable forecast is available.';
+
+	/// en: 'This flight date has passed'
+	String get pastForecastTitle => 'This flight date has passed';
+
+	/// en: 'Forecasts aren't available for past flights.'
+	String get pastForecastBody => 'Forecasts aren\'t available for past flights.';
 
 	/// en: 'Notifications are off. Enable them so the forecast alert can reach you.'
 	String get notificationPermissionHint => 'Notifications are off. Enable them so the forecast alert can reach you.';
@@ -2428,8 +2434,8 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Best views at takeoff and landing.'
 	String get verdictOvercastBody => 'Best views at takeoff and landing.';
 
-	/// en: 'Calm, clear skies expected'
-	String get smoothSkies => 'Calm, clear skies expected';
+	/// en: 'estimated'
+	String get estimatedShort => 'estimated';
 
 	/// en: 'Calm'
 	String get windCalm => 'Calm';
@@ -2446,17 +2452,14 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Strong wind'
 	String get windStrong => 'Strong wind';
 
-	/// en: 'Windy takeoff in $city ($speed m/s) — expect some bumps'
-	String windTakeoff({required Object city, required Object speed}) => 'Windy takeoff in ${city} (${speed} m/s) — expect some bumps';
-
-	/// en: 'Windy landing in $city ($speed m/s) — expect some bumps'
-	String windLanding({required Object city, required Object speed}) => 'Windy landing in ${city} (${speed} m/s) — expect some bumps';
-
 	/// en: 'Unlock airport weather and clouds along your route'
 	String get proTeaserTitle => 'Unlock airport weather and clouds along your route';
 
-	/// en: 'Weather data: MET Norway'
-	String get attribution => 'Weather data: MET Norway';
+	/// en: 'Based on data from $provider · Visualization by Flymap · $license'
+	String attribution({required Object provider, required Object license}) => 'Based on data from ${provider} · Visualization by Flymap · ${license}';
+
+	/// en: '$provider data · Flymap visualization · $license'
+	String attributionShare({required Object provider, required Object license}) => '${provider} data · Flymap visualization · ${license}';
 
 	/// en: 'Forecasts firm up closer to departure.'
 	String get hedge => 'Forecasts firm up closer to departure.';
@@ -2476,8 +2479,20 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Couldn't prepare the share — try again.'
 	String get shareFailed => 'Couldn\'t prepare the share — try again.';
 
-	/// en: 'Updated $time'
-	String updatedAt({required Object time}) => 'Updated ${time}';
+	/// en: 'Updated $relative'
+	String updatedRelative({required Object relative}) => 'Updated ${relative}';
+
+	/// en: 'Updated $date, $time'
+	String updatedExact({required Object date, required Object time}) => 'Updated ${date}, ${time}';
+
+	/// en: 'just now'
+	String get updatedJustNow => 'just now';
+
+	/// en: '$minutes min ago'
+	String updatedMinutesAgo({required Object minutes}) => '${minutes} min ago';
+
+	/// en: '$hours h ago'
+	String updatedHoursAgo({required Object hours}) => '${hours} h ago';
 }
 
 // Path: createFlight.routeTypeSelector
@@ -2578,20 +2593,50 @@ class TranslationsCreateFlightTravelDateEn {
 	/// en: 'Continue without a date'
 	String get skipDate => 'Continue without a date';
 
-	/// en: 'Add departure time (optional)'
-	String get addDepartureTime => 'Add departure time (optional)';
+	/// en: 'Skip date & time'
+	String get skipDateTimeScreen => 'Skip date & time';
+
+	/// en: 'Add departure time'
+	String get addDepartureTime => 'Add departure time';
 
 	/// en: 'Departure time · $time'
 	String departureTimeAt({required Object time}) => 'Departure time · ${time}';
 
+	/// en: 'Departure time'
+	String get departureTimeTitle => 'Departure time';
+
+	/// en: 'Set the local departure time to continue.'
+	String get departureTimeHint => 'Set the local departure time to continue.';
+
+	/// en: 'Pick a date first, then set the departure time.'
+	String get departureTimePickDateFirst => 'Pick a date first, then set the departure time.';
+
+	/// en: 'Set departure time'
+	String get setDepartureTime => 'Set departure time';
+
+	/// en: 'Departure · $time'
+	String departureTimeSelected({required Object time}) => 'Departure · ${time}';
+
+	/// en: 'Get flight reminders'
+	String get notificationPermissionTitle => 'Get flight reminders';
+
+	/// en: 'Allow notifications so Flymap can remind you to check the latest weather before your flight.'
+	String get notificationPermissionBody => 'Allow notifications so Flymap can remind you to check the latest weather before your flight.';
+
+	/// en: 'Not now'
+	String get notificationPermissionNotNow => 'Not now';
+
+	/// en: 'Allow notifications'
+	String get notificationPermissionAllow => 'Allow notifications';
+
 	/// en: 'We couldn't find this flight on this date'
 	String get noDepartureOnDateTitle => 'We couldn\'t find this flight on this date';
 
-	/// en: 'Check the date — tap it to change. Or continue anyway and we'll save just the date.'
-	String get noDepartureOnDateBody => 'Check the date — tap it to change. Or continue anyway and we\'ll save just the date.';
+	/// en: 'Check the date, or set the departure time manually to continue.'
+	String get noDepartureOnDateBody => 'Check the date, or set the departure time manually to continue.';
 
-	/// en: 'Couldn't check this date — saved as a date only.'
-	String get dateCheckFailed => 'Couldn\'t check this date — saved as a date only.';
+	/// en: 'Couldn't check this date. Set the departure time manually to continue.'
+	String get dateCheckFailed => 'Couldn\'t check this date. Set the departure time manually to continue.';
 }
 
 // Path: createFlight.flightNumberSearch
@@ -4305,13 +4350,15 @@ extension on Translations {
 			'createFlight.weather.arrivalLabel' => 'Arrival',
 			'createFlight.weather.tomorrow' => 'tomorrow',
 			'createFlight.weather.continueWithoutWeather' => 'Continue without weather',
-			'createFlight.weather.noDateTitle' => 'Add your flight date',
-			'createFlight.weather.noDatePickBody' => 'A weather forecast isn\'t possible without your flight date. Pick a date to see the weather along your route.',
-			'createFlight.weather.noDatePickButton' => 'Pick a date',
+			'createFlight.weather.noDateTitle' => 'Add your flight date & time',
+			'createFlight.weather.noDatePickBody' => 'A weather forecast needs both your flight date and departure time.',
+			'createFlight.weather.noDatePickButton' => 'Pick date & time',
 			'createFlight.weather.noDateRealBody' => 'A weather forecast isn\'t possible without your flight date. Choose a date when you select this flight to see the weather.',
 			'createFlight.weather.noDateBackButton' => 'Go back to pick a date',
 			'createFlight.weather.forecastTooFarTitle' => 'It\'s too early for a reliable forecast',
 			'createFlight.weather.forecastTooFarBody' => ({required Object days}) => 'Weather forecasts are only dependable up to ${days} days ahead. We\'ll notify you before your flight once a reliable forecast is available.',
+			'createFlight.weather.pastForecastTitle' => 'This flight date has passed',
+			'createFlight.weather.pastForecastBody' => 'Forecasts aren\'t available for past flights.',
 			'createFlight.weather.notificationPermissionHint' => 'Notifications are off. Enable them so the forecast alert can reach you.',
 			'createFlight.weather.verdictClearTitle' => 'Clear views',
 			'createFlight.weather.verdictClearBody' => 'Window seat worth it — the ground should be visible for most of the flight.',
@@ -4321,23 +4368,26 @@ extension on Translations {
 			'createFlight.weather.verdictCarpetBody' => 'A white sea of clouds beneath you — beautiful, but the ground will mostly stay hidden.',
 			'createFlight.weather.verdictOvercastTitle' => 'Overcast skies',
 			'createFlight.weather.verdictOvercastBody' => 'Best views at takeoff and landing.',
-			'createFlight.weather.smoothSkies' => 'Calm, clear skies expected',
+			'createFlight.weather.estimatedShort' => 'estimated',
 			'createFlight.weather.windCalm' => 'Calm',
 			'createFlight.weather.windLight' => 'Light wind',
 			'createFlight.weather.windBreezy' => 'Breezy',
 			'createFlight.weather.windWindy' => 'Windy',
 			'createFlight.weather.windStrong' => 'Strong wind',
-			'createFlight.weather.windTakeoff' => ({required Object city, required Object speed}) => 'Windy takeoff in ${city} (${speed} m/s) — expect some bumps',
-			'createFlight.weather.windLanding' => ({required Object city, required Object speed}) => 'Windy landing in ${city} (${speed} m/s) — expect some bumps',
 			'createFlight.weather.proTeaserTitle' => 'Unlock airport weather and clouds along your route',
-			'createFlight.weather.attribution' => 'Weather data: MET Norway',
+			'createFlight.weather.attribution' => ({required Object provider, required Object license}) => 'Based on data from ${provider} · Visualization by Flymap · ${license}',
+			'createFlight.weather.attributionShare' => ({required Object provider, required Object license}) => '${provider} data · Flymap visualization · ${license}',
 			'createFlight.weather.hedge' => 'Forecasts firm up closer to departure.',
 			'createFlight.weather.share' => 'Share',
 			'createFlight.weather.shareAsImage' => 'Share as image',
 			'createFlight.weather.shareAsVideo' => 'Share as video',
 			'createFlight.weather.preparingShare' => 'Preparing your share…',
 			'createFlight.weather.shareFailed' => 'Couldn\'t prepare the share — try again.',
-			'createFlight.weather.updatedAt' => ({required Object time}) => 'Updated ${time}',
+			'createFlight.weather.updatedRelative' => ({required Object relative}) => 'Updated ${relative}',
+			'createFlight.weather.updatedExact' => ({required Object date, required Object time}) => 'Updated ${date}, ${time}',
+			'createFlight.weather.updatedJustNow' => 'just now',
+			'createFlight.weather.updatedMinutesAgo' => ({required Object minutes}) => '${minutes} min ago',
+			'createFlight.weather.updatedHoursAgo' => ({required Object hours}) => '${hours} h ago',
 			'createFlight.routeTypeSelector.title' => 'New flight',
 			'createFlight.routeTypeSelector.basicTitle' => 'Approximate route',
 			'createFlight.routeTypeSelector.basicSubtitle' => 'From airports',
@@ -4362,11 +4412,21 @@ extension on Translations {
 			'createFlight.travelDate.checkingSchedule' => 'Checking the flight schedule…',
 			'createFlight.travelDate.noDateYet' => 'No date yet',
 			'createFlight.travelDate.skipDate' => 'Continue without a date',
-			'createFlight.travelDate.addDepartureTime' => 'Add departure time (optional)',
+			'createFlight.travelDate.skipDateTimeScreen' => 'Skip date & time',
+			'createFlight.travelDate.addDepartureTime' => 'Add departure time',
 			'createFlight.travelDate.departureTimeAt' => ({required Object time}) => 'Departure time · ${time}',
+			'createFlight.travelDate.departureTimeTitle' => 'Departure time',
+			'createFlight.travelDate.departureTimeHint' => 'Set the local departure time to continue.',
+			'createFlight.travelDate.departureTimePickDateFirst' => 'Pick a date first, then set the departure time.',
+			'createFlight.travelDate.setDepartureTime' => 'Set departure time',
+			'createFlight.travelDate.departureTimeSelected' => ({required Object time}) => 'Departure · ${time}',
+			'createFlight.travelDate.notificationPermissionTitle' => 'Get flight reminders',
+			'createFlight.travelDate.notificationPermissionBody' => 'Allow notifications so Flymap can remind you to check the latest weather before your flight.',
+			'createFlight.travelDate.notificationPermissionNotNow' => 'Not now',
+			'createFlight.travelDate.notificationPermissionAllow' => 'Allow notifications',
 			'createFlight.travelDate.noDepartureOnDateTitle' => 'We couldn\'t find this flight on this date',
-			'createFlight.travelDate.noDepartureOnDateBody' => 'Check the date — tap it to change. Or continue anyway and we\'ll save just the date.',
-			'createFlight.travelDate.dateCheckFailed' => 'Couldn\'t check this date — saved as a date only.',
+			'createFlight.travelDate.noDepartureOnDateBody' => 'Check the date, or set the departure time manually to continue.',
+			'createFlight.travelDate.dateCheckFailed' => 'Couldn\'t check this date. Set the departure time manually to continue.',
 			'createFlight.flightNumberSearch.title' => 'Flight number',
 			'createFlight.flightNumberSearch.subtitle' => 'Enter a flight number (for example BA117).',
 			'createFlight.flightNumberSearch.hint' => 'e.g. BA117',
@@ -4452,6 +4512,8 @@ extension on Translations {
 			'createFlight.overview.routeSummaryRegionsLabel' => 'Regions',
 			'createFlight.overview.routeSummaryRegionsTitle' => 'You\'ll fly over',
 			'createFlight.overview.routeSummaryPlacesLabel' => 'Places',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.routeSummaryTimelineTitle' => 'Timeline',
 			'createFlight.overview.routeSummaryPlacesTitle' => 'Places along the route',
 			'createFlight.overview.routeSummaryPoiSearchHint' => 'Search places',
@@ -4467,8 +4529,6 @@ extension on Translations {
 			'createFlight.overview.timeline.alsoAroundThisTime' => 'Also around same time:',
 			'createFlight.overview.timeline.minuteUnit' => 'min',
 			'createFlight.overview.timeline.hourCompactUnit' => 'h',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.timeline.minuteCompactUnit' => 'm',
 			'createFlight.overview.timeline.regionType.country' => 'Country',
 			'createFlight.overview.timeline.regionType.region' => 'Region',
@@ -4866,8 +4926,8 @@ extension on Translations {
 			'about.closingText' => 'Thank you for exploring it with us.',
 			'notifications.forecastReadyTitle' => 'Your flight forecast is ready',
 			'notifications.forecastReadyBody' => ({required Object route}) => 'Sun or rain at takeoff? Clear views on the way? Your first ${route} forecast is in.',
-			'notifications.forecastUpdatedTitle' => 'Updated forecast for tomorrow\'s flight',
-			'notifications.forecastUpdatedBody' => ({required Object route}) => 'The weather forecast for ${route} is available — tap to download it before you fly.',
+			'notifications.forecastUpdatedTitle' => 'Your flight is tomorrow',
+			'notifications.forecastUpdatedBody' => ({required Object route}) => '${route} — open Flymap for the latest forecast.',
 			'notifications.reminderEarlyTitle' => 'Your flight is coming up',
 			'notifications.reminderEarlyBody' => ({required Object route}) => '${route} is just a few days away — open the app to explore what you\'ll fly over.',
 			'notifications.reminderTomorrowTitle' => 'Your flight is tomorrow',
@@ -4966,6 +5026,8 @@ extension on Translations {
 			'countries.EH' => 'Western Sahara',
 			'countries.ER' => 'Eritrea',
 			'countries.ES' => 'Spain',
+			_ => null,
+		} ?? switch (path) {
 			'countries.ET' => 'Ethiopia',
 			'countries.FI' => 'Finland',
 			'countries.FJ' => 'Fiji',
@@ -4981,8 +5043,6 @@ extension on Translations {
 			'countries.GQ' => 'Equatorial Guinea',
 			'countries.GR' => 'Greece',
 			'countries.GT' => 'Guatemala',
-			_ => null,
-		} ?? switch (path) {
 			'countries.GW' => 'Guinea-Bissau',
 			'countries.GY' => 'Guyana',
 			'countries.HK' => 'Hong Kong, China',

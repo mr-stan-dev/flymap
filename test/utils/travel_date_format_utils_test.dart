@@ -56,9 +56,85 @@ void main() {
     });
   });
 
+  group('TravelDateFormatUtils.formatUtcOffset', () {
+    test('formats whole-hour and half-hour offsets', () {
+      expect(TravelDateFormatUtils.formatUtcOffset(120), 'GMT+2');
+      expect(TravelDateFormatUtils.formatUtcOffset(330), 'GMT+5:30');
+      expect(TravelDateFormatUtils.formatUtcOffset(-240), 'GMT-4');
+    });
+
+    test('omits zero because it can mean unknown', () {
+      expect(TravelDateFormatUtils.formatUtcOffset(0), isNull);
+    });
+  });
+
+  group('TravelDateFormatUtils.formatForecastFreshness', () {
+    final now = DateTime(2026, 8, 5, 15, 30);
+
+    test('uses only relative age for an update from today', () {
+      expect(
+        TravelDateFormatUtils.formatForecastFreshness(
+          DateTime(2026, 8, 5, 13, 15),
+          DateDisplayFormat.us,
+          now: now,
+        ),
+        'Updated 2 h ago',
+      );
+    });
+
+    test('uses only exact date and time for an older update', () {
+      expect(
+        TravelDateFormatUtils.formatForecastFreshness(
+          DateTime(2026, 8, 3, 15, 30),
+          DateDisplayFormat.international,
+          now: now,
+        ),
+        'Updated Mon, 3 Aug, 15:30',
+      );
+    });
+
+    test('switches to exact time immediately after a local day boundary', () {
+      expect(
+        TravelDateFormatUtils.formatForecastFreshness(
+          DateTime(2026, 8, 4, 23, 50),
+          DateDisplayFormat.us,
+          now: DateTime(2026, 8, 5, 0, 10),
+        ),
+        'Updated Tue, Aug 4, 23:50',
+      );
+    });
+
+    test('handles recent and future-clock timestamps safely', () {
+      expect(
+        TravelDateFormatUtils.formatForecastFreshness(
+          now.add(const Duration(minutes: 2)),
+          DateDisplayFormat.us,
+          now: now,
+        ),
+        'Updated just now',
+      );
+    });
+  });
+
+  group('TravelDateFormatUtils.formatScheduleDepartureTime', () {
+    test('marks a user-supplied departure time as approximate', () {
+      final schedule = FlightSchedule.approximate(
+        date,
+        departureTime: ApproximateDepartureTime.forPeriod(
+          ApproximateDeparturePeriod.morning,
+        ),
+      );
+
+      expect(
+        TravelDateFormatUtils.formatScheduleDepartureTime(schedule),
+        '~08:00',
+      );
+    });
+  });
+
   group('TravelDateFormatUtils.countdownLabel', () {
     test('past-date fallback follows the date-format setting', () {
-      final schedule = FlightSchedule.dateOnly(DateTime(2020, 8, 3));
+      final schedule = FlightSchedule(travelDate: DateTime(2020, 8, 3));
       expect(
         TravelDateFormatUtils.countdownLabel(
           schedule,

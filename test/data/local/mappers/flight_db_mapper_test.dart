@@ -148,7 +148,7 @@ void main() {
     test('round-trips a date-only schedule and normalizes the time away', () {
       final mapper = FlightDbMapper();
       final flight = _flight(id: 'flight-dated').copyWith(
-        schedule: FlightSchedule.dateOnly(DateTime(2026, 8, 3, 17, 42)),
+        schedule: FlightSchedule(travelDate: DateTime(2026, 8, 3, 17, 42)),
       );
 
       final restored = mapper.fromDb(mapper.toDb(flight));
@@ -156,6 +156,48 @@ void main() {
       expect(restored.schedule!.travelDate, DateTime(2026, 8, 3));
       expect(restored.schedule!.departure, isNull);
       expect(restored.schedule!.hasScheduledTime, isFalse);
+    });
+
+    test('round-trips a user time without turning it into a schedule', () {
+      final mapper = FlightDbMapper();
+      final flight = _flight(id: 'flight-approximate-time').copyWith(
+        schedule: FlightSchedule.approximate(
+          DateTime(2026, 8, 3),
+          departureTime: ApproximateDepartureTime.forPeriod(
+            ApproximateDeparturePeriod.evening,
+          ),
+        ),
+      );
+
+      final restored = mapper.fromDb(mapper.toDb(flight)).schedule!;
+
+      expect(restored.departure, isNull);
+      expect(
+        restored.timePrecision,
+        FlightScheduleTimePrecision.approximateTime,
+      );
+      expect(restored.approximateDepartureTime?.hour, 19);
+      expect(
+        restored.approximateDepartureTime?.period,
+        ApproximateDeparturePeriod.evening,
+      );
+    });
+
+    test('round-trips a manually specified departure minute', () {
+      final mapper = FlightDbMapper();
+      final flight = _flight(id: 'flight-specific-time').copyWith(
+        schedule: FlightSchedule.approximate(
+          DateTime(2026, 8, 3),
+          departureTime: const ApproximateDepartureTime(hour: 14, minute: 37),
+        ),
+      );
+
+      final restored = mapper.fromDb(mapper.toDb(flight)).schedule!;
+
+      expect(restored.departure, isNull);
+      expect(restored.approximateDepartureTime?.hour, 14);
+      expect(restored.approximateDepartureTime?.minute, 37);
+      expect(restored.approximateDepartureTime?.period, isNull);
     });
 
     test('reads pre-release schedules stored as separate UTC + offset', () {

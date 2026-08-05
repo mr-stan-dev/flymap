@@ -62,6 +62,10 @@ class FlightDBKeys {
   static const observedAt = 'observedAt';
   static const schedule = 'schedule';
   static const travelDate = 'travelDate';
+  static const approximateDepartureHour = 'approximateDepartureHour';
+  static const approximateDepartureMinute = 'approximateDepartureMinute';
+  static const approximateDeparturePeriod = 'approximateDeparturePeriod';
+
   /// ISO-8601 with offset ("2026-08-03T09:15:00.000+02:00").
   static const scheduledDeparture = 'scheduledDeparture';
   static const scheduledArrival = 'scheduledArrival';
@@ -463,8 +467,16 @@ class FlightDbMapper {
       // Date-only on purpose: no time component to mis-parse across zones.
       FlightDBKeys.travelDate: '$yyyy-$mm-$dd',
       if (schedule.departure != null)
-        FlightDBKeys.scheduledDeparture:
-            schedule.departure!.toIso8601String(),
+        FlightDBKeys.scheduledDeparture: schedule.departure!.toIso8601String(),
+      if (schedule.approximateDepartureTime != null) ...{
+        FlightDBKeys.approximateDepartureHour:
+            schedule.approximateDepartureTime!.hour,
+        FlightDBKeys.approximateDepartureMinute:
+            schedule.approximateDepartureTime!.minute,
+        if (schedule.approximateDepartureTime!.period != null)
+          FlightDBKeys.approximateDeparturePeriod:
+              schedule.approximateDepartureTime!.period!.name,
+      },
       if (schedule.arrival != null)
         FlightDBKeys.scheduledArrival: schedule.arrival!.toIso8601String(),
     };
@@ -478,10 +490,35 @@ class FlightDbMapper {
         ? null
         : DateTime.tryParse(travelDateRaw);
     if (travelDate == null) return null;
+    final approximateHour = _toInt(map[FlightDBKeys.approximateDepartureHour]);
+    final approximateMinute = _toInt(
+      map[FlightDBKeys.approximateDepartureMinute],
+    );
+    final periodName = _toNonEmptyString(
+      map[FlightDBKeys.approximateDeparturePeriod],
+    );
+    final period = ApproximateDeparturePeriod.values
+        .where((value) => value.name == periodName)
+        .firstOrNull;
+    final approximateTime =
+        approximateHour != null &&
+            approximateHour >= 0 &&
+            approximateHour <= 23 &&
+            approximateMinute != null &&
+            approximateMinute >= 0 &&
+            approximateMinute <= 59
+        ? ApproximateDepartureTime(
+            hour: approximateHour,
+            minute: approximateMinute,
+            period: period,
+          )
+        : null;
     return FlightSchedule(
       travelDate: DateTime(travelDate.year, travelDate.month, travelDate.day),
-      departure: ZonedInstant.tryParse(map[FlightDBKeys.scheduledDeparture]) ??
+      departure:
+          ZonedInstant.tryParse(map[FlightDBKeys.scheduledDeparture]) ??
           _legacyDeparture(map),
+      approximateDepartureTime: approximateTime,
       arrival: ZonedInstant.tryParse(map[FlightDBKeys.scheduledArrival]),
     );
   }

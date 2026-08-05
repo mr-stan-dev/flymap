@@ -33,8 +33,6 @@ class _DemoRoute {
   final double routeKm;
   final String asset;
   final DemoCloudStory story;
-
-  String get chipLabel => '$departureCode → $arrivalCode';
 }
 
 /// Weather payoff step: the real weather-map experience (same painter, same
@@ -158,9 +156,7 @@ class _OnboardingWeatherPayoffStepState
   @override
   void initState() {
     super.initState();
-    _projectedRoutes = [
-      for (final route in _routes) _projectRoute(route),
-    ];
+    _projectedRoutes = [for (final route in _routes) _projectRoute(route)];
     // The plane's landing IS the page-turn: each route plays one full
     // departure -> arrival flight, then the next example rotates in.
     _plane
@@ -388,7 +384,8 @@ class _OnboardingWeatherPayoffStepState
               for (var i = 0; i < _routes.length; i++) ...[
                 if (i > 0) const SizedBox(width: 8),
                 _RouteChip(
-                  label: _routes[i].chipLabel,
+                  departureCode: _routes[i].departureCode,
+                  arrivalCode: _routes[i].arrivalCode,
                   isSelected: i == _selected,
                   onTap: () => _selectRoute(i),
                 ),
@@ -403,12 +400,14 @@ class _OnboardingWeatherPayoffStepState
 
 class _RouteChip extends StatelessWidget {
   const _RouteChip({
-    required this.label,
+    required this.departureCode,
+    required this.arrivalCode,
     required this.isSelected,
     required this.onTap,
   });
 
-  final String label;
+  final String departureCode;
+  final String arrivalCode;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -433,14 +432,40 @@ class _RouteChip extends StatelessWidget {
                 : colorScheme.outline.withValues(alpha: 0.3),
           ),
         ),
-        child: Text(
-          label,
-          style: theme.textTheme.labelMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: isSelected ? colorScheme.primary : null,
+        child: Semantics(
+          label: '$departureCode → $arrivalCode',
+          button: true,
+          selected: isSelected,
+          child: ExcludeSemantics(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(departureCode, style: _labelStyle(theme, colorScheme)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  child: Icon(
+                    Icons.arrow_forward_rounded,
+                    key: ValueKey(
+                      'onboarding-weather-route-arrow-$departureCode-$arrivalCode',
+                    ),
+                    size: 14,
+                    color: isSelected ? colorScheme.primary : null,
+                  ),
+                ),
+                Text(arrivalCode, style: _labelStyle(theme, colorScheme)),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  TextStyle? _labelStyle(ThemeData theme, ColorScheme colorScheme) {
+    return theme.textTheme.labelMedium?.copyWith(
+      fontWeight: FontWeight.w700,
+      color: isSelected ? colorScheme.primary : null,
     );
   }
 }

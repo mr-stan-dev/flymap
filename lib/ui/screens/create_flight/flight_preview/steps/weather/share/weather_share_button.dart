@@ -17,6 +17,7 @@ import 'package:flymap/logger.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/share/weather_share_renderer.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/share/weather_share_service.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_symbols.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_wind_presentation.dart';
 import 'package:flymap/utils/travel_date_format_utils.dart';
 import 'package:get_it/get_it.dart';
 import 'package:share_plus/share_plus.dart';
@@ -184,11 +185,12 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
       context.read<SettingsCubit>().state.temperatureUnit,
     );
     final flightNumber = widget.flightNumber?.trim() ?? '';
+    final dateFormat = dateDisplayFormatFromSetting(
+      context.read<SettingsCubit>().state.dateDisplayFormat,
+    );
     final date = TravelDateFormatUtils.formatShortDate(
       weather.departure.timeLocal,
-      dateDisplayFormatFromSetting(
-        context.read<SettingsCubit>().state.dateDisplayFormat,
-      ),
+      dateFormat,
     );
     // Country flags in the headline for cross-border flights only — same rule
     // as the other share cards.
@@ -212,47 +214,82 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
       headline: '$depCode → $arrCode',
       subtitle: flightNumber.isEmpty ? date : '$flightNumber · $date',
       departure: _airport(
-        t.departureLabel,
         route.departure.displayCode,
         route.departure.city,
+        route.departure.countryCode,
         weather.departure,
-        weather.isTimeEstimated,
         tempUnit,
+        dateFormat,
       ),
       arrival: _airport(
-        t.arrivalLabel,
         route.arrival.displayCode,
         route.arrival.city,
+        route.arrival.countryCode,
         weather.arrival,
-        weather.isTimeEstimated,
         tempUnit,
+        dateFormat,
+        isNextDay: _isNextDay(
+          weather.departure.timeLocal,
+          weather.arrival.timeLocal,
+        ),
       ),
+      attribution:
+          '${t.attributionShare(provider: weather.attribution.providerName, license: weather.attribution.licenseName)}\n'
+          '${weather.attribution.licenseUrl}',
       watermark: 'flymap.app',
     );
   }
 
   WeatherShareAirport _airport(
-    String label,
     String code,
     String city,
+    String countryCode,
     AirportWeather weather,
-    bool isTimeEstimated,
     TemperatureUnit tempUnit,
-  ) {
+    DateDisplayFormat dateFormat, {
+    bool isNextDay = false,
+  }) {
     final temperature = weather.temperatureC;
     final wind = weather.windSpeedMs;
+    final windPresentation = wind == null
+        ? null
+        : weatherWindPresentation(wind, context.t.createFlight.weather);
+    var dateText = TravelDateFormatUtils.formatShortDate(
+      weather.timeLocal,
+      dateFormat,
+    );
+    if (isNextDay) {
+      dateText = '$dateText (${context.t.createFlight.weather.tomorrow})';
+    }
+    final normalizedCountryCode = countryCode.trim().toUpperCase();
     return WeatherShareAirport(
-      label: label,
       code: code,
       city: city,
+      countryCode: normalizedCountryCode,
+      countryFlag: RegionHighlightModel.flagEmoji(normalizedCountryCode) ?? '',
       emoji: weatherSymbolEmoji(weather.symbolCode, weather.cloudCoverPercent),
       temperatureText: temperature == null
           ? '–'
           : UnitFormatUtils.formatTemperatureValue(temperature, tempUnit),
-      timeText: isTimeEstimated
+      timeText: TravelDateFormatUtils.formatTime(weather.timeLocal),
+      utcOffsetText: TravelDateFormatUtils.formatUtcOffset(
+        weather.utcOffsetMinutes,
+      ),
+      dateText: dateText,
+      windText: windPresentation == null
           ? null
-          : TravelDateFormatUtils.formatTime(weather.timeLocal),
-      windText: wind == null ? null : '💨 ${wind.round()} m/s',
+          : '${windPresentation.label} · ${wind!.round()} m/s',
+      windFilledBars: windPresentation?.filledBars ?? 0,
+      windTone: windPresentation?.tone ?? WeatherWindTone.normal,
+      precipitationText: (weather.precipitationMm ?? 0) > 0
+          ? '${weather.precipitationMm!.toStringAsFixed(1)} mm'
+          : null,
     );
+  }
+
+  bool _isNextDay(DateTime departure, DateTime arrival) {
+    DateTime dateOnly(DateTime value) =>
+        DateTime(value.year, value.month, value.day);
+    return dateOnly(arrival).difference(dateOnly(departure)).inDays == 1;
   }
 }

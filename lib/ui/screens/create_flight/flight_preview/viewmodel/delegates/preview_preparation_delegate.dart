@@ -227,6 +227,10 @@ class PreviewPreparationDelegate {
         ),
       );
 
+      // For an already-entitled flight, overlap the weather request with the
+      // time spent viewing the route overview. The weather step reuses the
+      // same state and fetchWeather deduplicates if it is still in flight.
+      _cubit._prefetchWeatherIfEligible();
       unawaited(_prefetchWiki(route, userPrefs: userPrefs));
     } catch (e, stackTrace) {
       _cubit._logger.error('Failed to prepare map preview: $e');

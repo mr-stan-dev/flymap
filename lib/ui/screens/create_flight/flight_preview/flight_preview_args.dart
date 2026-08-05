@@ -16,8 +16,8 @@ class FlightPreviewArgs {
   final String? flightNumber;
   final String? fr24Id;
 
-  /// Schedule picked in the search step; null for dateless flights (a date
-  /// can still be added manually on the download step).
+  /// Schedule picked in the search step; null for dateless flights (a complete
+  /// manual date and time can still be added on the weather step).
   final FlightSchedule? schedule;
   final bool hasPendingFlightUnlock;
 }
