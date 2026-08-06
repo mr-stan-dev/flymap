@@ -53,6 +53,10 @@ post_install do |installer|
         # Fitness == PERMISSION_SENSORS. Without this it is stubbed out and
         # always returns denied.
         'PERMISSION_SENSORS=1',
+        # Local flight reminders use iOS notification authorization. Without
+        # this strategy permission_handler reports permanently denied without
+        # ever presenting Apple's system permission dialog.
+        'PERMISSION_NOTIFICATIONS=1',
       ]
     end
   end
