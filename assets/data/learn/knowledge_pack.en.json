@@ -589,6 +589,12 @@
           "title": "Why the Seat Belt Sign Turns On When It Feels Smooth",
           "premium": true,
           "order": 8
+        },
+        {
+          "id": "how_to_stop_your_ears_hurting_on_a_plane",
+          "title": "How to Stop Your Ears Hurting on a Plane",
+          "premium": false,
+          "order": 9
         }
       ],
       "order": 7

@@ -1467,6 +1467,7 @@ class _TranslationsFlightDashboardEs extends TranslationsFlightDashboardEn {
 	@override String get temperatureInfoBody => 'Una estimación de la temperatura exterior a partir de tu altitud. Baja mucho con la altura: a menudo unos -50 °C en crucero, incluso sobre un país cálido.';
 	@override String get cabinPressureEnableBody => 'Permite el acceso al movimiento para ver la presión del aire en la cabina.';
 	@override String get cabinPressureEnableButton => 'Activar';
+	@override String get cabinPressureEarPainArticle => '¿Te duelen los oídos?';
 }
 
 // Path: flight.upcoming
@@ -2448,6 +2449,7 @@ extension on TranslationsEs {
 			'flight.dashboard.temperatureInfoBody' => 'Una estimación de la temperatura exterior a partir de tu altitud. Baja mucho con la altura: a menudo unos -50 °C en crucero, incluso sobre un país cálido.',
 			'flight.dashboard.cabinPressureEnableBody' => 'Permite el acceso al movimiento para ver la presión del aire en la cabina.',
 			'flight.dashboard.cabinPressureEnableButton' => 'Activar',
+			'flight.dashboard.cabinPressureEarPainArticle' => '¿Te duelen los oídos?',
 			'flight.upcoming.mapTitle' => 'Empieza tu viaje en vuelo',
 			'flight.upcoming.mapSubtitle' => 'Inicia el seguimiento en vivo cuando comience tu vuelo',
 			'flight.upcoming.dashboardTitle' => 'Empieza tu viaje en vuelo',

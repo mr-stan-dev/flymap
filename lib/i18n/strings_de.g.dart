@@ -1467,6 +1467,7 @@ class _TranslationsFlightDashboardDe extends TranslationsFlightDashboardEn {
 	@override String get temperatureInfoBody => 'Eine Schätzung der Außentemperatur anhand deiner Höhe. Sie fällt stark mit der Höhe – im Reiseflug oft um -50 °C, selbst über einem warmen Land.';
 	@override String get cabinPressureEnableBody => 'Erlaube den Bewegungszugriff, um den Luftdruck in der Kabine zu sehen.';
 	@override String get cabinPressureEnableButton => 'Aktivieren';
+	@override String get cabinPressureEarPainArticle => 'Schmerzen die Ohren?';
 }
 
 // Path: flight.upcoming
@@ -2448,6 +2449,7 @@ extension on TranslationsDe {
 			'flight.dashboard.temperatureInfoBody' => 'Eine Schätzung der Außentemperatur anhand deiner Höhe. Sie fällt stark mit der Höhe – im Reiseflug oft um -50 °C, selbst über einem warmen Land.',
 			'flight.dashboard.cabinPressureEnableBody' => 'Erlaube den Bewegungszugriff, um den Luftdruck in der Kabine zu sehen.',
 			'flight.dashboard.cabinPressureEnableButton' => 'Aktivieren',
+			'flight.dashboard.cabinPressureEarPainArticle' => 'Schmerzen die Ohren?',
 			'flight.upcoming.mapTitle' => 'Starte deine Flugreise',
 			'flight.upcoming.mapSubtitle' => 'Starte die Live-Verfolgung, sobald dein Flug beginnt',
 			'flight.upcoming.dashboardTitle' => 'Starte deine Flugreise',

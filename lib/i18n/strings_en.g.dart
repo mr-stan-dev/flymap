@@ -3556,6 +3556,9 @@ class TranslationsFlightDashboardEn {
 
 	/// en: 'Enable'
 	String get cabinPressureEnableButton => 'Enable';
+
+	/// en: 'Feel pain in ears?'
+	String get cabinPressureEarPainArticle => 'Feel pain in ears?';
 }
 
 // Path: flight.upcoming
@@ -4772,6 +4775,7 @@ extension on Translations {
 			'flight.dashboard.temperatureInfoBody' => 'An estimate of the outside air temperature from your altitude. It falls steeply with height — often around -50 °C at cruise, even over a warm country.',
 			'flight.dashboard.cabinPressureEnableBody' => 'Allow motion access to see the air pressure inside the cabin.',
 			'flight.dashboard.cabinPressureEnableButton' => 'Enable',
+			'flight.dashboard.cabinPressureEarPainArticle' => 'Feel pain in ears?',
 			'flight.upcoming.mapTitle' => 'Begin your flight journey',
 			'flight.upcoming.mapSubtitle' => 'Start live tracking once your flight begins',
 			'flight.upcoming.dashboardTitle' => 'Begin your flight journey',

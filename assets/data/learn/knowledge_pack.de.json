@@ -589,6 +589,12 @@
           "title": "Warum das Anschnallzeichen angeht, obwohl es sich ruhig anfühlt",
           "premium": true,
           "order": 8
+        },
+        {
+          "id": "how_to_stop_your_ears_hurting_on_a_plane",
+          "title": "So verhinderst du Ohrenschmerzen im Flugzeug",
+          "premium": false,
+          "order": 9
         }
       ],
       "order": 7

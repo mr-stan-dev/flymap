@@ -589,6 +589,12 @@
           "title": "Pourquoi le signal ceinture s'allume alors que le vol parait fluide",
           "premium": true,
           "order": 8
+        },
+        {
+          "id": "how_to_stop_your_ears_hurting_on_a_plane",
+          "title": "Comment éviter d’avoir mal aux oreilles en avion",
+          "premium": false,
+          "order": 9
         }
       ],
       "order": 7

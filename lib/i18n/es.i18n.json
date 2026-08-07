@@ -836,7 +836,8 @@
       "headingInfoBody": "La dirección de la brújula hacia la que apunta el avión, según tu rumbo GPS. 0° es norte, 90° este, 180° sur y 270° oeste.",
       "temperatureInfoBody": "Una estimación de la temperatura exterior a partir de tu altitud. Baja mucho con la altura: a menudo unos -50 °C en crucero, incluso sobre un país cálido.",
       "cabinPressureEnableBody": "Permite el acceso al movimiento para ver la presión del aire en la cabina.",
-      "cabinPressureEnableButton": "Activar"
+      "cabinPressureEnableButton": "Activar",
+      "cabinPressureEarPainArticle": "¿Te duelen los oídos?"
     },
     "upcoming": {
       "mapTitle": "Empieza tu viaje en vuelo",

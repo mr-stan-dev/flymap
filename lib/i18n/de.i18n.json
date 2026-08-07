@@ -836,7 +836,8 @@
       "headingInfoBody": "Die Himmelsrichtung, in die das Flugzeug zeigt, aus deinem GPS-Kurs. 0° ist Norden, 90° Osten, 180° Süden und 270° Westen.",
       "temperatureInfoBody": "Eine Schätzung der Außentemperatur anhand deiner Höhe. Sie fällt stark mit der Höhe – im Reiseflug oft um -50 °C, selbst über einem warmen Land.",
       "cabinPressureEnableBody": "Erlaube den Bewegungszugriff, um den Luftdruck in der Kabine zu sehen.",
-      "cabinPressureEnableButton": "Aktivieren"
+      "cabinPressureEnableButton": "Aktivieren",
+      "cabinPressureEarPainArticle": "Schmerzen die Ohren?"
     },
     "upcoming": {
       "mapTitle": "Starte deine Flugreise",

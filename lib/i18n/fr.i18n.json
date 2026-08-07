@@ -836,7 +836,8 @@
       "headingInfoBody": "La direction de la boussole vers laquelle pointe l'avion, d'après votre cap GPS. 0° c'est le nord, 90° l'est, 180° le sud et 270° l'ouest.",
       "temperatureInfoBody": "Une estimation de la température extérieure à partir de votre altitude. Elle chute fortement avec l'altitude — souvent autour de -50 °C en croisière, même au-dessus d'un pays chaud.",
       "cabinPressureEnableBody": "Autorisez l'accès au mouvement pour voir la pression de l'air dans la cabine.",
-      "cabinPressureEnableButton": "Activer"
+      "cabinPressureEnableButton": "Activer",
+      "cabinPressureEarPainArticle": "Mal aux oreilles ?"
     },
     "upcoming": {
       "mapTitle": "Commencez votre voyage",

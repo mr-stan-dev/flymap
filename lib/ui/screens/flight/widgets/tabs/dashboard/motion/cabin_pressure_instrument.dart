@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flymap/data/motion/motion_sample.dart';
 import 'package:flymap/i18n/strings.g.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/instruments/instrument_palette.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/instruments/instrument_shell.dart';
 
@@ -12,6 +13,7 @@ class CabinPressureInstrument extends StatelessWidget {
   const CabinPressureInstrument({
     required this.sample,
     required this.altitudeUnit,
+    this.onEarPainArticleTap,
     super.key,
   });
 
@@ -19,6 +21,8 @@ class CabinPressureInstrument extends StatelessWidget {
 
   /// 'm' or 'ft' — for the cabin-altitude hint.
   final String altitudeUnit;
+
+  final VoidCallback? onEarPainArticleTap;
 
   // Bar range: low pressure (high cabin) on the left, sea level on the right.
   static const _minHpa = 700.0;
@@ -43,73 +47,85 @@ class CabinPressureInstrument extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  pressure.round().toString(),
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: palette.primaryText,
-                    fontWeight: FontWeight.w900,
-                    height: 0.95,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
+            children: [
+              Text(
+                pressure.round().toString(),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: palette.primaryText,
+                  fontWeight: FontWeight.w900,
+                  height: 0.95,
+                  fontFeatures: const [FontFeature.tabularFigures()],
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  'hPa',
-                  style: instrumentUnitStyle(context, palette.secondaryText),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'hPa',
+                style: instrumentUnitStyle(context, palette.secondaryText),
+              ),
+              const Spacer(),
+              Text(
+                context.t.flight.dashboard.cabinPressureLikeAltitude(
+                  altitude: _cabinAltitudeLabel(pressure),
                 ),
-                const Spacer(),
-                Text(
-                  context.t.flight.dashboard.cabinPressureLikeAltitude(
-                    altitude: _cabinAltitudeLabel(pressure),
-                  ),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: palette.secondaryText,
-                    fontWeight: FontWeight.w700,
-                  ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: palette.secondaryText,
+                  fontWeight: FontWeight.w700,
                 ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 16,
+            child: CustomPaint(
+              painter: _PressureBarPainter(
+                progress: ((pressure - _minHpa) / (_maxHpa - _minHpa))
+                    .clamp(0.0, 1.0)
+                    .toDouble(),
+                seaLevelProgress:
+                    ((_seaLevelHpa - _minHpa) / (_maxHpa - _minHpa))
+                        .clamp(0.0, 1.0)
+                        .toDouble(),
+                low: palette.altitudeLow,
+                high: palette.altitudeHigh,
+                marker: palette.primaryText,
+                track: palette.track,
+              ),
+              child: const SizedBox.expand(),
             ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 16,
-              child: CustomPaint(
-                painter: _PressureBarPainter(
-                  progress: ((pressure - _minHpa) / (_maxHpa - _minHpa))
-                      .clamp(0.0, 1.0)
-                      .toDouble(),
-                  seaLevelProgress:
-                      ((_seaLevelHpa - _minHpa) / (_maxHpa - _minHpa))
-                          .clamp(0.0, 1.0)
-                          .toDouble(),
-                  low: palette.altitudeLow,
-                  high: palette.altitudeHigh,
-                  marker: palette.primaryText,
-                  track: palette.track,
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                context.t.flight.dashboard.cabinPressureCruise,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: palette.secondaryText,
+                  fontFamily: 'monospace',
                 ),
-                child: const SizedBox.expand(),
+              ),
+              Text(
+                context.t.flight.dashboard.cabinPressureSeaLevel,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: palette.secondaryText,
+                  fontFamily: 'monospace',
+                ),
+              ),
+            ],
+          ),
+          if (onEarPainArticleTap != null) ...[
+            const SizedBox(height: DsSpacing.xs),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: onEarPainArticleTap,
+                child: Text(
+                  context.t.flight.dashboard.cabinPressureEarPainArticle,
+                ),
               ),
             ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  context.t.flight.dashboard.cabinPressureCruise,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: palette.secondaryText,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-                Text(
-                  context.t.flight.dashboard.cabinPressureSeaLevel,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: palette.secondaryText,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-              ],
-            ),
+          ],
         ],
       ),
     );

@@ -8,9 +8,14 @@ import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/instruments/inst
 /// Fitness has not been granted yet. Tapping the button requests it — we never
 /// prompt automatically on screen entry.
 class CabinPressureEnableCard extends StatelessWidget {
-  const CabinPressureEnableCard({required this.onEnable, super.key});
+  const CabinPressureEnableCard({
+    required this.onEnable,
+    this.onEarPainArticleTap,
+    super.key,
+  });
 
   final VoidCallback onEnable;
+  final VoidCallback? onEarPainArticleTap;
 
   @override
   Widget build(BuildContext context) {
@@ -26,11 +31,7 @@ class CabinPressureEnableCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
-                Icons.speed_rounded,
-                color: palette.secondaryText,
-                size: 28,
-              ),
+              Icon(Icons.speed_rounded, color: palette.secondaryText, size: 28),
               const SizedBox(width: DsSpacing.sm),
               Expanded(
                 child: Text(
@@ -51,6 +52,16 @@ class CabinPressureEnableCard extends StatelessWidget {
               child: Text(t.cabinPressureEnableButton),
             ),
           ),
+          if (onEarPainArticleTap != null) ...[
+            const SizedBox(height: DsSpacing.xs),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: onEarPainArticleTap,
+                child: Text(t.cabinPressureEarPainArticle),
+              ),
+            ),
+          ],
         ],
       ),
     );

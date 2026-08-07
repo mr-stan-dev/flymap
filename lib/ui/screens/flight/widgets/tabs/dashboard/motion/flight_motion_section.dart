@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:get_it/get_it.dart';
 import 'package:flymap/data/motion/motion_sample.dart';
 import 'package:flymap/data/motion/motion_sensor_service.dart';
 import 'package:flymap/domain/entity/units.dart';
+import 'package:flymap/domain/usecase/get_learn_article_content_use_case.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/metric_units_repository.dart';
+import 'package:flymap/router/app_router.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/metric_info.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/motion/cabin_pressure_enable_card.dart';
@@ -145,12 +147,15 @@ class _FlightMotionSectionState extends State<FlightMotionSection>
             onResetPeak: _service.resetPeak,
           ),
         ),
-        ..._buildPressureSection(t),
+        ..._buildPressureSection(context, t),
       ],
     );
   }
 
-  List<Widget> _buildPressureSection(TranslationsFlightDashboardEn t) {
+  List<Widget> _buildPressureSection(
+    BuildContext context,
+    TranslationsFlightDashboardEn t,
+  ) {
     // Data is flowing → the real tile.
     if (_display.pressureAvailable) {
       return [
@@ -161,6 +166,7 @@ class _FlightMotionSectionState extends State<FlightMotionSection>
           child: CabinPressureInstrument(
             sample: _display,
             altitudeUnit: _altitudeUnit,
+            onEarPainArticleTap: () => _openEarPainArticle(context),
           ),
         ),
       ];
@@ -169,10 +175,28 @@ class _FlightMotionSectionState extends State<FlightMotionSection>
     if (_permissionResolved && _needsPermission) {
       return [
         const SizedBox(height: DsSpacing.sm),
-        CabinPressureEnableCard(onEnable: _requestMotionPermission),
+        CabinPressureEnableCard(
+          onEnable: _requestMotionPermission,
+          onEarPainArticleTap: () => _openEarPainArticle(context),
+        ),
       ];
     }
     // Authorized but no barometer hardware, or still resolving → nothing.
     return const [];
+  }
+
+  Future<void> _openEarPainArticle(BuildContext context) async {
+    try {
+      final article = await GetIt.I<GetLearnArticleContentUseCase>()(
+        articleId: 'how_to_stop_your_ears_hurting_on_a_plane',
+      );
+      if (!context.mounted) return;
+      await AppRouter.goToLearnArticle(context, article: article);
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.t.learn.failedToLoadArticle)),
+      );
+    }
   }
 }
