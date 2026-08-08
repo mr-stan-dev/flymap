@@ -333,8 +333,12 @@ class PreviewPreparationDelegate {
             _normalizeNonEmpty(fallbackFlightNumber),
         field: 'flightNumber',
       ),
-      airlineCode: _normalizeNonEmpty(summary?.airlineCode),
-      airlineName: _normalizeNonEmpty(summary?.airlineName),
+      airlineCode:
+          _normalizeNonEmpty(summary?.airlineCode) ??
+          _normalizeNonEmpty(_cubit.airlineCodeHint),
+      airlineName:
+          _normalizeNonEmpty(summary?.airlineName) ??
+          _normalizeNonEmpty(_cubit.airlineNameHint),
       originCode: _requireNonEmpty(
         _normalizeNonEmpty(summary?.origIcao) ??
             _normalizeNonEmpty(departureCode),

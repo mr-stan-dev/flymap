@@ -82,6 +82,8 @@ class _FoundRouteSearchViewState extends State<_FoundRouteSearchView> {
       arrival: arrival,
       flightNumber: number,
       fr24Id: _dateSelection?.fr24Id ?? flight.fr24Id,
+      airlineCodeHint: flight.airlineCode,
+      airlineNameHint: flight.airlineName,
       schedule: schedule,
       hasPendingFlightUnlock: screen?.widget.hasPendingFlightUnlock ?? false,
     );

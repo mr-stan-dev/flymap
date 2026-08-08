@@ -147,6 +147,8 @@ class AppRouter {
             final arrival = extra?['arrival'] as Airport?;
             final flightNumber = extra?['flightNumber'] as String?;
             final fr24Id = extra?['fr24Id'] as String?;
+            final airlineCodeHint = extra?['airlineCodeHint'] as String?;
+            final airlineNameHint = extra?['airlineNameHint'] as String?;
             final schedule = extra?['schedule'] as FlightSchedule?;
             final hasPendingFlightUnlock =
                 extra?['hasPendingFlightUnlock'] as bool? ?? false;
@@ -159,6 +161,8 @@ class AppRouter {
                 arrival: arrival,
                 flightNumber: flightNumber,
                 fr24Id: fr24Id,
+                airlineCodeHint: airlineCodeHint,
+                airlineNameHint: airlineNameHint,
                 schedule: schedule,
                 hasPendingFlightUnlock: hasPendingFlightUnlock,
               ),
@@ -173,8 +177,7 @@ class AppRouter {
           // Requires a Flight in extra (a deep link whose flight lookup failed
           // could arrive without one). Redirect home instead of crashing on a
           // null cast — this was the only route not guarding its extra.
-          redirect: (context, state) =>
-              flightRouteRedirectTarget(state.extra),
+          redirect: (context, state) => flightRouteRedirectTarget(state.extra),
           builder: (context, state) {
             final extra = state.extra! as Map<String, dynamic>;
             final flight = extra['flight']! as Flight;
@@ -361,6 +364,8 @@ class AppRouter {
     required Airport arrival,
     String? flightNumber,
     String? fr24Id,
+    String? airlineCodeHint,
+    String? airlineNameHint,
     FlightSchedule? schedule,
     bool hasPendingFlightUnlock = false,
   }) {
@@ -374,6 +379,12 @@ class AppRouter {
     }
     if (fr24Id != null && fr24Id.trim().isNotEmpty) {
       extra['fr24Id'] = fr24Id;
+    }
+    if (airlineCodeHint != null && airlineCodeHint.trim().isNotEmpty) {
+      extra['airlineCodeHint'] = airlineCodeHint;
+    }
+    if (airlineNameHint != null && airlineNameHint.trim().isNotEmpty) {
+      extra['airlineNameHint'] = airlineNameHint;
     }
     if (schedule != null) {
       extra['schedule'] = schedule;

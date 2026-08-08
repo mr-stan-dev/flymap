@@ -67,6 +67,8 @@ class _FlightNumberSearchScreenState extends State<FlightNumberSearchScreen> {
       arrival: arrival,
       flightNumber: number,
       fr24Id: _dateSelection?.fr24Id ?? candidate.fr24Id,
+      airlineCodeHint: candidate.airlineCode,
+      airlineNameHint: candidate.airlineName,
       schedule: schedule,
       hasPendingFlightUnlock: widget.hasPendingFlightUnlock,
     );

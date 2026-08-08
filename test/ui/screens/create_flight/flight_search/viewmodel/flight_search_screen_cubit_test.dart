@@ -427,6 +427,8 @@ void main() {
           departure: route.departure,
           arrival: route.arrival,
           flightNumber: 'XX123',
+          airlineCodeHint: 'XX',
+          airlineNameHint: 'Example Air',
           connectivityChecker: connectivityChecker,
           getRouteOverviewUseCase: routeOverviewUseCase,
           // FR24 has never recorded the route: the preview callable 404s.
@@ -458,6 +460,8 @@ void main() {
         expect(state.flightRoute, isNotNull);
         // ...and the flight identity survives the fallback.
         expect(state.flightOperationalData?.flightNumber, 'XX123');
+        expect(state.flightOperationalData?.airlineCode, 'XX');
+        expect(state.flightOperationalData?.airlineName, 'Example Air');
       },
     );
 
@@ -809,6 +813,8 @@ class _TestFlightPreviewCubit extends FlightPreviewCubit {
     required super.departure,
     required super.arrival,
     super.flightNumber,
+    super.airlineCodeHint,
+    super.airlineNameHint,
     super.schedule,
     super.fetchFlightWeatherUseCase,
     super.hasPendingFlightUnlock,

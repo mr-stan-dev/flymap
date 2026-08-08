@@ -4,8 +4,8 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flymap/logger.dart';
 
 /// Calls `search_upcoming_flights_by_number`: the 7-day scheduled-departure
-/// window for a flight number (AeroDataBox), each entry stitched to the most
-/// recent recorded FR24 leg so the preview pipeline works unchanged.
+/// window for a flight number (AeroDataBox). This app opts out of redundant
+/// historical FR24 enrichment; older backends safely retain their old behavior.
 class UpcomingFlightSearchApi {
   UpcomingFlightSearchApi({
     FirebaseFunctions? functions,
@@ -109,6 +109,10 @@ class UpcomingFlightSearchApi {
   }) async {
     final payload = <String, dynamic>{
       'flightNumber': normalizedFlightNumber,
+      // Historical identity is either already retained from the selected
+      // candidate or was unavailable in the preceding lookup. Older backends
+      // ignore this field; newer ones avoid repeating the summary query.
+      'includeHistorical': false,
       if (date != null) 'date': _formatDate(date),
     };
     final invokeCallable = _invokeCallable;

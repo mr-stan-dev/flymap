@@ -4,12 +4,18 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flymap/logger.dart';
 
 class FlightRoutePreviewApi {
-  FlightRoutePreviewApi({FirebaseFunctions? functions})
-    : _functions = functions;
+  FlightRoutePreviewApi({
+    FirebaseFunctions? functions,
+    Future<dynamic> Function(String function, Map<String, dynamic> payload)?
+    invokeCallable,
+  }) : _functions = functions,
+       _invokeCallable = invokeCallable;
 
   static const _function = 'build_flight_route_preview';
 
   final FirebaseFunctions? _functions;
+  final Future<dynamic> Function(String function, Map<String, dynamic> payload)?
+  _invokeCallable;
   final _logger = const Logger('FlightRoutePreviewApi');
 
   Future<Map<String, dynamic>> buildFlightRoutePreview({
@@ -32,7 +38,6 @@ class FlightRoutePreviewApi {
       'callable=$_function flightNumber=$normalizedFlightNumber fr24Id=${normalizedFr24Id ?? "-"} origCode=${normalizedOrigCode ?? "-"} destCode=${normalizedDestCode ?? "-"} placesLimit=$placesLimit regionsLimit=$regionsLimit lang=$lang',
     );
     try {
-      final functions = _functions ?? FirebaseFunctions.instance;
       final requestPayload = <String, dynamic>{
         'flightNumber': normalizedFlightNumber,
         'placesLimit': placesLimit,
@@ -41,6 +46,9 @@ class FlightRoutePreviewApi {
       };
       if (normalizedFr24Id != null) {
         requestPayload['fr24Id'] = normalizedFr24Id;
+        // The ID came from the selected backend search result, so a compatible
+        // backend can fetch its track directly. Older backends ignore this.
+        requestPayload['skipSummaryLookup'] = true;
       }
       if (normalizedOrigCode != null) {
         requestPayload['origCode'] = normalizedOrigCode;
@@ -48,8 +56,17 @@ class FlightRoutePreviewApi {
       if (normalizedDestCode != null) {
         requestPayload['destCode'] = normalizedDestCode;
       }
-      final result = await functions.httpsCallable(_function).call(requestPayload);
-      final decoded = _decodeFunctionData(result.data);
+      final invokeCallable = _invokeCallable;
+      final dynamic rawData;
+      if (invokeCallable != null) {
+        rawData = await invokeCallable(_function, requestPayload);
+      } else {
+        final functions = _functions ?? FirebaseFunctions.instance;
+        rawData =
+            (await functions.httpsCallable(_function).call(requestPayload))
+                .data;
+      }
+      final decoded = _decodeFunctionData(rawData);
       if (decoded is! Map) {
         throw const FormatException(
           'build_flight_route_preview returned non-object payload',

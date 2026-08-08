@@ -7,6 +7,8 @@ class FlightPreviewArgs {
     required this.arrival,
     this.flightNumber,
     this.fr24Id,
+    this.airlineCodeHint,
+    this.airlineNameHint,
     this.schedule,
     this.hasPendingFlightUnlock = false,
   });
@@ -15,6 +17,8 @@ class FlightPreviewArgs {
   final Airport arrival;
   final String? flightNumber;
   final String? fr24Id;
+  final String? airlineCodeHint;
+  final String? airlineNameHint;
 
   /// Schedule picked in the search step; null for dateless flights (a complete
   /// manual date and time can still be added on the weather step).
