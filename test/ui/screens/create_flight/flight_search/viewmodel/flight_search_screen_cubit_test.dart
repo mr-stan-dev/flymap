@@ -29,6 +29,7 @@ import 'package:flymap/domain/entity/user_flight_prefs.dart';
 import 'package:flymap/domain/entity/wiki_article_candidate.dart';
 import 'package:flymap/domain/policy/poi_limits_policy.dart';
 import 'package:flymap/domain/provider/weather_forecast_provider.dart';
+import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/flight_unlock_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
@@ -508,7 +509,9 @@ void main() {
       expect(cubit.state.flightInfo.poi.length, PoiLimitsPolicy.proMaxPois);
     });
 
-    test('region wiki resolution uses english language for download', () async {
+    test('region wiki resolution uses the current app language', () async {
+      await LocaleSettings.setLocale(AppLocale.es);
+      addTearDown(() => LocaleSettings.setLocaleSync(AppLocale.en));
       subscriptionRepository.isPro = true;
       cubit.setStateForTest(
         cubit.state.copyWith(
@@ -531,7 +534,7 @@ void main() {
 
       await cubit.startDownload();
 
-      expect(regionWikiDownloadUseCase.lastPreferredLanguageCode, 'en');
+      expect(regionWikiDownloadUseCase.lastPreferredLanguageCode, 'es');
     });
 
     test('free user downloads only ungated regions', () async {

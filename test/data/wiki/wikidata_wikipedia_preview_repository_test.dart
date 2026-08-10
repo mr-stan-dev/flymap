@@ -234,6 +234,52 @@ void main() {
       expect(summary.length, equals(veryLong.length));
     });
 
+    test('resolves a regional locale to its base Wikipedia edition', () async {
+      final apiClient = _FakeWikimediaApiClient((uri) {
+        if (uri.host == 'www.wikidata.org') {
+          return _json({
+            'entities': {
+              'Q2807': {
+                'sitelinks': {
+                  'eswiki': {'title': 'Madrid'},
+                  'enwiki': {'title': 'Madrid'},
+                },
+                'descriptions': {
+                  'es': {'value': 'capital de España'},
+                },
+              },
+            },
+          });
+        }
+
+        expect(uri.host, 'es.wikipedia.org');
+        if (uri.queryParameters['action'] == 'parse') {
+          return _wikipediaParseResponse(
+            html:
+                '<div><p>Madrid es la capital y la ciudad más poblada de España.</p></div>',
+          );
+        }
+        return _wikipediaExtractResponse(
+          title: 'Madrid',
+          extract: 'Madrid es la capital y la ciudad más poblada de España.',
+        );
+      });
+      final repository = WikidataWikipediaPreviewRepository(
+        apiClient: apiClient,
+      );
+
+      final result = await repository.batchGetWikiPreviews(
+        qids: const ['Q2807'],
+        preferredLanguageCode: 'es-MX',
+      );
+
+      expect(result['Q2807']?.languageCode, 'es');
+      expect(
+        result['Q2807']?.sourceUrl,
+        'https://es.wikipedia.org/wiki/Madrid',
+      );
+    });
+
     test('falls back to enwiki when preferred locale is unavailable', () async {
       final apiClient = _FakeWikimediaApiClient((uri) {
         if (uri.host == 'www.wikidata.org') {

@@ -3,6 +3,8 @@ import 'package:flymap/data/local/learn_pack_local_db.dart';
 import 'package:flymap/domain/entity/learn_access.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   test(
     'defaults category access to free when access field is absent',
     () async {
@@ -237,6 +239,33 @@ void main() {
     final content = await db.getArticleContent(articleId: 'a1');
     expect(content.title, 'Articulo en espanol');
     expect(content.markdown, '# Articulo en espanol');
+  });
+
+  test('resolves locale tags to localized learn assets', () {
+    expect(
+      LearnPackLocalDb.packAssetPathForLanguageCode('es-MX'),
+      'assets/data/learn/knowledge_pack.es.json',
+    );
+    expect(
+      LearnPackLocalDb.articlesAssetDirForLanguageCode('es_MX'),
+      'assets/data/learn/articles_es',
+    );
+    expect(
+      LearnPackLocalDb.articlesAssetDirForLanguageCode('fr-CA'),
+      'assets/data/learn/articles_fr',
+    );
+  });
+
+  test('loads a bundled Spanish learn article for es-MX', () async {
+    final db = LearnPackLocalDb(localeCodeProvider: () => 'es-MX');
+
+    final content = await db.getArticleContent(
+      articleId: 'why_planes_stay_in_the_air',
+    );
+
+    expect(content.title, 'Por qué los aviones se mantienen en el aire');
+    expect(content.markdown, startsWith('# Por qué los aviones'));
+    expect(content.markdown, contains('El aire siempre se está moviendo'));
   });
 
   test(

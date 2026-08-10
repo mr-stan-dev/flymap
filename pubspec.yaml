@@ -91,6 +91,9 @@ flutter:
     - assets/data/airports.csv # source: https://ourairports.com/data/ filtered by large and medium size in chatgpt
     - assets/data/learn/
     - assets/data/learn/articles/
+    - assets/data/learn/articles_es/
+    - assets/data/learn/articles_fr/
+    - assets/data/learn/articles_de/
     - assets/data/geo_quiz/
     - assets/data/geo_quiz/countries/
     - assets/data/geo_quiz/geography/

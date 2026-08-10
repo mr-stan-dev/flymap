@@ -1,7 +1,6 @@
 part of '../flight_preview_cubit.dart';
 
 class DownloadFlowDelegate {
-  static const _regionArticleLanguageCode = 'en';
   static const _accessModeBasic = 'basic';
   static const _accessModeSubscription = 'subscription';
   static const _accessModeSingleFlightUnlock = 'single_flight_unlock';
@@ -364,7 +363,7 @@ class DownloadFlowDelegate {
       try {
         final regionResult = await _downloadRegionWikiArticlesUseCase.call(
           regions: regionsToDownload,
-          preferredLanguageCode: _regionArticleLanguageCode,
+          preferredLanguageCode: AppLocalization.currentLanguageCode,
           onProgress: (progress) {
             if (_downloadCancelled || _cubit.isClosed) return;
             _cubit._emitState(
