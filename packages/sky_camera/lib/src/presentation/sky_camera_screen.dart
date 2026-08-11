@@ -9,6 +9,7 @@ import 'package:sky_camera/src/domain/observers/sky_camera_observer.dart';
 import 'package:sky_camera/src/domain/services/sky_camera_driver.dart';
 import 'package:sky_camera/src/domain/services/sky_camera_export_service.dart';
 import 'package:sky_camera/src/domain/services/sky_camera_overlay_snapshot_source.dart';
+import 'package:sky_camera/src/domain/services/sky_camera_resource_monitor.dart';
 import 'package:sky_camera/src/presentation/sky_camera_capture_coordinator.dart';
 import 'package:sky_camera/src/presentation/sky_camera_metrics_position.dart';
 import 'package:sky_camera/src/presentation/sky_camera_strings.dart';
@@ -36,6 +37,8 @@ class SkyCameraScreen extends StatefulWidget {
     required this.photoCropper,
     required this.openCapturePreview,
     this.onRecordAudioChanged,
+    this.resourceMonitor,
+    this.resourceCheckInterval = const Duration(seconds: 2),
     this.videoCaptureEnabled = true,
     super.key,
   });
@@ -56,6 +59,11 @@ class SkyCameraScreen extends StatefulWidget {
 
   /// Persists the record-audio preference after the driver applied it.
   final ValueChanged<bool>? onRecordAudioChanged;
+
+  /// Resource pressure is sampled before and during video recording. A
+  /// reported issue stops and saves the current clip.
+  final SkyCameraResourceMonitor? resourceMonitor;
+  final Duration resourceCheckInterval;
 
   /// When false the camera is photo-only: the capture-mode switch is hidden
   /// and video recording can never start (release feature gate).
@@ -96,6 +104,9 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   Duration _recordingElapsed = Duration.zero;
   Timer? _recordingTicker;
   Timer? _recordingAutoStop;
+  Timer? _recordingResourceTimer;
+  bool _isCheckingRecordingResources = false;
+  SkyCameraRecordingResourceIssue? _resourceStopIssue;
 
   @override
   void initState() {
@@ -109,6 +120,7 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
     WidgetsBinding.instance.removeObserver(this);
     _recordingTicker?.cancel();
     _recordingAutoStop?.cancel();
+    _recordingResourceTimer?.cancel();
     unawaited(_snapshotSubscription?.cancel());
     unawaited(widget.snapshotSource.dispose());
     unawaited(widget.driver.dispose());
@@ -456,6 +468,15 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
       _isStartingVideo = true;
       _errorMessage = null;
     });
+    final resourceIssue = await _currentRecordingResourceIssue();
+    if (!mounted) return;
+    if (resourceIssue != null) {
+      setState(() {
+        _isStartingVideo = false;
+        _errorMessage = _resourceIssueMessage(resourceIssue, stopped: false);
+      });
+      return;
+    }
     try {
       await widget.driver.startVideoRecording();
     } catch (error) {
@@ -481,6 +502,14 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
       SkyCameraMediaFormat.maxVideoDuration,
       () => unawaited(_stopVideoRecording()),
     );
+    final resourceCheckInterval = widget.resourceCheckInterval;
+    if (widget.resourceMonitor != null &&
+        resourceCheckInterval > Duration.zero) {
+      _recordingResourceTimer = Timer.periodic(
+        resourceCheckInterval,
+        (_) => unawaited(_checkRecordingResources()),
+      );
+    }
     setState(() {
       _isStartingVideo = false;
       _isRecordingVideo = true;
@@ -506,8 +535,11 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
     _isStoppingVideo = true;
     _recordingTicker?.cancel();
     _recordingAutoStop?.cancel();
+    _recordingResourceTimer?.cancel();
+    _recordingResourceTimer = null;
     final track = _trackRecorder.stop();
     final snapshot = track.isNotEmpty ? track.first.snapshot : _snapshot;
+    final resourceStopIssue = _resourceStopIssue;
     setState(() {
       _isRecordingVideo = false;
       _isCapturing = true;
@@ -522,6 +554,12 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
         _isCapturing = false;
         _sessionCaptures.add(saved);
         _lastCapture = saved;
+        if (resourceStopIssue != null) {
+          _errorMessage = _resourceIssueMessage(
+            resourceStopIssue,
+            stopped: true,
+          );
+        }
       });
     } catch (error, stackTrace) {
       debugPrint('SkyCamera video capture failed: $error');
@@ -533,7 +571,57 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
       });
     } finally {
       _isStoppingVideo = false;
+      if (_resourceStopIssue == resourceStopIssue) {
+        _resourceStopIssue = null;
+      }
     }
+  }
+
+  Future<SkyCameraRecordingResourceIssue?>
+  _currentRecordingResourceIssue() async {
+    final monitor = widget.resourceMonitor;
+    if (monitor == null) return null;
+    try {
+      return await monitor.currentIssue();
+    } catch (error) {
+      debugPrint('SkyCamera resource check failed: $error');
+      return null;
+    }
+  }
+
+  Future<void> _checkRecordingResources() async {
+    if (_isCheckingRecordingResources ||
+        !_isRecordingVideo ||
+        _isStoppingVideo) {
+      return;
+    }
+    _isCheckingRecordingResources = true;
+    try {
+      final issue = await _currentRecordingResourceIssue();
+      if (!mounted || issue == null || !_isRecordingVideo || _isStoppingVideo) {
+        return;
+      }
+      _resourceStopIssue = issue;
+      await _stopVideoRecording();
+    } finally {
+      _isCheckingRecordingResources = false;
+    }
+  }
+
+  String _resourceIssueMessage(
+    SkyCameraRecordingResourceIssue issue, {
+    required bool stopped,
+  }) {
+    return switch (issue) {
+      SkyCameraRecordingResourceIssue.lowStorage =>
+        stopped
+            ? widget.strings.lowStorageRecordingStopped
+            : widget.strings.lowStorageRecordingBlocked,
+      SkyCameraRecordingResourceIssue.deviceTooHot =>
+        stopped
+            ? widget.strings.hotDeviceRecordingStopped
+            : widget.strings.hotDeviceRecordingBlocked,
+    };
   }
 
   Future<void> _openSettings() async {

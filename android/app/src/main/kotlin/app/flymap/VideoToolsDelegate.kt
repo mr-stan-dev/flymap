@@ -1,9 +1,15 @@
 package app.flymap
 
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.BatteryManager
 import android.media.MediaMetadataRetriever
+import android.os.Build
+import android.os.PowerManager
+import android.os.StatFs
 import androidx.media3.common.Effect
 import androidx.media3.common.MediaItem
 import androidx.media3.common.audio.AudioProcessor
@@ -31,6 +37,7 @@ class VideoToolsDelegate(private val context: Context) {
   companion object {
     private const val channelName = "app.flymap/video_tools"
     private const val progressPollMs = 400L
+    private const val hotBatteryTemperatureTenthsCelsius = 450
   }
 
   /**
@@ -57,6 +64,7 @@ class VideoToolsDelegate(private val context: Context) {
       when (call.method) {
         "extractPoster" -> handleExtractPoster(call, result)
         "getVideoInfo" -> handleGetVideoInfo(call, result)
+        "getCaptureResourceStatus" -> handleGetCaptureResourceStatus(result)
         "burnOverlay" -> handleBurnOverlay(call, result)
         "cancelBurn" -> handleCancelBurn(result)
         else -> result.notImplemented()
@@ -131,6 +139,35 @@ class VideoToolsDelegate(private val context: Context) {
       result.error("video_info_failed", error.message, null)
     } finally {
       retriever.release()
+    }
+  }
+
+  private fun handleGetCaptureResourceStatus(result: MethodChannel.Result) {
+    try {
+      val availableStorageBytes = StatFs(context.filesDir.path).availableBytes
+      val isTooHot = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val powerManager = context.getSystemService(PowerManager::class.java)
+        (powerManager?.currentThermalStatus ?: PowerManager.THERMAL_STATUS_NONE) >=
+          PowerManager.THERMAL_STATUS_SEVERE
+      } else {
+        val batteryStatus = context.registerReceiver(
+          null,
+          IntentFilter(Intent.ACTION_BATTERY_CHANGED),
+        )
+        val batteryTemperature = batteryStatus?.getIntExtra(
+          BatteryManager.EXTRA_TEMPERATURE,
+          Int.MIN_VALUE,
+        ) ?: Int.MIN_VALUE
+        batteryTemperature >= hotBatteryTemperatureTenthsCelsius
+      }
+      result.success(
+        mapOf(
+          "availableStorageBytes" to availableStorageBytes,
+          "isTooHot" to isTooHot,
+        ),
+      )
+    } catch (error: Exception) {
+      result.error("resource_status_failed", error.message, null)
     }
   }
 

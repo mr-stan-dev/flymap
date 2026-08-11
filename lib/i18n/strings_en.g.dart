@@ -352,6 +352,18 @@ class TranslationsSkyCameraEn {
 	/// en: 'Microphone access is off — videos record without sound.'
 	String get microphonePermissionDenied => 'Microphone access is off — videos record without sound.';
 
+	/// en: 'Free up storage before recording a video.'
+	String get lowStorageRecordingBlocked => 'Free up storage before recording a video.';
+
+	/// en: 'Recording stopped and was saved because storage is almost full.'
+	String get lowStorageRecordingStopped => 'Recording stopped and was saved because storage is almost full.';
+
+	/// en: 'Your device is too hot to record. Let it cool down and try again.'
+	String get hotDeviceRecordingBlocked => 'Your device is too hot to record. Let it cool down and try again.';
+
+	/// en: 'Recording stopped and was saved because your device is too hot.'
+	String get hotDeviceRecordingStopped => 'Recording stopped and was saved because your device is too hot.';
+
 	/// en: 'Preparing video…'
 	String get preparingVideo => 'Preparing video…';
 }
@@ -4094,6 +4106,10 @@ extension on Translations {
 			'skyCamera.recordAudio' => 'Record audio',
 			'skyCamera.recordAudioHint' => 'Videos capture microphone sound.',
 			'skyCamera.microphonePermissionDenied' => 'Microphone access is off — videos record without sound.',
+			'skyCamera.lowStorageRecordingBlocked' => 'Free up storage before recording a video.',
+			'skyCamera.lowStorageRecordingStopped' => 'Recording stopped and was saved because storage is almost full.',
+			'skyCamera.hotDeviceRecordingBlocked' => 'Your device is too hot to record. Let it cool down and try again.',
+			'skyCamera.hotDeviceRecordingStopped' => 'Recording stopped and was saved because your device is too hot.',
 			'skyCamera.preparingVideo' => 'Preparing video…',
 			'media.title' => 'Window Seat Media',
 			'media.loading' => 'Loading media...',
@@ -4511,12 +4527,12 @@ extension on Translations {
 			'createFlight.overview.fullSummary' => 'Full summary',
 			'createFlight.overview.routeSummaryTitle' => 'Route Summary',
 			'createFlight.overview.routeSummaryDistanceLabel' => 'Distance',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.routeSummaryDurationLabel' => 'Duration',
 			'createFlight.overview.routeSummaryRegionsLabel' => 'Regions',
 			'createFlight.overview.routeSummaryRegionsTitle' => 'You\'ll fly over',
 			'createFlight.overview.routeSummaryPlacesLabel' => 'Places',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.routeSummaryTimelineTitle' => 'Timeline',
 			'createFlight.overview.routeSummaryPlacesTitle' => 'Places along the route',
 			'createFlight.overview.routeSummaryPoiSearchHint' => 'Search places',
@@ -5025,13 +5041,13 @@ extension on Translations {
 			'countries.DO' => 'Dominican Republic',
 			'countries.DZ' => 'Algeria',
 			'countries.EC' => 'Ecuador',
+			_ => null,
+		} ?? switch (path) {
 			'countries.EE' => 'Estonia',
 			'countries.EG' => 'Egypt',
 			'countries.EH' => 'Western Sahara',
 			'countries.ER' => 'Eritrea',
 			'countries.ES' => 'Spain',
-			_ => null,
-		} ?? switch (path) {
 			'countries.ET' => 'Ethiopia',
 			'countries.FI' => 'Finland',
 			'countries.FJ' => 'Fiji',

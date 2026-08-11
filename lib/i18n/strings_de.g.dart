@@ -172,6 +172,10 @@ class _TranslationsSkyCameraDe extends TranslationsSkyCameraEn {
 	@override String get recordAudio => 'Ton aufnehmen';
 	@override String get recordAudioHint => 'Videos nehmen Mikrofonton auf.';
 	@override String get microphonePermissionDenied => 'Mikrofonzugriff ist aus — Videos werden ohne Ton aufgenommen.';
+	@override String get lowStorageRecordingBlocked => 'Gib Speicherplatz frei, bevor du ein Video aufnimmst.';
+	@override String get lowStorageRecordingStopped => 'Die Aufnahme wurde gestoppt und gespeichert, weil der Speicher fast voll ist.';
+	@override String get hotDeviceRecordingBlocked => 'Dein Gerät ist zu heiß für eine Aufnahme. Lass es abkühlen und versuche es erneut.';
+	@override String get hotDeviceRecordingStopped => 'Die Aufnahme wurde gestoppt und gespeichert, weil dein Gerät zu heiß ist.';
 	@override String get preparingVideo => 'Video wird vorbereitet…';
 }
 
@@ -1768,6 +1772,10 @@ extension on TranslationsDe {
 			'skyCamera.recordAudio' => 'Ton aufnehmen',
 			'skyCamera.recordAudioHint' => 'Videos nehmen Mikrofonton auf.',
 			'skyCamera.microphonePermissionDenied' => 'Mikrofonzugriff ist aus — Videos werden ohne Ton aufgenommen.',
+			'skyCamera.lowStorageRecordingBlocked' => 'Gib Speicherplatz frei, bevor du ein Video aufnimmst.',
+			'skyCamera.lowStorageRecordingStopped' => 'Die Aufnahme wurde gestoppt und gespeichert, weil der Speicher fast voll ist.',
+			'skyCamera.hotDeviceRecordingBlocked' => 'Dein Gerät ist zu heiß für eine Aufnahme. Lass es abkühlen und versuche es erneut.',
+			'skyCamera.hotDeviceRecordingStopped' => 'Die Aufnahme wurde gestoppt und gespeichert, weil dein Gerät zu heiß ist.',
 			'skyCamera.preparingVideo' => 'Video wird vorbereitet…',
 			'media.title' => 'Medien vom Fensterplatz',
 			'media.loading' => 'Medien werden geladen...',
@@ -2185,12 +2193,12 @@ extension on TranslationsDe {
 			'createFlight.overview.fullSummary' => 'Vollständige Zusammenfassung',
 			'createFlight.overview.routeSummaryTitle' => 'Routenzusammenfassung',
 			'createFlight.overview.routeSummaryDistanceLabel' => 'Distanz',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.routeSummaryDurationLabel' => 'Dauer',
 			'createFlight.overview.routeSummaryRegionsLabel' => 'Regionen',
 			'createFlight.overview.routeSummaryRegionsTitle' => 'Du fliegst über',
 			'createFlight.overview.routeSummaryPlacesLabel' => 'Orte',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.routeSummaryTimelineTitle' => 'Zeitachse',
 			'createFlight.overview.routeSummaryPlacesTitle' => 'Orte entlang der Route',
 			'createFlight.overview.routeSummaryPoiSearchHint' => 'Orte suchen',
@@ -2699,13 +2707,13 @@ extension on TranslationsDe {
 			'countries.DO' => 'Dominikanische Republik',
 			'countries.DZ' => 'Algerien',
 			'countries.EC' => 'Ecuador',
+			_ => null,
+		} ?? switch (path) {
 			'countries.EE' => 'Estland',
 			'countries.EG' => 'Ägypten',
 			'countries.EH' => 'Westsahara',
 			'countries.ER' => 'Eritrea',
 			'countries.ES' => 'Spanien',
-			_ => null,
-		} ?? switch (path) {
 			'countries.ET' => 'Äthiopien',
 			'countries.FI' => 'Finnland',
 			'countries.FJ' => 'Fidschi',

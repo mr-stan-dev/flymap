@@ -89,6 +89,96 @@ void main() {
     );
   });
 
+  for (final testCase
+      in <
+        ({SkyCameraRecordingResourceIssue issue, String label, String message})
+      >[
+        (
+          issue: SkyCameraRecordingResourceIssue.lowStorage,
+          label: 'low storage',
+          message: _strings.lowStorageRecordingStopped,
+        ),
+        (
+          issue: SkyCameraRecordingResourceIssue.deviceTooHot,
+          label: 'device heat',
+          message: _strings.hotDeviceRecordingStopped,
+        ),
+      ]) {
+    testWidgets('${testCase.label} stops and saves the active video', (
+      tester,
+    ) async {
+      final driver = _FakeSkyCameraDriver();
+      final exportService = _FakeExportService();
+      final resourceMonitor = _FakeResourceMonitor([null, testCase.issue]);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: SkyCameraScreen(
+            driver: driver,
+            snapshotSource: const _FakeSnapshotSource(),
+            exportService: exportService,
+            observer: const _FakeObserver(),
+            photoCropper: const _FakePhotoCropper(),
+            openCapturePreview: _openFakeCapturePreview,
+            overlayComposer: const SkyCameraOverlayComposer(),
+            strings: _strings,
+            resourceMonitor: resourceMonitor,
+            resourceCheckInterval: const Duration(milliseconds: 100),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('sky_camera.mode_video')));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+      await tester.pump();
+      expect(driver.isRecordingVideo, isTrue);
+
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle();
+
+      expect(driver.didStopVideo, isTrue);
+      expect(exportService.didSave, isTrue);
+      expect(find.text(testCase.message), findsOneWidget);
+      expect(
+        find.byKey(const Key('sky_camera.last_capture_thumbnail')),
+        findsOneWidget,
+      );
+    });
+  }
+
+  testWidgets('resource pressure blocks a new video before capture starts', (
+    tester,
+  ) async {
+    final driver = _FakeSkyCameraDriver();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SkyCameraScreen(
+          driver: driver,
+          snapshotSource: const _FakeSnapshotSource(),
+          exportService: _FakeExportService(),
+          observer: const _FakeObserver(),
+          photoCropper: const _FakePhotoCropper(),
+          openCapturePreview: _openFakeCapturePreview,
+          overlayComposer: const SkyCameraOverlayComposer(),
+          strings: _strings,
+          resourceMonitor: _FakeResourceMonitor([
+            SkyCameraRecordingResourceIssue.lowStorage,
+          ]),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('sky_camera.mode_video')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.pumpAndSettle();
+
+    expect(driver.didStartVideo, isFalse);
+    expect(find.text(_strings.lowStorageRecordingBlocked), findsOneWidget);
+  });
+
   testWidgets('locks capture and mode controls while video start is pending', (
     tester,
   ) async {
@@ -1206,6 +1296,18 @@ class _FakeSnapshotSource implements SkyCameraOverlaySnapshotSource {
   @override
   Stream<SkyCameraOverlaySnapshot> watch() {
     return Stream<SkyCameraOverlaySnapshot>.value(snapshot ?? _testSnapshot());
+  }
+}
+
+class _FakeResourceMonitor implements SkyCameraResourceMonitor {
+  _FakeResourceMonitor(this._issues);
+
+  final List<SkyCameraRecordingResourceIssue?> _issues;
+
+  @override
+  Future<SkyCameraRecordingResourceIssue?> currentIssue() async {
+    if (_issues.isEmpty) return null;
+    return _issues.removeAt(0);
   }
 }
 

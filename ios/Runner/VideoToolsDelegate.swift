@@ -28,6 +28,8 @@ final class VideoToolsDelegate {
       extractPoster(call: call, result: result)
     case "getVideoInfo":
       getVideoInfo(call: call, result: result)
+    case "getCaptureResourceStatus":
+      getCaptureResourceStatus(result: result)
     case "burnOverlay":
       burnOverlay(call: call, result: result)
     case "cancelBurn":
@@ -87,6 +89,22 @@ final class VideoToolsDelegate {
       "height": Int(abs(size.height).rounded()),
       "durationMs": Int(CMTimeGetSeconds(asset.duration) * 1000),
     ])
+  }
+
+  private func getCaptureResourceStatus(result: @escaping FlutterResult) {
+    let thermalState = ProcessInfo.processInfo.thermalState
+    var status: [String: Any] = [
+      "isTooHot": thermalState == .serious || thermalState == .critical,
+    ]
+    if
+      let attributes = try? FileManager.default.attributesOfFileSystem(
+        forPath: NSHomeDirectory()
+      ),
+      let availableStorageBytes = attributes[.systemFreeSize] as? NSNumber
+    {
+      status["availableStorageBytes"] = availableStorageBytes.int64Value
+    }
+    result(status)
   }
 
   private func burnOverlay(call: FlutterMethodCall, result: @escaping FlutterResult) {

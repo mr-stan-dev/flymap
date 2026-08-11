@@ -36,6 +36,14 @@ class SkyCameraStrings {
     this.recordAudioHint = 'Videos capture microphone sound.',
     this.microphonePermissionDenied =
         'Microphone access is off — videos record without sound.',
+    this.lowStorageRecordingBlocked =
+        'Free up storage before recording a video.',
+    this.lowStorageRecordingStopped =
+        'Recording stopped and was saved because storage is almost full.',
+    this.hotDeviceRecordingBlocked =
+        'Your device is too hot to record. Let it cool down and try again.',
+    this.hotDeviceRecordingStopped =
+        'Recording stopped and was saved because your device is too hot.',
   });
 
   final String loadingCamera;
@@ -65,4 +73,8 @@ class SkyCameraStrings {
   final String recordAudio;
   final String recordAudioHint;
   final String microphonePermissionDenied;
+  final String lowStorageRecordingBlocked;
+  final String lowStorageRecordingStopped;
+  final String hotDeviceRecordingBlocked;
+  final String hotDeviceRecordingStopped;
 }

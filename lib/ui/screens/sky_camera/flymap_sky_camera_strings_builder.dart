@@ -39,6 +39,10 @@ class FlymapSkyCameraStringsBuilder {
     final recordAudio = skyCameraT.recordAudio;
     final recordAudioHint = skyCameraT.recordAudioHint;
     final microphonePermissionDenied = skyCameraT.microphonePermissionDenied;
+    final lowStorageRecordingBlocked = skyCameraT.lowStorageRecordingBlocked;
+    final lowStorageRecordingStopped = skyCameraT.lowStorageRecordingStopped;
+    final hotDeviceRecordingBlocked = skyCameraT.hotDeviceRecordingBlocked;
+    final hotDeviceRecordingStopped = skyCameraT.hotDeviceRecordingStopped;
 
     final metricUnits = GetIt.I<MetricUnitsRepository>();
     final altitudeUnit = await metricUnits.getAltitudeUnit();
@@ -82,6 +86,10 @@ class FlymapSkyCameraStringsBuilder {
       recordAudio: recordAudio,
       recordAudioHint: recordAudioHint,
       microphonePermissionDenied: microphonePermissionDenied,
+      lowStorageRecordingBlocked: lowStorageRecordingBlocked,
+      lowStorageRecordingStopped: lowStorageRecordingStopped,
+      hotDeviceRecordingBlocked: hotDeviceRecordingBlocked,
+      hotDeviceRecordingStopped: hotDeviceRecordingStopped,
     );
   }
 }

@@ -63,6 +63,7 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
       exportService: session.exportService,
       observer: session.observer,
       videoCaptureEnabled: FeatureFlags.skyCameraVideoCapture,
+      resourceMonitor: const DeviceSkyCameraResourceMonitor(),
       overlayComposer: const SkyCameraOverlayComposer(),
       photoCropper: const SkyCameraPhotoCropper(),
       openCapturePreview: _openCapturePreview,
@@ -98,6 +99,14 @@ class _FlymapSkyCameraScreenState extends State<FlymapSkyCameraScreen> {
         recordAudioHint: context.t.skyCamera.recordAudioHint,
         microphonePermissionDenied:
             context.t.skyCamera.microphonePermissionDenied,
+        lowStorageRecordingBlocked:
+            context.t.skyCamera.lowStorageRecordingBlocked,
+        lowStorageRecordingStopped:
+            context.t.skyCamera.lowStorageRecordingStopped,
+        hotDeviceRecordingBlocked:
+            context.t.skyCamera.hotDeviceRecordingBlocked,
+        hotDeviceRecordingStopped:
+            context.t.skyCamera.hotDeviceRecordingStopped,
       ),
     );
   }

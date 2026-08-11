@@ -97,6 +97,10 @@
     "recordAudio": "Enregistrer le son",
     "recordAudioHint": "Les vidéos capturent le son du micro.",
     "microphonePermissionDenied": "L'accès au micro est désactivé — les vidéos sont enregistrées sans son.",
+    "lowStorageRecordingBlocked": "Libérez de l’espace avant d’enregistrer une vidéo.",
+    "lowStorageRecordingStopped": "L’enregistrement a été arrêté et sauvegardé, car l’espace de stockage est presque plein.",
+    "hotDeviceRecordingBlocked": "Votre appareil est trop chaud pour enregistrer. Laissez-le refroidir, puis réessayez.",
+    "hotDeviceRecordingStopped": "L’enregistrement a été arrêté et sauvegardé, car votre appareil est trop chaud.",
     "preparingVideo": "Préparation de la vidéo…"
   },
   "media": {

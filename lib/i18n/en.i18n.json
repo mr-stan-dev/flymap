@@ -97,6 +97,10 @@
     "recordAudio": "Record audio",
     "recordAudioHint": "Videos capture microphone sound.",
     "microphonePermissionDenied": "Microphone access is off — videos record without sound.",
+    "lowStorageRecordingBlocked": "Free up storage before recording a video.",
+    "lowStorageRecordingStopped": "Recording stopped and was saved because storage is almost full.",
+    "hotDeviceRecordingBlocked": "Your device is too hot to record. Let it cool down and try again.",
+    "hotDeviceRecordingStopped": "Recording stopped and was saved because your device is too hot.",
     "preparingVideo": "Preparing video…"
   },
   "media": {

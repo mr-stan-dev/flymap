@@ -97,6 +97,10 @@
     "recordAudio": "Grabar audio",
     "recordAudioHint": "Los vídeos capturan el sonido del micrófono.",
     "microphonePermissionDenied": "El acceso al micrófono está desactivado: los vídeos se graban sin sonido.",
+    "lowStorageRecordingBlocked": "Libera espacio antes de grabar un vídeo.",
+    "lowStorageRecordingStopped": "La grabación se detuvo y se guardó porque el almacenamiento está casi lleno.",
+    "hotDeviceRecordingBlocked": "El dispositivo está demasiado caliente para grabar. Deja que se enfríe e inténtalo de nuevo.",
+    "hotDeviceRecordingStopped": "La grabación se detuvo y se guardó porque el dispositivo está demasiado caliente.",
     "preparingVideo": "Preparando el vídeo…"
   },
   "media": {
