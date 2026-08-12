@@ -175,6 +175,24 @@ void main() {
     expect(find.byKey(homeSettingsTabKey), findsOneWidget);
   });
 
+  testWidgets('refreshes flight cards when the app resumes', (tester) async {
+    final repository = _CountingFlightRepository();
+    await GetIt.I.unregister<FlightRepository>();
+    GetIt.I.registerSingleton<FlightRepository>(repository);
+
+    await tester.pumpWidget(_testApp());
+    await _pumpForInitialLoad(tester);
+    final callsBeforeResume = repository.getAllFlightsCalls;
+    expect(callsBeforeResume, greaterThanOrEqualTo(1));
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+
+    expect(repository.getAllFlightsCalls, callsBeforeResume + 1);
+  });
+
   testWidgets('switches to Learn tab and keeps app stable', (tester) async {
     await tester.pumpWidget(_testApp());
     await _pumpForInitialLoad(tester);
@@ -658,6 +676,16 @@ class _DelayedFlightRepository extends _FakeFlightRepository {
 
   @override
   Future<List<Flight>> getAllFlights() => flightsCompleter.future;
+}
+
+class _CountingFlightRepository extends _FakeFlightRepository {
+  int getAllFlightsCalls = 0;
+
+  @override
+  Future<List<Flight>> getAllFlights() async {
+    getAllFlightsCalls++;
+    return super.getAllFlights();
+  }
 }
 
 class _FakeConnectivityChecker extends ConnectivityChecker {

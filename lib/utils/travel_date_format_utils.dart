@@ -11,6 +11,8 @@ import 'package:intl/intl.dart';
 class TravelDateFormatUtils {
   const TravelDateFormatUtils._();
 
+  static const int _maxRelativeCountdownDays = 7;
+
   static String get _locale => LocaleSettings.currentLocale.languageCode;
 
   /// "Mon, Aug 3" (US) / "Mon, 3 Aug" (international) — weekday + short date,
@@ -76,14 +78,14 @@ class TravelDateFormatUtils {
     return weatherT.updatedRelative(relative: relative);
   }
 
-  /// Provider schedule as a plain time, or a user-supplied time prefixed by
-  /// `~` so summary surfaces keep the precision honest.
+  /// Departure time for display, whether provider-supplied or entered by the
+  /// user. The source affects forecast handling, not how the time is shown.
   static String? formatScheduleDepartureTime(FlightSchedule? schedule) {
     if (schedule == null) return null;
     final scheduled = schedule.departureLocal;
     if (scheduled != null) return formatTime(scheduled);
-    final approximate = schedule.approximateDepartureLocal;
-    return approximate == null ? null : '~${formatTime(approximate)}';
+    final userEntered = schedule.approximateDepartureLocal;
+    return userEntered == null ? null : formatTime(userEntered);
   }
 
   /// "Mon, Aug 3 · 09:15" when a time is known, date alone otherwise.
@@ -97,17 +99,18 @@ class TravelDateFormatUtils {
     return '$formattedDate · ${formatTime(time)}';
   }
 
-  /// Home-card countdown: "Today · 09:15" / "Tomorrow" / "In 3 days";
-  /// past dates fall back to the plain date ("Mon, Jul 20"). Null when the
-  /// flight has no schedule.
+  /// Home-card countdown: "Today · 09:15" / "Tomorrow" / "In 3 days".
+  /// Dates more than a week away, and past dates, use the user's configured
+  /// short-date format instead. Null when the flight has no schedule.
   static String? countdownLabel(
     FlightSchedule? schedule,
-    DateDisplayFormat format,
-  ) {
+    DateDisplayFormat format, {
+    DateTime? now,
+  }) {
     if (schedule == null) return null;
     final dateT = t.createFlight.travelDate;
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
+    final current = now ?? DateTime.now();
+    final today = DateTime(current.year, current.month, current.day);
     final daysAway = schedule.travelDate.difference(today).inDays;
     if (daysAway == 0) {
       final departureTime = formatScheduleDepartureTime(schedule);
@@ -115,8 +118,15 @@ class TravelDateFormatUtils {
           ? dateT.today
           : '${dateT.today} · $departureTime';
     }
-    if (daysAway == 1) return dateT.tomorrow;
-    if (daysAway > 1) return dateT.inDays(count: daysAway);
+    if (daysAway == 1) {
+      final departureTime = formatScheduleDepartureTime(schedule);
+      return departureTime == null
+          ? dateT.tomorrow
+          : '${dateT.tomorrow} · $departureTime';
+    }
+    if (daysAway > 1 && daysAway <= _maxRelativeCountdownDays) {
+      return dateT.inDays(count: daysAway);
+    }
     return formatShortDate(schedule.travelDate, format);
   }
 }

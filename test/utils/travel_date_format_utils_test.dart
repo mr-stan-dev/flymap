@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/units.dart';
+import 'package:flymap/domain/entity/zoned_instant.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/utils/travel_date_format_utils.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -117,28 +118,100 @@ void main() {
   });
 
   group('TravelDateFormatUtils.formatScheduleDepartureTime', () {
-    test('marks a user-supplied departure time as approximate', () {
-      final schedule = FlightSchedule.approximate(
-        date,
-        departureTime: ApproximateDepartureTime.forPeriod(
-          ApproximateDeparturePeriod.morning,
+    test(
+      'shows a user-supplied departure time without an approximation mark',
+      () {
+        final schedule = FlightSchedule.approximate(
+          date,
+          departureTime: ApproximateDepartureTime.forPeriod(
+            ApproximateDeparturePeriod.morning,
+          ),
+        );
+
+        expect(
+          TravelDateFormatUtils.formatScheduleDepartureTime(schedule),
+          '08:00',
+        );
+      },
+    );
+  });
+
+  group('TravelDateFormatUtils.countdownLabel', () {
+    final now = DateTime(2026, 8, 12, 15, 30);
+
+    test('shows departure time for tomorrow when available', () {
+      final schedule = FlightSchedule(
+        travelDate: DateTime(2026, 8, 13),
+        departure: ZonedInstant(
+          utc: DateTime.utc(2026, 8, 13, 8, 15),
+          offsetMinutes: 60,
         ),
       );
 
       expect(
-        TravelDateFormatUtils.formatScheduleDepartureTime(schedule),
-        '~08:00',
+        TravelDateFormatUtils.countdownLabel(
+          schedule,
+          DateDisplayFormat.us,
+          now: now,
+        ),
+        'Tomorrow · 09:15',
       );
     });
-  });
 
-  group('TravelDateFormatUtils.countdownLabel', () {
+    test('keeps tomorrow without a time for date-only schedules', () {
+      final schedule = FlightSchedule(travelDate: DateTime(2026, 8, 13));
+
+      expect(
+        TravelDateFormatUtils.countdownLabel(
+          schedule,
+          DateDisplayFormat.us,
+          now: now,
+        ),
+        'Tomorrow',
+      );
+    });
+
+    test('uses relative labels for flights up to a week away', () {
+      final schedule = FlightSchedule(travelDate: DateTime(2026, 8, 19));
+
+      expect(
+        TravelDateFormatUtils.countdownLabel(
+          schedule,
+          DateDisplayFormat.us,
+          now: now,
+        ),
+        'In 7 days',
+      );
+    });
+
+    test('uses configured date format for a flight 19 days away', () {
+      final schedule = FlightSchedule(travelDate: DateTime(2026, 8, 31));
+
+      expect(
+        TravelDateFormatUtils.countdownLabel(
+          schedule,
+          DateDisplayFormat.us,
+          now: now,
+        ),
+        'Mon, Aug 31',
+      );
+      expect(
+        TravelDateFormatUtils.countdownLabel(
+          schedule,
+          DateDisplayFormat.international,
+          now: now,
+        ),
+        'Mon, 31 Aug',
+      );
+    });
+
     test('past-date fallback follows the date-format setting', () {
       final schedule = FlightSchedule(travelDate: DateTime(2020, 8, 3));
       expect(
         TravelDateFormatUtils.countdownLabel(
           schedule,
           DateDisplayFormat.international,
+          now: now,
         ),
         'Mon, 3 Aug',
       );
