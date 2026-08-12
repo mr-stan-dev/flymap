@@ -995,7 +995,7 @@ class _TranslationsCreateFlightWeatherEs extends TranslationsCreateFlightWeather
 	@override String get verdictClearBody => 'El asiento de ventanilla merece la pena: el suelo debería verse casi todo el vuelo.';
 	@override String get verdictPatchyTitle => 'Nubes dispersas';
 	@override String get verdictPatchyBody => 'Las vistas irán y vendrán entre las nubes.';
-	@override String get verdictCarpetTitle => 'Manto de nubes debajo';
+	@override String get verdictCarpetTitle => 'Manto de nubes';
 	@override String get verdictCarpetBody => 'Un mar blanco de nubes bajo el avión: precioso, pero el suelo quedará casi siempre oculto.';
 	@override String get verdictOvercastTitle => 'Cielo cubierto';
 	@override String get verdictOvercastBody => 'Las mejores vistas serán en el despegue y el aterrizaje.';
@@ -2049,7 +2049,7 @@ extension on TranslationsEs {
 			'createFlight.weather.verdictClearBody' => 'El asiento de ventanilla merece la pena: el suelo debería verse casi todo el vuelo.',
 			'createFlight.weather.verdictPatchyTitle' => 'Nubes dispersas',
 			'createFlight.weather.verdictPatchyBody' => 'Las vistas irán y vendrán entre las nubes.',
-			'createFlight.weather.verdictCarpetTitle' => 'Manto de nubes debajo',
+			'createFlight.weather.verdictCarpetTitle' => 'Manto de nubes',
 			'createFlight.weather.verdictCarpetBody' => 'Un mar blanco de nubes bajo el avión: precioso, pero el suelo quedará casi siempre oculto.',
 			'createFlight.weather.verdictOvercastTitle' => 'Cielo cubierto',
 			'createFlight.weather.verdictOvercastBody' => 'Las mejores vistas serán en el despegue y el aterrizaje.',

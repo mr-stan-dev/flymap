@@ -995,7 +995,7 @@ class _TranslationsCreateFlightWeatherDe extends TranslationsCreateFlightWeather
 	@override String get verdictClearBody => 'Der Fensterplatz lohnt sich — der Boden sollte fast den ganzen Flug sichtbar sein.';
 	@override String get verdictPatchyTitle => 'Aufgelockerte Bewölkung';
 	@override String get verdictPatchyBody => 'Die Sicht kommt und geht zwischen den Wolken.';
-	@override String get verdictCarpetTitle => 'Wolkenteppich unter dir';
+	@override String get verdictCarpetTitle => 'Wolkenteppich';
 	@override String get verdictCarpetBody => 'Ein weißes Wolkenmeer unter dir — wunderschön, aber der Boden bleibt meist verborgen.';
 	@override String get verdictOvercastTitle => 'Bedeckter Himmel';
 	@override String get verdictOvercastBody => 'Die beste Sicht gibt es bei Start und Landung.';
@@ -2049,7 +2049,7 @@ extension on TranslationsDe {
 			'createFlight.weather.verdictClearBody' => 'Der Fensterplatz lohnt sich — der Boden sollte fast den ganzen Flug sichtbar sein.',
 			'createFlight.weather.verdictPatchyTitle' => 'Aufgelockerte Bewölkung',
 			'createFlight.weather.verdictPatchyBody' => 'Die Sicht kommt und geht zwischen den Wolken.',
-			'createFlight.weather.verdictCarpetTitle' => 'Wolkenteppich unter dir',
+			'createFlight.weather.verdictCarpetTitle' => 'Wolkenteppich',
 			'createFlight.weather.verdictCarpetBody' => 'Ein weißes Wolkenmeer unter dir — wunderschön, aber der Boden bleibt meist verborgen.',
 			'createFlight.weather.verdictOvercastTitle' => 'Bedeckter Himmel',
 			'createFlight.weather.verdictOvercastBody' => 'Die beste Sicht gibt es bei Start und Landung.',

@@ -2434,8 +2434,8 @@ class TranslationsCreateFlightWeatherEn {
 	/// en: 'Views will come and go between the clouds.'
 	String get verdictPatchyBody => 'Views will come and go between the clouds.';
 
-	/// en: 'Cloud carpet below'
-	String get verdictCarpetTitle => 'Cloud carpet below';
+	/// en: 'Cloud carpet'
+	String get verdictCarpetTitle => 'Cloud carpet';
 
 	/// en: 'A white sea of clouds beneath you — beautiful, but the ground will mostly stay hidden.'
 	String get verdictCarpetBody => 'A white sea of clouds beneath you — beautiful, but the ground will mostly stay hidden.';
@@ -4383,7 +4383,7 @@ extension on Translations {
 			'createFlight.weather.verdictClearBody' => 'Window seat worth it — the ground should be visible for most of the flight.',
 			'createFlight.weather.verdictPatchyTitle' => 'Patchy clouds',
 			'createFlight.weather.verdictPatchyBody' => 'Views will come and go between the clouds.',
-			'createFlight.weather.verdictCarpetTitle' => 'Cloud carpet below',
+			'createFlight.weather.verdictCarpetTitle' => 'Cloud carpet',
 			'createFlight.weather.verdictCarpetBody' => 'A white sea of clouds beneath you — beautiful, but the ground will mostly stay hidden.',
 			'createFlight.weather.verdictOvercastTitle' => 'Overcast skies',
 			'createFlight.weather.verdictOvercastBody' => 'Best views at takeoff and landing.',

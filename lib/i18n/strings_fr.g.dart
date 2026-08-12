@@ -995,7 +995,7 @@ class _TranslationsCreateFlightWeatherFr extends TranslationsCreateFlightWeather
 	@override String get verdictClearBody => 'Le hublot vaut le coup — le sol devrait être visible pendant presque tout le vol.';
 	@override String get verdictPatchyTitle => 'Nuages épars';
 	@override String get verdictPatchyBody => 'Les vues iront et viendront entre les nuages.';
-	@override String get verdictCarpetTitle => 'Tapis de nuages en dessous';
+	@override String get verdictCarpetTitle => 'Tapis de nuages';
 	@override String get verdictCarpetBody => 'Une mer de nuages blancs sous vous — magnifique, mais le sol restera le plus souvent caché.';
 	@override String get verdictOvercastTitle => 'Ciel couvert';
 	@override String get verdictOvercastBody => 'Les plus belles vues seront au décollage et à l\'atterrissage.';
@@ -2049,7 +2049,7 @@ extension on TranslationsFr {
 			'createFlight.weather.verdictClearBody' => 'Le hublot vaut le coup — le sol devrait être visible pendant presque tout le vol.',
 			'createFlight.weather.verdictPatchyTitle' => 'Nuages épars',
 			'createFlight.weather.verdictPatchyBody' => 'Les vues iront et viendront entre les nuages.',
-			'createFlight.weather.verdictCarpetTitle' => 'Tapis de nuages en dessous',
+			'createFlight.weather.verdictCarpetTitle' => 'Tapis de nuages',
 			'createFlight.weather.verdictCarpetBody' => 'Une mer de nuages blancs sous vous — magnifique, mais le sol restera le plus souvent caché.',
 			'createFlight.weather.verdictOvercastTitle' => 'Ciel couvert',
 			'createFlight.weather.verdictOvercastBody' => 'Les plus belles vues seront au décollage et à l\'atterrissage.',
