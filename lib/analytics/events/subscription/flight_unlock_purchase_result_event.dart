@@ -2,7 +2,8 @@ import 'package:flymap/analytics/events/analytics_event.dart';
 import 'package:flymap/subscription/paywall_source.dart';
 import 'package:flymap/subscription/flight_unlock_purchase_result.dart';
 
-class FlightUnlockPurchaseResultEvent extends FirebaseAnalyticsEvent {
+class FlightUnlockPurchaseResultEvent extends AnalyticsEvent
+    implements FirebaseAnalyticsEvent, PostHogAnalyticsEvent {
   const FlightUnlockPurchaseResultEvent({
     required this.source,
     required this.result,
@@ -25,4 +26,10 @@ class FlightUnlockPurchaseResultEvent extends FirebaseAnalyticsEvent {
     'product_id': productId,
     'balance_after': balanceAfter,
   };
+
+  @override
+  String get postHogEventName => firebaseEventName;
+
+  @override
+  Map<String, Object> get postHogParameters => firebaseParameters;
 }

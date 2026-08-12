@@ -3,6 +3,7 @@ import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/domain/entity/flight_route_source.dart';
 import 'package:flymap/domain/entity/learn_access.dart';
 import 'package:flymap/map_download_config.dart';
+import 'package:flymap/subscription/flight_unlock_purchase_result.dart';
 import 'package:flymap/subscription/paywall_source.dart';
 
 void main() {
@@ -64,6 +65,12 @@ void main() {
         toStatus: 'pro',
         source: 'purchase',
       );
+      const flightUnlockPurchase = FlightUnlockPurchaseResultEvent(
+        source: PaywallSource.weatherGate,
+        result: FlightUnlockPurchaseStatus.purchased,
+        productId: 'flight_unlock',
+        balanceAfter: 1,
+      );
 
       expect(paywall.firebaseEventName, 'paywall_presented');
       expect(paywall.firebaseParameters['source'], 'settings_banner');
@@ -72,6 +79,16 @@ void main() {
       expect(restore.firebaseParameters['result'], 'no_subscription');
       expect(statusChanged.firebaseEventName, 'subscription_status_changed');
       expect(statusChanged.firebaseParameters['to_status'], 'pro');
+      expect(
+        flightUnlockPurchase.postHogEventName,
+        'flight_unlock_purchase_result',
+      );
+      expect(flightUnlockPurchase.postHogParameters, <String, Object>{
+        'source': 'weather_gate',
+        'result': 'purchased',
+        'product_id': 'flight_unlock',
+        'balance_after': 1,
+      });
     });
 
     test('learn events have stable privacy-safe properties', () {
