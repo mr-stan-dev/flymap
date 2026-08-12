@@ -442,7 +442,6 @@ class _TranslationsPreviewFr extends TranslationsPreviewEn {
 	@override String get downloadCompletedTitle => 'Téléchargement terminé';
 	@override String get shareFlightCard => 'Mettez votre superbe vol en avant';
 	@override String get shareVideo => 'Partager la vidéo du vol';
-	@override String get shareVideoNewBadge => 'NOUVEAU';
 	@override String get share => 'Partager la carte de vol';
 	@override String get home => 'Accueil';
 	@override String get navigatingHome => 'Retour à l’accueil...';
@@ -2321,7 +2320,6 @@ extension on TranslationsFr {
 			'preview.downloadCompletedTitle' => 'Téléchargement terminé',
 			'preview.shareFlightCard' => 'Mettez votre superbe vol en avant',
 			'preview.shareVideo' => 'Partager la vidéo du vol',
-			'preview.shareVideoNewBadge' => 'NOUVEAU',
 			'preview.share' => 'Partager la carte de vol',
 			'preview.home' => 'Accueil',
 			'preview.navigatingHome' => 'Retour à l’accueil...',
@@ -2707,9 +2705,9 @@ extension on TranslationsFr {
 			'countries.DO' => 'République dominicaine',
 			'countries.DZ' => 'Algérie',
 			'countries.EC' => 'Équateur',
+			'countries.EE' => 'Estonie',
 			_ => null,
 		} ?? switch (path) {
-			'countries.EE' => 'Estonie',
 			'countries.EG' => 'Égypte',
 			'countries.EH' => 'Sahara occidental',
 			'countries.ER' => 'Érythrée',

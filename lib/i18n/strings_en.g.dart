@@ -1022,9 +1022,6 @@ class TranslationsPreviewEn {
 	/// en: 'Share flight video'
 	String get shareVideo => 'Share flight video';
 
-	/// en: 'NEW'
-	String get shareVideoNewBadge => 'NEW';
-
 	/// en: 'Share flight card'
 	String get share => 'Share flight card';
 
@@ -4655,7 +4652,6 @@ extension on Translations {
 			'preview.downloadCompletedTitle' => 'Download completed',
 			'preview.shareFlightCard' => 'Show off your awesome flight',
 			'preview.shareVideo' => 'Share flight video',
-			'preview.shareVideoNewBadge' => 'NEW',
 			'preview.share' => 'Share flight card',
 			'preview.home' => 'Home',
 			'preview.navigatingHome' => 'Navigating to home...',
@@ -5041,9 +5037,9 @@ extension on Translations {
 			'countries.DO' => 'Dominican Republic',
 			'countries.DZ' => 'Algeria',
 			'countries.EC' => 'Ecuador',
+			'countries.EE' => 'Estonia',
 			_ => null,
 		} ?? switch (path) {
-			'countries.EE' => 'Estonia',
 			'countries.EG' => 'Egypt',
 			'countries.EH' => 'Western Sahara',
 			'countries.ER' => 'Eritrea',
