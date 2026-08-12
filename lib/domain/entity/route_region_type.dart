@@ -52,6 +52,13 @@ extension RouteRegionTypeAssetX on RouteRegionType {
   String? get assetImagePath {
     const base = 'assets/images/regions';
     switch (this) {
+      case RouteRegionType.country:
+      case RouteRegionType.region:
+      case RouteRegionType.state:
+      case RouteRegionType.province:
+      case RouteRegionType.geoarea:
+      case RouteRegionType.unknown:
+        return '$base/generic.webp';
       case RouteRegionType.sea:
         return '$base/sea.webp';
       case RouteRegionType.ocean:
@@ -101,8 +108,6 @@ extension RouteRegionTypeAssetX on RouteRegionType {
         return '$base/continent.webp';
       case RouteRegionType.isthmus:
         return '$base/isthmus.webp';
-      default:
-        return null;
     }
   }
 }

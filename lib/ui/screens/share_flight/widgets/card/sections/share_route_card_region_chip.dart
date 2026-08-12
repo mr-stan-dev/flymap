@@ -80,9 +80,6 @@ class ShareRouteCardRegionChip extends StatelessWidget {
 
   bool _shouldShowRegionIcon(RouteRegionType? type) {
     if (type == null) return false;
-    if (type == RouteRegionType.state || type == RouteRegionType.province) {
-      return false;
-    }
     if (type == RouteRegionType.country) return true;
     return type.assetImagePath != null;
   }

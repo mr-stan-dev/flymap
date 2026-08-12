@@ -24,7 +24,7 @@ void main() {
       RouteRegionType.mountainRange,
     );
     expect(mountains, isNotNull);
-    expect(await rasterizer.typeArtwork(RouteRegionType.unknown), isNull);
+    expect(await rasterizer.typeArtwork(RouteRegionType.unknown), isNotNull);
     rasterizer.dispose();
   });
 }

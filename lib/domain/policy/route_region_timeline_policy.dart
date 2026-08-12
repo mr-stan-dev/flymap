@@ -24,19 +24,18 @@ class RouteRegionMarker extends Equatable {
 }
 
 /// Picks the regions shown as circles on a saved flight card, "adaptive"
-/// style: countries abroad, nature at home.
+/// style: countries abroad, prominent crossed regions at home.
 ///
 /// - International flights lead with the transit countries overflown (their
-///   flags), then fill any remaining slots with the biggest natural features
-///   crossed (an ocean, a mountain range). The departure and arrival countries
-///   are NOT included here — they are drawn as flags at the strip endpoints.
-/// - Domestic flights have no transit countries, so they show natural
-///   features only.
+///   flags), then fill any remaining slots with the biggest crossed regions.
+///   The departure and arrival countries are NOT included here — they are
+///   drawn as flags at the strip endpoints.
+/// - Domestic flights have no transit countries, so they show the most
+///   prominent crossed regions, including administrative areas and natural
+///   features.
 ///
-/// Only ICON-ABLE regions are ever shown — countries (rendered as a flag) or
-/// natural features that have artwork. Admin sub-regions (state / province /
-/// generic region / geoarea) have no icon and are excluded, which is why
-/// domestic routes fall back to nature rather than states.
+/// Only icon-able regions are ever shown — countries rendered as flags, or
+/// region types with bundled artwork.
 class RouteRegionTimelinePolicy {
   const RouteRegionTimelinePolicy._();
 
@@ -58,7 +57,7 @@ class RouteRegionTimelinePolicy {
         ? CountryNameUtils.toCode(r.name, languageCode: lang) != null
         : r.regionType.assetImagePath != null;
 
-    final nature = _rankByCoverage(
+    final regionalFeatures = _rankByCoverage(
       _dedupeByKey(
         regions.where(
           (r) => r.regionType != RouteRegionType.country && iconable(r),
@@ -72,8 +71,10 @@ class RouteRegionTimelinePolicy {
 
     void addFlag(String countryName, double atProgress) {
       if (markers.length >= maxMarkers) return;
-      final code = CountryNameUtils.toCode(countryName, languageCode: lang)
-          ?.toUpperCase();
+      final code = CountryNameUtils.toCode(
+        countryName,
+        languageCode: lang,
+      )?.toUpperCase();
       final key = 'c:${code ?? countryName.trim().toLowerCase()}';
       if (key == 'c:' || !seen.add(key)) return;
       markers.add(
@@ -85,9 +86,9 @@ class RouteRegionTimelinePolicy {
       );
     }
 
-    void addNature(RouteRegion r) {
+    void addRegionalFeature(RouteRegion r) {
       if (markers.length >= maxMarkers) return;
-      final key = 'n:${r.regionType.apiValue}:${r.name.trim().toLowerCase()}';
+      final key = 'r:${r.regionType.apiValue}:${r.name.trim().toLowerCase()}';
       if (!seen.add(key)) return;
       markers.add(
         RouteRegionMarker(
@@ -104,14 +105,13 @@ class RouteRegionTimelinePolicy {
     );
 
     if (isDomestic) {
-      // No country flags to show (one country); natural features it is.
-      for (final r in nature) {
-        addNature(r);
+      // No transit-country flags to show; use the strongest regional markers.
+      for (final r in regionalFeatures) {
+        addRegionalFeature(r);
       }
     } else {
-      // Flags are strongly preferred: transit countries first, then pad with
-      // the departure and arrival country flags, and only fall back to
-      // natural features if there still aren't enough flags to fill.
+      // Flags are strongly preferred: transit countries first, then regional
+      // features if there still aren't enough flags to fill.
       final excluded = {dep, arr}..removeWhere((c) => c.isEmpty);
       final transit = _rankByCoverage(
         _dedupeByCountryCode(
@@ -132,9 +132,9 @@ class RouteRegionTimelinePolicy {
       }
       // The departure and arrival country flags are shown at the strip's
       // endpoints (next to the airport codes), so we deliberately do NOT repeat
-      // them here — the middle only carries transit countries, then nature.
-      for (final r in nature) {
-        addNature(r);
+      // them here — the middle only carries transit countries, then regions.
+      for (final r in regionalFeatures) {
+        addRegionalFeature(r);
       }
     }
 
@@ -172,8 +172,8 @@ class RouteRegionTimelinePolicy {
   ) {
     final best = <String, RouteRegion>{};
     for (final r in regions) {
-      final code = CountryNameUtils.toCode(r.name, languageCode: lang)
-              ?.toUpperCase() ??
+      final code =
+          CountryNameUtils.toCode(r.name, languageCode: lang)?.toUpperCase() ??
           r.name.trim().toLowerCase();
       final current = best[code];
       if (current == null ||
