@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flymap/data/debug/map_debug_gps_provider.dart';
 import 'package:flymap/data/gps_data_provider.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight.dart';
@@ -20,6 +21,48 @@ import 'package:latlong2/latlong.dart';
 
 void main() {
   group('FlightScreenCubit GPS handling', () {
+    test('debug simulation owns GPS until explicitly paused', () async {
+      final gpsProvider = _FakeGpsDataProvider();
+      final cubit = FlightScreenCubit(
+        flight: _buildFlight(status: FlightStatus.inProgress),
+        deleteFlightUseCase: _NoopDeleteFlightUseCase(),
+        completeFlightUseCase: _NoopCompleteFlightUseCase(),
+        startFlightUseCase: _FakeStartFlightUseCase(result: true),
+        gpsProvider: gpsProvider,
+        debugGpsProvider: MapDebugGpsProvider(tick: const Duration(hours: 1)),
+        enableGpsCheckTimer: false,
+      );
+      addTearDown(cubit.close);
+
+      await Future<void>.delayed(Duration.zero);
+      gpsProvider.emit(GpsStatus.searching);
+      cubit.playDebugGpsSimulation();
+
+      final simulated = cubit.state as FlightScreenLoaded;
+      expect(cubit.isDebugGpsSimulationPlaying, isTrue);
+      expect(simulated.gps.data?.latitude, closeTo(51.47, 0.001));
+      expect(simulated.gps.data?.longitude, closeTo(-0.45, 0.001));
+
+      gpsProvider.emit(
+        GpsStatus.gpsActive,
+        data: const GpsData(latitude: 1, longitude: 2, accuracy: 5),
+      );
+      expect(
+        (cubit.state as FlightScreenLoaded).gps.data?.latitude,
+        closeTo(51.47, 0.001),
+      );
+
+      cubit.pauseDebugGpsSimulation();
+      gpsProvider.emit(
+        GpsStatus.gpsActive,
+        data: const GpsData(latitude: 1, longitude: 2, accuracy: 5),
+      );
+
+      expect(cubit.isDebugGpsSimulationPlaying, isFalse);
+      expect((cubit.state as FlightScreenLoaded).gps.data?.latitude, 1);
+      expect((cubit.state as FlightScreenLoaded).gps.data?.longitude, 2);
+    });
+
     test('a GPS update after close does not emit on a closed cubit', () async {
       final gpsProvider = _FakeGpsDataProvider();
       final cubit = FlightScreenCubit(
@@ -245,8 +288,7 @@ class _FakeFlightRepository implements FlightRepository {
   Future<Flight?> getFlightById(String flightId) async => flight;
 
   @override
-  dynamic noSuchMethod(Invocation invocation) =>
-      super.noSuchMethod(invocation);
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 Flight _buildFlight({required FlightStatus status}) {

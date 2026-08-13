@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flymap/data/debug/map_debug_gps_provider.dart';
 import 'package:flymap/data/gps_data_provider.dart';
 import 'package:flymap/domain/entity/flight.dart';
 import 'package:flymap/domain/entity/flight_status.dart';
@@ -32,6 +33,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   final DateTime Function() _nowProvider;
   final Duration _gpsStaleThresholdOverride;
   final bool _enableGpsCheckTimer;
+  final MapDebugGpsProvider _debugGpsProvider;
   Timer? _gpsCheckTimer;
   int _gpsUpdateTick = 0;
   DateTime? _lastGpsEventAt;
@@ -48,6 +50,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
     DateTime Function()? nowProvider,
     Duration gpsStaleThreshold = _gpsStaleThreshold,
     bool enableGpsCheckTimer = true,
+    MapDebugGpsProvider? debugGpsProvider,
   }) : _currentFlight = flight,
        _flightRepository =
            flightRepository ??
@@ -62,8 +65,10 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
        _nowProvider = nowProvider ?? DateTime.now,
        _gpsStaleThresholdOverride = gpsStaleThreshold,
        _enableGpsCheckTimer = enableGpsCheckTimer,
+       _debugGpsProvider = debugGpsProvider ?? MapDebugGpsProvider(),
        super(FlightScreenLoading()) {
     _logger.log('flight routeInsights: ${flight.routeInsights}');
+    _loadDebugGpsRoute();
     load();
   }
 
@@ -260,12 +265,61 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
     );
   }
 
+  bool get hasDebugGpsSimulationRoute =>
+      kDebugMode && _debugGpsProvider.hasRoute;
+
+  bool get isDebugGpsSimulationPlaying =>
+      kDebugMode && _debugGpsProvider.isPlaying;
+
+  int get debugGpsSimulationSpeedMultiplier =>
+      _debugGpsProvider.speedMultiplier;
+
+  void playDebugGpsSimulation() {
+    if (!kDebugMode || !_debugGpsProvider.hasRoute) return;
+    _debugGpsProvider.play(
+      onUpdate: applyDebugGpsData,
+      onDone: disableDebugGpsOverride,
+    );
+  }
+
+  void pauseDebugGpsSimulation() {
+    if (!kDebugMode) return;
+    _debugGpsProvider.pause();
+    disableDebugGpsOverride();
+  }
+
+  void restartDebugGpsSimulation() {
+    if (!kDebugMode || !_debugGpsProvider.hasRoute) return;
+    var resetGeoState = true;
+    _debugGpsProvider.restart(
+      onUpdate: (data) {
+        applyDebugGpsData(data, resetGeoState: resetGeoState);
+        resetGeoState = false;
+      },
+      onDone: disableDebugGpsOverride,
+    );
+  }
+
+  void setDebugGpsSimulationSpeedMultiplier(int multiplier) {
+    if (!kDebugMode) return;
+    _debugGpsProvider.setSpeedMultiplier(multiplier);
+  }
+
   @visibleForTesting
   Future<void> checkGpsStatusForTest() => _checkGpsStatus();
 
   void disableDebugGpsOverride() {
     if (!kDebugMode) return;
     _debugGpsOverrideActive = false;
+  }
+
+  void _loadDebugGpsRoute() {
+    final route = _currentFlight.route;
+    _debugGpsProvider.loadRoute(
+      route.waypoints.length >= 2
+          ? route.waypointLatLngs
+          : [_currentFlight.departure.latLon, _currentFlight.arrival.latLon],
+    );
   }
 
   void _emitTelemetryUpdate({
@@ -339,6 +393,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   @override
   Future<void> close() async {
     _gpsCheckTimer?.cancel();
+    _debugGpsProvider.dispose();
     // Await so the position stream is torn down before super.close(); a
     // straggler update would otherwise emit on a closed cubit.
     await _gpsProvider.stop();

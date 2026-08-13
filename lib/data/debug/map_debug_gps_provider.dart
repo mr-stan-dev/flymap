@@ -11,7 +11,7 @@ class MapDebugGpsProvider {
     this.baseSpeedKmh = 820,
   });
 
-  static const _routeDeviationKm = 50.0;
+  static const _routeDeviationKm = 10.0;
 
   final Duration tick;
   final double baseSpeedKmh;
