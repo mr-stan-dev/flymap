@@ -68,15 +68,11 @@ void main() {
 
     await tester.pump(const Duration(seconds: 2));
     await tester.pump();
-    // Shutter countdown: the cap minus 2 elapsed seconds.
     expect(
-      tester
-          .widget<Text>(
-            find.byKey(const Key('sky_camera.recording_countdown_seconds')),
-          )
-          .data,
-      '${SkyCameraMediaFormat.maxVideoDuration.inSeconds - 2}',
+      find.byKey(const Key('sky_camera.recording_countdown_seconds')),
+      findsNothing,
     );
+    expect(find.text('0:02 / 10:00'), findsOneWidget);
     await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
     await tester.pumpAndSettle();
 

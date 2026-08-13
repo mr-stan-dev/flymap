@@ -3,12 +3,13 @@ class FeatureFlags {
   const FeatureFlags._();
 
   /// Sky camera video recording (capture-mode switch, recording, share-time
-  /// overlay burn-in). Shipping dark in the current release; flip the
-  /// default to `true` for the next release.
+  /// overlay burn-in). Enabled by default; builds can disable it with
+  /// `--dart-define=FLYMAP_SKY_CAMERA_VIDEO=false` if an emergency rollback is
+  /// needed.
   ///
-  /// Local/dev override: `--dart-define=FLYMAP_SKY_CAMERA_VIDEO=true`.
+  /// Build override: `--dart-define=FLYMAP_SKY_CAMERA_VIDEO=false`.
   static const bool skyCameraVideoCapture = bool.fromEnvironment(
     'FLYMAP_SKY_CAMERA_VIDEO',
-    defaultValue: false,
+    defaultValue: true,
   );
 }

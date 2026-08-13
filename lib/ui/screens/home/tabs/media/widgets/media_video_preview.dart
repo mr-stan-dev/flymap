@@ -114,8 +114,7 @@ class _MediaVideoPreviewState extends State<MediaVideoPreview> {
       );
     }
 
-    final overlaySnapshot =
-        _overlaySnapshot ?? _timeline.snapshotAt(0);
+    final overlaySnapshot = _overlaySnapshot ?? _timeline.snapshotAt(0);
     return GestureDetector(
       key: const Key('media.video_preview'),
       behavior: HitTestBehavior.opaque,
@@ -152,20 +151,57 @@ class _MediaVideoPreviewState extends State<MediaVideoPreview> {
                 ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: VideoProgressIndicator(
-                  _controller,
-                  allowScrubbing: true,
-                  colors: const VideoProgressColors(
-                    playedColor: Colors.white,
-                    bufferedColor: Colors.white24,
-                    backgroundColor: Colors.white12,
-                  ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                  child: _MediaVideoScrubber(controller: _controller),
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _MediaVideoScrubber extends StatelessWidget {
+  const _MediaVideoScrubber({required this.controller});
+
+  final VideoPlayerController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        final durationMs = controller.value.duration.inMilliseconds;
+        final max = durationMs > 0 ? durationMs.toDouble() : 1.0;
+        final position = controller.value.position.inMilliseconds
+            .clamp(0, durationMs > 0 ? durationMs : 0)
+            .toDouble();
+
+        return SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            trackHeight: 3,
+            activeTrackColor: Colors.white,
+            inactiveTrackColor: Colors.white24,
+            thumbColor: Colors.white,
+            overlayColor: Colors.white24,
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
+          ),
+          child: Slider(
+            key: const Key('media.video_scrubber'),
+            value: position,
+            max: max,
+            onChanged: durationMs <= 0
+                ? null
+                : (value) => unawaited(
+                    controller.seekTo(Duration(milliseconds: value.round())),
+                  ),
+          ),
+        );
+      },
     );
   }
 }

@@ -268,7 +268,6 @@ class _SkyCameraCaptureButton extends StatelessWidget {
                   // shapes.
                   width: isRecording ? 34 : 68,
                   height: isRecording ? 34 : 68,
-                  alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(isRecording ? 8 : 34),
                     color: innerColor,
@@ -280,20 +279,6 @@ class _SkyCameraCaptureButton extends StatelessWidget {
                             ).withValues(alpha: isCapturing ? 0.14 : 0.08),
                           ),
                   ),
-                  child: showCountdown
-                      ? Text(
-                          '$remainingSeconds',
-                          key: const Key(
-                            'sky_camera.recording_countdown_seconds',
-                          ),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            fontFeatures: [FontFeature.tabularFigures()],
-                          ),
-                        )
-                      : null,
                 ),
               ),
               if (showCountdown)

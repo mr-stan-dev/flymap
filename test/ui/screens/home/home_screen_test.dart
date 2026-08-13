@@ -223,6 +223,8 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
 
       expect(find.byKey(const Key('test.sky_camera.preview')), findsOneWidget);
+      expect(find.byKey(const Key('sky_camera.mode_selector')), findsOneWidget);
+      expect(find.byKey(const Key('sky_camera.mode_video')), findsOneWidget);
       expect(find.textContaining('LHR'), findsNothing);
       expect(find.textContaining('BCN'), findsNothing);
     },
