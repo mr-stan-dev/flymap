@@ -82,6 +82,12 @@ void main() {
       hasLiveLocation: true,
     );
     const shared = SkyPhotoShareEvent();
+    const videoShared = SkyVideoShareEvent(
+      source: 'media_preview',
+      result: 'success',
+      videoCount: 1,
+      photoCount: 0,
+    );
 
     expect(opened.firebaseParameters, isEmpty);
     expect(captured.firebaseEventName, 'sky_photo_captured');
@@ -90,5 +96,12 @@ void main() {
     });
     expect(shared.firebaseEventName, 'sky_photo_share');
     expect(shared.postHogParameters, isEmpty);
+    expect(videoShared.firebaseEventName, 'sky_video_share');
+    expect(videoShared.postHogParameters, <String, Object>{
+      'source': 'media_preview',
+      'result': 'success',
+      'video_count': 1,
+      'photo_count': 0,
+    });
   });
 }

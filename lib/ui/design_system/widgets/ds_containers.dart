@@ -205,7 +205,7 @@ class _ExpandableCardState extends State<ExpandableCard>
             child: SizeTransition(
               sizeFactor: _sizeFactor,
               axis: Axis.vertical,
-              axisAlignment: -1,
+              alignment: Alignment.topCenter,
               child: Padding(padding: widget.childPadding, child: widget.child),
             ),
           ),

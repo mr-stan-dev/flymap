@@ -74,8 +74,8 @@
     "zoom": "Zoom",
     "flash": "Flash",
     "cameraUnavailable": "Camera is unavailable right now.",
-    "cameraPermissionDenied": "Camera permission is required to take photos.",
-    "captureFailed": "Could not capture photo right now.",
+    "cameraPermissionDenied": "Camera permission is required to take photos and record videos.",
+    "captureFailed": "Could not save this capture right now.",
     "savedMessage": "Photo saved",
     "share": "Share",
     "noActiveFlightTitle": "No active flight",
@@ -99,6 +99,7 @@
     "microphonePermissionDenied": "Microphone access is off — videos record without sound.",
     "lowStorageRecordingBlocked": "Free up storage before recording a video.",
     "lowStorageRecordingStopped": "Recording stopped and was saved because storage is almost full.",
+    "lowStorageVideoExport": "Free up storage before preparing this video.",
     "hotDeviceRecordingBlocked": "Your device is too hot to record. Let it cool down and try again.",
     "hotDeviceRecordingStopped": "Recording stopped and was saved because your device is too hot.",
     "preparingVideo": "Preparing video…"

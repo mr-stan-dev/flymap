@@ -107,6 +107,7 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   Timer? _recordingResourceTimer;
   bool _isCheckingRecordingResources = false;
   SkyCameraRecordingResourceIssue? _resourceStopIssue;
+  Future<void> _lifecycleOperation = Future<void>.value();
 
   @override
   void initState() {
@@ -129,7 +130,16 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    unawaited(_handleAppLifecycleStateChanged(state));
+    // Preserve the order delivered by Flutter. Stopping and saving a video can
+    // outlive a quick trip through the app switcher; without a queue, the
+    // resumed handler can initialize first and the older paused handler then
+    // disposes the camera after the user has already returned.
+    _lifecycleOperation = _lifecycleOperation
+        .then((_) => _handleAppLifecycleStateChanged(state))
+        .catchError((Object error, StackTrace stackTrace) {
+          debugPrint('SkyCamera lifecycle transition failed: $error');
+          debugPrintStack(stackTrace: stackTrace);
+        });
   }
 
   @override

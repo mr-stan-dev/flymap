@@ -276,6 +276,53 @@ void main() {
     expect(find.text('Open'), findsOneWidget);
   });
 
+  testWidgets(
+    'quick resume waits for paused video save before reinitializing',
+    (tester) async {
+      final driver = _FakeSkyCameraDriver();
+      final exportService = _DelayedExportService();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: SkyCameraScreen(
+            driver: driver,
+            snapshotSource: const _FakeSnapshotSource(),
+            exportService: exportService,
+            observer: const _FakeObserver(),
+            photoCropper: const _FakePhotoCropper(),
+            openCapturePreview: _openFakeCapturePreview,
+            overlayComposer: const SkyCameraOverlayComposer(),
+            strings: _strings,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('sky_camera.mode_video')));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+      await tester.pump();
+      expect(driver.isRecordingVideo, isTrue);
+
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      await tester.pump();
+      expect(driver.didStopVideo, isTrue);
+      expect(driver.lifecycleStates, isEmpty);
+
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump();
+      expect(driver.lifecycleStates, isEmpty);
+
+      exportService.complete();
+      await tester.pumpAndSettle();
+
+      expect(driver.lifecycleStates, [
+        AppLifecycleState.paused,
+        AppLifecycleState.resumed,
+      ]);
+      expect(driver.isInitialized, isTrue);
+    },
+  );
+
   testWidgets('videoCaptureEnabled=false hides the mode strip', (tester) async {
     final driver = _FakeSkyCameraDriver();
     await tester.pumpWidget(
@@ -1179,6 +1226,7 @@ class _FakeSkyCameraDriver implements SkyCameraDriver {
   bool _audioEnabled = false;
   Offset? lastFocusPoint;
   final List<double> zoomUpdates = <double>[];
+  final List<AppLifecycleState> lifecycleStates = <AppLifecycleState>[];
 
   @override
   SkyCameraFlashState get flashState => SkyCameraFlashState.off;
@@ -1254,7 +1302,14 @@ class _FakeSkyCameraDriver implements SkyCameraDriver {
   }
 
   @override
-  Future<void> onAppLifecycleStateChanged(AppLifecycleState state) async {}
+  Future<void> onAppLifecycleStateChanged(AppLifecycleState state) async {
+    lifecycleStates.add(state);
+    if (state == AppLifecycleState.paused) {
+      _isInitialized = false;
+    } else if (state == AppLifecycleState.resumed) {
+      _isInitialized = true;
+    }
+  }
 
   @override
   Future<void> setFocusPoint(Offset normalizedPoint) async {

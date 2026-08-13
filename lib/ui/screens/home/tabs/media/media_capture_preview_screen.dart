@@ -166,6 +166,7 @@ class _MediaCapturePreviewScreenState extends State<MediaCapturePreviewScreen> {
     await GetIt.I<FlymapSkyCameraShareService>().shareMediaItems(
       captures: [capture],
       sharePositionOrigin: mediaShareRectForContext(context),
+      source: 'media_preview',
     );
   }
 

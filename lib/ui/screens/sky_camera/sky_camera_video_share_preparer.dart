@@ -26,13 +26,13 @@ Future<List<SkyCameraMediaItem>?> prepareSkyCameraMediaForSharing(
 
   final preparingLabel = context.t.skyCamera.preparingVideo;
   final failedLabel = context.t.skyCamera.captureFailed;
+  final lowStorageLabel = context.t.skyCamera.lowStorageVideoExport;
   final strings = await FlymapSkyCameraStringsBuilder.build(context);
   if (!context.mounted) return null;
 
   final progress = ValueNotifier<double>(0);
   final cancelLabel = context.t.common.cancel;
-  final service =
-      renditionService ?? GetIt.I<SkyCameraVideoRenditionService>();
+  final service = renditionService ?? GetIt.I<SkyCameraVideoRenditionService>();
   final cancellation = SkyCameraRenditionCancellation();
   unawaited(
     showDialog<void>(
@@ -109,6 +109,13 @@ Future<List<SkyCameraMediaItem>?> prepareSkyCameraMediaForSharing(
   } on SkyCameraRenditionCancelled {
     if (!context.mounted) return null;
     Navigator.of(context, rootNavigator: true).pop();
+    return null;
+  } on SkyCameraRenditionInsufficientStorage {
+    if (!context.mounted) return null;
+    Navigator.of(context, rootNavigator: true).pop();
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(lowStorageLabel)));
     return null;
   } catch (_) {
     if (!context.mounted) return null;

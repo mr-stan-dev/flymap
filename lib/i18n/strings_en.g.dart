@@ -283,11 +283,11 @@ class TranslationsSkyCameraEn {
 	/// en: 'Camera is unavailable right now.'
 	String get cameraUnavailable => 'Camera is unavailable right now.';
 
-	/// en: 'Camera permission is required to take photos.'
-	String get cameraPermissionDenied => 'Camera permission is required to take photos.';
+	/// en: 'Camera permission is required to take photos and record videos.'
+	String get cameraPermissionDenied => 'Camera permission is required to take photos and record videos.';
 
-	/// en: 'Could not capture photo right now.'
-	String get captureFailed => 'Could not capture photo right now.';
+	/// en: 'Could not save this capture right now.'
+	String get captureFailed => 'Could not save this capture right now.';
 
 	/// en: 'Photo saved'
 	String get savedMessage => 'Photo saved';
@@ -357,6 +357,9 @@ class TranslationsSkyCameraEn {
 
 	/// en: 'Recording stopped and was saved because storage is almost full.'
 	String get lowStorageRecordingStopped => 'Recording stopped and was saved because storage is almost full.';
+
+	/// en: 'Free up storage before preparing this video.'
+	String get lowStorageVideoExport => 'Free up storage before preparing this video.';
 
 	/// en: 'Your device is too hot to record. Let it cool down and try again.'
 	String get hotDeviceRecordingBlocked => 'Your device is too hot to record. Let it cool down and try again.';
@@ -4080,8 +4083,8 @@ extension on Translations {
 			'skyCamera.zoom' => 'Zoom',
 			'skyCamera.flash' => 'Flash',
 			'skyCamera.cameraUnavailable' => 'Camera is unavailable right now.',
-			'skyCamera.cameraPermissionDenied' => 'Camera permission is required to take photos.',
-			'skyCamera.captureFailed' => 'Could not capture photo right now.',
+			'skyCamera.cameraPermissionDenied' => 'Camera permission is required to take photos and record videos.',
+			'skyCamera.captureFailed' => 'Could not save this capture right now.',
 			'skyCamera.savedMessage' => 'Photo saved',
 			'skyCamera.share' => 'Share',
 			'skyCamera.noActiveFlightTitle' => 'No active flight',
@@ -4105,6 +4108,7 @@ extension on Translations {
 			'skyCamera.microphonePermissionDenied' => 'Microphone access is off — videos record without sound.',
 			'skyCamera.lowStorageRecordingBlocked' => 'Free up storage before recording a video.',
 			'skyCamera.lowStorageRecordingStopped' => 'Recording stopped and was saved because storage is almost full.',
+			'skyCamera.lowStorageVideoExport' => 'Free up storage before preparing this video.',
 			'skyCamera.hotDeviceRecordingBlocked' => 'Your device is too hot to record. Let it cool down and try again.',
 			'skyCamera.hotDeviceRecordingStopped' => 'Recording stopped and was saved because your device is too hot.',
 			'skyCamera.preparingVideo' => 'Preparing video…',
@@ -4523,9 +4527,9 @@ extension on Translations {
 			'createFlight.overview.routeReviewedSubtitle' => ({required Object regions, required Object departure, required Object arrival}) => 'You will fly over ${regions} from ${departure} to ${arrival}.',
 			'createFlight.overview.fullSummary' => 'Full summary',
 			'createFlight.overview.routeSummaryTitle' => 'Route Summary',
-			'createFlight.overview.routeSummaryDistanceLabel' => 'Distance',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.routeSummaryDistanceLabel' => 'Distance',
 			'createFlight.overview.routeSummaryDurationLabel' => 'Duration',
 			'createFlight.overview.routeSummaryRegionsLabel' => 'Regions',
 			'createFlight.overview.routeSummaryRegionsTitle' => 'You\'ll fly over',
@@ -5037,9 +5041,9 @@ extension on Translations {
 			'countries.DO' => 'Dominican Republic',
 			'countries.DZ' => 'Algeria',
 			'countries.EC' => 'Ecuador',
-			'countries.EE' => 'Estonia',
 			_ => null,
 		} ?? switch (path) {
+			'countries.EE' => 'Estonia',
 			'countries.EG' => 'Egypt',
 			'countries.EH' => 'Western Sahara',
 			'countries.ER' => 'Eritrea',

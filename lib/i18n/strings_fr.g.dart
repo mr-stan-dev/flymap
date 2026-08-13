@@ -149,8 +149,8 @@ class _TranslationsSkyCameraFr extends TranslationsSkyCameraEn {
 	@override String get zoom => 'Zoom';
 	@override String get flash => 'Flash';
 	@override String get cameraUnavailable => 'L’appareil photo n’est pas disponible pour le moment.';
-	@override String get cameraPermissionDenied => 'L’accès à l’appareil photo est requis pour prendre des photos.';
-	@override String get captureFailed => 'Impossible de prendre la photo pour le moment.';
+	@override String get cameraPermissionDenied => 'L’accès à l’appareil photo est requis pour prendre des photos et enregistrer des vidéos.';
+	@override String get captureFailed => 'Impossible d’enregistrer cette capture pour le moment.';
 	@override String get savedMessage => 'Photo enregistrée';
 	@override String get share => 'Partager';
 	@override String get noActiveFlightTitle => 'Aucun vol actif';
@@ -174,6 +174,7 @@ class _TranslationsSkyCameraFr extends TranslationsSkyCameraEn {
 	@override String get microphonePermissionDenied => 'L\'accès au micro est désactivé — les vidéos sont enregistrées sans son.';
 	@override String get lowStorageRecordingBlocked => 'Libérez de l’espace avant d’enregistrer une vidéo.';
 	@override String get lowStorageRecordingStopped => 'L’enregistrement a été arrêté et sauvegardé, car l’espace de stockage est presque plein.';
+	@override String get lowStorageVideoExport => 'Libérez de l’espace avant de préparer cette vidéo.';
 	@override String get hotDeviceRecordingBlocked => 'Votre appareil est trop chaud pour enregistrer. Laissez-le refroidir, puis réessayez.';
 	@override String get hotDeviceRecordingStopped => 'L’enregistrement a été arrêté et sauvegardé, car votre appareil est trop chaud.';
 	@override String get preparingVideo => 'Préparation de la vidéo…';
@@ -1748,8 +1749,8 @@ extension on TranslationsFr {
 			'skyCamera.zoom' => 'Zoom',
 			'skyCamera.flash' => 'Flash',
 			'skyCamera.cameraUnavailable' => 'L’appareil photo n’est pas disponible pour le moment.',
-			'skyCamera.cameraPermissionDenied' => 'L’accès à l’appareil photo est requis pour prendre des photos.',
-			'skyCamera.captureFailed' => 'Impossible de prendre la photo pour le moment.',
+			'skyCamera.cameraPermissionDenied' => 'L’accès à l’appareil photo est requis pour prendre des photos et enregistrer des vidéos.',
+			'skyCamera.captureFailed' => 'Impossible d’enregistrer cette capture pour le moment.',
 			'skyCamera.savedMessage' => 'Photo enregistrée',
 			'skyCamera.share' => 'Partager',
 			'skyCamera.noActiveFlightTitle' => 'Aucun vol actif',
@@ -1773,6 +1774,7 @@ extension on TranslationsFr {
 			'skyCamera.microphonePermissionDenied' => 'L\'accès au micro est désactivé — les vidéos sont enregistrées sans son.',
 			'skyCamera.lowStorageRecordingBlocked' => 'Libérez de l’espace avant d’enregistrer une vidéo.',
 			'skyCamera.lowStorageRecordingStopped' => 'L’enregistrement a été arrêté et sauvegardé, car l’espace de stockage est presque plein.',
+			'skyCamera.lowStorageVideoExport' => 'Libérez de l’espace avant de préparer cette vidéo.',
 			'skyCamera.hotDeviceRecordingBlocked' => 'Votre appareil est trop chaud pour enregistrer. Laissez-le refroidir, puis réessayez.',
 			'skyCamera.hotDeviceRecordingStopped' => 'L’enregistrement a été arrêté et sauvegardé, car votre appareil est trop chaud.',
 			'skyCamera.preparingVideo' => 'Préparation de la vidéo…',
@@ -2191,9 +2193,9 @@ extension on TranslationsFr {
 			'createFlight.overview.routeReviewedSubtitle' => ({required Object regions, required Object departure, required Object arrival}) => 'Vous survolerez ${regions} de ${departure} à ${arrival}.',
 			'createFlight.overview.fullSummary' => 'Résumé complet',
 			'createFlight.overview.routeSummaryTitle' => 'Résumé de l’itinéraire',
-			'createFlight.overview.routeSummaryDistanceLabel' => 'Distance',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.routeSummaryDistanceLabel' => 'Distance',
 			'createFlight.overview.routeSummaryDurationLabel' => 'Durée',
 			'createFlight.overview.routeSummaryRegionsLabel' => 'Régions',
 			'createFlight.overview.routeSummaryRegionsTitle' => 'Vous survolerez',
@@ -2705,9 +2707,9 @@ extension on TranslationsFr {
 			'countries.DO' => 'République dominicaine',
 			'countries.DZ' => 'Algérie',
 			'countries.EC' => 'Équateur',
-			'countries.EE' => 'Estonie',
 			_ => null,
 		} ?? switch (path) {
+			'countries.EE' => 'Estonie',
 			'countries.EG' => 'Égypte',
 			'countries.EH' => 'Sahara occidental',
 			'countries.ER' => 'Érythrée',

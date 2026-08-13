@@ -74,8 +74,8 @@
     "zoom": "Zoom",
     "flash": "Flash",
     "cameraUnavailable": "L’appareil photo n’est pas disponible pour le moment.",
-    "cameraPermissionDenied": "L’accès à l’appareil photo est requis pour prendre des photos.",
-    "captureFailed": "Impossible de prendre la photo pour le moment.",
+    "cameraPermissionDenied": "L’accès à l’appareil photo est requis pour prendre des photos et enregistrer des vidéos.",
+    "captureFailed": "Impossible d’enregistrer cette capture pour le moment.",
     "savedMessage": "Photo enregistrée",
     "share": "Partager",
     "noActiveFlightTitle": "Aucun vol actif",
@@ -99,6 +99,7 @@
     "microphonePermissionDenied": "L'accès au micro est désactivé — les vidéos sont enregistrées sans son.",
     "lowStorageRecordingBlocked": "Libérez de l’espace avant d’enregistrer une vidéo.",
     "lowStorageRecordingStopped": "L’enregistrement a été arrêté et sauvegardé, car l’espace de stockage est presque plein.",
+    "lowStorageVideoExport": "Libérez de l’espace avant de préparer cette vidéo.",
     "hotDeviceRecordingBlocked": "Votre appareil est trop chaud pour enregistrer. Laissez-le refroidir, puis réessayez.",
     "hotDeviceRecordingStopped": "L’enregistrement a été arrêté et sauvegardé, car votre appareil est trop chaud.",
     "preparingVideo": "Préparation de la vidéo…"

@@ -149,8 +149,8 @@ class _TranslationsSkyCameraDe extends TranslationsSkyCameraEn {
 	@override String get zoom => 'Zoom';
 	@override String get flash => 'Blitz';
 	@override String get cameraUnavailable => 'Die Kamera ist gerade nicht verfügbar.';
-	@override String get cameraPermissionDenied => 'Für Fotos wird Kamerazugriff benötigt.';
-	@override String get captureFailed => 'Das Foto konnte gerade nicht aufgenommen werden.';
+	@override String get cameraPermissionDenied => 'Für Fotos und Videoaufnahmen wird Kamerazugriff benötigt.';
+	@override String get captureFailed => 'Diese Aufnahme konnte gerade nicht gespeichert werden.';
 	@override String get savedMessage => 'Foto gespeichert';
 	@override String get share => 'Teilen';
 	@override String get noActiveFlightTitle => 'Kein aktiver Flug';
@@ -174,6 +174,7 @@ class _TranslationsSkyCameraDe extends TranslationsSkyCameraEn {
 	@override String get microphonePermissionDenied => 'Mikrofonzugriff ist aus — Videos werden ohne Ton aufgenommen.';
 	@override String get lowStorageRecordingBlocked => 'Gib Speicherplatz frei, bevor du ein Video aufnimmst.';
 	@override String get lowStorageRecordingStopped => 'Die Aufnahme wurde gestoppt und gespeichert, weil der Speicher fast voll ist.';
+	@override String get lowStorageVideoExport => 'Gib Speicherplatz frei, bevor du dieses Video vorbereitest.';
 	@override String get hotDeviceRecordingBlocked => 'Dein Gerät ist zu heiß für eine Aufnahme. Lass es abkühlen und versuche es erneut.';
 	@override String get hotDeviceRecordingStopped => 'Die Aufnahme wurde gestoppt und gespeichert, weil dein Gerät zu heiß ist.';
 	@override String get preparingVideo => 'Video wird vorbereitet…';
@@ -1748,8 +1749,8 @@ extension on TranslationsDe {
 			'skyCamera.zoom' => 'Zoom',
 			'skyCamera.flash' => 'Blitz',
 			'skyCamera.cameraUnavailable' => 'Die Kamera ist gerade nicht verfügbar.',
-			'skyCamera.cameraPermissionDenied' => 'Für Fotos wird Kamerazugriff benötigt.',
-			'skyCamera.captureFailed' => 'Das Foto konnte gerade nicht aufgenommen werden.',
+			'skyCamera.cameraPermissionDenied' => 'Für Fotos und Videoaufnahmen wird Kamerazugriff benötigt.',
+			'skyCamera.captureFailed' => 'Diese Aufnahme konnte gerade nicht gespeichert werden.',
 			'skyCamera.savedMessage' => 'Foto gespeichert',
 			'skyCamera.share' => 'Teilen',
 			'skyCamera.noActiveFlightTitle' => 'Kein aktiver Flug',
@@ -1773,6 +1774,7 @@ extension on TranslationsDe {
 			'skyCamera.microphonePermissionDenied' => 'Mikrofonzugriff ist aus — Videos werden ohne Ton aufgenommen.',
 			'skyCamera.lowStorageRecordingBlocked' => 'Gib Speicherplatz frei, bevor du ein Video aufnimmst.',
 			'skyCamera.lowStorageRecordingStopped' => 'Die Aufnahme wurde gestoppt und gespeichert, weil der Speicher fast voll ist.',
+			'skyCamera.lowStorageVideoExport' => 'Gib Speicherplatz frei, bevor du dieses Video vorbereitest.',
 			'skyCamera.hotDeviceRecordingBlocked' => 'Dein Gerät ist zu heiß für eine Aufnahme. Lass es abkühlen und versuche es erneut.',
 			'skyCamera.hotDeviceRecordingStopped' => 'Die Aufnahme wurde gestoppt und gespeichert, weil dein Gerät zu heiß ist.',
 			'skyCamera.preparingVideo' => 'Video wird vorbereitet…',
@@ -2191,9 +2193,9 @@ extension on TranslationsDe {
 			'createFlight.overview.routeReviewedSubtitle' => ({required Object regions, required Object departure, required Object arrival}) => 'Du wirst ${regions} von ${departure} nach ${arrival} überfliegen.',
 			'createFlight.overview.fullSummary' => 'Vollständige Zusammenfassung',
 			'createFlight.overview.routeSummaryTitle' => 'Routenzusammenfassung',
-			'createFlight.overview.routeSummaryDistanceLabel' => 'Distanz',
 			_ => null,
 		} ?? switch (path) {
+			'createFlight.overview.routeSummaryDistanceLabel' => 'Distanz',
 			'createFlight.overview.routeSummaryDurationLabel' => 'Dauer',
 			'createFlight.overview.routeSummaryRegionsLabel' => 'Regionen',
 			'createFlight.overview.routeSummaryRegionsTitle' => 'Du fliegst über',
@@ -2705,9 +2707,9 @@ extension on TranslationsDe {
 			'countries.DO' => 'Dominikanische Republik',
 			'countries.DZ' => 'Algerien',
 			'countries.EC' => 'Ecuador',
-			'countries.EE' => 'Estland',
 			_ => null,
 		} ?? switch (path) {
+			'countries.EE' => 'Estland',
 			'countries.EG' => 'Ägypten',
 			'countries.EH' => 'Westsahara',
 			'countries.ER' => 'Eritrea',

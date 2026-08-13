@@ -23,6 +23,7 @@ class VideoToolsChannel {
   static const _channel = MethodChannel('app.flymap/video_tools');
   static const _methodExtractPoster = 'extractPoster';
   static const _methodGetVideoInfo = 'getVideoInfo';
+  static const _methodGetCaptureResourceStatus = 'getCaptureResourceStatus';
   static const _methodBurnOverlay = 'burnOverlay';
   static const _methodCancelBurn = 'cancelBurn';
 
@@ -54,10 +55,10 @@ class VideoToolsChannel {
     required String videoPath,
     int atMs = 0,
   }) async {
-    final bytes = await _channel.invokeMethod<Uint8List>(
-      _methodExtractPoster,
-      {'videoPath': videoPath, 'atMs': atMs},
-    );
+    final bytes = await _channel.invokeMethod<Uint8List>(_methodExtractPoster, {
+      'videoPath': videoPath,
+      'atMs': atMs,
+    });
     if (bytes == null || bytes.isEmpty) {
       throw PlatformException(
         code: 'empty_poster',
@@ -81,11 +82,17 @@ class VideoToolsChannel {
         message: 'getVideoInfo returned incomplete data.',
       );
     }
-    return VideoToolsInfo(
-      width: width,
-      height: height,
-      durationMs: durationMs,
+    return VideoToolsInfo(width: width, height: height, durationMs: durationMs);
+  }
+
+  /// Available bytes on the filesystem used for app captures, when the
+  /// platform can determine it. A null value keeps the feature fail-open on
+  /// platforms where resource status is temporarily unavailable.
+  Future<int?> getAvailableStorageBytes() async {
+    final result = await _channel.invokeMapMethod<String, Object?>(
+      _methodGetCaptureResourceStatus,
     );
+    return (result?['availableStorageBytes'] as num?)?.toInt();
   }
 
   /// Transcodes [videoPath] into [outputPath] with the overlay frames

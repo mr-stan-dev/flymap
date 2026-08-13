@@ -74,8 +74,8 @@
     "zoom": "Zoom",
     "flash": "Blitz",
     "cameraUnavailable": "Die Kamera ist gerade nicht verfügbar.",
-    "cameraPermissionDenied": "Für Fotos wird Kamerazugriff benötigt.",
-    "captureFailed": "Das Foto konnte gerade nicht aufgenommen werden.",
+    "cameraPermissionDenied": "Für Fotos und Videoaufnahmen wird Kamerazugriff benötigt.",
+    "captureFailed": "Diese Aufnahme konnte gerade nicht gespeichert werden.",
     "savedMessage": "Foto gespeichert",
     "share": "Teilen",
     "noActiveFlightTitle": "Kein aktiver Flug",
@@ -99,6 +99,7 @@
     "microphonePermissionDenied": "Mikrofonzugriff ist aus — Videos werden ohne Ton aufgenommen.",
     "lowStorageRecordingBlocked": "Gib Speicherplatz frei, bevor du ein Video aufnimmst.",
     "lowStorageRecordingStopped": "Die Aufnahme wurde gestoppt und gespeichert, weil der Speicher fast voll ist.",
+    "lowStorageVideoExport": "Gib Speicherplatz frei, bevor du dieses Video vorbereitest.",
     "hotDeviceRecordingBlocked": "Dein Gerät ist zu heiß für eine Aufnahme. Lass es abkühlen und versuche es erneut.",
     "hotDeviceRecordingStopped": "Die Aufnahme wurde gestoppt und gespeichert, weil dein Gerät zu heiß ist.",
     "preparingVideo": "Video wird vorbereitet…"

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/domain/entity/sky_camera_media_item.dart';
@@ -70,7 +72,87 @@ void main() {
       ],
     );
   });
+
+  testWidgets('shows a specific message when rendition storage is too low', (
+    tester,
+  ) async {
+    late BuildContext context;
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(
+          home: Builder(
+            builder: (builderContext) {
+              context = builderContext;
+              return const Scaffold();
+            },
+          ),
+        ),
+      ),
+    );
+
+    final preparation = prepareSkyCameraMediaForSharing(
+      context,
+      captures: [_mediaItem(id: 'raw', mediaType: SkyCameraMediaType.video)],
+      renditionService: _LowStorageRenditionService(),
+    );
+    await tester.pumpAndSettle();
+
+    expect(await preparation, isNull);
+    expect(
+      find.text(context.t.skyCamera.lowStorageVideoExport),
+      findsOneWidget,
+    );
+  });
+
+  test('reserves room for the burned MP4 before rendering frames', () async {
+    final tempDirectory = await Directory.systemTemp.createTemp(
+      'flymap-rendition-storage-',
+    );
+    addTearDown(() => tempDirectory.delete(recursive: true));
+    final source = File('${tempDirectory.path}/source.mp4');
+    await source.writeAsBytes(List<int>.filled(100, 1));
+    final item = _mediaItem(
+      id: 'low-storage',
+      mediaType: SkyCameraMediaType.video,
+    ).copyWith(sourcePath: source.path);
+    final service = SkyCameraVideoRenditionService(
+      repository: SkyCameraMediaRepository.forTest(),
+      availableStorageBytes: () async => 199,
+      minimumFreeBytesAfterExport: 100,
+    );
+
+    await expectLater(
+      service.ensureOverlayRendition(item, strings: _testStrings),
+      throwsA(isA<SkyCameraRenditionInsufficientStorage>()),
+    );
+  });
 }
+
+const _testStrings = SkyCameraStrings(
+  loadingCamera: 'Loading',
+  loadingGpsData: 'Loading GPS',
+  retry: 'Retry',
+  close: 'Close',
+  zoom: 'Zoom',
+  flash: 'Flash',
+  captureFailed: 'Failed',
+  cameraUnavailable: 'Unavailable',
+  cameraPermissionDenied: 'Denied',
+  savedMessage: 'Saved',
+  share: 'Share',
+  telemetrySpeed: 'Speed',
+  telemetryAltitude: 'Altitude',
+  telemetryHeading: 'Heading',
+  telemetryTime: 'Time',
+  contextCaption: 'Context',
+  mapCaption: 'Map',
+  coordinatesCaption: 'Coordinates',
+  noValuePlaceholder: '--',
+  altitudeUnit: SkyCameraAltitudeUnit.meter,
+  speedUnit: SkyCameraSpeedUnit.kmh,
+  temperatureUnit: SkyCameraTemperatureUnit.celsius,
+  dateDisplayFormat: SkyCameraDateDisplayFormat.dayMonthYear,
+);
 
 SkyCameraMediaItem _mediaItem({
   required String id,
@@ -143,5 +225,20 @@ class _FakeRenditionService extends SkyCameraVideoRenditionService {
       ],
       selectedRenditionId: SkyCameraVideoRenditionService.renditionId,
     );
+  }
+}
+
+class _LowStorageRenditionService extends SkyCameraVideoRenditionService {
+  _LowStorageRenditionService()
+    : super(repository: SkyCameraMediaRepository.forTest());
+
+  @override
+  Future<SkyCameraMediaItem> ensureOverlayRendition(
+    SkyCameraMediaItem item, {
+    required SkyCameraStrings strings,
+    void Function(double fraction)? onProgress,
+    SkyCameraRenditionCancellation? cancellation,
+  }) async {
+    throw const SkyCameraRenditionInsufficientStorage();
   }
 }

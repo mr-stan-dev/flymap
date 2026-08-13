@@ -190,6 +190,7 @@ class _MediaFolderScreenState extends State<MediaFolderScreen> {
     await GetIt.I<FlymapSkyCameraShareService>().shareMediaItems(
       captures: prepared,
       sharePositionOrigin: mediaShareRectForContext(context),
+      source: 'media_folder',
     );
   }
 

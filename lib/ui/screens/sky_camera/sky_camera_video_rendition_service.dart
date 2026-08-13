@@ -16,6 +16,10 @@ class SkyCameraRenditionCancelled implements Exception {
   const SkyCameraRenditionCancelled();
 }
 
+class SkyCameraRenditionInsufficientStorage implements Exception {
+  const SkyCameraRenditionInsufficientStorage();
+}
+
 /// Cooperative cancellation for [SkyCameraVideoRenditionService]: the frame
 /// rasterization loop polls it, and the native transcode is cancelled
 /// through the video tools channel.
@@ -36,17 +40,25 @@ class SkyCameraVideoRenditionService {
     required SkyCameraMediaRepository repository,
     VideoToolsChannel videoTools = const VideoToolsChannel(),
     SkyCameraOverlayComposer composer = const SkyCameraOverlayComposer(),
+    Future<int?> Function()? availableStorageBytes,
+    this.minimumFreeBytesAfterExport = defaultMinimumFreeBytesAfterExport,
   }) : _repository = repository,
        _videoTools = videoTools,
-       _composer = composer;
+       _composer = composer,
+       _availableStorageBytes = availableStorageBytes,
+       assert(minimumFreeBytesAfterExport >= 0);
 
   static const String renditionId = 'default';
   static const String _skinId = 'flymap_default_v1';
   static const int _frameDurationMs = 1000;
+  static const int _storageCheckFrameInterval = 10;
+  static const int defaultMinimumFreeBytesAfterExport = 512 * 1024 * 1024;
 
   final SkyCameraMediaRepository _repository;
   final VideoToolsChannel _videoTools;
   final SkyCameraOverlayComposer _composer;
+  final Future<int?> Function()? _availableStorageBytes;
+  final int minimumFreeBytesAfterExport;
   final Logger _logger = const Logger('SkyCameraVideoRendition');
 
   /// Returns the item whose [SkyCameraMediaItem.sharePath] is the burned
@@ -70,6 +82,8 @@ class SkyCameraVideoRenditionService {
     }
     const rasterWeight = 0.35;
 
+    final sourceFile = File(item.sourcePath);
+    await _ensureStorageForRendition(sourceFile);
     final info = await _videoTools.getVideoInfo(videoPath: item.sourcePath);
     final frameCount = (info.durationMs / _frameDurationMs).ceil().clamp(
       1,
@@ -88,6 +102,9 @@ class SkyCameraVideoRenditionService {
       for (var index = 0; index < frameCount; index++) {
         if (cancellation?.isCancelled ?? false) {
           throw const SkyCameraRenditionCancelled();
+        }
+        if (index % _storageCheckFrameInterval == 0) {
+          await _ensureStorageForRendition(sourceFile);
         }
         final bytes = await _composer.composeOverlayFrame(
           width: info.width,
@@ -109,6 +126,7 @@ class SkyCameraVideoRenditionService {
       if (cancellation?.isCancelled ?? false) {
         throw const SkyCameraRenditionCancelled();
       }
+      await _ensureStorageForRendition(sourceFile);
       try {
         await _videoTools.burnOverlay(
           videoPath: item.sourcePath,
@@ -164,4 +182,27 @@ class SkyCameraVideoRenditionService {
   /// Cancels the in-flight native transcode, if any. Pair with
   /// [SkyCameraRenditionCancellation.cancel] to stop the raster loop too.
   Future<void> cancelActiveBurn() => _videoTools.cancelBurn();
+
+  Future<void> _ensureStorageForRendition(File sourceFile) async {
+    final int? availableStorageBytes;
+    try {
+      availableStorageBytes =
+          await (_availableStorageBytes?.call() ??
+              _videoTools.getAvailableStorageBytes());
+    } catch (error) {
+      // Match recording resource checks: failure to query the OS must not make
+      // an otherwise valid video permanently unshareable.
+      _logger.error('Could not read storage before video rendition: $error');
+      return;
+    }
+    if (availableStorageBytes == null) return;
+    final sourceBytes = await sourceFile.length();
+    // The burned rendition is a second video alongside the clean original.
+    // Keep a fixed reserve for temporary overlay PNGs and normal app writes;
+    // repeated checks account for those frames as they accumulate.
+    final requiredBytes = sourceBytes + minimumFreeBytesAfterExport;
+    if (availableStorageBytes < requiredBytes) {
+      throw const SkyCameraRenditionInsufficientStorage();
+    }
+  }
 }
