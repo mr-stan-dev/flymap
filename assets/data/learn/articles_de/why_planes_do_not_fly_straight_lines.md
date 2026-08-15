@@ -1,84 +1,83 @@
-# Warum Flugzeuge keine geraden Linien fliegen
+# Warum Flugzeuge nicht immer die direkteste Route nehmen
 
-Wenn du eine Flugkarte ansiehst, wirken Flugrouten oft gekrümmt oder indirekt.
+Die kürzeste Linie zwischen Start und Ziel ist nur eine von mehreren möglichen Routen.
 
-Das kann zunächst seltsam erscheinen, aber dafür gibt es gute Gründe.
-
----
-
-## 🌍 1. Die Erde ist rund
-
-Eine Route, die auf einer flachen Karte gekrümmt aussieht, kann in Wirklichkeit einer der kürzesten Wege über die Erdoberfläche sein.
-
-Langstreckenflugzeuge folgen oft solchen gekrümmt wirkenden Wegen, weil der Planet nicht flach ist.
-
-👉 Die Karte kann irreführend sein, selbst wenn die Route effizient ist.
+Ein echter Flug muss durch wechselndes Wetter, unterschiedliche Winde, kontrollierten Luftraum und anderen Verkehr passen. Die beste Route bringt all diese Bedingungen sicher und effizient in Einklang.
 
 ---
 
-## 🌬 2. Wind und Wetter beeinflussen die Routenführung
+## 🌬 1. Wind kann einen Umweg lohnend machen
 
-Piloten und Dispatcher achten nicht nur auf die Entfernung.
+Verkehrsflugzeuge bewegen sich durch Luft, die selbst bereits in Bewegung ist.
 
-Sie berücksichtigen auch:
+Starker Gegenwind kann eine direkte Strecke langsam und treibstoffintensiv machen. Eine etwas längere Route findet vielleicht schwächeren Gegenwind oder hilfreichen Rückenwind und erreicht das Ziel dadurch früher und mit weniger Treibstoff.
 
-- Gegenwind
-- Rückenwind
-- Gewitter
-- Turbulenzen
-
-Manchmal ist eine längere Route auf der Karte in Wirklichkeit schneller oder ruhiger.
+Deshalb vergleichen Flugdienstberater **Zeit und Treibstoff** — nicht nur die Entfernung.
 
 ---
 
-## 🚦 3. Die Flugsicherung organisiert den Verkehr
+## ⛈ 2. Wetter sorgt für Umwege
 
-Flugzeuge folgen oft festgelegten Luftstraßen, Verfahren und kontrollierten Routen.
+Gewitter, Turbulenzen, Vulkanasche, Vereisungsbedingungen und starke Winde können die geplante Route beeinflussen.
 
-Das hilft dabei, den Verkehr getrennt und vorhersehbar zu halten.
+Besatzungen halten großzügigen Abstand zu gefährlichem Wetter, statt durch die kleinste sichtbare Lücke zu fliegen. Eine Abweichung kann die Strecke verlängern, aber einen sichereren und ruhigeren Flug ermöglichen.
 
-Darum nimmt ein Flug nicht immer die direkteste Linie, wenn eine besser organisierte Route sinnvoller ist.
+Auch das Wetter verändert sich. Deshalb kann die Route vor dem Start oder während des Fluges angepasst werden.
 
 ---
 
-## ✈️ 4. Routen werden nach Effizienz gewählt, nicht nach optischer Einfachheit
+## 🚧 3. Nicht jeder Luftraum ist verfügbar
 
-Die beste Route bringt ein Gleichgewicht aus:
+Manche Bereiche des Himmels sind beschränkt, vorübergehend geschlossen, für militärische Nutzung reserviert oder wegen Staatsgrenzen und Betriebsvorschriften nicht verfügbar.
 
-- Sicherheit
-- Treibstoffeffizienz
-- Zeit
-- Verkehrsfluss
+In Flughafennähe folgen Flugzeuge außerdem veröffentlichten Abflug- und Anflugverfahren. Diese führen Flüge sicher zwischen den Start- und Landebahnen und dem übrigen Luftstraßennetz — auch wenn sie nicht der direktesten Linie entsprechen.
 
-Eine Route kann ungewöhnlich aussehen und trotzdem die klügste Wahl sein.
+---
+
+## 🚦 4. Die Flugsicherung ordnet den Verkehr
+
+Ein voller Himmel braucht Struktur.
+
+Die Flugsicherung kann einem Flugzeug einen anderen Kurs, eine andere Höhe oder Route zuweisen, um:
+
+- Flüge sicher voneinander zu trennen
+- Überlastungen zu vermeiden
+- Ankünfte in eine geordnete Reihenfolge zu bringen
+- die gerade genutzten Start- und Landebahnen zu berücksichtigen
+
+Ein kleiner Umweg für einen Flug kann dazu beitragen, dass der gesamte Verkehrsfluss berechenbar bleibt.
+
+---
+
+## 🛟 5. Die Route muss sichere Möglichkeiten offenlassen
+
+Bei der Flugplanung werden auch geeignete Ausweichflughäfen, Treibstoffreserven, die Leistung des Flugzeugs und die für den Flug geltenden Regeln berücksichtigt.
+
+Über abgelegenen Gebieten oder Ozeanen kann die gewählte Strecke geeignete Flughäfen in Reichweite halten. Die genauen Anforderungen hängen vom Flugzeug und vom Einsatz ab, doch das Prinzip ist einfach: Eine Route muss sichere Alternativen bieten, falls sich die Pläne ändern.
 
 ---
 
 ## ✨ Was das bedeutet
 
-Flugrouten werden sorgfältig geplant und nicht zufällig gewählt.
+Eine indirekt wirkende Route ist nicht automatisch verschwenderisch.
 
-Ihre Form zeigt, wie Luftfahrt in der realen Welt funktioniert:
-
-- auf einer runden Erde
-- in bewegter Luft
-- innerhalb eines organisierten Verkehrssystems
+Vielleicht umgeht sie Wetter, nutzt bessere Winde, folgt einer Freigabe der Flugsicherung oder erhält bessere Ausweichmöglichkeiten. Fluggesellschaft und Besatzung bewerten diese Abwägungen während der gesamten Reise immer wieder neu.
 
 ---
 
 ## 💡 Einfach erklärt
 
-Flugrouten sind wie:
-> der klügste Weg durch einen bewegten, gekrümmten und vollen Himmel...  
-> nicht einfach nur der Weg, der auf dem Bildschirm gerade aussieht.
+Es ist wie:
+> eine etwas längere Straße zu nehmen, um einem Sturm, einer Sperrung und dichtem Verkehr auszuweichen —
+> und dadurch sicherer oder früher ans Ziel zu kommen.
 
 ---
 
-## 🟢 Kurzfakt
+## 🟢 Kurz erklärt
 
-Manche Transatlantik- und Polarrouten sehen auf Karten stark gekrümmt aus, obwohl sie in der realen Welt sehr effizient sind.
+Die vor dem Start eingereichte Route ist nicht für immer festgelegt. Besatzung und Flugsicherung können sie ändern, wenn sich Wetter, Wind oder Verkehrslage verändern.
 
 ---
 
-Flugzeuge fliegen nicht immer scheinbar gerade Linien -  
-weil die kürzeste, schnellste oder sicherste Route oft etwas subtiler ist.
+Flugzeuge nehmen nicht immer die direkteste Route —
+denn der beste Weg durch den Himmel hängt von weit mehr als nur der Entfernung ab.

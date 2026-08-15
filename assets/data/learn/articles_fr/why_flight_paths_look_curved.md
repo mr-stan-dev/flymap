@@ -1,77 +1,67 @@
-# Pourquoi les trajectoires de vol paraissent courbes
+# Pourquoi les trajectoires de vol paraissent courbes sur une carte
 
-Si tu as deja regarde ton vol sur une carte, tu as peut-etre remarque quelque chose d'etrange :  
-la route parait **courbe**, et non droite.
+Sur une carte de vol, une route peut former un arc vers le nord ou le sud au lieu de traverser l’écran en ligne droite.
 
-Mais en realite, cette ligne courbe est en fait le **chemin le plus court**.
-
----
-
-## 🌍 1. La Terre est ronde
-
-Les cartes sur ton telephone sont plates - mais la Terre est une sphere.
-
-Quand tu traces une "ligne droite" sur une carte plate, elle ne represente pas le chemin le plus court sur une surface courbe.
+Cela ne signifie pas forcément que l’avion fait un détour. Même le chemin le plus court à la surface de la Terre peut paraître courbe lorsqu’il est dessiné sur une carte plate.
 
 ---
 
-## ✈️ 2. Le chemin le plus court est une courbe
+## 🌍 1. Une carte plate doit déformer un monde rond
 
-Les avions suivent souvent ce qu'on appelle une **route orthodromique**.
+La Terre est courbe, tandis que l’écran du téléphone ou du siège est plat.
 
-👉 C'est la distance la plus courte entre deux points sur une sphere.
+Transformer un globe en rectangle oblige toujours à étirer, comprimer ou courber quelque chose. Chaque **projection cartographique** fait des compromis différents, et la déformation devient particulièrement visible sur les longues routes et près des pôles.
 
-Sur une carte plate, elle parait courbe.  
-Sur la Terre elle-meme, c'est en realite le chemin le plus direct.
-
----
-
-## 🧭 3. Pourquoi cela compte
-
-Suivre la route la plus courte signifie :
-
-- moins de distance parcourue
-- moins de carburant consomme
-- des temps de vol plus courts
-
-Meme de petites differences comptent sur de longues distances.
+Une ligne qui paraît droite sur une carte ne représente donc pas forcément le chemin le plus court sur la surface terrestre.
 
 ---
 
-## 🗺 4. Pourquoi cela parait si etrange sur les cartes
+## ✈️ 2. Le chemin le plus court suit un grand cercle
 
-La plupart des cartes, comme celles des telephones, utilisent des projections qui deforment la Terre.
+Le trajet le plus court entre deux points d’une sphère suit une partie d’un **grand cercle**, dont le centre coïncide avec celui de la sphère.
 
-Cela fait que :
-- des chemins droits paraissent courbes
-- les routes polaires semblent extremes
-
-👉 C'est la carte qui cree l'illusion - pas la route.
+Les compagnies utilisent cette géométrie comme point de départ important pour planifier un long vol. Sur de nombreuses cartes plates familières, une route orthodromique forme un arc alors qu’elle constitue le chemin le plus direct sur la surface.
 
 ---
 
-## ✨ Ce que cela donne en ressenti
+## 🗺 3. La projection change la forme
 
-Depuis l'avion, tout parait droit et fluide.
+Une même route peut sembler très courbe sur une projection et beaucoup plus droite sur une autre.
 
-La "courbe" n'existe que lorsque tu regardes le vol sur une carte plate.
-
----
-
-## 💡 Facon simple d'y penser
-
-Imagine que tu traces une ligne droite sur un globe :
-
-> aplatis ensuite le globe en carte -  
-> cette ligne droite paraitra soudain courbe.
+Les cartes qui étirent fortement les hautes latitudes rendent les routes vers l’Arctique particulièrement spectaculaires. Le logiciel ne courbe pas la ligne au hasard : il affiche une géométrie courbe sur une surface plate.
 
 ---
 
-## 🟢 Fait rapide
+## 🌦 4. Toutes les courbes ne viennent pas de la carte
 
-De nombreux vols long-courriers, comme entre l'Europe et l'Amerique du Nord, passent pres de l'Arctique - parce que c'est le chemin le plus court.
+Les vols réels suivent rarement un grand cercle parfait d’une piste à l’autre.
+
+La météo, les vents, les espaces aériens restreints, les instructions du contrôle aérien, les procédures de départ et d’arrivée ainsi que les aéroports de dégagement appropriés peuvent modifier la trajectoire prévue.
+
+Une ligne courbe peut donc combiner deux effets : la projection de la carte et de véritables changements de route.
 
 ---
 
-Les trajectoires de vol peuvent sembler courbes -  
-mais elles sont en realite les **routes les plus efficaces et les plus directes sur une Terre ronde**.
+## 👀 5. Pourquoi la courbe est difficile à sentir
+
+L’échelle de la carte rend très visible un changement de direction progressif sur des milliers de kilomètres.
+
+Dans la cabine, l’avion suit ses caps par petites transitions souples. On ne ressent généralement pas le grand arc tracé autour du globe.
+
+---
+
+## 💡 Une façon simple de l’imaginer
+
+Tracez le chemin le plus court entre deux villes sur un globe :
+
+> découpez ensuite le globe et aplatissez-le comme une peau d’orange ; la ligne doit changer de forme sur la feuille.
+
+---
+
+## 🟢 Le saviez-vous ?
+
+Les routes entre l’Europe et l’Amérique du Nord paraissent souvent courbées vers le nord sur les cartes du monde courantes, car un grand cercle atteint des latitudes plus élevées que ne le suggère une ligne droite à l’écran.
+
+---
+
+Une trajectoire peut paraître courbe parce que la carte est plate, que la Terre ne l’est pas et que la route réelle s’adapte aussi aux conditions du jour.

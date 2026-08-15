@@ -1,84 +1,83 @@
-# Por qué los aviones no vuelan en líneas rectas
+# Por qué los aviones no siempre toman la ruta más directa
 
-Cuando miras un mapa de vuelo, las rutas de los aviones suelen parecer curvas o indirectas.
+La línea más corta entre el origen y el destino es solo una de las rutas posibles.
 
-Eso puede parecer extraño al principio, pero hay buenas razones para ello.
-
----
-
-## 🌍 1. La Tierra es redonda
-
-Una ruta que parece curva en un mapa plano puede ser en realidad una de las trayectorias más cortas sobre la superficie terrestre.
-
-Las aeronaves de larga distancia suelen seguir estas rutas de aspecto curvo porque el planeta no es plano.
-
-👉 El mapa puede resultar engañoso, incluso cuando la ruta es eficiente.
+Un vuelo real debe abrirse paso entre el tiempo cambiante, los vientos, el espacio aéreo controlado y otros aviones. La mejor ruta es la que equilibra todas esas condiciones de forma segura y eficiente.
 
 ---
 
-## 🌬 2. El viento y el tiempo afectan a la ruta
+## 🌬 1. El viento puede hacer rentable una ruta más larga
 
-Los pilotos y los despachadores no se preocupan solo por la distancia.
+Los aviones se desplazan dentro de una masa de aire que ya está en movimiento.
 
-También tienen en cuenta:
+Un viento de cara fuerte puede hacer que una trayectoria directa sea lenta y consuma mucho combustible. Una ruta algo más larga puede encontrar menos viento de cara o aprovechar un viento de cola y llegar antes gastando menos.
 
-- vientos de cara
-- vientos de cola
-- tormentas
-- turbulencia
-
-A veces una ruta más larga en el mapa resulta más rápida o más suave en la práctica.
+Por eso los responsables de operaciones comparan **tiempo y combustible**, no solo distancia.
 
 ---
 
-## 🚦 3. El control de tráfico aéreo organiza el tráfico
+## ⛈ 2. El tiempo obliga a desviarse
 
-Las aeronaves suelen seguir aerovías, procedimientos y rutas controladas establecidas.
+Las tormentas, la turbulencia, la ceniza volcánica, las condiciones de engelamiento y los vientos intensos pueden afectar a la ruta prevista.
 
-Eso ayuda a mantener el tráfico separado y predecible.
+Las tripulaciones dejan un margen amplio alrededor del tiempo peligroso en lugar de intentar pasar por el hueco visible más pequeño. Un desvío puede añadir distancia, pero también ofrecer un vuelo más seguro y cómodo.
 
-Por eso un vuelo puede no tomar la línea más directa si una ruta más organizada funciona mejor.
-
----
-
-## ✈️ 4. Las rutas se eligen por eficiencia, no por simplicidad visual
-
-La mejor ruta equilibra:
-
-- seguridad
-- eficiencia de combustible
-- tiempo
-- flujo de tráfico
-
-Una ruta puede parecer poco habitual y aun así ser la opción más inteligente.
+Además, el tiempo cambia, por lo que la ruta puede ajustarse antes de salir o cuando el avión ya está en vuelo.
 
 ---
 
-## ✨ Lo que significa
+## 🚧 3. No todo el espacio aéreo está disponible
 
-Las rutas de los aviones se planifican cuidadosamente, no al azar.
+Algunas zonas están restringidas, cerradas temporalmente, reservadas para actividad militar o no disponibles debido a fronteras y normas operativas.
 
-Su forma refleja cómo funciona la aviación en el mundo real:
+Cerca de los aeropuertos, los aviones también se incorporan a procedimientos publicados de salida y llegada. Estas rutas guían los vuelos con seguridad entre las pistas y la red de aerovías, aunque no sigan la línea más directa.
 
-- sobre una Tierra redonda
-- dentro de aire en movimiento
-- dentro de un sistema de tráfico organizado
+---
+
+## 🚦 4. El control aéreo organiza el flujo
+
+Un cielo concurrido necesita estructura.
+
+Los controladores pueden asignar al avión otro rumbo, altitud o ruta para:
+
+- mantener una separación segura entre vuelos
+- evitar la congestión
+- ordenar la secuencia de llegadas
+- adaptarse a las pistas que se están utilizando
+
+Un pequeño desvío para un vuelo puede ayudar a que todo el tráfico siga siendo predecible.
+
+---
+
+## 🛟 5. La ruta debe conservar opciones seguras
+
+La planificación también tiene en cuenta aeropuertos alternativos adecuados, reservas de combustible, prestaciones del avión y las reglas aplicables a ese vuelo.
+
+Sobre regiones remotas u océanos, la trayectoria elegida puede mantener aeropuertos apropiados al alcance. Los requisitos exactos dependen del avión y de la operación, pero el principio es sencillo: la ruta debe ofrecer opciones seguras si el plan cambia.
+
+---
+
+## ✨ Qué significa
+
+Una ruta que parece indirecta no es necesariamente un desperdicio.
+
+Puede estar evitando mal tiempo, aprovechando mejores vientos, siguiendo una autorización del control aéreo o conservando mejores alternativas. La aerolínea y la tripulación vuelven a valorar estas opciones durante todo el viaje.
 
 ---
 
 ## 💡 Una forma sencilla de verlo
 
-Las trayectorias de vuelo son como:
-> el camino más inteligente a través de un cielo en movimiento, curvo y lleno de tráfico...  
-> no simplemente el que parece recto en una pantalla.
+Es como:
+> tomar una carretera algo más larga para evitar una tormenta, un cierre y mucho tráfico —
+> y llegar al destino con más seguridad o incluso antes.
 
 ---
 
 ## 🟢 Dato rápido
 
-Algunas rutas transatlánticas y polares parecen muy curvas en los mapas, aunque en la práctica sean trayectorias eficientes.
+La ruta presentada antes del despegue no queda fijada para siempre. La tripulación y los controladores pueden cambiarla si varían el tiempo, los vientos o el tráfico.
 
 ---
 
-Los aviones no siempre vuelan en líneas que parecen rectas,  
-porque la ruta más corta, más rápida o más segura suele ser algo más sutil.
+Los aviones no siempre toman la ruta más directa —
+porque el mejor camino por el cielo depende de mucho más que la distancia.

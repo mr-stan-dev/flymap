@@ -1,77 +1,67 @@
-# Warum Flugrouten gekrümmt aussehen
+# Warum Flugrouten auf Karten gekrümmt aussehen
 
-Wenn du deinen Flug auf einer Karte ansiehst, fällt dir vielleicht etwas Merkwürdiges auf:  
-die Route wirkt **gekrümmt** und nicht gerade.
+Eine Route auf der Flugkarte kann sich nach Norden oder Süden wölben, statt als gerade Linie über den Bildschirm zu verlaufen.
 
-In Wirklichkeit ist diese gekrümmte Linie aber der **kürzeste Weg**.
-
----
-
-## 🌍 1. Die Erde ist rund
-
-Karten auf dem Handy sind flach - die Erde ist aber eine Kugel.
-
-Wenn du auf einer flachen Karte eine "gerade Linie" zeichnest, zeigt sie nicht den kürzesten Weg über eine gekrümmte Oberfläche.
+Das bedeutet nicht automatisch, dass das Flugzeug einen Umweg fliegt. Selbst der kürzeste Weg über die Erde kann gekrümmt aussehen, wenn er auf einer flachen Karte dargestellt wird.
 
 ---
 
-## ✈️ 2. Der kürzeste Weg ist eine Kurve
+## 🌍 1. Eine flache Karte muss eine runde Welt verzerren
 
-Flugzeuge folgen oft einer sogenannten **Großkreisroute**.
+Die Erde ist gekrümmt, ein Handy- oder Sitzbildschirm dagegen flach.
 
-👉 Das ist die kürzeste Entfernung zwischen zwei Punkten auf einer Kugel.
+Wenn ein Globus in ein Rechteck übertragen wird, muss immer etwas gestreckt, gestaucht oder gebogen werden. Verschiedene **Kartenprojektionen** lösen dieses Problem unterschiedlich. Auf langen Strecken und in Polnähe fällt die Verzerrung besonders auf.
 
-Auf einer flachen Karte sieht sie gekrümmt aus.  
-Auf der Erde selbst ist sie der direkteste Weg.
-
----
-
-## 🧭 3. Warum das wichtig ist
-
-Den kürzesten Weg zu fliegen bedeutet:
-
-- weniger zurückgelegte Strecke
-- geringerer Treibstoffverbrauch
-- kürzere Flugzeiten
-
-Selbst kleine Unterschiede sind auf langen Strecken wichtig.
+Eine Linie, die auf einer Karte gerade aussieht, muss deshalb nicht der kürzeste Weg über die Erdoberfläche sein.
 
 ---
 
-## 🗺 4. Warum es auf Karten so seltsam aussieht
+## ✈️ 2. Der kürzeste Weg folgt einem Großkreis
 
-Die meisten Karten, zum Beispiel auf Handys, verwenden Projektionen, die die Erde verzerren.
+Die kürzeste Verbindung zwischen zwei Punkten auf einer Kugel verläuft entlang eines **Großkreises**. Dessen Mittelpunkt entspricht dem Mittelpunkt der Kugel.
 
-Dadurch passiert Folgendes:
-- gerade Wege erscheinen gekrümmt
-- Polarrouten sehen extrem aus
-
-👉 Die Karte ist die Illusion - nicht die Route.
+Diese Geometrie ist ein wichtiger Ausgangspunkt für die Planung langer Flüge. Auf vielen vertrauten Weltkarten erscheint eine Großkreisroute als Bogen, obwohl sie der direkteste Weg über die Oberfläche ist.
 
 ---
 
-## ✨ Wie es sich anfühlt
+## 🗺 3. Die Kartenprojektion bestimmt die Form
 
-Aus dem Flugzeug wirkt alles gerade und ruhig.
+Dieselbe Route kann auf einer Projektion stark gekrümmt und auf einer anderen deutlich gerader aussehen.
 
-Die "Kurve" existiert nur, wenn du den Flug auf einer flachen Karte ansiehst.
+Karten, die hohe Breitengrade stark strecken, lassen Routen in Richtung Arktis besonders auffällig wirken. Die Kartensoftware biegt die Linie dabei nicht willkürlich. Sie zeigt gekrümmte Geometrie lediglich auf einer flachen Fläche.
+
+---
+
+## 🌦 4. Nicht jede Kurve entsteht durch die Kartenform
+
+Echte Flüge folgen vom Start bis zur Landung nur selten einem perfekten Großkreis.
+
+Wetter, Wind, gesperrte Lufträume, Anweisungen der Flugsicherung, Abflug- und Anflugverfahren sowie geeignete Ausweichflughäfen können den geplanten Kurs verändern.
+
+Eine gekrümmte Linie kann daher zwei Ursachen verbinden: die Kartenprojektion und tatsächliche Änderungen der Route.
+
+---
+
+## 👀 5. Warum man die Kurve kaum spürt
+
+Der Kartenmaßstab macht eine sanfte Richtungsänderung über Tausende Kilometer deutlich sichtbar.
+
+In der Kabine folgt das Flugzeug seinen Kursen in kleinen, ruhigen Schritten. Meist ist nicht zu spüren, dass die Route auf der Weltkarte einen großen Bogen bildet.
 
 ---
 
 ## 💡 Einfach erklärt
 
-Stell dir vor, du zeichnest eine gerade Linie auf einen Globus:
+Zeichne die kürzeste Linie zwischen zwei Städten auf einen Globus:
 
-> Wenn du den Globus dann zu einer Karte abflachst -  
-> sieht diese gerade Linie plötzlich gekrümmt aus.
+> Schneidest du den Globus auf und glättest ihn wie eine Orangenschale, muss die Linie auf dem Papier ihre Form verändern.
 
 ---
 
 ## 🟢 Kurzfakt
 
-Viele Langstreckenflüge, zum Beispiel von Europa nach Nordamerika, verlaufen nahe der Arktis - weil das der kürzeste Weg ist.
+Routen zwischen Europa und Nordamerika wirken auf gängigen Weltkarten oft nach Norden gebogen, weil eine Großkreisroute höhere Breitengrade erreicht, als eine gerade Bildschirmlinie vermuten lässt.
 
 ---
 
-Flugrouten sehen vielleicht gekrümmt aus -  
-sind aber in Wirklichkeit die **effizientesten und direktesten Wege über eine runde Erde**.
+Eine Flugroute kann gekrümmt aussehen, weil die Karte flach ist, die Erde aber nicht – und weil sich die tatsächliche Route zusätzlich an die Bedingungen des Tages anpasst.

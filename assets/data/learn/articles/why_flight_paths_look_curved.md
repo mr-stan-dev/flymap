@@ -1,77 +1,69 @@
-# Why Flight Paths Look Curved
+# Why Flight Paths Look Curved on a Map
 
-If you’ve ever looked at your flight on a map, you might notice something strange:  
-the route looks **curved**, not straight.
+A route on a flight map can appear to bow north or south instead of crossing the screen in a straight line.
 
-But in reality, that curved line is actually the **shortest path**.
-
----
-
-## 🌍 1. The Earth Is Round
-
-Maps on your phone are flat — but Earth is a sphere.
-
-When you draw a “straight line” on a flat map, it doesn’t represent the shortest path over a curved surface.
+That does not automatically mean the aircraft is taking a detour. Even the shortest path over Earth can look curved when it is drawn on a flat map.
 
 ---
 
-## ✈️ 2. The Shortest Path Is a Curve
+## 🌍 1. A Flat Map Has to Distort a Round World
 
-Planes follow something called a **great circle route**.
+Earth is curved, while a phone or seatback map is flat.
 
-👉 This is the shortest distance between two points on a sphere.
+Turning a globe into a rectangle always stretches, compresses, or bends something. Different **map projections** make different compromises, and the distortion becomes especially obvious on long routes and near the poles.
 
-On a flat map, it looks curved.  
-On the Earth itself, it’s actually the most direct path.
-
----
-
-## 🧭 3. Why This Matters
-
-Flying the shortest route means:
-
-- less distance traveled
-- lower fuel usage
-- faster flight times
-
-Even small differences matter over long distances.
+A line that looks straight on one kind of map may not represent the shortest path over the planet's surface.
 
 ---
 
-## 🗺 4. Why It Looks So Strange on Maps
+## ✈️ 2. The Shortest Surface Path Is a Great Circle
 
-Most maps (like the ones on phones) use projections that distort the Earth.
+The shortest path between two points on a sphere follows part of a **great circle**: a circle whose centre matches the centre of the sphere.
 
-This causes:
-- straight paths to appear curved
-- polar routes to look extreme
-
-👉 The map is the illusion — not the route.
+Airlines use this geometry as an important starting point when planning a long flight. On many familiar flat maps, a great-circle path looks like an arc even though it is the most direct surface route.
 
 ---
 
-## ✨ What It Feels Like
+## 🗺 3. The Map Projection Changes the Shape
 
-From the plane, everything looks straight and smooth.
+There is no single appearance that every route must have.
 
-The “curve” only exists when you look at the flight on a flat map.
+The same path can look strongly curved on one projection and much straighter on another. Maps that stretch high latitudes can make routes towards the Arctic look particularly dramatic.
+
+The line is not being bent by the map software at random. It is the result of showing curved geometry on a flat display.
+
+---
+
+## 🌦 4. Not Every Curve Is Caused by Geometry
+
+Real flights rarely trace a perfect great circle from runway to runway.
+
+Weather, winds, restricted airspace, air traffic instructions, departure and arrival procedures, and suitable diversion airports can all change the planned track. Those operational choices are a separate reason why a route may bend or zigzag.
+
+So a curved line may combine two things: the map projection and genuine route changes.
+
+---
+
+## 👀 5. Why the Curve Is Hard to Feel
+
+The scale of the map makes a gentle change across thousands of kilometres look obvious.
+
+Inside the cabin, the aircraft follows headings in small, smooth stages. There is usually no sensation of tracing a large arc around the globe.
 
 ---
 
 ## 💡 Simple Way to Think About It
 
-Imagine drawing a straight line on a globe:
+Imagine drawing the shortest line between two cities on a globe:
 
-> now flatten the globe into a map —  
-> that straight line will suddenly look curved.
+> cut the globe open and flatten it like orange peel, and the line has to change shape on the page.
 
 ---
 
 ## 🟢 Quick Fact
 
-Many long-haul flights (like Europe to North America) pass near the Arctic — because that’s the shortest path.
+Routes between Europe and North America often appear to bend north on common world maps because a great-circle path crosses higher latitudes than a straight screen line suggests.
 
 ---
 
-Flight paths may look curved —  
-but they are actually the **most efficient and direct routes across a round Earth**.
+A flight path can look curved because the map is flat, the Earth is not, and the real route may also adapt to the conditions of the day.

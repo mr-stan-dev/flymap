@@ -1,68 +1,82 @@
 # Turbulence en air clair : le type invisible
 
-Certaines turbulences apparaissent sans nuages evidents a proximite.
+Il arrive qu’un avion commence à être secoué alors que le ciel paraît calme et dégagé.
 
-On appelle cela la **turbulence en air clair**, et c'est l'une des raisons pour lesquelles un ciel d'apparence calme peut quand meme produire des secousses.
-
----
-
-## 🌬 1. Elle apparait dans un ciel qui semble clair
-
-La turbulence en air clair se forme souvent la ou il existe de forts changements de vitesse ou de direction du vent.
-
-Cela peut arriver :
-
-- pres des courants-jets
-- pres des limites de pression
-- a haute altitude
-
-Comme il peut ne pas y avoir de nuage visible, elle peut sembler plus surprenante.
+C’est de la **turbulence en air clair** : un écoulement d’air perturbé sans nuage d’orage évident pour indiquer où il commence. Son invisibilité peut surprendre, mais les phénomènes qui la provoquent sont bien compris.
 
 ---
 
-## 👀 2. Elle est plus difficile a reperer en regardant dehors
+## 🌬 1. L’air en mouvement forme différentes couches
 
-Les pilotes ne peuvent pas toujours identifier visuellement la turbulence en air clair comme ils le peuvent avec les nuages orageux.
+En haute atmosphère, des couches d’air voisines ne se déplacent pas toujours à la même vitesse ni dans la même direction.
 
-A la place, ils s'appuient davantage sur :
+Lorsque cet écart change brutalement, la limite entre elles peut devenir instable. Un écoulement régulier peut se décomposer en vagues et en tourbillons, créant des secousses quand un avion le traverse.
 
-- les previsions
-- les comptes rendus d'autres avions
-- leurs connaissances meteorologiques
-
-Cela rend la planification particulierement importante.
+Ce changement rapide du vent sur une courte distance s’appelle le **cisaillement du vent**.
 
 ---
 
-## ✈️ 3. C'est l'une des raisons pour lesquelles la ceinture compte
+## 🌊 2. Elle se forme souvent près de courants rapides
 
-Comme la turbulence en air clair peut arriver avec peu d'avertissement, les compagnies rappellent aux passagers de garder leur ceinture attachee quand ils sont assis.
+La turbulence en air clair est souvent associée :
 
-L'avion lui-meme va generalement bien, mais un mouvement soudain de la cabine peut tout de meme surprendre.
+- aux bords des courants-jets
+- à de forts contrastes de température et de pression
+- à un écoulement perturbé par les chaînes de montagnes
+- aux zones où le vent change rapidement avec l’altitude
 
----
-
-## ✨ Ce que cela signifie
-
-La turbulence en air clair montre que toute l'air agite n'est pas visible.
-
-Le ciel peut paraitre calme tout en contenant de forts changements invisibles dans l'ecoulement de l'air.
+Elle ne nécessite pas la présence d’un orage à proximité. Le ciel peut sembler bleu alors que des couches d’air invisibles interagissent fortement.
 
 ---
 
-## 💡 Facon simple d'y penser
+## 👀 3. Pourquoi elle est difficile à voir
 
-C'est comme :
-> heurter une bosse invisible dans le ciel...  
-> sans nuage evident pour montrer ou elle commence.
+Les nuages deviennent visibles lorsque des gouttelettes d’eau ou des cristaux de glace se forment. La turbulence en air clair peut apparaître sans qu’il y ait assez d’humidité visible pour révéler l’air perturbé.
 
----
-
-## 🟢 Fait rapide
-
-La turbulence en air clair est souvent associee a la haute atmosphere, la ou beaucoup d'avions de ligne sont en croisiere.
+Les pilotes ne peuvent donc pas se fier à la vue extérieure. Le radar météorologique est particulièrement utile pour repérer les précipitations dans les orages, mais l’air sec et dégagé peut ne donner aucune image évidente des secousses à venir.
 
 ---
 
-La turbulence en air clair parait mysterieuse surtout parce qu'elle est difficile a voir -  
-pas parce qu'elle sort de l'experience normale du vol.
+## 🧑‍✈️ 4. Comment les équipages s’y préparent
+
+Avant et pendant le vol, les équipages utilisent :
+
+- des prévisions de courants-jets et de cisaillement du vent
+- des indications de turbulence calculées à partir des données météo
+- les comptes rendus d’avions ayant déjà traversé la zone
+- les informations partagées par le contrôle aérien et les équipes d’exploitation de la compagnie
+
+Si de l’air agité est prévu ou signalé, les pilotes peuvent demander une autre altitude ou une autre route. Les conditions peuvent cependant évoluer entre deux comptes rendus, si bien que chaque zone ne peut pas toujours être évitée.
+
+---
+
+## ✈️ 5. Pourquoi la ceinture est importante
+
+La turbulence en air clair peut arriver sans avertissement visuel net. L’avion est conçu pour supporter des conditions turbulentes, mais une personne non attachée peut être projetée contre l’intérieur de la cabine lors d’un mouvement soudain.
+
+C’est pourquoi il est utile de garder sa ceinture attachée sans la serrer lorsqu’on est assis, même si le signal est éteint et que le ciel paraît paisible.
+
+---
+
+## ✨ Ce que l’on ressent
+
+Cela peut aller d’une légère ondulation à des secousses plus vives et irrégulières. L’absence de cause visible rend souvent le mouvement plus mystérieux que la turbulence rencontrée dans un nuage.
+
+Les secousses ne signifient pas que l’avion est entré dans un vide ou qu’il a cessé de voler. L’air environnant continue de le porter pendant qu’il traverse un écoulement perturbé.
+
+---
+
+## 💡 Une façon simple d’y penser
+
+C’est comme :
+> un bateau qui traverse un sillage invisible : depuis la cabine, on ne voit pas la limite, mais on ressent le changement d’écoulement.
+
+---
+
+## 🟢 Le saviez-vous ?
+
+Le compte rendu d’un avion peut aider les vols suivants à changer d’altitude, à ralentir jusqu’à une vitesse adaptée aux turbulences ou à allumer le signal de ceinture avant d’atteindre la même zone.
+
+---
+
+La turbulence en air clair paraît mystérieuse parce qu’aucun nuage évident ne l’entoure — et non parce qu’elle sort du monde normal et bien compris de l’aviation.

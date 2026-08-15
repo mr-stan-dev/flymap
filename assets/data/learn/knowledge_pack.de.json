@@ -46,7 +46,7 @@
         },
         {
           "id": "why_flight_paths_look_curved",
-          "title": "Warum Flugrouten gekrümmt aussehen",
+          "title": "Warum Flugrouten auf Karten gekrümmt aussehen",
           "premium": false,
           "order": 7
         },
@@ -95,88 +95,76 @@
           "order": 1
         },
         {
-          "id": "why_the_sky_turns_darker_at_altitude",
-          "title": "Warum der Himmel in großer Höhe dunkler wird",
-          "premium": false,
-          "order": 2
-        },
-        {
           "id": "cumulonimbus_giant_of_the_sky",
           "title": "Cumulonimbus: der Riese am Himmel",
-          "premium": true,
-          "order": 3
+          "premium": false,
+          "order": 2
         },
         {
           "id": "cirrus_the_high_icy_clouds",
           "title": "Cirrus: die hohen eisigen Wolken",
           "premium": true,
-          "order": 4
+          "order": 3
         },
         {
           "id": "why_clouds_form_in_layers",
           "title": "Warum sich Wolken in Schichten bilden",
           "premium": true,
-          "order": 5
+          "order": 4
         },
         {
           "id": "how_thunderstorms_grow",
           "title": "Wie Gewitter wachsen",
           "premium": true,
-          "order": 6
-        },
-        {
-          "id": "what_makes_clear_air_turbulence",
-          "title": "Was Clear-Air-Turbulenz verursacht",
-          "premium": true,
-          "order": 7
+          "order": 5
         },
         {
           "id": "jet_streams_and_fast_moving_air",
           "title": "Jetstreams und schnell bewegte Luft",
           "premium": true,
-          "order": 8
+          "order": 6
         },
         {
           "id": "why_sunsets_are_so_intense_from_planes",
           "title": "Warum Sonnenuntergänge aus dem Flugzeug so intensiv wirken",
           "premium": true,
-          "order": 9
+          "order": 7
         },
         {
           "id": "how_weather_radars_help_pilots",
           "title": "Wie Wetterradar Piloten hilft",
           "premium": true,
-          "order": 10
+          "order": 8
         },
         {
           "id": "why_some_clouds_look_flat_and_others_look_puffy",
           "title": "Warum manche Wolken flach aussehen und andere bauschig",
           "premium": true,
-          "order": 11
+          "order": 9
         },
         {
           "id": "why_temperature_drops_so_much_at_high_altitude",
           "title": "Warum die Temperatur in großer Höhe so stark sinkt",
           "premium": true,
-          "order": 12
+          "order": 10
         },
         {
           "id": "what_fog_means_for_flying",
           "title": "Was Nebel fürs Fliegen bedeutet",
           "premium": true,
-          "order": 13
+          "order": 11
         },
         {
           "id": "why_airplanes_avoid_storm_clouds_by_so_much",
           "title": "Warum Flugzeuge Gewitterwolken so weiträumig umfliegen",
           "premium": true,
-          "order": 14
+          "order": 12
         },
         {
           "id": "how_ice_forms_on_aircraft_and_how_it_is_prevented",
           "title": "Wie sich Eis an Flugzeugen bildet und wie es verhindert wird",
           "premium": true,
-          "order": 15
+          "order": 13
         }
       ],
       "order": 2
@@ -378,7 +366,7 @@
         },
         {
           "id": "why_planes_do_not_fly_straight_lines",
-          "title": "Warum Flugzeuge keine geraden Linien fliegen",
+          "title": "Warum Flugzeuge nicht immer die direkteste Route nehmen",
           "premium": true,
           "order": 4
         },
@@ -429,12 +417,6 @@
           "title": "Was SIDs und STARs sind",
           "premium": true,
           "order": 12
-        },
-        {
-          "id": "why_flights_sometimes_take_longer_routes_on_purpose",
-          "title": "Warum Flüge manchmal absichtlich längere Routen nehmen",
-          "premium": true,
-          "order": 13
         }
       ],
       "order": 5
@@ -481,58 +463,52 @@
           "order": 6
         },
         {
-          "id": "jet_streams_fast_rivers_in_the_sky",
-          "title": "Jetstreams: schnelle Flüsse am Himmel",
-          "premium": true,
-          "order": 7
-        },
-        {
           "id": "why_planes_do_not_fall_in_turbulence",
           "title": "Warum Flugzeuge bei Turbulenzen nicht herunterfallen",
           "premium": true,
-          "order": 8
+          "order": 7
         },
         {
           "id": "how_much_turbulence_can_a_plane_handle",
           "title": "Wie viel Turbulenz ein Flugzeug aushalten kann",
           "premium": true,
-          "order": 9
+          "order": 8
         },
         {
           "id": "why_turbulence_feels_worse_than_it_is",
           "title": "Warum sich Turbulenzen schlimmer anfühlen, als sie sind",
           "premium": true,
-          "order": 10
+          "order": 9
         },
         {
           "id": "how_pilots_avoid_turbulence",
           "title": "Wie Piloten Turbulenz vermeiden",
           "premium": true,
-          "order": 11
+          "order": 10
         },
         {
           "id": "why_turbulence_cannot_always_be_avoided",
           "title": "Warum Turbulenzen nicht immer vermieden werden können",
           "premium": true,
-          "order": 12
+          "order": 11
         },
         {
           "id": "where_to_sit_for_the_smoothest_ride",
           "title": "Wo man für den ruhigsten Flug sitzen sollte",
           "premium": true,
-          "order": 13
+          "order": 12
         },
         {
           "id": "when_turbulence_is_most_likely_during_a_flight",
           "title": "Wann Turbulenzen während eines Fluges am wahrscheinlichsten sind",
           "premium": true,
-          "order": 14
+          "order": 13
         },
         {
           "id": "why_the_air_is_not_actually_empty",
           "title": "Warum die Luft eigentlich nicht leer ist",
           "premium": true,
-          "order": 15
+          "order": 14
         }
       ],
       "order": 6

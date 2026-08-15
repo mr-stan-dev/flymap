@@ -1,295 +1,125 @@
 # How to Stop Your Ears Hurting on a Plane
 
-That familiar *pop* in your ears during a flight is your body adjusting to changing cabin pressure.
+The familiar pop in your ears is your body adjusting to changing cabin pressure.
 
-For some passengers it is barely noticeable. For others, especially during landing, it can become surprisingly painful.
-
-Fortunately, there are several ways to help your ears equalise — and most work best **before the pain starts**.
+For some passengers it is barely noticeable. For others, especially during descent, the pressure can become painful. A few simple habits can help, and they usually work best **before the pain starts**.
 
 ---
 
-## 👂 Why Your Ears Pop in the First Place
+## 👂 Why Your Ears Pop
 
-Behind your eardrum is a small air-filled space called the **middle ear**.
+Behind each eardrum is an air-filled space called the **middle ear**. A narrow passage called the **Eustachian tube** connects it to the back of the nose and throat.
 
-It is connected to the back of your nose and throat by a narrow passage called the **Eustachian tube**.
+As cabin pressure changes, the tube needs to open briefly so that air can move and the pressure on both sides of the eardrum stays similar. If it does not open quickly enough, you may notice:
 
-As cabin pressure changes, this tube opens briefly to let air move in or out and keep the pressure on both sides of your eardrum similar.
+- pressure or fullness
+- muffled hearing
+- popping or crackling
+- discomfort or sharp pain
 
-When it cannot open quickly enough, you may feel:
-
-* pressure
-* blocked or muffled hearing
-* popping or crackling
-* discomfort
-* sometimes sharp ear pain
+This temporary pressure problem is often called airplane ear.
 
 ---
 
-## 🛬 Why Landing Is Usually Worse
+## 🛬 Why Descent Is Usually Harder
 
-Ear problems can happen during both takeoff and landing, but **descent is usually more difficult**.
+During takeoff, cabin pressure falls and air inside the middle ear can usually escape fairly easily.
 
-During takeoff, cabin pressure decreases and air inside your middle ear can usually escape relatively easily.
+During descent, cabin pressure rises again. Air must move **into** the middle ear through the Eustachian tube, which can be more difficult. A cold, sinus problem, allergy, or ear infection may narrow the passage further.
 
-During descent, cabin pressure rises again. Air needs to travel **into** the middle ear through the Eustachian tube.
-
-That can be harder, especially if your nose is blocked by a cold, sinus infection or allergies.
-
-This is why ears often start complaining just as everyone else is preparing for landing.
+That is why ears often become uncomfortable as the aircraft prepares to land.
 
 ---
 
-## 💧 1. Swallow Frequently
+## ⏱ 1. Start Early and Stay Awake
 
-Probably the simplest technique is just to swallow.
+Do not wait until your ears feel completely blocked.
 
-Every swallow activates muscles that can briefly open your Eustachian tubes.
+Start equalising when you notice the aircraft descending. Small pressure differences are usually easier to manage than pressure that has already built up.
+
+If ear pain is a regular problem for you, try not to sleep through the descent. When awake, you naturally swallow, yawn, drink, and move your jaw more often.
+
+---
+
+## 💧 2. Swallow, Yawn, or Chew
+
+Swallowing and yawning activate muscles that can briefly open the Eustachian tubes.
 
 Try:
 
-* taking small sips of water
-* swallowing deliberately every few seconds
-* sucking on a sweet or lozenge
+- taking small sips of water
+- swallowing deliberately every so often
+- making a slow, wide yawning movement
+- chewing gum or sucking a sweet, when appropriate
 
-Do not wait until your ears hurt. Start as soon as you notice the aircraft descending.
-
----
-
-## 😮 2. Yawn
-
-Yawning is another natural way to open the Eustachian tubes.
-
-A real yawn works well, but you can also try deliberately making the movement:
-
-1. Open your mouth wide.
-2. Move your lower jaw slightly forward.
-3. Make a slow yawning motion.
-
-You may hear a click, crackle or small pop.
-
-That is often the sound you are looking for.
+The gum or sweet does not change the cabin pressure itself. It simply encourages jaw movement and frequent swallowing.
 
 ---
 
-## 🍬 3. Chew Gum or Suck a Sweet
+## 👃 3. Equalise Gently
 
-There is a reason chewing gum has become such a classic flying tip.
-
-The gum itself does nothing to cabin pressure.
-
-What helps is that chewing makes you **move your jaw and swallow repeatedly**.
-
-A hard sweet can have a similar effect by encouraging frequent swallowing.
-
-Start shortly before takeoff and again when the aircraft begins descending.
-
----
-
-## 👃 4. Try the Valsalva Manoeuvre
-
-If swallowing and yawning are not enough, there is a more deliberate technique.
-
-It is called the **Valsalva manoeuvre**.
+If swallowing is not enough, you can try a gentle **Valsalva manoeuvre**:
 
 1. Close your mouth.
 2. Pinch your nostrils closed.
-3. Gently try to blow air through your nose.
-4. Stop as soon as you feel your ears equalise.
+3. Very gently try to breathe out through your nose.
+4. Stop as soon as you feel a small pop or pressure change.
 
-The important word is **gently**.
-
-You are not trying to force your ears open. Blowing very hard can potentially make things worse.
-
-A soft pop or change in pressure is enough.
+Do not blow hard or keep forcing the movement. Stop if it causes significant pain, dizziness, or any unusual symptom.
 
 ---
 
-## 🤏 5. Try the Toynbee Manoeuvre
+## 🎧 4. Filtered Earplugs May Help
 
-There is another simple technique that combines swallowing with a closed nose.
+Pressure-regulating or filtered earplugs are designed to slow the pressure change reaching the ear. They may give your ears more time to adjust during takeoff and landing.
 
-1. Pinch your nose closed.
-2. Keep your mouth closed.
-3. Swallow.
-
-This is called the **Toynbee manoeuvre**.
-
-Some people find it more comfortable than blowing against a closed nose, so it can be worth trying if the Valsalva technique does not feel natural.
+They are different from ordinary foam earplugs used mainly for noise. You should still swallow and yawn while wearing them.
 
 ---
 
-## 👅 6. Try the Frenzel Manoeuvre
+## 🤧 5. Congestion Makes Equalising Harder
 
-Freedivers and scuba divers use several specialised techniques to equalise their ears. One of them is the **Frenzel manoeuvre**.
+A heavily blocked nose, sinus infection, or ear infection can make pressure changes more painful. If your symptoms are severe and your plans are flexible, ask a clinician whether delaying the flight would be sensible.
 
-A simplified version is:
+Some adults consider a decongestant when flying, but these medicines are not suitable for everyone and product advice varies. Ask a pharmacist or clinician about your own circumstances rather than relying on a flight-specific dose or timing rule.
 
-1. Pinch your nose.
-2. Close the back of your throat.
-3. Place your tongue high in your mouth.
-4. Make a small movement similar to saying the letter **“K”**.
-
-This uses the tongue and throat to create pressure rather than blowing strongly from the lungs.
-
-It takes a little practice, so it is probably not the first technique to learn while your aircraft is already descending.
+Do not give a young child an antihistamine or decongestant just for flight-related ear pain unless a qualified clinician advises it. Evidence does not show a clear benefit for this purpose, and these medicines can cause unwanted effects in children.
 
 ---
 
-## 🎧 7. Try Pressure-Regulating Earplugs
+## 👶 Helping Babies and Children
 
-Special **filtered or pressure-regulating earplugs** are designed to slow down the pressure change reaching the ear.
+Children may find pressure changes harder because their Eustachian tubes are smaller and they may not know how to equalise deliberately.
 
-They do not completely eliminate the change in pressure, but they may give your ears more time to adjust during takeoff and landing.
+During descent, swallowing can be encouraged with:
 
-They are different from ordinary foam earplugs designed mainly to reduce noise.
+- breastfeeding or a bottle for a baby
+- a pacifier
+- small sips of water for an older child
+- age-appropriate gum or a sweet for a child who can use it safely
 
-You should still swallow and yawn while wearing them.
-
----
-
-## 😴 8. Don't Sleep Through the Descent
-
-Sleeping sounds like an excellent way to avoid thinking about your ears.
-
-Unfortunately, it can do the opposite.
-
-When you are awake, you naturally:
-
-* swallow
-* yawn
-* drink
-* move your jaw
-
-When you are asleep, you do these things less deliberately.
-
-If you regularly get painful ears while flying, it is worth waking up before landing and starting to equalise early.
+Keeping children awake for the descent makes it easier to encourage regular swallowing. Never ask a child to blow forcefully against a pinched nose.
 
 ---
 
-## ⏱ 9. Start Before Your Ears Hurt
+## 🩺 When to Get Medical Advice
 
-This may be the most useful trick of all.
+Most blocked ears improve soon after landing. Seek medical advice if pain is severe or does not settle, or if there is bleeding from the ear, marked dizziness or vertigo, or hearing loss.
 
-Do not wait for significant pressure to build up.
-
-As soon as you notice the aircraft beginning its descent, start swallowing or gently equalising every so often.
-
-Small pressure differences are generally easier to equalise than waiting until your ears already feel completely blocked.
-
-Think of it as keeping the pressure balanced rather than fixing it afterwards.
+Those symptoms can indicate more than the usual brief pressure imbalance and deserve proper assessment.
 
 ---
 
-## 🤧 10. Be Extra Careful When You Have a Cold
+## ✨ What to Remember
 
-A blocked nose can also mean blocked Eustachian tubes.
-
-That is why flying with:
-
-* a heavy cold
-* sinus congestion
-* nasal allergies
-* an ear infection
-
-can make ear pressure considerably more uncomfortable.
-
-If symptoms are severe and changing your travel plans is possible, postponing the flight may be the easiest solution.
-
----
-
-## 💊 11. Decongestants May Help Some Adults
-
-For passengers who are congested, some nasal or oral decongestants can make it easier for the Eustachian tubes to work.
-
-They are sometimes taken before takeoff or landing rather than waiting for the ears to become painful.
-
-However, they are **not suitable for everyone**. Certain decongestants may be inappropriate for people with conditions such as high blood pressure, heart problems, or during pregnancy, and nasal decongestant sprays can cause rebound congestion if overused.
-
-If you are unsure, ask a pharmacist or doctor rather than taking medication specifically for a flight.
-
----
-
-## 🌼 12. Keep Your Usual Allergy Treatment in Mind
-
-If allergies regularly make your nose congested, staying on top of your normal allergy treatment before flying can also make pressure equalisation easier.
-
-The problem is often not the ear itself — it is swelling around the opening of the Eustachian tube behind the nose.
-
----
-
-## 👶 What About Babies and Children?
-
-Children can have an especially difficult time with ear pressure because their Eustachian tubes are smaller and they may not know how to intentionally pop their ears.
-
-During descent, swallowing can help.
-
-For babies this might mean:
-
-* breastfeeding
-* drinking from a bottle
-* using a pacifier
-
-Older children can try:
-
-* sipping water
-* chewing gum when age-appropriate
-* yawning
-* swallowing deliberately
-
-If possible, try to time feeding or drinking for the descent rather than finishing everything while the aircraft is still cruising.
-
-Decongestants should not simply be given to young children for flying without appropriate medical advice.
-
----
-
-## ⚠️ Don't Force Your Ears to Pop
-
-If an equalising manoeuvre is not working, blowing harder is not necessarily better.
-
-Pressure should be applied **gently**.
-
-Stop if attempting to equalise causes significant pain, dizziness or other unusual symptoms.
-
----
-
-## 🩺 When Ear Pain Isn't Just Normal Popping
-
-For most passengers, blocked ears improve shortly after landing.
-
-Medical advice is worth seeking if you experience symptoms such as:
-
-* severe or persistent ear pain
-* significant hearing loss
-* dizziness or vertigo
-* ringing that does not settle
-* fluid or blood coming from the ear
-* ears that remain badly blocked for an extended period
-
-Severe pressure differences can occasionally cause **ear barotrauma**, although serious complications from normal commercial flying are uncommon.
-
-People who repeatedly experience severe problems when flying may also benefit from speaking to an ear, nose and throat specialist.
-
----
-
-## ✨ The Best Strategy
-
-There is no single trick that works perfectly for everyone.
-
-For most passengers, a good landing routine is surprisingly simple:
-
-**Stay awake → start early → sip water → swallow → yawn → gently equalise if necessary.**
-
-The goal is not to wait for your ears to hurt and then make them pop.
-
-It is to keep them equalising gradually as the cabin pressure changes around you.
+Start early, stay awake for descent, and swallow or yawn regularly. If needed, equalise gently rather than forcefully.
 
 ---
 
 ## 🟢 Quick Fact
 
-The uncomfortable pressure you feel is not caused simply by the aircraft being high in the sky.
+Landing is usually harder on the ears because rising cabin pressure must push air back into the middle ear through a narrow passage.
 
-At cruising altitude the cabin pressure can remain relatively stable for hours.
+---
 
-Your ears are most likely to notice **the change in pressure** — particularly while the aircraft is descending towards your destination.
+For most passengers, a little preparation is enough to turn a painful descent into a much more comfortable one.

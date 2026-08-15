@@ -1,65 +1,76 @@
 # Ce que signifie ce changement de bruit du moteur
 
-Pendant un vol, le bruit des moteurs change souvent.
+Les moteurs principaux ne conservent pas le même réglage de puissance pendant tout le vol.
 
-Les passagers peuvent entendre l'avion devenir plus bruyant, plus silencieux ou differemment tonal, surtout pendant le decollage, la montee et la descente.
-
----
-
-## 🚀 1. Plus de puissance signifie generalement plus de bruit
-
-Pendant le decollage, les moteurs utilisent une forte puissance pour accelerer et monter.
-
-C'est pourquoi cette partie du vol semble souvent la plus bruyante.
-
-Le bruit puissant correspond a la forte poussee utilisee.
+Lorsque la poussée change, les passagers peuvent entendre les moteurs devenir plus bruyants, plus discrets ou changer de tonalité. Ces variations indiquent généralement que l’avion passe à une autre phase du vol.
 
 ---
 
-## ⬆️ 2. La montee et la croisiere ne sonnent pas pareil
+## 🚀 1. Le décollage demande une forte poussée
 
-Apres le decollage, la puissance moteur est souvent reduite par rapport au reglage maximal de decollage.
+Les moteurs produisent une poussée importante pour accélérer sur la piste et commencer à monter.
 
-Les passagers peuvent alors remarquer que la cabine devient plus silencieuse ou que la tonalite change.
-
-C'est normal et cela signifie generalement que l'avion passe a la phase suivante du vol.
+C’est ce qui crée le grondement continu que la plupart des passagers associent au décollage. Le son précis dépend de l’avion, du type de moteur et du siège occupé, mais il s’agit normalement de l’un des bruits de moteur les plus puissants du voyage.
 
 ---
 
-## ⬇️ 3. La descente peut aussi avoir un son different
+## ⬆️ 2. Les moteurs deviennent souvent plus discrets après l’envol
 
-Au cours du vol, le bruit des moteurs peut encore changer pendant la descente ou l'approche.
+La poussée de décollage n’est pas nécessaire pendant toute la montée.
 
-L'avion peut avoir besoin de :
+Lorsque l’avion est bien établi en vol, l’équipage sélectionne normalement un réglage de montée. Le changement peut donner l’impression d’une baisse soudaine de puissance, même si les moteurs fournissent encore largement assez de poussée et que l’avion continue à monter normalement.
 
-- moins de poussee
-- plus de trainee
-- reglages de puissance differents
+C’est l’une des variations de bruit que les passagers remarquent le plus souvent.
 
-Le son entendu dans la cabine change donc quand l'exploitation change.
+---
+
+## ✈️ 3. La montée et la croisière demandent de petits ajustements
+
+Lorsque l’altitude, la vitesse et les vents changent, la poussée nécessaire évolue elle aussi.
+
+Les systèmes automatiques de poussée ou les pilotes effectuent de petits réglages pour tenir la vitesse prévue. La tonalité peut légèrement monter ou descendre lors d’une mise en palier, d’un changement d’altitude ou d’une variation du vent.
+
+En croisière, le son est généralement plus stable, car l’avion n’a plus besoin de la poussée du décollage ou de la montée.
+
+---
+
+## ⬇️ 4. La descente utilise souvent très peu de poussée
+
+Pendant une grande partie de la descente, les moteurs peuvent fonctionner à faible puissance tandis que l’avion perd progressivement de l’altitude.
+
+Ils peuvent redevenir plus bruyants si l’avion se met en palier, doit ajuster sa vitesse ou commence l’approche finale. Une remise de gaz demanderait une augmentation bien plus nette, puisque l’avion doit recommencer à monter.
+
+Aucune de ces variations ne signifie que les moteurs ont été arrêtés puis redémarrés. Les réacteurs continuent de fonctionner pendant que leur poussée est ajustée.
+
+---
+
+## 👂 5. S’agit-il vraiment du moteur ?
+
+Tous les bruits de la cabine ne proviennent pas de la puissance des moteurs.
+
+Les volets, le train d’atterrissage, l’écoulement de l’air, les pompes et les systèmes de cabine ont leurs propres sons. Les variations des moteurs sont généralement plus progressives et durables : le grondement de fond augmente ou diminue dans son ensemble, au lieu de produire un bref claquement, ronronnement ou roulement.
 
 ---
 
 ## ✨ Ce que cela signifie
 
-Les changements de bruit moteur sont generalement un signe normal indiquant que l'avion passe d'une phase de vol a une autre.
+Une tonalité de moteur qui change correspond normalement à une variation de poussée.
 
-Ils font partie du fonctionnement normal et ne signifient pas, en general, qu'il y a un probleme.
-
----
-
-## 💡 Facon simple d'y penser
-
-Le bruit du moteur, c'est comme :
-> la bande-son des efforts changeants de l'avion...  
-> plus forte quand il travaille davantage, plus calme quand il se stabilise.
+Les moteurs travaillent le plus lorsque l’avion a besoin d’une forte accélération ou de bonnes performances en montée, puis passent à des réglages plus faibles lorsqu’il faut moins de poussée.
 
 ---
 
-## 🟢 Fait rapide
+## 💡 Une façon simple d’y penser
 
-L'un des changements de bruit les plus perceptibles pendant un vol se produit souvent juste apres le decollage, lorsque la puissance moteur est ajustee pour la montee.
+Le bruit du moteur, c’est comme :
+> entendre une voiture fournir plus de puissance en montée puis relâcher dans la descente, tandis que le moteur continue de tourner.
 
 ---
 
-Si les moteurs sonnent differemment pendant un vol, c'est generalement simplement parce que l'avion accomplit une tache differente de celle d'il y a quelques minutes.
+## 🟢 Le saviez-vous ?
+
+Les passagers assis derrière les moteurs ou à proximité entendent généralement les variations de poussée plus nettement que ceux qui en sont plus éloignés.
+
+---
+
+Lorsque la tonalité du moteur change, c’est généralement le son de la poussée que l’on ajuste pour la prochaine partie du vol.

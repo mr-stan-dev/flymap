@@ -1,71 +1,88 @@
 # Por qué la cabina se vuelve silenciosa y ruidosa en distintos momentos
 
-El sonido dentro de la cabina de un avión no es constante.
+La cabina tiene todo un paisaje sonoro más allá de los motores principales.
 
-Cambia porque las distintas fases del vuelo imponen diferentes exigencias a la aeronave y a sus sistemas.
-
----
-
-## 🔊 1. El despegue suele ser una de las fases más ruidosas
-
-Durante el despegue, la aeronave usa una potencia importante de motor.
-
-Eso crea un sonido general más fuerte en la cabina, especialmente por:
-
-- el empuje del motor
-- la vibración
-- el flujo de aire
-
-Esto es normal porque la aeronave está trabajando intensamente.
+El flujo de aire, los flaps, el tren de aterrizaje, las bombas y los sistemas eléctricos cambian de función a medida que avanza el vuelo. Sus sonidos, totalmente normales, pueden destacar más cuando desaparece otro ruido de fondo.
 
 ---
 
-## ✈️ 2. El crucero suele sentirse más estable
+## 🔌 1. En la puerta, la electricidad y la ventilación ya funcionan
 
-Una vez que la aeronave se nivela, la potencia de los motores y las condiciones del flujo de aire suelen volverse más constantes.
+Antes de salir, el avión necesita electricidad y aire acondicionado.
 
-La cabina puede sentirse:
+Pueden proceder de equipos del aeropuerto o de la **unidad de potencia auxiliar (APU)**, una pequeña fuente de energía que suele estar cerca de la cola. Antes de que arranquen los motores principales puedes oír un zumbido constante, ventiladores o un silbido lejano.
 
-- más tranquila
-- más uniforme en sonido
-- menos intensa que durante el despegue
-
-Por eso el crucero suele parecer más silencioso.
+Al desconectar los equipos externos y cambiar de fuente eléctrica, las luces o los ventiladores pueden comportarse o sonar de otra forma durante un instante. Esa transición suele ser normal.
 
 ---
 
-## ⬇️ 3. El descenso trae sonidos distintos
+## 🛞 2. Las ruedas hacen ruido después del despegue
 
-A medida que la aeronave desciende, los pasajeros pueden oír:
+Poco después de dejar el suelo, el tren de aterrizaje se repliega dentro del avión.
 
-- cambios en el tono del motor
-- diferencias en el flujo de aire
-- más tarde en la aproximación, sonidos de flaps o del tren de aterrizaje
+Desde la cabina esto puede producir:
 
-La cabina vuelve a cambiar acústicamente porque el avión está haciendo cosas nuevas.
+- un retumbo bajo mientras las ruedas siguen girando
+- uno o varios golpes firmes al moverse las compuertas y quedar bloqueado el tren
+- un breve zumbido hidráulico o mecánico
+
+Estos sonidos terminan cuando se completa la secuencia.
 
 ---
 
-## ✨ Lo que significa
+## 🪽 3. Los flaps cambian los sonidos mecánicos y del aire
 
-Los cambios en el sonido de la cabina son un reflejo normal de cómo está operando la aeronave.
+Los flaps y slats se extienden para despegar y aterrizar y se recogen cuando dejan de hacer falta.
 
-Una cabina silenciosa o ruidosa suele decir más sobre la fase del vuelo que sobre cualquier problema.
+Su movimiento puede producir un zumbido. Su posición también cambia la forma en que el aire circula alrededor del ala, por lo que el sonido del aire exterior puede aumentar o disminuir sin que cambie del mismo modo el empuje de los motores.
+
+Los pasajeros próximos a las alas suelen oírlo con más claridad.
+
+---
+
+## 🌬 4. El crucero tiene su propio sonido de fondo estable
+
+En crucero, el aire rápido alrededor del fuselaje y las ventanillas crea un sonido continuo. La ventilación y el aire acondicionado añaden un zumbido más estable en el interior.
+
+El nivel puede variar con la velocidad, la altitud, el asiento y pequeños cambios del flujo. Un momento más silencioso puede hacer que un ventilador, una vibración o el aire se noten más.
+
+---
+
+## 🛬 5. La aproximación recupera algunos sonidos
+
+Durante la aproximación, los flaps y slats se extienden por etapas. Más tarde baja el tren de aterrizaje.
+
+La extensión del tren puede provocar un golpe mecánico seguido de un sonido de aire más fuerte y cierta vibración. Ese ruido adicional continúa porque las ruedas y los soportes expuestos alteran el flujo hasta el aterrizaje.
+
+---
+
+## ⚙️ 6. Los zumbidos y clics breves vienen de los sistemas
+
+Los aviones contienen bombas hidráulicas, motores eléctricos, válvulas y ventiladores. Algunos funcionan continuamente; otros solo cuando un sistema los necesita.
+
+Por eso un silbido, clic o vibración breve puede empezar y parar sin indicar ningún problema. Incluso el sonido repentino del inodoro es un ruido normal de un sistema de cabina por presión, no algo que ocurre en los motores.
+
+---
+
+## ✨ Qué significa
+
+El ruido de la cabina mezcla el aire que pasa alrededor del avión con sistemas que cambian de configuración.
+
+Un rugido que aumenta poco a poco puede ser el flujo de aire. Un zumbido breve puede venir de un mecanismo de los flaps o de una bomba. Un golpe y un retumbo durante el despegue o la aproximación pueden proceder del tren de aterrizaje.
 
 ---
 
 ## 💡 Una forma sencilla de verlo
 
-La cabina se vuelve silenciosa y ruidosa en distintos momentos porque:
-> el avión va cambiando cuánto esfuerzo hace...  
-> y eso se oye a través del ambiente de cabina.
+La cabina es como:
+> una casa con ventiladores, tuberías, puertas y aparatos, salvo que toda la casa cambia de forma en cada fase del vuelo.
 
 ---
 
 ## 🟢 Dato rápido
 
-Los pasajeros suelen notar los cambios de sonido con más claridad que los cambios de sistema, por eso una operación normal a veces puede sentirse dramática.
+El asiento cambia lo que oyes: los mecanismos del ala se escuchan mejor en la zona central, el tren cerca de sus compartimentos y la APU a menudo en la parte trasera.
 
 ---
 
-El cambio de sonido de la cabina es una de las formas más fáciles de notar que el vuelo está pasando de una etapa a otra.
+La cabina se vuelve silenciosa y ruidosa porque el flujo de aire y los sistemas del avión cambian de tarea durante el viaje de la puerta al cielo y de vuelta al suelo.
