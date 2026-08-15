@@ -4,8 +4,6 @@ Vor dem Start und nach der Landung verbringen Flugzeuge Zeit damit, sich am Bode
 
 Diese Phase nennt man **Rollen**, und sie ist ein kontrollierter Teil des Flugs - nicht bloß Warten.
 
----
-
 ## 🛣 1. Rollen bedeutet Bewegung zwischen Piste und Gate
 
 Rollen passiert, wenn sich das Flugzeug auf Rollwegen statt auf der Piste bewegt.
@@ -19,8 +17,6 @@ Dazu kann gehören:
 
 👉 Es ist die Bodenreise des Flugzeugs rund um den Flughafen.
 
----
-
 ## ✈️ 2. Das Flugzeug nutzt die Triebwerksleistung vorsichtig
 
 Beim Rollen laufen die Triebwerke normalerweise mit geringer Leistung.
@@ -33,8 +29,6 @@ Das Flugzeug bewegt sich langsam, weil:
 
 Piloten steuern die Geschwindigkeit sorgfältig mit Schub, Bremsen und Lenkung.
 
----
-
 ## 🧭 3. Piloten folgen Bodenanweisungen
 
 Die Flugsicherung steuert nicht nur Flugzeuge am Himmel.
@@ -46,8 +40,6 @@ Auch am Boden erhalten Piloten Anweisungen dazu:
 - wann sie eine Piste kreuzen dürfen
 
 Dadurch bleibt der Verkehr geordnet und sicher.
-
----
 
 ## 👀 4. Beim Rollen gibt es viel zu beobachten
 
@@ -62,8 +54,6 @@ Sie überwachen:
 
 Rollen ist eine Arbeitsphase, keine Pause.
 
----
-
 ## ✨ Was das bedeutet
 
 Das Rollen verbindet den Flug sicher vom Gate zur Piste und wieder zurück.
@@ -74,21 +64,15 @@ Es mag langsam wirken, ist aber:
 - stark verfahrensgesteuert
 - wichtig für die Sicherheit
 
----
-
 ## 💡 Einfach erklärt
 
 Rollen ist wie:
 > das Flugzeug fährt durch das Straßensystem des Flughafens...  
 > vor oder nach dem Fliegen.
 
----
-
 ## 🟢 Kurzfakt
 
 An großen Flughäfen kann das Rollen manchmal länger dauern, als Passagiere erwarten, weil das Bodenverkehrssystem sehr stark ausgelastet sein kann.
-
----
 
 Rollen wirkt vielleicht nicht dramatisch -  
 aber es ist ein wichtiger Teil jedes Flugs von Anfang bis Ende.

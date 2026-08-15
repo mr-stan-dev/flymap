@@ -2,8 +2,6 @@
 
 Wenn ein Flugzeug startet, kann das wie ein kraftvoller, leicht geheimnisvoller Moment wirken. In Wirklichkeit ist es aber ein ruhiger und sorgfältig kontrollierter Ablauf aus ein paar einfachen Schritten.
 
----
-
 ## 🛫 1. Beschleunigung auf der Piste
 
 Bevor das Flugzeug den Boden verlässt, braucht es Geschwindigkeit.
@@ -16,8 +14,6 @@ Du spürst vielleicht:
 
 Das ist völlig normal - das Flugzeug baut die Geschwindigkeit auf, die es zum Fliegen braucht.
 
----
-
 ## 🌬 2. Die Flügel beginnen, Auftrieb zu erzeugen
 
 Wenn Luft über und unter die Flügel strömt, entsteht **Auftrieb** - eine nach oben gerichtete Kraft.
@@ -25,8 +21,6 @@ Wenn Luft über und unter die Flügel strömt, entsteht **Auftrieb** - eine nach
 Ab einer bestimmten Geschwindigkeit (der *Abhebegeschwindigkeit*) reicht dieser Auftrieb aus, um das Flugzeug vom Boden abzuheben.
 
 Die Flügel tun ihre Arbeit also schon, bevor das Flugzeug die Piste verlässt.
-
----
 
 ## ⬆️ 3. Rotation (die Nase anheben)
 
@@ -40,8 +34,6 @@ Dadurch hebt sich die Nase des Flugzeugs leicht - dieser Moment heißt **Rotatio
 
 Sekunden später verlassen die Räder den Boden.
 
----
-
 ## ☁️ 4. Anfangssteigflug
 
 Jetzt in der Luft beginnt das Flugzeug in den Himmel zu steigen.
@@ -51,8 +43,6 @@ Jetzt in der Luft beginnt das Flugzeug in den Himmel zu steigen.
 - Der Steigwinkel wird allmählich geringer
 
 Das Ziel ist, ruhig eine sichere und effiziente Höhe zu erreichen.
-
----
 
 ## ✨ Wie es sich anfühlt
 
@@ -64,20 +54,14 @@ Ein Start kann intensiv wirken, besonders wenn du nicht ans Fliegen gewöhnt bis
 
 Piloten folgen präzisen Verfahren, um einen sicheren und ruhigen Abflug zu gewährleisten.
 
----
-
 ## 💡 Einfach erklärt
 
 Starten ist wie:
 > auf einer Straße schneller zu werden... bis die Luft selbst stark genug wird, dich anzuheben.
 
----
-
 ## 🟢 Kurzfakt
 
 Die meisten Verkehrsflugzeuge heben bei etwa **250-300 km/h** vom Boden ab.
-
----
 
 Ein Start kann dramatisch wirken -  
 aber er ist einfach Physik, Timing und viel Technik, die perfekt zusammenarbeiten.

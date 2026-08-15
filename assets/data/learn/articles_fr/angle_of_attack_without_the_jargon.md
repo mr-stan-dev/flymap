@@ -5,8 +5,6 @@ L'une des idees les plus importantes en aviation est l'**angle d'attaque**.
 Cela sonne technique, mais cela signifie simplement :  
 👉 l'angle entre l'aile et l'air qui s'ecoule vers elle.
 
----
-
 ## 🌬 1. Il s'agit de l'angle de l'aile, pas seulement de la position du nez
 
 L'angle d'attaque n'est pas exactement la meme chose que l'orientation du nez de l'avion.
@@ -17,8 +15,6 @@ Il depend :
 - de la direction de l'ecoulement de l'air
 
 Un avion peut donc avoir une assiette a cabrer sans avoir un angle d'attaque extreme.
-
----
 
 ## ⬆️ 2. Plus d'angle peut creer plus de portance
 
@@ -35,8 +31,6 @@ C'est utile :
 
 Mais seulement jusqu'a un certain point.
 
----
-
 ## ⚠️ 3. Trop d'angle devient un probleme
 
 Si l'angle d'attaque devient trop eleve :
@@ -46,8 +40,6 @@ Si l'angle d'attaque devient trop eleve :
 - la trainee augmente rapidement
 
 👉 C'est ce qui conduit au decrochage.
-
----
 
 ## ✈️ 4. Les pilotes le gerent en permanence
 
@@ -62,8 +54,6 @@ Ils le gerent grace a :
 
 Les systemes de l'avion aident aussi a garder l'appareil dans une zone sure.
 
----
-
 ## ⚖️ 5. C'est un equilibre entre portance et controle
 
 Trop peu d'angle peut ne pas creer assez de portance a basse vitesse.
@@ -74,8 +64,6 @@ L'objectif est de garder l'aile dans une zone intermediaire utile :
 
 - assez d'angle pour voler
 - pas au point que l'ecoulement se detache
-
----
 
 ## ✨ Ce que cela signifie
 
@@ -88,8 +76,6 @@ L'angle d'attaque est important parce qu'il influence :
 
 C'est l'un des aspects les plus importants du comportement d'une aile.
 
----
-
 ## 💡 Facon simple d'y penser
 
 L'angle d'attaque, c'est comme :
@@ -97,13 +83,9 @@ L'angle d'attaque, c'est comme :
 > si tu l'inclines un peu, l'air la soutient davantage,  
 > si tu l'inclines trop, l'ecoulement devient chaotique.
 
----
-
 ## 🟢 Fait rapide
 
 Un decrochage peut survenir a des vitesses tres differentes - ce qui compte vraiment, c'est le moment ou l'aile depasse son angle d'attaque critique.
-
----
 
 L'angle d'attaque peut ressembler a du jargon de pilote -  
 mais c'est surtout l'histoire de la facon dont l'aile rencontre l'air.

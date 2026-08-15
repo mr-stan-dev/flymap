@@ -5,8 +5,6 @@ but they actually fall into a few clear groups, called **cloud families**.
 
 Each type tells a story about what’s happening in the sky.
 
----
-
 ## ☁️ 1. Low Clouds (Near the Ground)
 
 These clouds form close to the Earth.
@@ -21,8 +19,6 @@ They often look like:
 
 They can make the sky look overcast and are often linked to light rain or mist.
 
----
-
 ## 🌤 2. Middle Clouds (Mid-Level)
 
 These clouds sit higher up and often appear:
@@ -35,8 +31,6 @@ These clouds sit higher up and often appear:
 - **Altostratus** or **Altocumulus**
 
 They often signal changing weather.
-
----
 
 ## ☁️☁️ 3. High Clouds (Very High Altitude)
 
@@ -52,8 +46,6 @@ They look:
 
 They are made of ice crystals and often appear before weather changes.
 
----
-
 ## ⬆️ 4. Vertical Clouds (Growing Upward)
 
 Some clouds don’t stay in layers — they grow vertically.
@@ -67,8 +59,6 @@ They can rise:
 
 These are the tallest and most powerful clouds.
 
----
-
 ## ✈️ What You See from a Plane
 
 From above, cloud families become easier to recognize:
@@ -78,20 +68,14 @@ From above, cloud families become easier to recognize:
 - high clouds appear thin and delicate
 - vertical clouds rise like towers
 
----
-
 ## 💡 Simple Way to Think About It
 
 Clouds are grouped by:
 > how high they are… and how they grow.
 
----
-
 ## 🟢 Quick Fact
 
 Some storm clouds can grow up to **10–12 km high** — reaching the same altitude as commercial airplanes.
-
----
 
 Clouds may look random —  
 but they follow clear patterns that help us understand the sky.

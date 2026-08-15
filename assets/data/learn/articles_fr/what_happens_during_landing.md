@@ -4,8 +4,6 @@ L'atterrissage peut sembler plus incertain que le decollage - le sol se rapproch
 
 Mais tout comme le decollage, l'atterrissage est un **processus precis et tres pratique**.
 
----
-
 ## ⬇️ 1. La descente commence
 
 Avant l'atterrissage, l'avion commence a descendre depuis son altitude de croisiere.
@@ -19,8 +17,6 @@ Tu peux remarquer :
 - une douce sensation d'enfoncement
 
 C'est tout a fait normal - l'avion descend simplement de facon controlee.
-
----
 
 ## 🛬 2. L'avion ralentit en l'air
 
@@ -37,8 +33,6 @@ Pour cela, les pilotes deployent certaines parties des ailes :
 
 Ce sont des signes que l'avion se prepare a l'atterrissage.
 
----
-
 ## 🎯 3. L'approche finale
 
 L'avion s'aligne maintenant avec la piste.
@@ -48,8 +42,6 @@ L'avion s'aligne maintenant avec la piste.
 - La piste apparait droit devant
 
 C'est l'une des parties les plus controlees du vol.
-
----
 
 ## 🛞 4. Le toucher des roues
 
@@ -64,8 +56,6 @@ Juste avant l'atterrissage :
 
 C'est attendu - cela signifie que l'avion a atterri en securite.
 
----
-
 ## 🛑 5. Freinage et ralentissement
 
 Apres le toucher des roues, l'avion ralentit rapidement grace a :
@@ -75,8 +65,6 @@ Apres le toucher des roues, l'avion ralentit rapidement grace a :
 - parfois les spoilers sur les ailes
 
 👉 C'est pour cela que tu te sens legerement pousse vers l'avant.
-
----
 
 ## ✨ Ce que l'on ressent
 
@@ -89,20 +77,14 @@ Mais tout est :
 - surveille
 - routinier pour les pilotes
 
----
-
 ## 💡 Facon simple d'y penser
 
 Atterrir, c'est comme :
 > glisser doucement le long d'une longue pente invisible... jusqu'a ce que le sol vienne a ta rencontre.
 
----
-
 ## 🟢 Fait rapide
 
 Les avions sont concus pour atterrir en securite meme avec de forts vents - les pilotes s'entrainent specifiquement a ces conditions.
-
----
 
 L'atterrissage peut sembler intense -  
 mais c'est l'une des parties les plus pratiquees et les plus soigneusement gerees de n'importe quel vol.

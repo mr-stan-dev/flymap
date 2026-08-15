@@ -5,8 +5,6 @@ D'autres deviennent d'immenses geants qui dominent le ciel.
 
 On les appelle **cumulonimbus** - les nuages a l'origine des orages.
 
----
-
 ## ⬆️ 1. Un nuage qui se developpe vers le haut
 
 Contrairement aux nuages plats, les cumulonimbus se developpent verticalement.
@@ -16,8 +14,6 @@ Ils peuvent monter :
 - jusqu'a **10 a 12 km de hauteur**
 
 👉 C'est aussi haut que volent les avions de ligne.
-
----
 
 ## 🌩 2. Le nuage des orages
 
@@ -30,8 +26,6 @@ Les cumulonimbus sont responsables de :
 
 Ils contiennent de forts courants d'air ascendants et descendants.
 
----
-
 ## ☁️ 3. Pourquoi ils paraissent si hauts
 
 Ces nuages se forment lorsque :
@@ -42,8 +36,6 @@ Ces nuages se forment lorsque :
 
 👉 Plus l'air monte vite, plus le nuage devient haut.
 
----
-
 ## 🍄 4. La forme en "enclume"
 
 A haute altitude, le sommet du nuage s'etale souvent.
@@ -53,8 +45,6 @@ Cela cree une forme comme :
 - ou une enclume
 
 👉 Cela arrive parce que l'air ascendant atteint une couche stable et s'etale sur les cotes.
-
----
 
 ## ✈️ 5. Pourquoi les avions les evitent
 
@@ -68,8 +58,6 @@ A l'interieur, il peut y avoir :
 
 👉 A la place, les avions volent generalement autour ou au-dessus d'eux.
 
----
-
 ## ✨ Ce que tu vois depuis un avion
 
 D'en haut, les cumulonimbus ressemblent :
@@ -80,20 +68,14 @@ D'en haut, les cumulonimbus ressemblent :
 
 Ils font partie des spectacles les plus impressionnants du ciel.
 
----
-
 ## 💡 Facon simple d'y penser
 
 Un cumulonimbus, c'est comme :
 > une puissante colonne d'air ascendant... qui construit un orage dans le ciel.
 
----
-
 ## 🟢 Fait rapide
 
 Le sommet d'un cumulonimbus peut etre si haut qu'il atteint des temperatures inferieures a **−50 °C**.
-
----
 
 Les cumulonimbus ne sont pas seulement des nuages -  
 ce sont **de veritables systemes meteorologiques qui se developpent verticalement dans le ciel**.

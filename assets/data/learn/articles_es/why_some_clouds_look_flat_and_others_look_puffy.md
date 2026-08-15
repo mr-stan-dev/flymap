@@ -5,8 +5,6 @@ mientras que otras se ven como formas algodonosas que ascienden hacia el cielo.
 
 Esta diferencia depende de cómo se mueve el aire.
 
----
-
 ## 🌬 1. Depende de la estabilidad del aire
 
 La idea clave es **aire estable frente a aire inestable**.
@@ -15,8 +13,6 @@ La idea clave es **aire estable frente a aire inestable**.
 - **Aire inestable** -> permite que el aire suba con libertad  
 
 👉 Esto determina la forma de las nubes.
-
----
 
 ## ⬜ 2. Nubes planas (aire estable)
 
@@ -31,8 +27,6 @@ En aire estable:
 
 Estas suelen llamarse **nubes de tipo estrato**.
 
----
-
 ## ☁️ 3. Nubes esponjosas (aire inestable)
 
 En aire inestable:
@@ -46,8 +40,6 @@ En aire inestable:
 
 Estas se conocen como **nubes cúmulo**.
 
----
-
 ## ⬆️ 4. Cuando las nubes esponjosas crecen más
 
 Si el aire ascendente es lo bastante fuerte:
@@ -56,8 +48,6 @@ Si el aire ascendente es lo bastante fuerte:
 - hasta convertirse en torres altas  
 
 👉 Estas pueden desarrollarse en nubes de tormenta.
-
----
 
 ## ✈️ 5. Lo que ves desde un avión
 
@@ -68,8 +58,6 @@ Desde arriba, la diferencia es clara:
 
 👉 Es como comparar una superficie tranquila con otra móvil y llena de textura.
 
----
-
 ## 💡 Una forma sencilla de verlo
 
 La forma de las nubes depende del movimiento del aire:
@@ -77,13 +65,9 @@ La forma de las nubes depende del movimiento del aire:
 > el aire tranquilo las extiende...  
 > el aire ascendente las construye hacia arriba.
 
----
-
 ## 🟢 Dato rápido
 
 La misma nube puede cambiar de forma si el aire se vuelve más o menos estable.
-
----
 
 Las nubes no son solo formas:  
 revelan cómo se está moviendo el aire en el cielo.

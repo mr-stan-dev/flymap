@@ -3,8 +3,6 @@
 Thunderstorms can look dramatic from the ground —  
 but from above, they reveal something even more fascinating: a powerful system growing upward through the sky.
 
----
-
 ## 🌡 1. It Starts with Warm Air Rising
 
 Thunderstorms begin when:
@@ -15,8 +13,6 @@ Thunderstorms begin when:
 
 👉 This forms the early stage of a cloud.
 
----
-
 ## ⬆️ 2. Rising Air Feeds the Cloud
 
 If conditions are right:
@@ -26,8 +22,6 @@ If conditions are right:
 - the cloud grows taller and taller
 
 👉 This is how a simple cloud becomes a towering one.
-
----
 
 ## 🌩 3. The Storm Becomes Active
 
@@ -43,8 +37,6 @@ As the cloud grows:
 
 This creates a **dynamic and unstable system**.
 
----
-
 ## ⚡ 4. Lightning and Heavy Rain
 
 Inside the storm:
@@ -54,8 +46,6 @@ Inside the storm:
 - heavy rain or even hail can form
 
 👉 The storm is now fully developed.
-
----
 
 ## 🍄 5. The Cloud Reaches Its Limit
 
@@ -67,8 +57,6 @@ At high altitude:
 
 👉 This creates the classic **anvil shape** at the top.
 
----
-
 ## ✈️ 6. Why Planes Stay Away
 
 Thunderstorms are avoided because they contain:
@@ -78,8 +66,6 @@ Thunderstorms are avoided because they contain:
 - lightning and hail
 
 Pilots carefully route around them.
-
----
 
 ## ✨ What You See from a Plane
 
@@ -91,20 +77,14 @@ From above, thunderstorms look:
 
 They are among the most powerful sights in the sky.
 
----
-
 ## 💡 Simple Way to Think About It
 
 A thunderstorm is like:
 > a column of rising warm air… building energy until it becomes a full storm.
 
----
-
 ## 🟢 Quick Fact
 
 Some thunderstorms can grow so tall that they briefly reach into the lower stratosphere.
-
----
 
 Thunderstorms are not just clouds —  
 they are **powerful systems driven by rising air, moisture, and energy**.

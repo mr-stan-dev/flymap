@@ -10,8 +10,6 @@ En un avión comercial típico, la respuesta es:
 
 Y la razón principal es la **presión**.
 
----
-
 ## La cabina está presurizada
 
 Cuando un avión vuela a gran altitud, el aire exterior es muy tenue y tiene una presión muy baja.
@@ -25,8 +23,6 @@ Eso crea una gran diferencia entre:
 
 Esa diferencia empuja la puerta con enorme fuerza contra su marco.
 
----
-
 ## La mayoría de las puertas se abren hacia adentro primero
 
 En muchos aviones comerciales, la puerta principal está diseñada de modo que primero debe **moverse un poco hacia adentro** antes de poder abrirse hacia afuera o deslizarse.
@@ -34,8 +30,6 @@ En muchos aviones comerciales, la puerta principal está diseñada de modo que p
 Durante el vuelo, la presión de cabina la mantiene tan firmemente sellada en su sitio que nadie podría moverla.
 
 Cuanto más alto vuela el avión, más fuerte suele ser ese efecto.
-
----
 
 ## No se trata solo de fuerza humana
 
@@ -45,8 +39,6 @@ Es que la puerta puede estar soportando una fuerza equivalente a **miles de kilo
 
 Así que, aunque alguien quisiera abrirla, físicamente no podría mientras exista esa diferencia de presión.
 
----
-
 ## ¿Y qué pasa cerca del suelo?
 
 Después del aterrizaje, una vez que la presión dentro y fuera se iguala, la puerta sí puede abrirse con normalidad.
@@ -54,13 +46,9 @@ Después del aterrizaje, una vez que la presión dentro y fuera se iguala, la pu
 Por eso las puertas de avión no están “bloqueadas por arte de magia” en el aire.  
 Simplemente están diseñadas de manera que **la física ayuda a mantenerlas cerradas** cuando más importa.
 
----
-
 ## Dato rápido ✨
 
 Incluso antes de pensar en las cerraduras o los procedimientos, la **presión de cabina por sí sola** suele ser suficiente para impedir que una puerta de avión comercial se abra en vuelo.
-
----
 
 ## La idea clave
 

@@ -4,15 +4,11 @@ From an airplane, a desert can look like a sea of frozen waves - but many desert
 
 This guide helps you recognize both the wider dry landscape and the dunes that wind builds within it.
 
----
-
 ## 🏜 1. Start With the Overall Shape
 
 A sand sea often shows repetition: rows of crescents, long parallel ridges, or star-like mounds spread across a basin. Crescent-shaped **barchan dunes** tend to form where sand is limited and wind usually comes from one direction. Linear and star dunes reflect different supplies of sand and more complex wind patterns.
 
 Beyond the dunes, look for broad bare plateaus, gravel plains, pale salt flats, and river channels that are dry for much of the year. Aridity defines a desert; a golden blanket of sand is only one possible surface.
-
----
 
 ## 🌗 2. Confirm With Texture, Color, and Shadow
 
@@ -22,8 +18,6 @@ Sand may appear cream, red, brown, grey, or even very dark depending on its mine
 
 Color alone is weak evidence. Repeated shape, consistent shadows, and the way features relate to wind and terrain are better clues.
 
----
-
 ## 🧭 3. Read the Landscape Around It
 
 Dune fields often stop sharply at mountains, cliffs, coastlines, or changes in surface. Wind can funnel around an obstacle, leaving a clear sand-free streak on one side and accumulation on another.
@@ -32,8 +26,6 @@ Look for old drainage networks crossing otherwise dry ground. A little vegetatio
 
 These relationships help distinguish a living wind-shaped landscape from a simple patch of similar color.
 
----
-
 ## 🕵️ 4. Watch for Common Look-Alikes
 
 Snow ridges can resemble pale dunes, especially through haze. Ploughed fields create regular lines, ocean waves create parallel highlights, and cloud shadows can draw false dark bands across flat ground.
@@ -41,8 +33,6 @@ Snow ridges can resemble pale dunes, especially through haze. Ploughed fields cr
 Eroded bedrock can also form streamlined ridges. Unlike loose dunes, those ridges may connect to a larger rock plateau and show channels cut through them. Beaches and river bars contain sand but do not by themselves make the surrounding region a desert.
 
 A single crescent shape is a hint. A repeated field of related shapes is much more persuasive.
-
----
 
 ## 👀 5. Try This Next-Time Checklist
 
@@ -56,19 +46,13 @@ Ask:
 
 Cabin glare can hide texture, so changing your viewing angle may help without guaranteeing an identification.
 
----
-
 ## 💡 Simple Way to Think About It
 
 A dune field is like:
 > a slow-motion ocean whose waves are shaped by wind and can migrate grain by grain.
 
----
-
 ## 🟢 Quick Fact
 
 Sand moves up a dune's gentler windward side and falls down its steeper slip face. Repeating that process allows the entire dune to migrate over time.
-
----
 
 The best desert view is read in layers: first the dry region, then its surfaces, and finally the wind-written details that reveal whether you are seeing dunes.

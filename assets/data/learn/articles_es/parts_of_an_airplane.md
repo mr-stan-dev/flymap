@@ -4,8 +4,6 @@ Un avión puede parecer una sola máquina uniforme, pero en realidad está forma
 
 Juntas, esas partes permiten a la aeronave moverse, elevarse, dirigirse y aterrizar con seguridad.
 
----
-
 ## ✈️ 1. El fuselaje es el cuerpo principal
 
 El **fuselaje** es el cuerpo central de la aeronave.
@@ -19,8 +17,6 @@ Aquí es donde encuentras:
 
 👉 Conecta todas las demás partes principales entre sí.
 
----
-
 ## 🌬 2. Las alas crean sustentación
 
 Las alas son una de las partes más importantes del avión.
@@ -33,8 +29,6 @@ Su función es:
 
 Sin alas, el avión no podría volar con eficiencia.
 
----
-
 ## 🧭 3. La cola mantiene la estabilidad de la aeronave
 
 La sección de cola ayuda a que el avión permanezca equilibrado y controlable.
@@ -45,8 +39,6 @@ Normalmente incluye:
 - estabilizadores horizontales
 
 Estos ayudan a que el avión se mantenga estable y le permiten moverse hacia arriba, hacia abajo y hacia los lados de forma controlada.
-
----
 
 ## 🚀 4. Los motores proporcionan empuje
 
@@ -60,8 +52,6 @@ Según la aeronave, los motores pueden estar montados:
 - en la parte trasera del fuselaje
 - en otras posiciones especiales
 
----
-
 ## 🛬 5. El tren de aterrizaje sostiene la aeronave en tierra
 
 El tren de aterrizaje es lo que permite al avión:
@@ -73,8 +63,6 @@ El tren de aterrizaje es lo que permite al avión:
 
 Muchas aeronaves retraen el tren de aterrizaje después del despegue para reducir la resistencia.
 
----
-
 ## ✨ Lo que significa
 
 Cada parte principal de la aeronave tiene una función clara:
@@ -85,21 +73,15 @@ Cada parte principal de la aeronave tiene una función clara:
 - los motores empujan
 - el tren de aterrizaje sostiene en tierra
 
----
-
 ## 💡 Una forma sencilla de verlo
 
 Un avión es como:
 > un equipo de partes que trabajan juntas...  
 > cada una encargándose de una parte del trabajo de volar.
 
----
-
 ## 🟢 Dato rápido
 
 En muchos aviones comerciales, las alas no solo sirven para generar sustentación: también almacenan una gran cantidad del combustible de la aeronave.
-
----
 
 Un avión puede parecer simple desde lejos,  
 pero cada parte principal está ahí por una razón muy concreta.

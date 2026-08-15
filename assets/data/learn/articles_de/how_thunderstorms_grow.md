@@ -3,8 +3,6 @@
 Gewitter können vom Boden aus dramatisch aussehen -  
 aber von oben zeigen sie etwas noch Faszinierenderes: ein mächtiges System, das nach oben in den Himmel wächst.
 
----
-
 ## 🌡 1. Es beginnt mit aufsteigender warmer Luft
 
 Gewitter entstehen, wenn:
@@ -15,8 +13,6 @@ Gewitter entstehen, wenn:
 
 👉 Dadurch entsteht das frühe Stadium einer Wolke.
 
----
-
 ## ⬆️ 2. Aufsteigende Luft speist die Wolke
 
 Wenn die Bedingungen stimmen:
@@ -26,8 +22,6 @@ Wenn die Bedingungen stimmen:
 - wächst die Wolke immer höher
 
 👉 So wird aus einer einfachen Wolke eine mächtige Wolke.
-
----
 
 ## 🌩 3. Das Gewitter wird aktiv
 
@@ -43,8 +37,6 @@ Wenn die Wolke wächst:
 
 Dadurch entsteht ein **dynamisches und instabiles System**.
 
----
-
 ## ⚡ 4. Blitz und starker Regen
 
 Im Inneren des Gewitters:
@@ -54,8 +46,6 @@ Im Inneren des Gewitters:
 - können starker Regen oder sogar Hagel entstehen
 
 👉 Das Gewitter ist nun voll entwickelt.
-
----
 
 ## 🍄 5. Die Wolke erreicht ihre Grenze
 
@@ -67,8 +57,6 @@ In großer Höhe:
 
 👉 Dadurch entsteht oben die klassische **Ambossform**.
 
----
-
 ## ✈️ 6. Warum Flugzeuge Abstand halten
 
 Gewitter werden gemieden, weil sie enthalten:
@@ -78,8 +66,6 @@ Gewitter werden gemieden, weil sie enthalten:
 - Blitz und Hagel
 
 Piloten planen ihre Route sorgfältig um sie herum.
-
----
 
 ## ✨ Was man aus dem Flugzeug sieht
 
@@ -91,20 +77,14 @@ Von oben sehen Gewitter aus:
 
 Sie gehören zu den mächtigsten Anblicken am Himmel.
 
----
-
 ## 💡 Einfach erklärt
 
 Ein Gewitter ist wie:
 > eine Säule aufsteigender warmer Luft... die Energie aufbaut, bis daraus ein vollständiges Gewitter wird.
 
----
-
 ## 🟢 Kurzfakt
 
 Einige Gewitter können so hoch wachsen, dass sie kurzzeitig bis in die untere Stratosphäre reichen.
-
----
 
 Gewitter sind nicht einfach nur Wolken -  
 sie sind **mächtige Systeme, angetrieben von aufsteigender Luft, Feuchtigkeit und Energie**.

@@ -3,8 +3,6 @@
 Les orages peuvent sembler impressionnants depuis le sol -  
 mais vus d'en haut, ils revelent quelque chose d'encore plus fascinant : un systeme puissant qui grandit verticalement dans le ciel.
 
----
-
 ## 🌡 1. Tout commence par de l'air chaud qui monte
 
 Les orages commencent lorsque :
@@ -15,8 +13,6 @@ Les orages commencent lorsque :
 
 👉 Cela forme le stade initial d'un nuage.
 
----
-
 ## ⬆️ 2. L'air ascendant alimente le nuage
 
 Si les conditions sont favorables :
@@ -26,8 +22,6 @@ Si les conditions sont favorables :
 - le nuage grandit de plus en plus en hauteur
 
 👉 C'est ainsi qu'un nuage simple devient un nuage imposant.
-
----
 
 ## 🌩 3. L'orage devient actif
 
@@ -43,8 +37,6 @@ Quand le nuage se developpe :
 
 Cela cree un **systeme dynamique et instable**.
 
----
-
 ## ⚡ 4. Foudre et fortes pluies
 
 A l'interieur de l'orage :
@@ -54,8 +46,6 @@ A l'interieur de l'orage :
 - de fortes pluies ou meme de la grele peuvent se former
 
 👉 L'orage est maintenant pleinement developpe.
-
----
 
 ## 🍄 5. Le nuage atteint sa limite
 
@@ -67,8 +57,6 @@ A haute altitude :
 
 👉 Cela cree la forme classique **d'enclume** au sommet.
 
----
-
 ## ✈️ 6. Pourquoi les avions s'en tiennent a distance
 
 Les orages sont evites parce qu'ils contiennent :
@@ -78,8 +66,6 @@ Les orages sont evites parce qu'ils contiennent :
 - de la foudre et de la grele
 
 Les pilotes les contournent avec soin.
-
----
 
 ## ✨ Ce que tu vois depuis un avion
 
@@ -91,20 +77,14 @@ Depuis le dessus, les orages ressemblent :
 
 Ils comptent parmi les spectacles les plus puissants du ciel.
 
----
-
 ## 💡 Facon simple d'y penser
 
 Un orage, c'est comme :
 > une colonne d'air chaud ascendant... qui accumule de l'energie jusqu'a devenir un veritable orage.
 
----
-
 ## 🟢 Fait rapide
 
 Certains orages peuvent se developper si haut qu'ils atteignent brievement la basse stratosphere.
-
----
 
 Les orages ne sont pas seulement des nuages -  
 ce sont **des systemes puissants, alimentes par l'air ascendant, l'humidite et l'energie**.

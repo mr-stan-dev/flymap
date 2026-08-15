@@ -4,8 +4,6 @@ Aux extremites de nombreuses ailes modernes, on peut voir de petites extensions 
 
 On les appelle des **winglets**, et elles aident a rendre le vol plus efficace.
 
----
-
 ## ✈️ 1. Les extremites d'aile sont une zone active de l'aile
 
 A l'extremite de l'aile, l'air situé sous l'aile cherche a se deplacer vers la zone de plus basse pression au-dessus.
@@ -13,8 +11,6 @@ A l'extremite de l'aile, l'air situé sous l'aile cherche a se deplacer vers la 
 Cela cree un air tourbillonnant appele **vortex marginal**.
 
 Ce mouvement en tourbillon est un signe d'energie perdue.
-
----
 
 ## 🌬 2. Les winglets aident a controler ce tourbillon
 
@@ -28,8 +24,6 @@ Elles aident a :
 
 👉 Meme un petit changement de forme a l'extremite peut avoir un effet reel.
 
----
-
 ## ⛽ 3. Moins de trainee signifie moins de carburant
 
 Quand la trainee diminue, l'avion n'a pas besoin de travailler autant.
@@ -41,8 +35,6 @@ Cela peut signifier :
 - une meilleure efficacite sur les longs vols
 
 C'est l'une des raisons pour lesquelles les winglets sont devenues si courantes sur les avions de ligne.
-
----
 
 ## 🛫 4. Elles peuvent aussi aider les performances
 
@@ -56,8 +48,6 @@ Dans certains cas, elles peuvent ameliorer :
 
 L'effet exact depend de la conception de l'avion.
 
----
-
 ## 🧩 5. Toutes les winglets ne se ressemblent pas
 
 Certains avions ont :
@@ -69,8 +59,6 @@ Certains avions ont :
 
 Des conceptions differentes visent le meme objectif de base : une meilleure efficacite a l'extremite de l'aile.
 
----
-
 ## ✨ Ce que cela signifie
 
 Les winglets montrent a quel point de petits details de conception peuvent compter en aviation.
@@ -81,21 +69,15 @@ Elles aident les avions a :
 - reduire la trainee
 - voler plus efficacement sur de longues distances
 
----
-
 ## 💡 Facon simple d'y penser
 
 Les winglets, c'est comme :
 > de petits outils aux bouts des ailes...  
 > qui rangent l'ecoulement d'air desordonne avant qu'il ne se transforme en energie perdue.
 
----
-
 ## 🟢 Fait rapide
 
 Les winglets peuvent economiser suffisamment de carburant au fil du temps pour que leurs avantages deviennent tres importants a l'echelle de grandes flottes de compagnies.
-
----
 
 Les winglets peuvent paraitre petites depuis le hublot -  
 mais elles ont un effet etonnamment grand sur l'efficacite d'un avion.

@@ -4,8 +4,6 @@ Si alguna vez has mirado al cielo y has visto vetas finas, blancas y plumosas mu
 
 Son unas de las nubes más fáciles de reconocer y suelen ser una señal de que algo está cambiando en la atmósfera.
 
----
-
 ## ¿Qué son los cirros?
 
 Los cirros son nubes altas formadas casi por completo por **cristales de hielo**.
@@ -20,8 +18,6 @@ Como están hechas de hielo y no de gotas gruesas de agua, suelen verse:
 
 Por eso a veces se parecen a mechones de cabello o pinceladas en el cielo.
 
----
-
 ## ¿Dónde se forman?
 
 Los cirros pertenecen a la familia de las **nubes altas**.
@@ -33,8 +29,6 @@ A esas alturas:
 - el aire es muy tenue
 - la temperatura es extremadamente baja
 - dominan los cristales de hielo
-
----
 
 ## ¿Qué indican sobre el tiempo?
 
@@ -48,8 +42,6 @@ A menudo aparecen:
 
 Eso significa que a veces son la primera señal de que un sistema más amplio se está acercando.
 
----
-
 ## ¿Importan para la aviación?
 
 Sí, aunque normalmente no de forma dramática.
@@ -62,13 +54,9 @@ Los cirros por sí mismos no suelen causar turbulencia fuerte ni tormentas, pero
 
 Para los pilotos y meteorólogos, eso los convierte en una pequeña pista útil dentro de un panorama mayor.
 
----
-
 ## Dato rápido ✨
 
 La palabra **cirro** viene del latín y está relacionada con un “rizo” o “mechón”, lo que encaja bastante bien con su aspecto.
-
----
 
 ## La idea clave
 

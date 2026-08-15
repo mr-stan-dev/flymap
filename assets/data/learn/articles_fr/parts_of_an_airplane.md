@@ -4,8 +4,6 @@ Un avion peut sembler etre une seule machine fluide, mais il est en realite comp
 
 Ensemble, ces parties permettent a l'appareil d'avancer, de creer de la portance, de se diriger et d'atterrir en securite.
 
----
-
 ## ✈️ 1. Le fuselage est le corps principal
 
 Le **fuselage** est le corps central de l'avion.
@@ -19,8 +17,6 @@ C'est la que l'on trouve :
 
 👉 Il relie entre elles toutes les autres grandes parties.
 
----
-
 ## 🌬 2. Les ailes creent la portance
 
 Les ailes sont l'une des parties les plus importantes de l'avion.
@@ -33,8 +29,6 @@ Leur role est de :
 
 Sans ailes, l'avion ne pourrait pas voler efficacement.
 
----
-
 ## 🧭 3. L'empennage maintient la stabilite de l'avion
 
 La partie arriere aide l'avion a rester equilibre et controllable.
@@ -45,8 +39,6 @@ Elle comprend generalement :
 - des stabilisateurs horizontaux
 
 Ces elements aident l'avion a rester stable et lui permettent de se deplacer vers le haut, vers le bas et lateralement de maniere controlee.
-
----
 
 ## 🚀 4. Les moteurs fournissent la poussee
 
@@ -60,8 +52,6 @@ Selon l'avion, les moteurs peuvent etre montes :
 - a l'arriere du fuselage
 - dans d'autres positions particulieres
 
----
-
 ## 🛬 5. Le train d'atterrissage soutient l'avion au sol
 
 Le train d'atterrissage permet a l'avion de :
@@ -73,8 +63,6 @@ Le train d'atterrissage permet a l'avion de :
 
 De nombreux avions rentrent leur train apres le decollage afin de reduire la trainee.
 
----
-
 ## ✨ Ce que cela signifie
 
 Chaque grande partie de l'avion a un role clair :
@@ -85,21 +73,15 @@ Chaque grande partie de l'avion a un role clair :
 - les moteurs poussent
 - le train soutient au sol
 
----
-
 ## 💡 Facon simple d'y penser
 
 Un avion, c'est comme :
 > une equipe de pieces qui travaillent ensemble...  
 > chacune s'occupant d'une partie du travail du vol.
 
----
-
 ## 🟢 Fait rapide
 
 Sur beaucoup d'avions de ligne, les ailes ne servent pas seulement a la portance - elles stockent aussi une grande partie du carburant.
-
----
 
 Un avion peut paraitre simple de loin -  
 mais chaque grande partie est la pour une raison tres precise.

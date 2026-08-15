@@ -6,8 +6,6 @@ No significa que “todos se vayan a dormir”.
 
 Significa que las aerolíneas usan procedimientos, tripulaciones ampliadas y reglas de gestión de la fatiga para que el avión siga operando con seguridad durante viajes muy largos.
 
----
-
 ## ¿Por qué hace falta descanso?
 
 Algunos vuelos duran muchas horas y atraviesan zonas horarias, a menudo de noche.
@@ -20,8 +18,6 @@ Por eso, en vuelos de largo recorrido, suele haber:
 - periodos de descanso programados
 - espacios designados para descansar
 
----
-
 ## ¿Quién sigue a los mandos?
 
 Siempre queda una tripulación calificada responsable del vuelo.
@@ -30,15 +26,11 @@ Mientras uno o más pilotos descansan, los demás permanecen despiertos en la ca
 
 Los descansos se hacen por turnos, no todos al mismo tiempo.
 
----
-
 ## ¿Dónde descansan?
 
 En algunos aviones de largo radio hay compartimentos especiales para la tripulación, separados de la cabina de pasajeros.
 
 En otros casos, pueden usarse asientos reclinables designados, según el avión y la normativa aplicable.
-
----
 
 ## ¿Es seguro?
 
@@ -49,13 +41,9 @@ Permitir descansos controlados ayuda a reducir la fatiga, y la fatiga es un ries
 La seguridad no consiste en fingir que los humanos nunca se cansan.  
 Consiste en planificar la operación para manejar ese cansancio de forma inteligente.
 
----
-
 ## Dato rápido ✨
 
 Los vuelos de muy larga distancia suelen llevar **tripulaciones reforzadas**, para que los pilotos puedan turnarse y descansar mientras otros siguen a los mandos.
-
----
 
 ## La idea clave
 

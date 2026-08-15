@@ -5,8 +5,6 @@ the colors look **stronger, deeper, and more dramatic** than on the ground.
 
 There’s a reason for that — and it’s all about light and atmosphere.
 
----
-
 ## 🌅 1. You’re Above Much of the Lower Atmosphere
 
 On the ground, sunlight passes through a thick layer of air.
@@ -16,8 +14,6 @@ At cruising altitude:
 - less haze and pollution
 
 👉 This makes the light clearer and more intense.
-
----
 
 ## 🌈 2. Sunlight Travels a Longer Path
 
@@ -32,8 +28,6 @@ Its light travels:
 - oranges
 - warm tones
 
----
-
 ## ✈️ 3. From a Plane, the Effect Is Stronger
 
 From above:
@@ -45,8 +39,6 @@ From above:
 - color contrast
 - brightness
 - depth
-
----
 
 ## ☁️ 4. Clouds Reflect and Amplify Colors
 
@@ -60,8 +52,6 @@ Clouds play a big role:
 - clouds lit from the side
 - dramatic layers of color
 
----
-
 ## 🌌 5. The Sky Above Gets Darker
 
 At the same time:
@@ -71,8 +61,6 @@ At the same time:
 
 👉 This makes the colors appear even richer.
 
----
-
 ## ✨ What It Feels Like
 
 Sunsets from a plane feel:
@@ -80,20 +68,14 @@ Sunsets from a plane feel:
 - more layered
 - almost unreal
 
----
-
 ## 💡 Simple Way to Think About It
 
 Airplane sunsets are more intense because:
 > you’re above most of the haze — and looking across the full depth of the atmosphere.
 
----
-
 ## 🟢 Quick Fact
 
 On some flights, especially when heading west or changing altitude, the view can make sunset seem to last longer than it would from the ground.
-
----
 
 From above the clouds, a sunset isn’t just a view —  
 it’s a vivid display of light traveling through layers of the atmosphere.

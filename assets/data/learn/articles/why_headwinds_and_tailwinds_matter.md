@@ -4,8 +4,6 @@ An airplane moves through air, not through the ground.
 
 That is why wind can have a big effect on how long a flight takes and how efficient it is.
 
----
-
 ## 🌬 1. A Headwind Slows Ground Progress
 
 A **headwind** is wind blowing against the aircraft's direction of travel.
@@ -16,8 +14,6 @@ That can mean:
 
 - longer flight time
 - more fuel use
-
----
 
 ## 🌬 2. A Tailwind Helps Push the Trip Along
 
@@ -30,8 +26,6 @@ This increases groundspeed, which can mean:
 
 That is why wind is such an important part of route planning.
 
----
-
 ## ✈️ 3. The Wing Still Cares About Airspeed
 
 Even though wind changes groundspeed, the wing still cares mainly about speed through the air.
@@ -43,8 +37,6 @@ This is why an aircraft can have:
 
 depending on the wind.
 
----
-
 ## ✨ What It Means
 
 Headwinds and tailwinds affect the journey, not just the feeling of the flight.
@@ -55,21 +47,15 @@ They play a role in:
 - fuel planning
 - route decisions
 
----
-
 ## 💡 Simple Way to Think About It
 
 Wind for an airplane is like:
 > walking on a moving walkway...  
 > it can help your trip or slow it down.
 
----
-
 ## 🟢 Quick Fact
 
 The same route can take very different amounts of time on different days because of changing winds aloft.
-
----
 
 Headwinds and tailwinds matter because the sky is not still -  
 and airlines are always flying through moving air.

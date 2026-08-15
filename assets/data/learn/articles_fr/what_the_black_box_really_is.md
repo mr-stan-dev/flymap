@@ -4,8 +4,6 @@ Le terme **boite noire** sonne mysterieux, mais il designe d'importants appareil
 
 Ils sont concus pour aider les enqueteurs a comprendre ce qui s'est passe si quelque chose tourne mal.
 
----
-
 ## 🎙 1. Il y a plus d'un enregistreur
 
 Ce que les gens appellent la boite noire est en general une paire d'appareils :
@@ -14,8 +12,6 @@ Ce que les gens appellent la boite noire est en general une paire d'appareils :
 - l'enregistreur phonique du cockpit
 
 Ensemble, ils capturent des informations cles sur le vol et l'environnement du cockpit.
-
----
 
 ## 📊 2. L'un enregistre les donnees de l'avion
 
@@ -28,8 +24,6 @@ L'enregistreur de donnees de vol memorise des informations comme :
 
 Cela aide les enqueteurs a reconstituer la facon dont l'avion etait exploite.
 
----
-
 ## 🎧 3. L'autre enregistre le son du cockpit
 
 L'enregistreur phonique du cockpit capte les sons dans le cockpit, notamment :
@@ -39,8 +33,6 @@ L'enregistreur phonique du cockpit capte les sons dans le cockpit, notamment :
 - les bruits de fond
 
 Cela peut fournir un contexte important sur ce qui se passait pendant un evenement critique.
-
----
 
 ## 🧱 4. Ils sont construits pour survivre a des dommages severes
 
@@ -54,8 +46,6 @@ Ils sont concus pour resister :
 
 C'est pourquoi ils sont si precieux apres un accident.
 
----
-
 ## ✨ Ce que cela signifie
 
 La boite noire sert en realite a l'apprentissage et a l'enquete.
@@ -66,21 +56,15 @@ Elle aide les experts en securite a comprendre :
 - ce que l'equipage a vecu
 - quels changements pourraient prevenir de futurs accidents
 
----
-
 ## 💡 Facon simple d'y penser
 
 La boite noire, c'est comme :
 > la memoire de l'avion...  
 > stockee dans une forme concue pour survivre aux pires conditions.
 
----
-
 ## 🟢 Fait rapide
 
 Les "boites noires" des avions sont en general orange vif, et non noires, afin d'etre plus faciles a retrouver apres un accident.
-
----
 
 La boite noire n'a rien de mysterieux une fois qu'on la comprend -  
 elle est l'un des outils les plus importants de l'aviation pour ameliorer la securite.

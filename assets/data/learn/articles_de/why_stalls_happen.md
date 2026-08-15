@@ -4,8 +4,6 @@ Ein Strömungsabriss klingt dramatisch, bedeutet aber nicht, dass das Triebwerk 
 
 In der Luftfahrt passiert ein **Strömungsabriss**, wenn der Flügel nicht mehr genug Auftrieb erzeugen kann, weil die Luftströmung über ihm gestört wurde.
 
----
-
 ## 🌬 1. Ein Strömungsabriss betrifft den Flügel, nicht das Triebwerk
 
 Viele Menschen hören "stall" und denken an einen Motor, der abstirbt.
@@ -20,8 +18,6 @@ Er passiert, wenn:
 
 👉 Das zentrale Problem ist die Luftströmung, nicht die Triebwerksleistung.
 
----
-
 ## ⬆️ 2. Zu viel Anstellwinkel verursacht das Problem
 
 Wenn der Flügel der Luft in einem größeren Winkel begegnet, nimmt der Auftrieb normalerweise zu - aber nur bis zu einem bestimmten Punkt.
@@ -33,8 +29,6 @@ Danach:
 - bricht der Auftrieb zusammen
 
 Das ist der Punkt des Strömungsabrisses.
-
----
 
 ## ⚠️ 3. Ein Strömungsabriss kann bei vielen Geschwindigkeiten passieren
 
@@ -48,8 +42,6 @@ Ein Strömungsabriss kann immer dann passieren, wenn der Flügel seinen kritisch
 - bei einem aggressiven Steigflug
 - bei schlechter Handhabung bei niedriger Geschwindigkeit
 
----
-
 ## ✈️ 4. Piloten werden darauf trainiert, ihn zu vermeiden und zu beenden
 
 Flugzeuge sind so gebaut und Piloten so geschult, dass sie mit Strömungsabrissen sicher umgehen können.
@@ -61,8 +53,6 @@ Die Erholung bedeutet meist:
 - bei Bedarf Leistung hinzuzufügen
 
 Moderne Flugzeuge haben außerdem Warnungen und Schutzsysteme, die helfen, Strömungsabrisse zu verhindern.
-
----
 
 ## 🧍 5. Warum das für Passagiere wichtig ist
 
@@ -76,8 +66,6 @@ Trotzdem hilft das Verständnis davon zu erklären, warum Piloten so genau auf F
 - Nicklage
 - Konfiguration
 
----
-
 ## ✨ Was das bedeutet
 
 Ein Strömungsabriss ist im Kern ein Problem der Flügelleistung.
@@ -88,20 +76,14 @@ Er zeigt:
 - zu viel Winkel kann diese Strömung zerstören
 - sicheres Fliegen bedeutet, innerhalb der Grenzen des Flügels zu bleiben
 
----
-
 ## 💡 Einfach erklärt
 
 Ein Strömungsabriss ist wie:
 > vom Flügel mehr zu verlangen, als die Luftströmung tragen kann.
 
----
-
 ## 🟢 Kurzfakt
 
 Ein Flugzeug kann selbst bei laufenden Triebwerken einen Strömungsabriss erleiden, wenn der Flügel seinen kritischen Anstellwinkel überschreitet.
-
----
 
 Ein Strömungsabriss entsteht, wenn der Flügel die glatte Luftströmung verliert, die er braucht -  
 und genau deshalb sind Winkel, Geschwindigkeit und Kontrolle so wichtig.

@@ -4,8 +4,6 @@ Muchos aviones comerciales están pintados principalmente de blanco, y eso no es
 
 La pintura blanca aporta varias ventajas prácticas para las aerolíneas y los propietarios de aeronaves.
 
----
-
 ## ☀️ 1. El blanco refleja mejor el calor
 
 Los aviones pasan mucho tiempo expuestos al sol.
@@ -16,8 +14,6 @@ Esto puede ayudar a mantener:
 
 - temperaturas más bajas en la cabina
 - temperaturas de la superficie más manejables
-
----
 
 ## 👀 2. Hace que los problemas sean más fáciles de detectar
 
@@ -32,8 +28,6 @@ Eso puede incluir:
 
 👉 Los equipos de mantenimiento se benefician de esa visibilidad.
 
----
-
 ## 🎨 3. El blanco también es flexible para la imagen de marca
 
 Las aerolíneas quieren espacio para:
@@ -43,8 +37,6 @@ Las aerolíneas quieren espacio para:
 - diseños de cola
 
 Una aeronave mayoritariamente blanca funciona bien como base neutra para muchos esquemas de pintura.
-
----
 
 ## ⛽ 4. Las decisiones de pintura afectan al peso y al coste
 
@@ -58,8 +50,6 @@ Los esquemas de pintura simples pueden ayudar a reducir:
 
 Esto importa en grandes flotas.
 
----
-
 ## ✨ Lo que significa
 
 Las aeronaves blancas son comunes porque ese color es práctico, eficiente y fácil de mantener.
@@ -70,21 +60,15 @@ Ayuda con:
 - la inspección
 - la flexibilidad de imagen
 
----
-
 ## 💡 Una forma sencilla de verlo
 
 La pintura blanca es como:
 > la ropa más simple y versátil para un avión...  
 > primero práctica, después elegante.
 
----
-
 ## 🟢 Dato rápido
 
 La pintura oscura puede hacer que las superficies de la aeronave se calienten más bajo un sol fuerte.
-
----
 
 Los aviones suelen ser blancos porque, en aviación,  
 las decisiones que parecen cotidianas suelen tener razones prácticas detrás.

@@ -4,8 +4,6 @@ Landing might feel more uncertain than takeoff — the ground is getting closer,
 
 But just like takeoff, landing is a **precise and well-practiced process**.
 
----
-
 ## ⬇️ 1. Descent Begins
 
 Before landing, the aircraft starts descending from cruising altitude.
@@ -19,8 +17,6 @@ You might notice:
 - a gentle sinking feeling
 
 This is completely normal — the plane is simply coming down in a controlled way.
-
----
 
 ## 🛬 2. Slowing Down in the Air
 
@@ -37,8 +33,6 @@ To do this, pilots extend parts of the wings:
 
 These are signs the aircraft is preparing for landing.
 
----
-
 ## 🎯 3. Final Approach
 
 Now the plane lines up with the runway.
@@ -48,8 +42,6 @@ Now the plane lines up with the runway.
 - The runway appears directly ahead
 
 This is one of the most controlled parts of the flight.
-
----
 
 ## 🛞 4. Touchdown
 
@@ -64,8 +56,6 @@ Just before landing:
 
 This is expected — it means the plane has landed safely.
 
----
-
 ## 🛑 5. Braking and Slowing
 
 After touchdown, the aircraft slows down quickly using:
@@ -75,8 +65,6 @@ After touchdown, the aircraft slows down quickly using:
 - sometimes spoilers on the wings
 
 👉 This is why you feel pushed slightly forward.
-
----
 
 ## ✨ What It Feels Like
 
@@ -89,19 +77,13 @@ But everything is:
 - monitored
 - routine for pilots
 
----
-
 ## 💡 Simple Way to Think About It
 
 Landing is like:
 > smoothly gliding down a long invisible slope… until the ground meets you.
 
----
-
 ## 🟢 Quick Fact
 
 Airplanes are designed to land safely even in strong winds — pilots train specifically for these conditions.
-
----
 
 Landing may feel intense — but it’s one of the most practiced and carefully managed parts of any flight.

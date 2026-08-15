@@ -42,11 +42,17 @@ void main() {
 
       for (final article in content.articles) {
         final body = File('${content.articlesDirectory}/${article.id}.md');
-        final heading = body.readAsLinesSync().first;
+        final lines = body.readAsLinesSync();
+        final heading = lines.first;
         expect(
           heading,
           '# ${article.title}',
           reason: '$locale/${article.id} H1 must match its metadata title',
+        );
+        expect(
+          lines.any((line) => line.trim() == '---'),
+          isFalse,
+          reason: '$locale/${article.id} must not contain section dividers',
         );
       }
 

@@ -3,8 +3,6 @@
 Autopilot might sound like the plane is flying itself —  
 but in reality, it’s more like a **highly advanced assistant for the pilots**.
 
----
-
 ## ✈️ 1. Autopilot Helps Control the Plane
 
 Autopilot can manage:
@@ -17,8 +15,6 @@ It keeps the aircraft stable and on its planned path.
 
 👉 Think of it as helping with precision, not replacing the pilots.
 
----
-
 ## 🧑‍✈️ 2. Pilots Are Always in Charge
 
 Even when autopilot is on:
@@ -28,8 +24,6 @@ Even when autopilot is on:
 - they decide what the plane should do
 
 👉 Autopilot follows instructions — it doesn’t make decisions on its own.
-
----
 
 ## 🧭 3. It Follows the Flight Plan
 
@@ -42,8 +36,6 @@ Autopilot can then:
 
 This makes long flights smoother and more efficient.
 
----
-
 ## ⬆️⬇️ 4. It Can Handle Climb and Descent
 
 Autopilot can:
@@ -54,8 +46,6 @@ Autopilot can:
 
 👉 But pilots still supervise every phase.
 
----
-
 ## 🎯 5. It Improves Precision
 
 Autopilot is extremely accurate.
@@ -65,8 +55,6 @@ It helps:
 - reduce small movements
 - maintain exact flight conditions
 
----
-
 ## ✨ What It Means for You
 
 For passengers, autopilot means:
@@ -75,21 +63,15 @@ For passengers, autopilot means:
 - more consistent movement
 - less workload for pilots
 
----
-
 ## 💡 Simple Way to Think About It
 
 Autopilot is like:
 > cruise control in a car —  
 > it helps maintain speed and direction, but the driver is still in control.
 
----
-
 ## 🟢 Quick Fact
 
 Modern autopilot systems can even assist with landing in low visibility — but pilots are always ready to take over.
-
----
 
 Autopilot doesn’t replace pilots —  
 it helps them fly **more precisely, safely, and efficiently**.

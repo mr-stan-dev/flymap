@@ -4,8 +4,6 @@ Las nubes parecen infinitamente variadas, pero la mayoría pertenecen a unas poc
 
 Una forma útil de entenderlas es fijarse en **qué altura tienen** y **cómo crecen**.
 
----
-
 ## 1. Nubes altas
 
 Estas se forman muy arriba, donde el aire es frío y muchas nubes están hechas de cristales de hielo.
@@ -18,8 +16,6 @@ Los principales tipos son:
 
 Las nubes altas suelen señalar cambios del tiempo más que lluvia intensa inmediata.
 
----
-
 ## 2. Nubes medias
 
 Se forman a altitudes intermedias y suelen estar compuestas por gotas de agua, a veces mezcladas con hielo.
@@ -30,8 +26,6 @@ Los tipos comunes son:
 - **Altocúmulos**: grupos o parches redondeados
 
 Las nubes medias pueden indicar que el tiempo está evolucionando y a veces aparecen antes de sistemas más amplios.
-
----
 
 ## 3. Nubes bajas
 
@@ -44,8 +38,6 @@ Incluyen:
 - **Nimbostratos**: capas gruesas asociadas a lluvia continua
 
 Las nubes bajas suelen estar más relacionadas con tiempo gris, techos bajos y llovizna o lluvia persistente.
-
----
 
 ## 4. Nubes de desarrollo vertical
 
@@ -64,8 +56,6 @@ Este grupo es especialmente importante en aviación porque el gran desarrollo ve
 - rayos
 - fuertes corrientes ascendentes y descendentes
 
----
-
 ## ¿Por qué importa esto?
 
 Porque las nubes no solo son “decoración del cielo”.
@@ -77,14 +67,10 @@ Su forma y su altura dan pistas sobre:
 - movimiento vertical
 - posibles riesgos meteorológicos
 
----
-
 ## Dato rápido ✨
 
 Muchos nombres de nubes provienen del latín:  
 **cirro** se relaciona con rizos, **estrato** con capas y **cúmulo** con montones.
-
----
 
 ## La idea clave
 

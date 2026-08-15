@@ -4,8 +4,6 @@ Wenn Menschen aus einem Flugzeugfenster schauen, kann der Himmel leer wirken.
 
 Für ein Flugzeug ist der Himmel aber voller Luft mit Struktur, Bewegung, Druck und Kraft.
 
----
-
 ## 🌬 1. Luft ist ein echtes physikalisches Medium
 
 Luft ist zwar unsichtbar, aber sie hat:
@@ -17,8 +15,6 @@ Luft ist zwar unsichtbar, aber sie hat:
 
 Das bedeutet, dass sie ein Flugzeug schieben, tragen, abbremsen und stören kann.
 
----
-
 ## ✈️ 2. Flügel und Triebwerke sind auf sie angewiesen
 
 Ohne Luft:
@@ -28,8 +24,6 @@ Ohne Luft:
 - hätten Steuerflächen nur sehr wenig Wirkung
 
 Das Flugzeug ist dafür gebaut, in diesem bewegten Medium zu arbeiten.
-
----
 
 ## 🌍 3. Der Himmel hat Schichten und Struktur
 
@@ -43,15 +37,11 @@ Verschiedene Teile von ihr können haben:
 
 Darum können sich Flugbedingungen mit Höhe und Wetter verändern.
 
----
-
 ## ✨ Was das bedeutet
 
 Fliegen bedeutet nicht, sich durch leeren Raum zu bewegen.
 
 Es bedeutet, sich durch eine reale, dynamische Umgebung zu bewegen, mit der das Flugzeug ständig wechselwirkt.
-
----
 
 ## 💡 Einfach erklärt
 
@@ -59,13 +49,9 @@ Der Himmel ist wie:
 > ein unsichtbarer Ozean aus bewegter Luft...  
 > und das Flugzeug ist dafür gebaut, durch ihn zu reisen.
 
----
-
 ## 🟢 Kurzfakt
 
 Viele der wichtigsten Teile des Fliegens - Auftrieb, Widerstand, Turbulenzen, Druck - ergeben nur Sinn, weil Luft eine echte physikalische Substanz ist.
-
----
 
 Der Himmel mag für menschliche Augen leer wirken -  
 für ein Flugzeug ist er aber eine reiche und aktive Umgebung.

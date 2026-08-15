@@ -4,8 +4,6 @@ Wenn Flugzeuge hoch am Himmel im Reiseflug unterwegs sind, wird ihre Höhe oft a
 
 Das ist eine standardisierte Art, den vertikalen Raum zu organisieren.
 
----
-
 ## ✈️ 1. Flugflächen sind standardisierte Höhen
 
 Eine Flugfläche basiert auf Druckeinstellungen und nicht nur auf der lokalen Höhe über dem Meeresspiegel.
@@ -16,8 +14,6 @@ Zum Beispiel:
 
 Das hilft Flugzeugen in vielen Regionen, dieselbe Referenz zu verwenden.
 
----
-
 ## 🌍 2. Standarddruck hält den Verkehr geordnet
 
 In großer Höhe hilft eine gemeinsame Druckeinstellung, Verwechslungen zu vermeiden.
@@ -26,15 +22,11 @@ Wenn jedes Flugzeug unterschiedliche lokale Druckreferenzen nutzen würde, wäre
 
 Flugflächen schaffen ein gemeinsames System für alle.
 
----
-
 ## ↕️ 3. Sie helfen, Flugzeuge vertikal zu trennen
 
 Flugzeuge, die in ähnlichen Bereichen fliegen, können unterschiedlichen Flugflächen zugewiesen werden.
 
 Dadurch entsteht ein sicherer Abstand zwischen ihnen in der Vertikalen, so wie Routen sie horizontal trennen.
-
----
 
 ## 🧭 4. Piloten wechseln in größerer Höhe auf Standardeinstellungen
 
@@ -43,8 +35,6 @@ Während des Steigflugs ändern Crews ihre Höhenmessereinstellung, wenn sie die
 Danach beziehen sie sich auf Flugflächen statt auf lokale Höhe.
 
 Das ist ein routinemäßiger, aber wichtiger Teil des Flugs.
-
----
 
 ## ✨ Was das bedeutet
 
@@ -58,21 +48,15 @@ Sie helfen:
 
 dabei, eine gemeinsame vertikale Referenz zu nutzen.
 
----
-
 ## 💡 Einfach erklärt
 
 Flugflächen sind wie:
 > nummerierte Stockwerke im oberen Himmel...  
 > die helfen, Flugzeuge getrennt und organisiert zu halten.
 
----
-
 ## 🟢 Kurzfakt
 
 Zwei Flugzeuge können weit entfernt von jedem Berg oder jeder Stadt sein - und dennoch geben Flugflächen ihnen ein präzises gemeinsames Höhensystem.
-
----
 
 Flugflächen mögen technisch klingen -  
 aber sie sind einfach eines der besten Werkzeuge der Luftfahrt, um den Himmel strukturiert zu halten.

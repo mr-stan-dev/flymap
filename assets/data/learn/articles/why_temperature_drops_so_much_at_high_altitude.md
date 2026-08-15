@@ -5,8 +5,6 @@ but just outside the plane, the temperature can be as low as **-50°C**.
 
 Why does it get so cold so quickly as you go higher?
 
----
-
 ## 🌡 1. The Air Is Heated from Below
 
 Most of the Earth's warmth comes from:
@@ -18,8 +16,6 @@ Most of the Earth's warmth comes from:
 - air near the surface is warmer  
 - air higher up gets less heat  
 
----
-
 ## ⬆️ 2. Higher Air = Less Heat
 
 As you go up:
@@ -28,8 +24,6 @@ As you go up:
 - there's less heat being transferred  
 
 👉 So temperature drops with altitude.
-
----
 
 ## 🌬 3. Air Expands and Cools
 
@@ -42,8 +36,6 @@ When air expands, it cools.
 
 👉 This is a key reason temperatures fall rapidly.
 
----
-
 ## ❄️ 4. Why It Gets Extremely Cold
 
 At cruising altitude:
@@ -54,8 +46,6 @@ At cruising altitude:
 
 👉 This is why high clouds are often made of ice.
 
----
-
 ## ✈️ 5. Why You Don't Feel It
 
 Inside the aircraft:
@@ -65,8 +55,6 @@ Inside the aircraft:
 
 👉 Outside conditions are completely different from inside.
 
----
-
 ## ✨ What It Means
 
 Cold temperatures at altitude affect:
@@ -75,21 +63,15 @@ Cold temperatures at altitude affect:
 - engine performance  
 - flight efficiency  
 
----
-
 ## 💡 Simple Way to Think About It
 
 It gets colder with height because:
 > you're moving away from the Earth's warmth...  
 > and into thinner, expanding air.
 
----
-
 ## 🟢 Quick Fact
 
 The temperature drops by about **6-7°C per kilometer** as you go higher in the lower atmosphere.
-
----
 
 High above the ground, the sky may look calm -  
 but it's actually one of the coldest environments on Earth.

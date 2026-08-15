@@ -4,8 +4,6 @@ Les numeros de piste ne sont pas des etiquettes choisies au hasard.
 
 Ils sont bases sur l'orientation de la piste.
 
----
-
 ## 🧭 1. Le numero correspond a la direction compas
 
 Chaque numero de piste vient de son cap magnetique, arrondi a la dizaine la plus proche puis raccourci.
@@ -13,8 +11,6 @@ Chaque numero de piste vient de son cap magnetique, arrondi a la dizaine la plus
 Ainsi, une piste orientee vers environ 180 degres est designee comme la piste `18`.
 
 Cela aide les pilotes a connaitre la direction qu'ils utiliseront pour le decollage ou l'atterrissage.
-
----
 
 ## ↔️ 2. Les deux extremites ont des numeros differents
 
@@ -29,8 +25,6 @@ Par exemple :
 - une extremite peut etre `09`
 - l'autre peut etre `27`
 
----
-
 ## ✈️ 3. Les numeros aident a l'orientation
 
 Les numeros de piste donnent rapidement aux pilotes une idee de :
@@ -41,15 +35,11 @@ Les numeros de piste donnent rapidement aux pilotes une idee de :
 
 Cela est tres utile dans les operations aeroportuaires chargees.
 
----
-
 ## ✨ Ce que cela signifie
 
 Les numeros de piste transforment l'orientation en une etiquette visuelle simple.
 
 Ils aident a rendre les operations aeroportuaires plus claires et plus sures.
-
----
 
 ## 💡 Facon simple d'y penser
 
@@ -57,13 +47,9 @@ Les numeros de piste, c'est comme :
 > des etiquettes de boussole peintes sur l'aeroport...  
 > qui montrent vers ou pointe la piste.
 
----
-
 ## 🟢 Fait rapide
 
 Lorsque la variation magnetique change avec le temps, certaines pistes sont meme renumerotees pour correspondre a leur nouvel alignement.
-
----
 
 Les numeros de piste peuvent sembler simples -  
 mais ils donnent aux pilotes une information directionnelle immediate chaque fois qu'ils s'alignent pour partir ou atterrir.

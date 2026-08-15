@@ -5,8 +5,6 @@ Muchos aviones pueden seguir volando con seguridad aunque un motor deje de funci
 
 De hecho, los aviones con varios motores están diseñados teniendo esto en cuenta.
 
----
-
 ## Los aviones no dependen de que todos los motores funcionen todo el tiempo
 
 En un avión de dos motores, perder uno no significa que el otro deje de funcionar.  
@@ -19,8 +17,6 @@ El avión no volará igual que antes:
 - puede que necesite desviarse y aterrizar antes
 
 Pero sigue siendo controlable.
-
----
 
 ## ¿Qué cambia cuando falla un motor?
 
@@ -37,8 +33,6 @@ El avión también puede:
 
 Los pilotos entrenan este escenario de forma repetida porque es uno de los casos clásicos que deben saber gestionar.
 
----
-
 ## Está previsto en el diseño
 
 Los aviones comerciales se certifican con requisitos estrictos sobre cómo deben rendir si pierden un motor, especialmente durante fases críticas como el despegue.
@@ -50,8 +44,6 @@ Eso incluye demostrar que el avión puede:
 - aterrizar con seguridad
 
 En operaciones de largo alcance sobre agua o zonas remotas, también existen reglas especiales para asegurarse de que un avión pueda llegar a un aeropuerto adecuado incluso con un solo motor.
-
----
 
 ## Entonces, ¿es peligroso?
 
@@ -68,13 +60,9 @@ El objetivo es:
 - desviarse si hace falta
 - aterrizar con seguridad
 
----
-
 ## Dato rápido ✨
 
 Los aviones bimotores hacen parte de su certificación demostrando que pueden despegar y seguir volando incluso si un motor falla en el peor momento permitido.
-
----
 
 ## La idea clave
 
