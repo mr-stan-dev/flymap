@@ -30,6 +30,7 @@ class _MediaCapturePreviewScreenState extends State<MediaCapturePreviewScreen> {
   static const _deleteMenuValue = 'delete';
   static const _thumbnailExtent = 64.0;
   static const _thumbnailGap = 8.0;
+  static const _filmstripHeight = 92.0;
 
   late final List<SkyCameraMediaItem> _captures;
   late final PageController _pageController;
@@ -113,6 +114,9 @@ class _MediaCapturePreviewScreenState extends State<MediaCapturePreviewScreen> {
                     // (e.g. after a rendition was produced).
                     key: ValueKey('video_${pageCapture.id}'),
                     capture: pageCapture,
+                    bottomControlsInset: _captures.length > 1
+                        ? _filmstripHeight
+                        : 0,
                   );
                 }
                 return Center(
@@ -261,7 +265,7 @@ class _MediaPreviewFilmstrip extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        height: 92,
+        height: _MediaCapturePreviewScreenState._filmstripHeight,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,

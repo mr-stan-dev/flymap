@@ -12,9 +12,17 @@ import 'package:video_player/video_player.dart';
 /// overlay drawn live on top from the recorded 1 Hz track — no burned file
 /// needed to watch it in the app.
 class MediaVideoPreview extends StatefulWidget {
-  const MediaVideoPreview({required this.capture, super.key});
+  const MediaVideoPreview({
+    required this.capture,
+    this.bottomControlsInset = 0,
+    super.key,
+  }) : assert(bottomControlsInset >= 0);
 
   final SkyCameraMediaItem capture;
+
+  /// Space reserved below the seek bar for preview controls owned by the
+  /// parent, such as the capture filmstrip.
+  final double bottomControlsInset;
 
   @override
   State<MediaVideoPreview> createState() => _MediaVideoPreviewState();
@@ -119,46 +127,54 @@ class _MediaVideoPreviewState extends State<MediaVideoPreview> {
       key: const Key('media.video_preview'),
       behavior: HitTestBehavior.opaque,
       onTap: _togglePlayback,
-      child: Center(
-        child: AspectRatio(
-          aspectRatio: _controller.value.aspectRatio,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              VideoPlayer(_controller),
-              IgnorePointer(
-                child: SkyCameraOverlayView(
-                  snapshot: overlaySnapshot,
-                  strings: strings,
-                  metricsPosition: SkyCameraMetricsPosition.initial,
-                  onMetricsPositionChanged: (_) {},
-                ),
-              ),
-              if (!_controller.value.isPlaying)
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.4),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.play_arrow_rounded,
-                      size: 42,
-                      color: Colors.white,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Center(
+            child: AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  VideoPlayer(_controller),
+                  IgnorePointer(
+                    child: SkyCameraOverlayView(
+                      snapshot: overlaySnapshot,
+                      strings: strings,
+                      metricsPosition: SkyCameraMetricsPosition.initial,
+                      onMetricsPositionChanged: (_) {},
                     ),
                   ),
-                ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                  child: _MediaVideoScrubber(controller: _controller),
-                ),
+                  if (!_controller.value.isPlaying)
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.4),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.play_arrow_rounded,
+                          size: 42,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: widget.bottomControlsInset,
+            child: SafeArea(
+              top: false,
+              minimum: const EdgeInsets.only(bottom: 10),
+              child: _MediaVideoScrubber(controller: _controller),
+            ),
+          ),
+        ],
       ),
     );
   }
