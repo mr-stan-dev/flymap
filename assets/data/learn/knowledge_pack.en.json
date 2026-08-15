@@ -165,6 +165,12 @@
           "title": "How Ice Forms on Aircraft and How It Is Prevented",
           "premium": true,
           "order": 13
+        },
+        {
+          "id": "why_contrails_form_and_why_some_last",
+          "title": "Why Contrails Form and Why Some Last",
+          "premium": true,
+          "order": 14
         }
       ],
       "order": 2
@@ -337,6 +343,24 @@
           "title": "What the APU Does",
           "premium": true,
           "order": 13
+        },
+        {
+          "id": "ailerons_elevator_and_rudder_how_a_plane_steers",
+          "title": "Ailerons, Elevator and Rudder: How a Plane Steers",
+          "premium": true,
+          "order": 14
+        },
+        {
+          "id": "why_wings_flex_without_breaking",
+          "title": "Why Wings Flex Without Breaking",
+          "premium": true,
+          "order": 15
+        },
+        {
+          "id": "how_passenger_oxygen_masks_work",
+          "title": "How Passenger Oxygen Masks Work",
+          "premium": true,
+          "order": 16
         }
       ],
       "order": 4
@@ -417,6 +441,18 @@
           "title": "What SIDs and STARs Are",
           "premium": true,
           "order": 12
+        },
+        {
+          "id": "how_airliners_navigate_and_communicate_across_oceans",
+          "title": "How Airliners Navigate and Communicate Across Oceans",
+          "premium": true,
+          "order": 13
+        },
+        {
+          "id": "how_pilots_land_when_they_cannot_see_the_runway",
+          "title": "How Pilots Land When They Cannot See the Runway",
+          "premium": true,
+          "order": 14
         }
       ],
       "order": 5
@@ -571,6 +607,18 @@
           "title": "How to Stop Your Ears Hurting on a Plane",
           "premium": false,
           "order": 9
+        },
+        {
+          "id": "what_the_cabin_chimes_mean",
+          "title": "What the Cabin Chimes Mean",
+          "premium": true,
+          "order": 10
+        },
+        {
+          "id": "how_in_flight_wifi_works",
+          "title": "How In-Flight Wi-Fi Works",
+          "premium": true,
+          "order": 11
         }
       ],
       "order": 7
@@ -627,6 +675,24 @@
           "title": "What Happens Between Arrival and the Next Departure",
           "premium": true,
           "order": 8
+        },
+        {
+          "id": "what_happens_during_pushback",
+          "title": "What Happens During Pushback",
+          "premium": true,
+          "order": 9
+        },
+        {
+          "id": "how_airports_choose_which_runway_to_use",
+          "title": "How Airports Choose Which Runway to Use",
+          "premium": true,
+          "order": 10
+        },
+        {
+          "id": "what_airport_slots_are_and_why_delays_ripple",
+          "title": "What Airport Slots Are and Why Delays Ripple",
+          "premium": true,
+          "order": 11
         }
       ],
       "order": 8
@@ -683,6 +749,36 @@
           "title": "Why Some Landscapes Look Like Patterns From Above",
           "premium": true,
           "order": 8
+        },
+        {
+          "id": "why_some_fields_are_perfect_circles",
+          "title": "Why Some Fields Are Perfect Circles",
+          "premium": true,
+          "order": 9
+        },
+        {
+          "id": "how_to_spot_volcanoes_from_the_air",
+          "title": "How to Spot Volcanoes From the Air",
+          "premium": true,
+          "order": 10
+        },
+        {
+          "id": "how_to_spot_glaciers_from_the_air",
+          "title": "How to Spot Glaciers From the Air",
+          "premium": true,
+          "order": 11
+        },
+        {
+          "id": "how_to_spot_river_deltas_from_the_air",
+          "title": "How to Spot River Deltas From the Air",
+          "premium": true,
+          "order": 12
+        },
+        {
+          "id": "how_to_spot_deserts_and_dunes_from_the_air",
+          "title": "How to Spot Deserts and Dunes From the Air",
+          "premium": true,
+          "order": 13
         }
       ],
       "order": 9
@@ -739,6 +835,18 @@
           "title": "Can a Plane Fly on One Engine?",
           "premium": true,
           "order": 8
+        },
+        {
+          "id": "do_airplanes_dump_toilet_waste_in_flight",
+          "title": "Do Airplanes Dump Toilet Waste in Flight?",
+          "premium": true,
+          "order": 9
+        },
+        {
+          "id": "do_you_really_need_airplane_mode",
+          "title": "Do You Really Need Airplane Mode?",
+          "premium": true,
+          "order": 10
         }
       ],
       "order": 10

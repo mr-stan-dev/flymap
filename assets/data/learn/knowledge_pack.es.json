@@ -165,6 +165,12 @@
           "title": "Cómo se forma el hielo en las aeronaves y cómo se evita",
           "premium": true,
           "order": 13
+        },
+        {
+          "id": "why_contrails_form_and_why_some_last",
+          "title": "Por qué se forman las estelas de condensación y por qué algunas persisten",
+          "premium": true,
+          "order": 14
         }
       ],
       "order": 2
@@ -337,6 +343,24 @@
           "title": "Qué hace el APU",
           "premium": true,
           "order": 13
+        },
+        {
+          "id": "ailerons_elevator_and_rudder_how_a_plane_steers",
+          "title": "Alerones, timón de profundidad y timón de dirección: cómo se dirige un avión",
+          "premium": true,
+          "order": 14
+        },
+        {
+          "id": "why_wings_flex_without_breaking",
+          "title": "Por qué las alas se flexionan sin romperse",
+          "premium": true,
+          "order": 15
+        },
+        {
+          "id": "how_passenger_oxygen_masks_work",
+          "title": "Cómo funcionan las máscaras de oxígeno para pasajeros",
+          "premium": true,
+          "order": 16
         }
       ],
       "order": 4
@@ -417,6 +441,18 @@
           "title": "Qué son los SID y los STAR",
           "premium": true,
           "order": 12
+        },
+        {
+          "id": "how_airliners_navigate_and_communicate_across_oceans",
+          "title": "Cómo navegan y se comunican los aviones comerciales sobre los océanos",
+          "premium": true,
+          "order": 13
+        },
+        {
+          "id": "how_pilots_land_when_they_cannot_see_the_runway",
+          "title": "Cómo aterrizan los pilotos cuando no pueden ver la pista",
+          "premium": true,
+          "order": 14
         }
       ],
       "order": 5
@@ -571,6 +607,18 @@
           "title": "Cómo evitar el dolor de oídos en el avión",
           "premium": false,
           "order": 9
+        },
+        {
+          "id": "what_the_cabin_chimes_mean",
+          "title": "Qué significan los tonos de la cabina",
+          "premium": true,
+          "order": 10
+        },
+        {
+          "id": "how_in_flight_wifi_works",
+          "title": "Cómo funciona el Wi-Fi a bordo",
+          "premium": true,
+          "order": 11
         }
       ],
       "order": 7
@@ -627,6 +675,24 @@
           "title": "Qué ocurre entre la llegada y la siguiente salida",
           "premium": true,
           "order": 8
+        },
+        {
+          "id": "what_happens_during_pushback",
+          "title": "Qué ocurre durante el pushback",
+          "premium": true,
+          "order": 9
+        },
+        {
+          "id": "how_airports_choose_which_runway_to_use",
+          "title": "Cómo eligen los aeropuertos qué pista utilizar",
+          "premium": true,
+          "order": 10
+        },
+        {
+          "id": "what_airport_slots_are_and_why_delays_ripple",
+          "title": "Qué son los slots aeroportuarios y por qué los retrasos se propagan",
+          "premium": true,
+          "order": 11
         }
       ],
       "order": 8
@@ -683,6 +749,36 @@
           "title": "Por qué algunos paisajes parecen patrones desde arriba",
           "premium": true,
           "order": 8
+        },
+        {
+          "id": "why_some_fields_are_perfect_circles",
+          "title": "Por qué algunos campos son círculos perfectos",
+          "premium": true,
+          "order": 9
+        },
+        {
+          "id": "how_to_spot_volcanoes_from_the_air",
+          "title": "Cómo reconocer volcanes desde el aire",
+          "premium": true,
+          "order": 10
+        },
+        {
+          "id": "how_to_spot_glaciers_from_the_air",
+          "title": "Cómo reconocer glaciares desde el aire",
+          "premium": true,
+          "order": 11
+        },
+        {
+          "id": "how_to_spot_river_deltas_from_the_air",
+          "title": "Cómo reconocer deltas fluviales desde el aire",
+          "premium": true,
+          "order": 12
+        },
+        {
+          "id": "how_to_spot_deserts_and_dunes_from_the_air",
+          "title": "Cómo reconocer desiertos y dunas desde el aire",
+          "premium": true,
+          "order": 13
         }
       ],
       "order": 9
@@ -739,6 +835,18 @@
           "title": "¿Puede un avión volar con un solo motor?",
           "premium": true,
           "order": 8
+        },
+        {
+          "id": "do_airplanes_dump_toilet_waste_in_flight",
+          "title": "¿Los aviones descargan residuos del baño durante el vuelo?",
+          "premium": true,
+          "order": 9
+        },
+        {
+          "id": "do_you_really_need_airplane_mode",
+          "title": "¿De verdad necesitas el modo avión?",
+          "premium": true,
+          "order": 10
         }
       ],
       "order": 10
