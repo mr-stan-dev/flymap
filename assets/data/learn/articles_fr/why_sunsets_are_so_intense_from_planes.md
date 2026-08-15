@@ -5,6 +5,8 @@ les couleurs paraissent **plus fortes, plus profondes et plus spectaculaires** q
 
 Il y a une raison a cela - et tout est une question de lumiere et d'atmosphere.
 
+---
+
 ## 🌅 1. Tu es au-dessus d'une grande partie de la basse atmosphere
 
 Au sol, la lumiere du soleil traverse une epaisse couche d'air.
@@ -14,6 +16,8 @@ A l'altitude de croisiere :
 - il y a moins de brume et de pollution
 
 👉 Cela rend la lumiere plus claire et plus intense.
+
+---
 
 ## 🌈 2. La lumiere du soleil parcourt un trajet plus long
 
@@ -28,6 +32,8 @@ Sa lumiere parcourt :
 - des oranges
 - des tons chauds
 
+---
+
 ## ✈️ 3. Depuis un avion, l'effet est plus fort
 
 Vu d'en haut :
@@ -39,6 +45,8 @@ Vu d'en haut :
 - le contraste des couleurs
 - la luminosite
 - la profondeur
+
+---
 
 ## ☁️ 4. Les nuages refletent et amplifient les couleurs
 
@@ -52,6 +60,8 @@ Les nuages jouent un grand role :
 - des nuages eclaires de cote
 - des couches de couleur spectaculaires
 
+---
+
 ## 🌌 5. Le ciel au-dessus devient plus sombre
 
 En meme temps :
@@ -61,6 +71,8 @@ En meme temps :
 
 👉 Cela rend les couleurs encore plus riches.
 
+---
+
 ## ✨ Ce que l'on ressent
 
 Les couchers de soleil vus d'un avion paraissent :
@@ -68,14 +80,20 @@ Les couchers de soleil vus d'un avion paraissent :
 - plus stratifies
 - presque irreels
 
+---
+
 ## 💡 Facon simple d'y penser
 
 Les couchers de soleil en avion sont plus intenses parce que :
 > tu es au-dessus de la plus grande partie de la brume - et tu regardes a travers toute la profondeur de l'atmosphere.
 
+---
+
 ## 🟢 Fait rapide
 
 Sur certains vols, surtout en allant vers l'ouest ou en changeant d'altitude, la vue peut donner l'impression que le coucher de soleil dure plus longtemps qu'au sol.
+
+---
 
 Au-dessus des nuages, un coucher de soleil n'est pas seulement une vue -  
 c'est une demonstration eclatante de la lumiere traversant les couches de l'atmosphere.

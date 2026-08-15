@@ -5,6 +5,8 @@ mais ils appartiennent en realite a quelques groupes bien definis, appeles **fam
 
 Chaque type raconte quelque chose sur ce qui se passe dans le ciel.
 
+---
+
 ## ☁️ 1. Les nuages bas (pres du sol)
 
 Ces nuages se forment pres de la Terre.
@@ -19,6 +21,8 @@ Ils ressemblent souvent a :
 
 Ils peuvent donner au ciel un aspect couvert et sont souvent lies a de faibles pluies ou a la brume.
 
+---
+
 ## 🌤 2. Les nuages moyens (a moyenne altitude)
 
 Ces nuages sont plus hauts et apparaissent souvent :
@@ -31,6 +35,8 @@ Ces nuages sont plus hauts et apparaissent souvent :
 - **altostratus** ou **altocumulus**
 
 Ils signalent souvent un changement de temps.
+
+---
 
 ## ☁️☁️ 3. Les nuages eleves (tres haute altitude)
 
@@ -46,6 +52,8 @@ Ils paraissent :
 
 Ils sont faits de cristaux de glace et apparaissent souvent avant un changement de temps.
 
+---
+
 ## ⬆️ 4. Les nuages verticaux (qui se developpent vers le haut)
 
 Certains nuages ne restent pas en couches - ils se developpent verticalement.
@@ -59,6 +67,8 @@ Ils peuvent s'elever :
 
 Ce sont les nuages les plus hauts et les plus puissants.
 
+---
+
 ## ✈️ Ce que tu vois depuis un avion
 
 Depuis le dessus, les familles de nuages deviennent plus faciles a reconnaitre :
@@ -68,14 +78,20 @@ Depuis le dessus, les familles de nuages deviennent plus faciles a reconnaitre :
 - les nuages eleves paraissent fins et delicats
 - les nuages verticaux montent comme des tours
 
+---
+
 ## 💡 Facon simple d'y penser
 
 Les nuages sont classes selon :
 > leur hauteur... et la facon dont ils se developpent.
 
+---
+
 ## 🟢 Fait rapide
 
 Certains nuages d'orage peuvent atteindre **10 a 12 km de hauteur** - soit la meme altitude que les avions commerciaux.
+
+---
 
 Les nuages peuvent sembler aleatoires -  
 mais ils suivent des schemas clairs qui nous aident a comprendre le ciel.

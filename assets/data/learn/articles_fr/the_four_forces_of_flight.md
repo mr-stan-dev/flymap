@@ -4,6 +4,8 @@ Chaque avion dans le ciel est soumis en meme temps a quatre forces principales.
 
 Ce sont elles qui rendent le vol possible et qui maintiennent l'equilibre de l'appareil une fois en l'air.
 
+---
+
 ## ✈️ 1. La portance pousse vers le haut
 
 La **portance** est la force dirigee vers le haut.
@@ -13,6 +15,8 @@ Elle est creee par les ailes lorsque l'air s'ecoule autour d'elles.
 Si la portance est assez forte, elle soutient l'avion contre la gravite.
 
 👉 C'est elle qui aide l'avion a rester dans le ciel.
+
+---
 
 ## 🌍 2. Le poids tire vers le bas
 
@@ -29,6 +33,8 @@ Tout contribue au poids :
 
 👉 Le poids cherche toujours a ramener l'avion vers le bas.
 
+---
+
 ## 🚀 3. La poussee pousse vers l'avant
 
 La **poussee** est la force dirigee vers l'avant.
@@ -39,6 +45,8 @@ Ce mouvement vers l'avant est essentiel parce que les ailes ont besoin d'air en 
 
 👉 Sans poussee, l'avion ne peut pas conserver une vitesse suffisante pour voler.
 
+---
+
 ## 🌬 4. La trainee tire vers l'arriere
 
 La **trainee** est la force qui s'oppose au mouvement.
@@ -48,6 +56,8 @@ Quand l'avion avance, l'air pousse en retour contre lui.
 Cette resistance ralentit l'appareil.
 
 👉 La trainee ressemble a une forme de frottement dans l'air.
+
+---
 
 ## ⚖️ 5. Le vol est un equilibre
 
@@ -65,6 +75,8 @@ Si l'une devient plus forte ou plus faible, l'avion change :
 - plus de poussee peut l'accelerer
 - plus de trainee peut le ralentir
 
+---
+
 ## ✨ Ce que cela signifie
 
 Voler ne consiste pas a laisser une seule force faire tout le travail.
@@ -78,6 +90,8 @@ Il s'agit d'un equilibre entre :
 
 Les pilotes et les systemes de l'avion gerent en permanence cet equilibre pendant tout le vol.
 
+---
+
 ## 💡 Facon simple d'y penser
 
 Un avion est toujours dans un tir a la corde :
@@ -86,8 +100,12 @@ Un avion est toujours dans un tir a la corde :
 
 Quand ces forces sont equilibrees, le vol parait fluide et stable.
 
+---
+
 ## 🟢 Fait rapide
 
 Meme pendant un vol horizontal stabilise, les quatre forces agissent toujours sur l'avion en permanence.
+
+---
 
 Chaque decollage, montee, croisiere et atterrissage raconte en realite l'histoire de ces quatre forces qui travaillent ensemble en equilibre.

@@ -4,6 +4,8 @@ La **presión del aire** es una de esas cosas en las que casi nunca pensamos en 
 
 Y en la aviación, ese cambio importa mucho.
 
+---
+
 ## ¿Qué es la presión del aire?
 
 El aire tiene peso.  
@@ -19,6 +21,8 @@ Cuando subes a mayor altitud:
 
 En pocas palabras:  
 **cuanto más alto subes, menor es la presión del aire.**
+
+---
 
 ## ¿Por qué es importante en la aviación?
 
@@ -36,6 +40,8 @@ Cuando el aire es más delgado:
 
 Por eso volar alto tiene ventajas, pero también requiere ajustes.
 
+---
+
 ## Entonces, ¿por qué los aviones suben tanto?
 
 Porque el aire a gran altitud también ofrece grandes beneficios:
@@ -49,6 +55,8 @@ Los aviones comerciales suelen volar entre **30.000 y 40.000 pies**, donde el ai
 
 Eso es excelente para la eficiencia, pero es demasiado alto para que los humanos respiren cómodamente sin ayuda.
 
+---
+
 ## ¿Cómo pueden respirar las personas allí arriba?
 
 Gracias a las **cabinas presurizadas**.
@@ -56,6 +64,8 @@ Gracias a las **cabinas presurizadas**.
 El avión no mantiene la presión interior igual que al nivel del mar, pero sí la conserva dentro de un rango cómodo y seguro.
 
 Así, aunque afuera el aire sea muy delgado, dentro los pasajeros y la tripulación pueden respirar con normalidad.
+
+---
 
 ## Cómo afecta la altitud al cuerpo
 
@@ -67,9 +77,13 @@ Si subieras muy alto sin presurización:
 
 Por eso la presurización no es un lujo. Es esencial.
 
+---
+
 ## Dato rápido ✨
 
 A unos **5.500 metros (18.000 pies)**, la presión del aire es aproximadamente **la mitad** de la que hay al nivel del mar.
+
+---
 
 ## La idea clave
 

@@ -5,6 +5,8 @@ pero justo fuera del avión la temperatura puede ser de hasta **-50 °C**.
 
 ¿Por qué hace tanto frío tan rápido a medida que subes?
 
+---
+
 ## 🌡 1. El aire se calienta desde abajo
 
 La mayor parte del calor de la Tierra proviene de:
@@ -16,6 +18,8 @@ La mayor parte del calor de la Tierra proviene de:
 - el aire cerca de la superficie es más cálido  
 - el aire más alto recibe menos calor  
 
+---
+
 ## ⬆️ 2. Más altura = menos calor
 
 A medida que subes:
@@ -24,6 +28,8 @@ A medida que subes:
 - se transfiere menos calor  
 
 👉 Por eso la temperatura baja con la altitud.
+
+---
 
 ## 🌬 3. El aire se expande y se enfría
 
@@ -36,6 +42,8 @@ Cuando el aire se expande, se enfría.
 
 👉 Esta es una de las razones clave por las que la temperatura desciende con rapidez.
 
+---
+
 ## ❄️ 4. Por qué llega a hacer un frío extremo
 
 A altitud de crucero:
@@ -46,6 +54,8 @@ A altitud de crucero:
 
 👉 Por eso las nubes altas suelen estar hechas de hielo.
 
+---
+
 ## ✈️ 5. Por qué tú no lo sientes
 
 Dentro de la aeronave:
@@ -55,6 +65,8 @@ Dentro de la aeronave:
 
 👉 Las condiciones exteriores son completamente distintas de las del interior.
 
+---
+
 ## ✨ Lo que significa
 
 Las bajas temperaturas en altitud afectan a:
@@ -63,15 +75,21 @@ Las bajas temperaturas en altitud afectan a:
 - el rendimiento del motor  
 - la eficiencia del vuelo  
 
+---
+
 ## 💡 Una forma sencilla de verlo
 
 Hace más frío con la altura porque:
 > te alejas del calor de la Tierra...  
 > y entras en aire más tenue y en expansión.
 
+---
+
 ## 🟢 Dato rápido
 
 La temperatura baja unos **6-7 °C por kilómetro** a medida que subes en la atmósfera baja.
+
+---
 
 Muy por encima del suelo, el cielo puede parecer tranquilo,  
 pero en realidad es uno de los entornos más fríos de la Tierra.

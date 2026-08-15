@@ -5,6 +5,8 @@ doch direkt außerhalb des Flugzeugs kann die Temperatur bis auf **-50 °C** fal
 
 Warum wird es so schnell so kalt, je höher man steigt?
 
+---
+
 ## 🌡 1. Die Luft wird von unten erwärmt
 
 Der größte Teil der Wärme der Erde kommt daher, dass:
@@ -16,6 +18,8 @@ Der größte Teil der Wärme der Erde kommt daher, dass:
 - Luft nahe der Oberfläche ist wärmer  
 - höhere Luftschichten bekommen weniger Wärme ab  
 
+---
+
 ## ⬆️ 2. Höhere Luft = weniger Wärme
 
 Je weiter du nach oben gehst:
@@ -24,6 +28,8 @@ Je weiter du nach oben gehst:
 - desto weniger Wärme wird übertragen  
 
 👉 Darum sinkt die Temperatur mit der Höhe.
+
+---
 
 ## 🌬 3. Luft dehnt sich aus und kühlt ab
 
@@ -36,6 +42,8 @@ Wenn sich Luft ausdehnt, kühlt sie ab.
 
 👉 Das ist ein wichtiger Grund dafür, dass die Temperaturen schnell fallen.
 
+---
+
 ## ❄️ 4. Warum es extrem kalt wird
 
 In Reiseflughöhe:
@@ -46,6 +54,8 @@ In Reiseflughöhe:
 
 👉 Darum bestehen hohe Wolken oft aus Eis.
 
+---
+
 ## ✈️ 5. Warum du es nicht spürst
 
 Im Flugzeug:
@@ -55,6 +65,8 @@ Im Flugzeug:
 
 👉 Die Bedingungen draußen sind völlig anders als drinnen.
 
+---
+
 ## ✨ Was das bedeutet
 
 Kalte Temperaturen in großer Höhe beeinflussen:
@@ -63,15 +75,21 @@ Kalte Temperaturen in großer Höhe beeinflussen:
 - Triebwerksleistung  
 - Flugeffizienz  
 
+---
+
 ## 💡 Einfach erklärt
 
 Mit zunehmender Höhe wird es kälter, weil:
 > du dich von der Wärme der Erde entfernst...  
 > und in dünnere, sich ausdehnende Luft gelangst.
 
+---
+
 ## 🟢 Kurzfakt
 
 In der unteren Atmosphäre sinkt die Temperatur im Durchschnitt um etwa **6 bis 7 °C pro Kilometer** Höhe.
+
+---
 
 Hoch über dem Boden kann der Himmel ruhig wirken -  
 doch tatsächlich gehört er zu den kältesten Umgebungen der Erde.

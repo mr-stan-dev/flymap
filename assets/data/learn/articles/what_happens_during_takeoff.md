@@ -2,6 +2,8 @@
 
 When a plane takes off, it might feel like a powerful, slightly mysterious moment. But in reality, it’s a smooth and carefully controlled process made up of a few simple steps.
 
+---
+
 ## 🛫 1. Acceleration on the Runway
 
 Before leaving the ground, the aircraft needs speed.
@@ -14,6 +16,8 @@ You might feel:
 
 This is completely normal — the plane is building the speed it needs to fly.
 
+---
+
 ## 🌬 2. Wings Start Creating Lift
 
 As air flows over and under the wings, it creates **lift** — an upward force.
@@ -21,6 +25,8 @@ As air flows over and under the wings, it creates **lift** — an upward force.
 At a certain speed (called *takeoff speed*), there is enough lift to raise the aircraft off the ground.
 
 The wings are already doing their job — even before the plane leaves the runway.
+
+---
 
 ## ⬆️ 3. Rotation (Lifting the Nose)
 
@@ -34,6 +40,8 @@ This lifts the nose of the aircraft slightly — a moment called **rotation**.
 
 Seconds later, the wheels leave the ground.
 
+---
+
 ## ☁️ 4. Initial Climb
 
 Now airborne, the plane begins climbing into the sky.
@@ -43,6 +51,8 @@ Now airborne, the plane begins climbing into the sky.
 - The angle of climb gradually reduces
 
 The goal is to reach a safe and efficient altitude smoothly.
+
+---
 
 ## ✨ What It Feels Like
 
@@ -54,13 +64,19 @@ Takeoff can feel intense, especially if you're not used to flying. But everythin
 
 Pilots follow precise procedures to ensure a safe and smooth departure.
 
+---
+
 ## 💡 Simple Way to Think About It
 
 Takeoff is like:
 > speeding up on a road… until the air itself becomes strong enough to lift you.
 
+---
+
 ## 🟢 Quick Fact
 
 Most commercial airplanes leave the ground at around **250–300 km/h**.
+
+---
 
 Takeoff may feel dramatic — but it’s just physics, timing, and a lot of engineering working together perfectly.

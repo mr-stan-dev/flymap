@@ -4,11 +4,15 @@ Depuis un avion, un désert peut ressembler à une mer de vagues figées. Pourta
 
 Ce guide vous aide à reconnaître à la fois le vaste paysage aride et les dunes que le vent y construit.
 
+---
+
 ## 🏜 1. Commencez par la forme générale
 
 Une mer de sable présente souvent des répétitions : rangées de croissants, longues crêtes parallèles ou monticules en étoile répartis dans un bassin. Les **barkhanes**, dunes en forme de croissant, apparaissent plutôt lorsque le sable est limité et que le vent vient habituellement d’une seule direction. Les dunes linéaires et étoilées reflètent d’autres quantités de sable et des régimes de vent plus complexes.
 
 Au-delà des dunes, cherchez de vastes plateaux nus, des plaines de graviers, des étendues salées pâles et des lits de rivière secs pendant une grande partie de l’année. C’est l’aridité qui définit un désert ; une couverture de sable doré n’est qu’une surface possible.
+
+---
 
 ## 🌗 2. Confirmez avec la texture, la couleur et les ombres
 
@@ -18,6 +22,8 @@ Le sable paraît crème, rouge, brun, gris ou même très sombre selon ses miné
 
 La couleur seule apporte peu de certitude. Les formes répétées, des ombres cohérentes et la relation des éléments avec le vent et le relief sont de meilleurs indices.
 
+---
+
 ## 🧭 3. Lisez le paysage alentour
 
 Les champs de dunes s’arrêtent souvent brusquement contre des montagnes, des falaises, une côte ou un changement de surface. Le vent peut contourner un obstacle et laisser d’un côté une traînée nette sans sable, tout en accumulant celui-ci de l’autre.
@@ -26,6 +32,8 @@ Recherchez d’anciens réseaux de drainage traversant un sol autrement sec. Un 
 
 Ces relations distinguent un paysage vivant façonné par le vent d’une simple zone de couleur semblable.
 
+---
+
 ## 🕵️ 4. Méfiez-vous des ressemblances courantes
 
 Des crêtes enneigées peuvent imiter des dunes claires, surtout à travers la brume. Les champs labourés créent des lignes régulières, les vagues des reflets parallèles et l’ombre des nuages de fausses bandes sombres sur un sol plat.
@@ -33,6 +41,8 @@ Des crêtes enneigées peuvent imiter des dunes claires, surtout à travers la b
 Le substrat rocheux érodé peut lui aussi former des crêtes profilées. Contrairement aux dunes meubles, elles peuvent se rattacher à un grand plateau rocheux et porter des chenaux creusés dans leur surface. Une plage ou un banc de rivière contient du sable sans faire de toute la région un désert.
 
 Un seul croissant est un indice. Tout un champ de formes apparentées et répétées est beaucoup plus convaincant.
+
+---
 
 ## 👀 5. Essayez cette liste lors de votre prochain vol
 
@@ -46,13 +56,19 @@ Demandez-vous :
 
 Les reflets dans le hublot peuvent masquer la texture. Changer votre angle de vue peut aider, sans garantir l’identification.
 
+---
+
 ## 💡 Une façon simple de l’imaginer
 
 Un champ de dunes ressemble :
 > à un océan au ralenti, dont le vent façonne les vagues et les fait migrer grain après grain.
 
+---
+
 ## 🟢 Fait rapide
 
 Le sable remonte la pente douce exposée au vent puis retombe sur le versant d’avalanche plus raide. À force de se répéter, ce mouvement permet à toute la dune de migrer.
+
+---
 
 La meilleure façon de lire un désert consiste à procéder par couches : d’abord la région sèche, puis ses surfaces et enfin les détails écrits par le vent qui révèlent la présence de dunes.

@@ -4,6 +4,8 @@ El tiempo cálido puede parecer inofensivo en tierra, pero para los aviones pued
 
 La razón principal es que el aire caliente es menos denso.
 
+---
+
 ## 🌡 1. El aire caliente se expande
 
 Cuando el aire se calienta, sus moléculas se separan más.
@@ -11,6 +13,8 @@ Cuando el aire se calienta, sus moléculas se separan más.
 Eso significa que el aire se vuelve menos denso.
 
 👉 Un aire menos denso da a las alas y a los motores menos con qué trabajar.
+
+---
 
 ## ✈️ 2. Las alas se vuelven menos eficaces
 
@@ -23,6 +27,8 @@ En un día caluroso:
 
 Eso puede hacer que la distancia de despegue sea mayor.
 
+---
+
 ## 🚀 3. Los motores también pueden perder rendimiento
 
 Los motores también dependen del aire entrante.
@@ -34,6 +40,8 @@ En aire más caliente y tenue:
 
 Así que tanto la sustentación como la potencia del motor pueden verse afectadas al mismo tiempo.
 
+---
+
 ## 🛫 4. Los aeropuertos en altura lo notan aún más
 
 El calor se convierte en un factor todavía mayor en aeropuertos situados a gran elevación.
@@ -41,6 +49,8 @@ El calor se convierte en un factor todavía mayor en aeropuertos situados a gran
 Eso se debe a que allí el aire ya es más tenue.
 
 Las condiciones de calor y altitud juntas pueden crear limitaciones importantes de rendimiento.
+
+---
 
 ## ✨ Lo que significa
 
@@ -52,15 +62,21 @@ En días calurosos, las aeronaves pueden necesitar:
 
 Esto es una parte normal de la seguridad en aviación.
 
+---
+
 ## 💡 Una forma sencilla de verlo
 
 El aire caliente es como:
 > darle al avión un colchón de aire más fino con el que trabajar...  
 > justo cuando necesita el máximo rendimiento.
 
+---
+
 ## 🟢 Dato rápido
 
 Antes del despegue, los pilotos usan cálculos de rendimiento que tienen en cuenta conjuntamente la temperatura, la altitud y el peso de la aeronave.
+
+---
 
 Un día caluroso puede parecer agradable para las personas,  
 pero para un avión puede hacer el despegue silenciosamente más difícil.

@@ -5,6 +5,8 @@ während andere wie weiche, watteartige Formen aussehen, die in den Himmel aufst
 
 Dieser Unterschied hängt damit zusammen, wie sich die Luft bewegt.
 
+---
+
 ## 🌬 1. Es hängt von der Stabilität der Luft ab
 
 Die Grundidee ist **stabile gegen instabile Luft**.
@@ -13,6 +15,8 @@ Die Grundidee ist **stabile gegen instabile Luft**.
 - **Instabile Luft** -> lässt Luft frei aufsteigen  
 
 👉 Das bestimmt die Form von Wolken.
+
+---
 
 ## ⬜ 2. Flache Wolken (stabile Luft)
 
@@ -27,6 +31,8 @@ In stabiler Luft:
 
 Diese werden oft als **Stratuswolken** bezeichnet.
 
+---
+
 ## ☁️ 3. Bauschige Wolken (instabile Luft)
 
 In instabiler Luft:
@@ -40,6 +46,8 @@ In instabiler Luft:
 
 Diese nennt man **Cumuluswolken**.
 
+---
+
 ## ⬆️ 4. Wenn bauschige Wolken höher wachsen
 
 Wenn die aufsteigende Luft stark genug ist:
@@ -48,6 +56,8 @@ Wenn die aufsteigende Luft stark genug ist:
 - und zu hohen Türmen werden  
 
 👉 Daraus können sich Gewitterwolken entwickeln.
+
+---
 
 ## ✈️ 5. Was du aus dem Flugzeug siehst
 
@@ -58,6 +68,8 @@ Von oben ist der Unterschied klar:
 
 👉 Es ist wie der Unterschied zwischen einer ruhigen Oberfläche und einer bewegten, strukturierten.
 
+---
+
 ## 💡 Einfach erklärt
 
 Wolkenformen hängen von Luftbewegung ab:
@@ -65,9 +77,13 @@ Wolkenformen hängen von Luftbewegung ab:
 > ruhige Luft breitet Wolken aus...  
 > aufsteigende Luft baut sie nach oben auf.
 
+---
+
 ## 🟢 Kurzfakt
 
 Dieselbe Wolke kann ihre Form verändern, wenn die Luft stabiler oder instabiler wird.
+
+---
 
 Wolken sind nicht nur Formen -  
 sie zeigen, wie sich die Luft am Himmel bewegt.

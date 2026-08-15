@@ -3,6 +3,8 @@
 Las tormentas eléctricas pueden verse dramáticas desde el suelo,  
 pero desde arriba revelan algo aún más fascinante: un sistema poderoso que crece hacia arriba a través del cielo.
 
+---
+
 ## 🌡 1. Todo empieza con aire cálido que asciende
 
 Las tormentas eléctricas comienzan cuando:
@@ -13,6 +15,8 @@ Las tormentas eléctricas comienzan cuando:
 
 👉 Así se forma la etapa inicial de una nube.
 
+---
+
 ## ⬆️ 2. El aire ascendente alimenta la nube
 
 Si las condiciones son adecuadas:
@@ -22,6 +26,8 @@ Si las condiciones son adecuadas:
 - la nube crece cada vez más en altura
 
 👉 Así es como una nube simple se convierte en una nube enorme.
+
+---
 
 ## 🌩 3. La tormenta se vuelve activa
 
@@ -37,6 +43,8 @@ A medida que la nube crece:
 
 Esto crea un **sistema dinámico e inestable**.
 
+---
+
 ## ⚡ 4. Rayos y lluvia intensa
 
 Dentro de la tormenta:
@@ -46,6 +54,8 @@ Dentro de la tormenta:
 - puede formarse lluvia intensa o incluso granizo
 
 👉 La tormenta ya está completamente desarrollada.
+
+---
 
 ## 🍄 5. La nube alcanza su límite
 
@@ -57,6 +67,8 @@ A gran altitud:
 
 👉 Esto crea la clásica **forma de yunque** en la parte superior.
 
+---
+
 ## ✈️ 6. Por qué los aviones se mantienen alejados
 
 Las tormentas eléctricas se evitan porque contienen:
@@ -66,6 +78,8 @@ Las tormentas eléctricas se evitan porque contienen:
 - rayos y granizo
 
 Los pilotos planean cuidadosamente la ruta para rodearlas.
+
+---
 
 ## ✨ Lo que ves desde un avión
 
@@ -77,14 +91,20 @@ Desde arriba, las tormentas eléctricas se ven:
 
 Son de las imágenes más poderosas del cielo.
 
+---
+
 ## 💡 Una forma sencilla de verlo
 
 Una tormenta eléctrica es como:
 > una columna de aire cálido ascendente... construyendo energía hasta convertirse en una tormenta completa.
 
+---
+
 ## 🟢 Dato rápido
 
 Algunas tormentas eléctricas pueden crecer tanto que llegan brevemente a la parte baja de la estratosfera.
+
+---
 
 Las tormentas eléctricas no son solo nubes:  
 son **sistemas poderosos impulsados por aire ascendente, humedad y energía**.

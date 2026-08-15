@@ -4,6 +4,8 @@ Un avion ne se soucie pas seulement de son poids total.
 
 Il se soucie aussi de **l'endroit ou ce poids est place**.
 
+---
+
 ## ⚖️ 1. Le poids total affecte les performances
 
 Plus un avion est lourd, plus il doit fournir d'effort.
@@ -17,6 +19,8 @@ Un poids supplementaire peut affecter :
 
 C'est pourquoi les avions ont des limites de poids strictes.
 
+---
+
 ## 📦 2. L'equilibrage concerne la facon dont le poids est reparti
 
 Le poids doit aussi etre reparti correctement.
@@ -24,6 +28,8 @@ Le poids doit aussi etre reparti correctement.
 Si une trop grande partie du poids est trop en avant ou trop en arriere, l'avion peut devenir plus difficile a controler.
 
 👉 Un vol sur depend a la fois du poids total et du bon equilibrage.
+
+---
 
 ## ✈️ 3. Le centre de gravite compte beaucoup
 
@@ -37,6 +43,8 @@ S'il est mal place, l'avion peut :
 - necessiter des actions de commande inhabituelles
 - se comporter differemment de ce qui est attendu
 
+---
+
 ## 🧍 4. Passagers, bagages et carburant comptent tous
 
 L'equilibrage est affecte par de nombreuses choses ordinaires :
@@ -46,6 +54,8 @@ L'equilibrage est affecte par de nombreuses choses ordinaires :
 - la quantite de carburant emportee
 
 Meme si les passagers ne le remarquent pas, le chargement est soigneusement planifie.
+
+---
 
 ## ✨ Ce que cela signifie
 
@@ -59,15 +69,21 @@ Ils influencent :
 
 C'est pourquoi ils sont verifies avant chaque vol.
 
+---
+
 ## 💡 Facon simple d'y penser
 
 C'est comme porter un sac a dos :
 > le poids total compte...  
 > mais l'endroit ou ce poids se trouve compte aussi.
 
+---
+
 ## 🟢 Fait rapide
 
 Un avion peut etre sous son poids maximal et rester dangereux si son equilibrage est en dehors des limites.
+
+---
 
 En aviation, le poids et l'equilibrage ne sont pas de petits details -  
 ils font partie de ce qui permet a l'avion de bien se comporter dans l'air.

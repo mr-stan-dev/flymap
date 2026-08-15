@@ -4,6 +4,8 @@ Connecting to Wi-Fi at cruising altitude feels almost ordinary. Behind the login
 
 Airlines use different systems, but most in-flight connections follow one of two paths: through a satellite or through a network of antennas on the ground.
 
+---
+
 ## 📶 1. Your Device Connects Inside the Cabin
 
 The first step looks much like Wi-Fi at home. Cabin access points create a local wireless network, and an onboard router manages the connected phones, tablets, and laptops.
@@ -11,6 +13,8 @@ The first step looks much like Wi-Fi at home. Cabin access points create a local
 That local network still needs a link to the outside world. The aircraft’s communication equipment collects the traffic and sends it through its satellite or air-to-ground connection.
 
 The internet capacity is shared, so one aircraft does not provide a separate long-distance link for every passenger.
+
+---
 
 ## 🛰 2. Satellite Wi-Fi Looks Upward
 
@@ -20,6 +24,8 @@ Some systems use satellites very high above Earth, while newer networks may use 
 
 Satellite coverage makes connectivity possible over many ocean and remote routes, although service is not guaranteed everywhere.
 
+---
+
 ## 📡 3. Air-to-Ground Wi-Fi Looks Downward
 
 An **air-to-ground** system connects the aircraft to a chain of specialized ground stations, rather like a phone moving between mobile towers.
@@ -27,6 +33,8 @@ An **air-to-ground** system connects the aircraft to a chain of specialized grou
 Its antenna is usually on the underside of the aircraft. As the flight moves, the connection hands over from one station to the next. This approach works mainly where a supporting land network exists; a long ocean crossing generally requires a satellite link instead.
 
 Some fleets combine technologies to suit different routes.
+
+---
 
 ## 🐢 4. Why the Connection Can Slow or Drop
 
@@ -36,6 +44,8 @@ Coverage gaps, satellite handovers, aircraft position, ground-network congestion
 
 A fast connection on one flight therefore does not promise the same performance on the next, even with the same airline.
 
+---
+
 ## ✈️ 5. Wi-Fi and Airplane Mode Can Work Together
 
 Airplane mode normally turns off a device’s cellular transmitter. You can then switch Wi-Fi back on separately if the airline permits it and follow the crew’s instructions.
@@ -44,13 +54,19 @@ The phone is using the aircraft’s approved onboard network, not trying to make
 
 As on any shared public network, avoid sending sensitive information through untrusted sites or apps.
 
+---
+
 ## 💡 Simple Way to Think About It
 
 In-flight Wi-Fi is like:
 > one long internet cable shared by the whole cabin — except the middle of that “cable” is a radio link to a satellite or a station far below.
 
+---
+
 ## 🟢 Quick Fact
 
 The bump on top of a Wi-Fi-equipped aircraft is often a **radome**, a streamlined cover that protects a satellite antenna while allowing radio signals through.
+
+---
 
 The connection may take an extraordinary route, but the goal is familiar: link the cabin’s local Wi-Fi network to the ground while the aircraft keeps moving.

@@ -5,6 +5,8 @@ mais les pilotes disposent d'outils qui montrent ce qui se passe **a l'interieur
 
 L'un des plus importants est le **radar meteo**.
 
+---
+
 ## 📡 1. Voir a l'interieur des nuages
 
 Le radar meteo envoie des signaux depuis le nez de l'avion.
@@ -15,6 +17,8 @@ Ces signaux :
 - reviennent vers l'avion
 
 👉 Cela aide a detecter ce qui se trouve a l'interieur des nuages - et pas seulement leur forme.
+
+---
 
 ## 🌧 2. Ce que le radar detecte
 
@@ -28,6 +32,8 @@ Le radar meteo est particulierement efficace pour reperer :
 - une pluie plus intense
 - des precipitations plus importantes
 
+---
+
 ## 🎨 3. Interpreter les couleurs
 
 Dans le cockpit, les donnees radar sont affichees avec des couleurs :
@@ -37,6 +43,8 @@ Dans le cockpit, les donnees radar sont affichees avec des couleurs :
 - rouge → forte activite orageuse
 
 👉 Les pilotes s'en servent pour comprendre ce qui les attend.
+
+---
 
 ## ✈️ 4. Eviter les zones dangereuses
 
@@ -51,6 +59,8 @@ Grace au radar, les pilotes peuvent :
 - de fortes pluies
 - les parties les plus actives des cellules orageuses
 
+---
+
 ## 🧑‍✈️ 5. Ce n'est pas completement automatique
 
 Le radar meteo fournit des informations - mais :
@@ -60,6 +70,8 @@ Le radar meteo fournit des informations - mais :
 
 👉 C'est un outil, pas un decideur.
 
+---
+
 ## 👀 6. Pourquoi tu ne vois pas ce qu'eux voient
 
 Depuis la cabine :
@@ -68,6 +80,8 @@ Depuis la cabine :
 - les precipitations les plus fortes a l'interieur restent cachees
 
 👉 Le radar revele ce que tes yeux ne peuvent pas voir.
+
+---
 
 ## ✨ Ce que cela signifie pour toi
 
@@ -79,14 +93,20 @@ Le radar meteo aide a rendre les vols :
 
 Meme si le ciel parait calme, les pilotes surveillent toujours ce qui se trouve devant.
 
+---
+
 ## 💡 Facon simple d'y penser
 
 Le radar meteo, c'est comme :
 > projeter un faisceau invisible dans des nuages pluvieux... pour voir ou se trouvent les zones les plus fortes.
 
+---
+
 ## 🟢 Fait rapide
 
 Le radar se trouve generalement dans le nez de l'avion - derriere la partie avant arrondie.
+
+---
 
 Meme quand tu ne peux pas le voir,  
 les pilotes "regardent devant" en permanence dans la meteo - en utilisant le radar pour guider le vol en securite.

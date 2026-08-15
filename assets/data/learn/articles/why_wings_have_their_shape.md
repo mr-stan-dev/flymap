@@ -4,6 +4,8 @@ Airplane wings are not flat by accident.
 
 Their shape is carefully designed to help the aircraft create lift efficiently and move smoothly through the air.
 
+---
+
 ## ✈️ 1. Wings Are Built for Airflow
 
 A wing has a shape that helps air move around it in a controlled way.
@@ -16,6 +18,8 @@ Most wings are:
 
 👉 This helps the wing guide airflow smoothly.
 
+---
+
 ## 🌬 2. Shape Helps Create Lift
 
 As air flows over and under the wing, the shape helps produce lift.
@@ -27,6 +31,8 @@ It does this by helping the wing:
 - keep airflow attached more smoothly
 
 Without the right shape, flying would be much less efficient.
+
+---
 
 ## ⚖️ 3. Wings Must Balance Many Jobs
 
@@ -41,6 +47,8 @@ It also needs to:
 
 So wing design is always a balance, not just one simple idea.
 
+---
+
 ## 🛬 4. Different Flight Phases Need Different Help
 
 Aircraft do not use exactly the same wing shape in every phase of flight.
@@ -53,6 +61,8 @@ That is why many airplanes have:
 
 These help the wing perform better during takeoff and landing.
 
+---
+
 ## 🚀 5. Efficient Shape Saves Fuel
 
 A well-designed wing can:
@@ -62,6 +72,8 @@ A well-designed wing can:
 - help the plane cruise more efficiently
 
 That means better performance and lower fuel use.
+
+---
 
 ## ✨ What It Means
 
@@ -74,14 +86,20 @@ It affects:
 - how much fuel it uses
 - how stable it feels
 
+---
+
 ## 💡 Simple Way to Think About It
 
 A wing is shaped like a tool made for air:
 > not just to cut through it...  
 > but to control how the air moves.
 
+---
+
 ## 🟢 Quick Fact
 
 Even small changes in wing shape can noticeably affect lift, drag, and fuel efficiency.
+
+---
 
 Wings look the way they do because every curve and angle is there to help the airplane fly better.

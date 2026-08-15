@@ -2,6 +2,8 @@
 
 Quand un avion decolle, cela peut donner l'impression d'un moment puissant et un peu mysterieux. En realite, c'est un processus fluide et soigneusement controle compose de quelques etapes simples.
 
+---
+
 ## 🛫 1. Acceleration sur la piste
 
 Avant de quitter le sol, l'avion a besoin de vitesse.
@@ -14,6 +16,8 @@ Tu peux ressentir :
 
 C'est tout a fait normal - l'avion accumule simplement la vitesse dont il a besoin pour voler.
 
+---
+
 ## 🌬 2. Les ailes commencent a creer de la portance
 
 Lorsque l'air passe au-dessus et en dessous des ailes, il cree la **portance** - une force dirigee vers le haut.
@@ -21,6 +25,8 @@ Lorsque l'air passe au-dessus et en dessous des ailes, il cree la **portance** -
 A une certaine vitesse (appelee *vitesse de decollage*), il y a suffisamment de portance pour soulever l'avion du sol.
 
 Les ailes font deja leur travail - meme avant que l'avion ne quitte la piste.
+
+---
 
 ## ⬆️ 3. La rotation
 
@@ -34,6 +40,8 @@ Cela releve legerement le nez de l'avion - un moment appele **rotation**.
 
 Quelques secondes plus tard, les roues quittent le sol.
 
+---
+
 ## ☁️ 4. La montee initiale
 
 Maintenant en l'air, l'avion commence a monter dans le ciel.
@@ -43,6 +51,8 @@ Maintenant en l'air, l'avion commence a monter dans le ciel.
 - L'angle de montee diminue progressivement
 
 Le but est d'atteindre une altitude sure et efficace en douceur.
+
+---
 
 ## ✨ Ce que l'on ressent
 
@@ -54,14 +64,20 @@ Le decollage peut sembler intense, surtout si tu n'as pas l'habitude de voler. M
 
 Les pilotes suivent des procedures precises pour assurer un depart sur et fluide.
 
+---
+
 ## 💡 Facon simple d'y penser
 
 Le decollage, c'est comme :
 > accelerer sur une route... jusqu'a ce que l'air lui-meme devienne assez fort pour te soulever.
 
+---
+
 ## 🟢 Fait rapide
 
 La plupart des avions commerciaux quittent le sol autour de **250 a 300 km/h**.
+
+---
 
 Le decollage peut sembler spectaculaire -  
 mais ce n'est que de la physique, du timing et beaucoup d'ingenierie qui fonctionnent ensemble a la perfection.

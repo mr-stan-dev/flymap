@@ -4,6 +4,8 @@ As an airplane climbs higher, the air around it changes.
 
 One of the biggest changes is **air pressure** - and it drops with altitude.
 
+---
+
 ## 🌍 1. Air Has Weight
 
 Even though air feels light, it still has mass.
@@ -17,6 +19,8 @@ At lower altitude, there is:
 
 👉 That creates higher pressure near the ground.
 
+---
+
 ## ⬆️ 2. Pressure Gets Lower as You Climb
 
 The higher you go:
@@ -27,6 +31,8 @@ The higher you go:
 So the atmosphere becomes lower in pressure.
 
 That is why mountaintops and cruising altitudes have much thinner, lower-pressure air.
+
+---
 
 ## 🌬 3. Lower Pressure Means Less Dense Air
 
@@ -42,6 +48,8 @@ This affects:
 
 Pressure and density are closely connected in normal flying conditions.
 
+---
+
 ## ✈️ 4. Aircraft Feel These Changes Too
 
 As altitude increases, lower pressure affects how the aircraft performs.
@@ -54,6 +62,8 @@ For example:
 
 This is a basic part of flight planning and aircraft design.
 
+---
+
 ## 🧍 5. Humans Need Protection From It
 
 People are affected by low pressure too.
@@ -65,6 +75,8 @@ At high altitude:
 
 That is why airliners use pressurized cabins to keep passengers comfortable and safe.
 
+---
+
 ## ✨ What It Means
 
 Altitude is not just about being farther from the ground.
@@ -75,15 +87,21 @@ It also means entering an environment where:
 - air is thinner
 - both aircraft and humans must adapt
 
+---
+
 ## 💡 Simple Way to Think About It
 
 Air pressure is like the weight of the sky above you:
 > the higher you go...  
 > the less sky is pressing down.
 
+---
+
 ## 🟢 Quick Fact
 
 At around 5,500 meters, air pressure is roughly about half of what it is at sea level.
+
+---
 
 Air pressure quietly changes with altitude -  
 and that change affects almost everything about flight.

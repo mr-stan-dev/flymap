@@ -5,6 +5,8 @@ Lift is the force that helps an airplane rise into the sky.
 It can sound complicated, but the basic idea is simple:  
 👉 a wing moves through the air in a way that creates an upward force.
 
+---
+
 ## 🌬 1. A Wing Needs Moving Air
 
 Lift only happens when air is flowing around the wing.
@@ -15,6 +17,8 @@ That flow can come from:
 - air moving past the wing
 
 Without airflow, the wing cannot create enough lift to fly.
+
+---
 
 ## ✈️ 2. The Wing Guides the Air
 
@@ -28,6 +32,8 @@ As air meets the wing:
 
 👉 If air is pushed downward, the wing is pushed upward.
 
+---
+
 ## ⬆️ 3. Pressure Also Helps
 
 Lift is not only about pushing air down.
@@ -38,6 +44,8 @@ The airflow around the wing also creates:
 - higher pressure below it
 
 That pressure difference helps support the aircraft in the air.
+
+---
 
 ## 🚀 4. Speed Makes Lift Stronger
 
@@ -51,6 +59,8 @@ That usually means:
 
 This is why airplanes need speed during takeoff.
 
+---
+
 ## ⚖️ 5. Lift Must Match Weight
 
 For steady flight, lift needs to balance the airplane's weight.
@@ -61,6 +71,8 @@ If lift becomes:
 - less than weight -> the plane will descend
 
 Pilots manage this balance with speed, power, and wing angle.
+
+---
 
 ## ✨ What It Means
 
@@ -75,15 +87,21 @@ It is the result of:
 
 All of that works together to create upward force.
 
+---
+
 ## 💡 Simple Way to Think About It
 
 Lift is like this:
 > the wing meets the air at the right shape and angle...  
 > and the air pushes back.
 
+---
+
 ## 🟢 Quick Fact
 
 Lift increases with speed, which is why airplanes must accelerate before they can leave the runway.
+
+---
 
 Lift works because wings are designed to work with moving air -  
 and that moving air can hold up something as heavy as an airplane.

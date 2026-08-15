@@ -5,6 +5,8 @@ las nubes suelen aparecer en **capas distintas**, apiladas a diferentes alturas.
 
 Esto no es aleatorio: es la forma en que está estructurada la atmósfera.
 
+---
+
 ## 🌬 1. El aire no es igual en todas partes
 
 La atmósfera está formada por capas con diferentes:
@@ -14,6 +16,8 @@ La atmósfera está formada por capas con diferentes:
 - estabilidad
 
 👉 Cada capa se comporta de manera diferente.
+
+---
 
 ## 🌡 2. Las nubes se forman donde las condiciones son adecuadas
 
@@ -26,6 +30,8 @@ Pero esto solo ocurre a ciertas altitudes, donde:
 
 👉 Por eso las nubes aparecen en bandas o capas.
 
+---
+
 ## ⬆️ 3. Las capas estables frenan el movimiento vertical
 
 A veces la atmósfera tiene **capas estables** que actúan como barreras.
@@ -34,6 +40,8 @@ A veces la atmósfera tiene **capas estables** que actúan como barreras.
 - las nubes se extienden hacia los lados en lugar de crecer hacia arriba
 
 👉 Esto crea capas de nubes planas y horizontales.
+
+---
 
 ## ☁️ 4. Distintas capas, distintas nubes
 
@@ -45,6 +53,8 @@ Cada altitud puede producir tipos diferentes de nubes:
 
 👉 Pueden existir varias capas al mismo tiempo.
 
+---
+
 ## ✈️ 5. Lo que ves desde un avión
 
 Desde arriba, las capas de nubes pueden parecer:
@@ -55,20 +65,28 @@ Desde arriba, las capas de nubes pueden parecer:
 
 Puede sentirse como volar a través de un cielo apilado.
 
+---
+
 ## ✨ Lo que significa
 
 Las capas de nubes muestran que:
 - la atmósfera está estructurada
 - existen condiciones diferentes a distintas alturas
 
+---
+
 ## 💡 Una forma sencilla de verlo
 
 Las capas de nubes son como:
 > pisos en el cielo... cada uno formándose donde las condiciones son las adecuadas.
 
+---
+
 ## 🟢 Dato rápido
 
 Los pilotos suelen elegir niveles de vuelo que evitan ciertas capas de nubes para reducir turbulencia y mejorar la visibilidad.
+
+---
 
 Las nubes no se forman al azar:  
 aparecen en capas que revelan cómo está organizada la atmósfera por encima de nosotros.

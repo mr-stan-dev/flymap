@@ -3,6 +3,8 @@
 Autopilot klingt vielleicht so, als würde das Flugzeug sich selbst fliegen -  
 aber in Wirklichkeit ist er eher **ein hochentwickelter Assistent für die Piloten**.
 
+---
+
 ## ✈️ 1. Der Autopilot hilft, das Flugzeug zu steuern
 
 Der Autopilot kann Folgendes steuern:
@@ -15,6 +17,8 @@ Er hält das Flugzeug stabil und auf seiner geplanten Bahn.
 
 👉 Denk an ihn als Hilfe für Präzision, nicht als Ersatz für die Piloten.
 
+---
+
 ## 🧑‍✈️ 2. Piloten bleiben immer verantwortlich
 
 Auch wenn der Autopilot eingeschaltet ist:
@@ -24,6 +28,8 @@ Auch wenn der Autopilot eingeschaltet ist:
 - entscheiden sie, was das Flugzeug tun soll
 
 👉 Der Autopilot folgt Anweisungen - er trifft keine eigenen Entscheidungen.
+
+---
 
 ## 🧭 3. Er folgt dem Flugplan
 
@@ -36,6 +42,8 @@ Der Autopilot kann dann:
 
 Das macht lange Flüge ruhiger und effizienter.
 
+---
+
 ## ⬆️⬇️ 4. Er kann Steig- und Sinkflug übernehmen
 
 Der Autopilot kann:
@@ -46,6 +54,8 @@ Der Autopilot kann:
 
 👉 Aber die Piloten überwachen trotzdem jede Phase.
 
+---
+
 ## 🎯 5. Er verbessert die Präzision
 
 Der Autopilot ist äußerst genau.
@@ -55,6 +65,8 @@ Er hilft:
 - kleine Bewegungen zu verringern
 - exakte Flugbedingungen einzuhalten
 
+---
+
 ## ✨ Was das für dich bedeutet
 
 Für Passagiere bedeutet Autopilot:
@@ -63,15 +75,21 @@ Für Passagiere bedeutet Autopilot:
 - gleichmäßigere Bewegungen
 - weniger Arbeitsbelastung für die Piloten
 
+---
+
 ## 💡 Einfach erklärt
 
 Autopilot ist wie:
 > Tempomat im Auto -  
 > er hilft, Geschwindigkeit und Richtung zu halten, aber der Fahrer bleibt in Kontrolle.
 
+---
+
 ## 🟢 Kurzfakt
 
 Moderne Autopilot-Systeme können sogar bei Landungen mit schlechter Sicht helfen - aber Piloten sind immer bereit, einzugreifen.
+
+---
 
 Der Autopilot ersetzt die Piloten nicht -  
 er hilft ihnen, **präziser, sicherer und effizienter** zu fliegen.

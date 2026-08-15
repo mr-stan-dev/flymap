@@ -4,6 +4,8 @@ Chaque fois qu'un avion se deplace dans l'air, l'air s'oppose a ce mouvement.
 
 Cette force de resistance s'appelle la **trainee**.
 
+---
+
 ## 🌬 1. La trainee, c'est l'air qui repousse
 
 Quand l'avion avance, il doit pousser l'air hors de son chemin.
@@ -16,6 +18,8 @@ Cela cree une resistance :
 
 👉 La trainee agit toujours vers l'arriere, a l'oppose du mouvement.
 
+---
+
 ## ✈️ 2. Plus de vitesse signifie generalement plus de trainee
 
 Plus l'avion vole vite, plus la trainee devient forte.
@@ -26,6 +30,8 @@ Cela signifie :
 - que ralentir reduit la trainee
 
 C'est l'une des raisons pour lesquelles les avions sont soigneusement concus pour une vitesse de croisiere efficace.
+
+---
 
 ## 🧱 3. La forme compte enormement
 
@@ -39,6 +45,8 @@ C'est pourquoi les avions sont dessines avec :
 
 👉 Une bonne conception aide l'avion a se deplacer plus facilement dans l'air.
 
+---
+
 ## 🔧 4. La trainee change pendant le vol
 
 La trainee n'est pas toujours identique.
@@ -50,6 +58,8 @@ Elle peut augmenter lorsque :
 - l'avion vole a des angles moins efficaces
 
 Parfois, cette trainee supplementaire est utile, surtout pendant la descente et l'atterrissage.
+
+---
 
 ## ⚖️ 5. Les moteurs doivent la vaincre
 
@@ -63,6 +73,8 @@ Si :
 
 Cet equilibre compte tout au long du vol.
 
+---
+
 ## ✨ Ce que cela signifie
 
 La trainee n'est pas un probleme que les ingenieurs essaient d'eliminer completement.
@@ -73,15 +85,21 @@ Au contraire, ils cherchent a :
 - gerer la trainee utile
 - rendre l'avion efficace a ses vitesses normales
 
+---
+
 ## 💡 Facon simple d'y penser
 
 La trainee, c'est comme :
 > marcher dans l'eau plutot que dans le vide -  
 > plus tu essaies d'aller vite, plus tu ressens de resistance.
 
+---
+
 ## 🟢 Fait rapide
 
 Les avions de ligne modernes sont dessines avec tant de soin parce que meme de petites reductions de trainee peuvent economiser de grandes quantites de carburant au fil du temps.
+
+---
 
 La trainee est la force invisible qui repousse en permanence -  
 et les avions doivent composer avec elle a chaque vol.

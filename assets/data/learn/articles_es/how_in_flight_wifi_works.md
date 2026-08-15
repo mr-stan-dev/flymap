@@ -4,6 +4,8 @@ Conectarse a una red Wi-Fi a la altitud de crucero parece casi algo cotidiano. S
 
 Las aerolíneas emplean sistemas diferentes, pero la mayoría de las conexiones a bordo siguen uno de dos caminos: un satélite o una red de antenas terrestres.
 
+---
+
 ## 📶 1. Tu dispositivo se conecta dentro de la cabina
 
 El primer paso se parece mucho al Wi-Fi de casa. Unos puntos de acceso crean una red inalámbrica local en la cabina y un router de a bordo gestiona los teléfonos, tabletas y ordenadores conectados.
@@ -11,6 +13,8 @@ El primer paso se parece mucho al Wi-Fi de casa. Unos puntos de acceso crean una
 Esa red local aún necesita un enlace con el exterior. El equipo de comunicaciones del avión reúne el tráfico y lo envía mediante la conexión por satélite o aire-tierra.
 
 La capacidad de internet se comparte: el avión no ofrece un enlace independiente de larga distancia a cada pasajero.
+
+---
 
 ## 🛰 2. El Wi-Fi por satélite mira hacia arriba
 
@@ -20,6 +24,8 @@ Algunos sistemas utilizan satélites situados a gran altura sobre la Tierra, mie
 
 La cobertura por satélite permite ofrecer conexión en muchas rutas oceánicas y remotas, aunque el servicio no está garantizado en todas partes.
 
+---
+
 ## 📡 3. El Wi-Fi aire-tierra mira hacia abajo
 
 Un sistema **aire-tierra** conecta el avión con una cadena de estaciones especializadas en tierra, de forma parecida a un teléfono que pasa de una antena móvil a otra.
@@ -27,6 +33,8 @@ Un sistema **aire-tierra** conecta el avión con una cadena de estaciones especi
 La antena suele estar en la parte inferior de la aeronave. A medida que avanza el vuelo, la conexión se transfiere de una estación a la siguiente. Esta opción funciona sobre todo donde existe una red terrestre compatible; una travesía oceánica larga suele necesitar un enlace por satélite.
 
 Algunas flotas combinan tecnologías para adaptarse a rutas distintas.
+
+---
 
 ## 🐢 4. Por qué la conexión puede ralentizarse o cortarse
 
@@ -36,6 +44,8 @@ Los huecos de cobertura, los cambios de satélite, la posición del avión, la c
 
 Por tanto, una conexión rápida en un vuelo no garantiza el mismo rendimiento en el siguiente, ni siquiera con la misma compañía.
 
+---
+
 ## ✈️ 5. El Wi-Fi y el modo avión pueden funcionar juntos
 
 El modo avión suele desactivar el transmisor celular del dispositivo. Después puedes volver a encender el Wi-Fi por separado, si la aerolínea lo permite, y seguir las instrucciones de la tripulación.
@@ -44,13 +54,19 @@ El teléfono utiliza la red de a bordo aprobada para ese avión, en lugar de int
 
 Como en cualquier red pública compartida, evita enviar información sensible mediante sitios o aplicaciones que no sean de confianza.
 
+---
+
 ## 💡 Una forma sencilla de verlo
 
 El Wi-Fi a bordo es como:
 > un único cable largo de internet compartido por toda la cabina, salvo que la parte central de ese «cable» es un enlace de radio con un satélite o una estación muy por debajo.
 
+---
+
 ## 🟢 Dato rápido
 
 El bulto situado sobre un avión equipado con Wi-Fi suele ser un **radomo**, una cubierta aerodinámica que protege la antena de satélite y deja pasar las señales de radio.
+
+---
 
 La conexión puede seguir una ruta extraordinaria, pero su objetivo es conocido: enlazar la red Wi-Fi local de la cabina con tierra mientras el avión continúa en movimiento.

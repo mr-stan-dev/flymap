@@ -5,6 +5,8 @@ but pilots have tools that show what’s happening **inside the clouds ahead**.
 
 One of the most important is **weather radar**.
 
+---
+
 ## 📡 1. Seeing Inside the Clouds
 
 Weather radar sends out signals from the aircraft’s nose.
@@ -15,6 +17,8 @@ These signals:
 - bounce back to the aircraft
 
 👉 This helps detect what’s inside clouds — not just their shape.
+
+---
 
 ## 🌧 2. What the Radar Detects
 
@@ -28,6 +32,8 @@ Weather radar is especially good at finding:
 - heavier rain
 - more intense precipitation
 
+---
+
 ## 🎨 3. Interpreting the Colors
 
 In the cockpit, radar data is shown using colors:
@@ -37,6 +43,8 @@ In the cockpit, radar data is shown using colors:
 - red → strong storm activity
 
 👉 Pilots use this to understand what lies ahead.
+
+---
 
 ## ✈️ 4. Avoiding Dangerous Areas
 
@@ -51,6 +59,8 @@ Using radar, pilots can:
 - heavy rain
 - the most active parts of storm cells
 
+---
+
 ## 🧑‍✈️ 5. It’s Not Fully Automatic
 
 Weather radar provides information — but:
@@ -60,6 +70,8 @@ Weather radar provides information — but:
 
 👉 It’s a tool, not a decision-maker.
 
+---
+
 ## 👀 6. Why You Don’t See What They See
 
 From the cabin:
@@ -68,6 +80,8 @@ From the cabin:
 - the heaviest precipitation inside them is hidden
 
 👉 Radar reveals what your eyes can’t.
+
+---
 
 ## ✨ What It Means for You
 
@@ -79,14 +93,20 @@ Weather radar helps make flights:
 
 Even if the sky looks calm, pilots are always monitoring what’s ahead.
 
+---
+
 ## 💡 Simple Way to Think About It
 
 Weather radar is like:
 > shining an invisible beam into rainy clouds… to see where the strongest parts are.
 
+---
+
 ## 🟢 Quick Fact
 
 The radar is usually located in the nose of the aircraft — behind the rounded front section.
+
+---
 
 Even when you can’t see it,  
 pilots are constantly “looking ahead” into the weather — using radar to guide the flight safely.

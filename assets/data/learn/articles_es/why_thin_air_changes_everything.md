@@ -4,6 +4,8 @@ A gran altitud, el aire es mucho más tenue que cerca del suelo.
 
 Ese solo cambio afecta a casi todas las partes del vuelo.
 
+---
+
 ## 🌬 1. Aire tenue significa menos moléculas
 
 Cuando decimos que el aire es “tenue”, queremos decir que es menos denso.
@@ -16,6 +18,8 @@ Simplemente hay:
 
 👉 La aeronave tiene menos aire con el que trabajar.
 
+---
+
 ## ✈️ 2. Las alas obtienen menos sustentación del aire tenue
 
 Las alas dependen del flujo de aire para generar sustentación.
@@ -26,6 +30,8 @@ En aire más tenue:
 - es más difícil generar sustentación en las mismas condiciones indicadas
 
 Por eso las aeronaves necesitan gestionar la velocidad con cuidado cuando cambia la altitud.
+
+---
 
 ## 🚀 3. Los motores también notan la diferencia
 
@@ -42,6 +48,8 @@ Esto se nota especialmente en:
 - días calurosos
 - altitudes muy elevadas
 
+---
+
 ## 🛫 4. El despegue puede ser más difícil con aire tenue
 
 Cuando el aire es tenue:
@@ -57,6 +65,8 @@ Eso puede significar:
 
 Los pilotos prestan mucha atención a esto en aeropuertos a gran elevación.
 
+---
+
 ## 🛬 5. El aire tenue también tiene una ventaja
 
 El aire más tenue crea menos resistencia.
@@ -69,6 +79,8 @@ Esa es una de las razones por las que las aeronaves vuelan alto en la atmósfera
 
 Así que el aire tenue crea tanto desafíos como beneficios.
 
+---
+
 ## ✨ Lo que significa
 
 El aire tenue afecta a:
@@ -80,15 +92,21 @@ El aire tenue afecta a:
 
 Es una de las mayores razones por las que el vuelo a gran altitud se siente tan distinto del vuelo a baja altitud.
 
+---
+
 ## 💡 Una forma sencilla de verlo
 
 El aire tenue es como intentar trabajar con menos piezas de construcción:
 > el avión todavía puede volar...  
 > pero cada ala y cada motor tienen menos aire con el que trabajar.
 
+---
+
 ## 🟢 Dato rápido
 
 Un día caluroso en un aeropuerto de gran altitud puede hacer que el aire se comporte como si fuera aún “más tenue”, lo que puede afectar mucho al rendimiento de despegue.
+
+---
 
 El aire tenue cambia casi todo en aviación,  
 desde la distancia de despegue hasta la eficiencia en crucero.

@@ -5,6 +5,8 @@ Der Himmel wirkt **tiefer, dunkler und intensiver** als am Boden.
 
 Das ist keine Einbildung - es gibt einen echten Grund dafür.
 
+---
+
 ## 🌌 1. Du bist über einem großen Teil der dichteren unteren Luft
 
 Am Boden bist du von einer dicken Luftschicht umgeben.
@@ -14,6 +16,8 @@ In Reiseflughöhe:
 - ist die Luft um dich herum dünner
 
 👉 Weniger Luft = weniger Streuung des Lichts.
+
+---
 
 ## 🌈 2. Woher die Farbe des Himmels kommt
 
@@ -26,6 +30,8 @@ Weiter oben:
 - gibt es weniger Luft, die Licht streuen kann
 - wird das Blau tiefer und dunkler
 
+---
+
 ## ✈️ 3. Auch der Horizont sieht anders aus
 
 Aus dem Flugzeug kannst du vielleicht Folgendes bemerken:
@@ -34,6 +40,8 @@ Aus dem Flugzeug kannst du vielleicht Folgendes bemerken:
 - manchmal sogar einen Hauch von Dunkelheit darüber
 
 👉 Du beginnst bereits den Übergang zum Weltraum zu sehen.
+
+---
 
 ## 🌅 4. Sonnenlicht wirkt intensiver
 
@@ -45,6 +53,8 @@ Darum:
 - sehen Sonnenuntergänge dramatischer aus
 - leuchten Wolken mit stärkerem Kontrast
 
+---
+
 ## ✨ Wie es sich anfühlt
 
 Der Himmel von oben wirkt:
@@ -52,15 +62,21 @@ Der Himmel von oben wirkt:
 - tiefer
 - fast "näher am Weltraum"
 
+---
+
 ## 💡 Einfach erklärt
 
 Der Himmel sieht anders aus, weil:
 > du nicht mehr durch den größten Teil der Atmosphäre hindurchschaust -  
 > sondern über ihre obere Schicht hinweg.
 
+---
+
 ## 🟢 Kurzfakt
 
 Aus einem Verkehrsflugzeug wirkt der Horizont weiter entfernt, und der Himmel zeigt oft einen stärkeren Übergang von hell nach dunkel als am Boden.
+
+---
 
 Je höher du steigst, desto weniger Atmosphäre umgibt dich -  
 und desto mehr beginnst du den Himmel so zu sehen, wie er wirklich ist.

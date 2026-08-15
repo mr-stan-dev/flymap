@@ -5,6 +5,8 @@ el cielo se ve **más profundo, más oscuro y más vivo** que en tierra.
 
 No es imaginación: hay una razón real detrás.
 
+---
+
 ## 🌌 1. Estás por encima de gran parte del aire más denso y bajo
 
 En tierra, estás rodeado por una capa gruesa de aire.
@@ -14,6 +16,8 @@ A altitud de crucero:
 - el aire que te rodea es más tenue
 
 👉 Menos aire = menos dispersión de la luz.
+
+---
 
 ## 🌈 2. Cómo obtiene su color el cielo
 
@@ -26,6 +30,8 @@ Pero más arriba:
 - hay menos aire para dispersar la luz
 - el azul se vuelve más profundo y más oscuro
 
+---
+
 ## ✈️ 3. El horizonte también se ve diferente
 
 Desde un avión, puede que notes:
@@ -34,6 +40,8 @@ Desde un avión, puede que notes:
 - a veces incluso un toque de oscuridad más arriba
 
 👉 Estás empezando a ver la transición hacia el espacio.
+
+---
 
 ## 🌅 4. La luz solar se siente más intensa
 
@@ -45,6 +53,8 @@ Por eso:
 - los atardeceres se ven más dramáticos
 - las nubes brillan con un contraste más fuerte
 
+---
+
 ## ✨ Cómo se siente
 
 El cielo desde arriba se siente:
@@ -52,15 +62,21 @@ El cielo desde arriba se siente:
 - más profundo
 - casi “más cerca del espacio”
 
+---
+
 ## 💡 Una forma sencilla de verlo
 
 El cielo se ve diferente porque:
 > ya no estás mirando *a través* de la mayor parte de la atmósfera...  
 > estás mirando *a lo largo* de su parte superior.
 
+---
+
 ## 🟢 Dato rápido
 
 Desde un avión comercial, el horizonte se ve más lejano y el cielo suele mostrar un degradado de claro a oscuro más marcado que desde el suelo.
+
+---
 
 Cuanto más alto subes, menos atmósfera te rodea,  
 y más empiezas a ver el cielo tal como realmente es.

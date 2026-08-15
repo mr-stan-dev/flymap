@@ -5,6 +5,8 @@ La sustentación es la fuerza que ayuda a que un avión se eleve hacia el cielo.
 Puede sonar complicado, pero la idea básica es sencilla:  
 👉 un ala se mueve a través del aire de una manera que crea una fuerza hacia arriba.
 
+---
+
 ## 🌬 1. Un ala necesita aire en movimiento
 
 La sustentación solo se produce cuando el aire fluye alrededor del ala.
@@ -15,6 +17,8 @@ Ese flujo puede venir de:
 - el aire moviéndose alrededor del ala
 
 Sin flujo de aire, el ala no puede generar suficiente sustentación para volar.
+
+---
 
 ## ✈️ 2. El ala guía el aire
 
@@ -28,6 +32,8 @@ Cuando el aire se encuentra con el ala:
 
 👉 Si el aire es empujado hacia abajo, el ala es empujada hacia arriba.
 
+---
+
 ## ⬆️ 3. La presión también ayuda
 
 La sustentación no consiste solo en empujar el aire hacia abajo.
@@ -38,6 +44,8 @@ El flujo de aire alrededor del ala también crea:
 - mayor presión debajo de ella
 
 Esa diferencia de presión ayuda a sostener la aeronave en el aire.
+
+---
 
 ## 🚀 4. La velocidad hace la sustentación más fuerte
 
@@ -51,6 +59,8 @@ Eso normalmente significa:
 
 Por eso los aviones necesitan velocidad durante el despegue.
 
+---
+
 ## ⚖️ 5. La sustentación debe equilibrar el peso
 
 En vuelo estable, la sustentación debe equilibrar el peso del avión.
@@ -61,6 +71,8 @@ Si la sustentación se vuelve:
 - menor que el peso -> el avión descenderá
 
 Los pilotos gestionan este equilibrio con la velocidad, la potencia y el ángulo del ala.
+
+---
 
 ## ✨ Lo que significa
 
@@ -75,15 +87,21 @@ Es el resultado de:
 
 Todo eso trabaja junto para crear una fuerza hacia arriba.
 
+---
+
 ## 💡 Una forma sencilla de verlo
 
 La sustentación funciona así:
 > el ala se encuentra con el aire con la forma y el ángulo adecuados...  
 > y el aire responde empujando.
 
+---
+
 ## 🟢 Dato rápido
 
 La sustentación aumenta con la velocidad, por eso los aviones deben acelerar antes de poder despegar de la pista.
+
+---
 
 La sustentación funciona porque las alas están diseñadas para trabajar con aire en movimiento,  
 y ese aire en movimiento puede sostener algo tan pesado como un avión.

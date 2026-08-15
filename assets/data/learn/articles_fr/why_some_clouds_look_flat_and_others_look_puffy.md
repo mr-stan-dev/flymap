@@ -5,6 +5,8 @@ alors que d'autres paraissent comme des masses cotonneuses qui montent dans le c
 
 Cette difference vient de la facon dont l'air se deplace.
 
+---
+
 ## 🌬 1. Tout depend de la stabilite de l'air
 
 L'idee cle est celle de **l'air stable contre l'air instable**.
@@ -13,6 +15,8 @@ L'idee cle est celle de **l'air stable contre l'air instable**.
 - **Air instable** -> laisse l'air monter librement  
 
 👉 C'est cela qui determine la forme des nuages.
+
+---
 
 ## ⬜ 2. Nuages plats (air stable)
 
@@ -27,6 +31,8 @@ Dans un air stable :
 
 On les appelle souvent des **nuages de type stratus**.
 
+---
+
 ## ☁️ 3. Nuages gonfles (air instable)
 
 Dans un air instable :
@@ -40,6 +46,8 @@ Dans un air instable :
 
 On les appelle des **cumulus**.
 
+---
+
 ## ⬆️ 4. Quand les nuages gonfles grandissent davantage
 
 Si l'air ascendant est assez fort :
@@ -48,6 +56,8 @@ Si l'air ascendant est assez fort :
 - et devenir de grandes tours  
 
 👉 Ils peuvent alors evoluer en nuages d'orage.
+
+---
 
 ## ✈️ 5. Ce que tu vois depuis un avion
 
@@ -58,6 +68,8 @@ Vus d'en haut, la difference est claire :
 
 👉 C'est comme comparer une surface calme a une surface mouvante et texturee.
 
+---
+
 ## 💡 Facon simple d'y penser
 
 La forme des nuages depend du mouvement de l'air :
@@ -65,9 +77,13 @@ La forme des nuages depend du mouvement de l'air :
 > un air calme etale les nuages...  
 > un air ascendant les construit vers le haut.
 
+---
+
 ## 🟢 Fait rapide
 
 Un meme nuage peut changer de forme si l'air devient plus ou moins stable.
+
+---
 
 Les nuages ne sont pas seulement des formes -  
 ils revelent la facon dont l'air se deplace dans le ciel.

@@ -8,6 +8,8 @@ Eso es todo.
 
 Y aun así, este pequeño ángulo influye mucho en cómo vuela un avión.
 
+---
+
 ## Imagina una mano por la ventana del coche
 
 Piensa en sacar la mano por la ventanilla de un coche en movimiento.
@@ -20,6 +22,8 @@ Eso se parece a lo que hace un ala.
 Al cambiar su inclinación frente al aire que llega, **el ala cambia cuánta sustentación genera**.
 
 Ese cambio de inclinación es el ángulo de ataque.
+
+---
 
 ## ¿Por qué importa?
 
@@ -37,6 +41,8 @@ Si el ángulo se hace demasiado grande, el flujo de aire deja de moverse con sua
 
 Entonces la sustentación disminuye rápidamente y el ala puede entrar en **pérdida**.
 
+---
+
 ## No es lo mismo que la actitud del avión
 
 Esto confunde a mucha gente.
@@ -51,6 +57,8 @@ Lo que de verdad importa es:
 Así que un avión puede tener el morro bastante arriba y seguir teniendo un ángulo de ataque seguro.  
 O puede verse casi nivelado y aun así estar acercándose a una pérdida.
 
+---
+
 ## ¿Cómo lo controlan los pilotos?
 
 Los pilotos lo gestionan con:
@@ -64,9 +72,13 @@ Durante el despegue y el aterrizaje, el ángulo de ataque se vuelve especialment
 
 Algunos aviones incluso tienen sistemas específicos para medirlo o advertir si es demasiado alto.
 
+---
+
 ## Dato rápido ✨
 
 Las alas se pueden poner en pérdida **a cualquier velocidad** si el ángulo de ataque supera su límite crítico.
+
+---
 
 ## La idea clave
 

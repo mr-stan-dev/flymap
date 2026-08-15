@@ -33,6 +33,14 @@ class LearnArticleScreen extends StatelessWidget {
           ),
         ),
       ),
+      horizontalRuleDecoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.45),
+            width: 2,
+          ),
+        ),
+      ),
     );
 
     return Scaffold(
@@ -74,9 +82,7 @@ class LearnArticleScreen extends StatelessWidget {
               if (!launched && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(
-                      context.t.settings.couldNotOpenUrl(url: link),
-                    ),
+                    content: Text(context.t.settings.couldNotOpenUrl(url: link)),
                   ),
                 );
               }

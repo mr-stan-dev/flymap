@@ -5,6 +5,8 @@ le ciel parait **plus profond, plus sombre et plus intense** qu'au sol.
 
 Ce n'est pas ton imagination - il y a une vraie raison a cela.
 
+---
+
 ## 🌌 1. Tu es au-dessus d'une grande partie de l'air epais de basse altitude
 
 Au sol, tu es entoure d'une epaisse couche d'air.
@@ -14,6 +16,8 @@ A l'altitude de croisiere :
 - l'air autour de toi est plus fin
 
 👉 Moins d'air = moins de diffusion de la lumiere.
+
+---
 
 ## 🌈 2. Comment le ciel obtient sa couleur
 
@@ -26,6 +30,8 @@ Mais plus haut :
 - il y a moins d'air pour diffuser la lumiere
 - le bleu devient plus profond et plus sombre
 
+---
+
 ## ✈️ 3. L'horizon aussi parait different
 
 Depuis un avion, tu peux remarquer :
@@ -34,6 +40,8 @@ Depuis un avion, tu peux remarquer :
 - parfois meme une legere touche d'obscurite au-dessus
 
 👉 Tu commences a voir la transition vers l'espace.
+
+---
 
 ## 🌅 4. La lumiere du soleil parait plus intense
 
@@ -45,6 +53,8 @@ C'est pourquoi :
 - les couchers de soleil paraissent plus spectaculaires
 - les nuages brillent avec un contraste plus fort
 
+---
+
 ## ✨ Ce que l'on ressent
 
 Le ciel vu d'en haut parait :
@@ -52,15 +62,21 @@ Le ciel vu d'en haut parait :
 - plus profond
 - presque "plus proche de l'espace"
 
+---
+
 ## 💡 Facon simple d'y penser
 
 Le ciel parait different parce que :
 > tu ne regardes plus a travers la plus grande partie de l'atmosphere -  
 > tu regardes au-dessus de sa couche superieure.
 
+---
+
 ## 🟢 Fait rapide
 
 Depuis un avion de ligne, l'horizon parait plus lointain et le ciel montre souvent un degrade plus prononce du clair vers le sombre qu'au sol.
+
+---
 
 Plus tu montes, moins l'atmosphere t'entoure -  
 et plus tu commences a voir le ciel tel qu'il est reellement.

@@ -4,6 +4,8 @@ An airplane does not just care about how heavy it is.
 
 It also cares about **where that weight is placed**.
 
+---
+
 ## ⚖️ 1. Total Weight Affects Performance
 
 The heavier an airplane is, the more work it must do.
@@ -17,6 +19,8 @@ Extra weight can affect:
 
 That is why aircraft have strict weight limits.
 
+---
+
 ## 📦 2. Balance Is About Where the Weight Sits
 
 Weight must also be distributed in the right way.
@@ -24,6 +28,8 @@ Weight must also be distributed in the right way.
 If too much weight is too far forward or too far back, the aircraft can become harder to control.
 
 👉 Safe flying depends on both total weight and correct balance.
+
+---
 
 ## ✈️ 3. The Center of Gravity Matters
 
@@ -37,6 +43,8 @@ If it is in the wrong place, the airplane may:
 - need unusual control inputs
 - perform differently than expected
 
+---
+
 ## 🧍 4. Passengers, Bags, and Fuel All Count
 
 Balance is affected by many ordinary things:
@@ -46,6 +54,8 @@ Balance is affected by many ordinary things:
 - how much fuel is carried
 
 Even though passengers may not notice it, loading is carefully planned.
+
+---
 
 ## ✨ What It Means
 
@@ -59,15 +69,21 @@ They affect:
 
 That is why they are checked before every flight.
 
+---
+
 ## 💡 Simple Way to Think About It
 
 It is like carrying a backpack:
 > the total weight matters...  
 > but where that weight sits matters too.
 
+---
+
 ## 🟢 Quick Fact
 
 An aircraft can be under its maximum weight and still be unsafe if the balance is outside limits.
+
+---
 
 In aviation, weight and balance are not small details -  
 they are part of what makes the aircraft behave properly in the air.
