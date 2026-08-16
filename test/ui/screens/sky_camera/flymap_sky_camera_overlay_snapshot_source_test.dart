@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flymap/data/location/app_location_client.dart';
+import 'package:flymap/data/location/app_location_service.dart';
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_overlay_snapshot_source.dart';
 import 'package:flymap/ui/screens/sky_camera/flymap_sky_camera_session_factory.dart';
 import 'package:geolocator/geolocator.dart';
@@ -156,4 +160,74 @@ void main() {
     expect(snapshot.outsideTemperatureCelsius, isNotNull);
     expect(snapshot.outsideTemperatureIsEstimated, isTrue);
   });
+
+  test('suspend releases camera GPS and start restores it', () async {
+    final locationClient = _TrackingLocationClient();
+    final source = FlymapSkyCameraOverlaySnapshotSource(
+      builder: const FlymapSkyCameraOverlaySnapshotBuilder(
+        placeholderCopy: FlymapSkyCameraPlaceholderCopy(
+          routeLabel: 'London, UK → Barcelona, ES',
+          originCode: 'LHR',
+          destinationCode: 'BCN',
+          originCountryCode: 'GB',
+          destinationCountryCode: 'ES',
+          contextLabel: 'Mediterranean Sea',
+          mapPlaceholder: 'Route preview',
+        ),
+      ),
+      locationService: AppLocationService(client: locationClient),
+    );
+
+    await source.start();
+    expect(locationClient.streamStartCount, 1);
+
+    await source.suspend();
+    expect(locationClient.streamCancelCount, 1);
+
+    await source.start();
+    expect(locationClient.streamStartCount, 2);
+
+    await source.dispose();
+    expect(locationClient.streamCancelCount, 2);
+  });
+}
+
+class _TrackingLocationClient implements AppLocationClient {
+  int streamStartCount = 0;
+  int streamCancelCount = 0;
+
+  @override
+  Future<LocationPermission> checkPermission() async {
+    return LocationPermission.whileInUse;
+  }
+
+  @override
+  Future<Position> getCurrentPosition({
+    required LocationAccuracy accuracy,
+  }) async {
+    throw StateError('No test position');
+  }
+
+  @override
+  Stream<Position> getPositionStream({
+    required LocationSettings locationSettings,
+  }) {
+    streamStartCount += 1;
+    late final StreamController<Position> controller;
+    controller = StreamController<Position>.broadcast(
+      onCancel: () {
+        streamCancelCount += 1;
+        unawaited(controller.close());
+      },
+    );
+    return controller.stream;
+  }
+
+  @override
+  Future<bool> isLocationServiceEnabled() async => true;
+
+  @override
+  Future<LocationPermission> requestPermission() async {
+    return LocationPermission.whileInUse;
+  }
 }

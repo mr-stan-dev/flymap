@@ -54,6 +54,7 @@ class DeviceSkyCameraDriver implements SkyCameraDriver {
         // stream. Captures are still center-cropped as a platform safeguard.
         ResolutionPreset.high,
         enableAudio: _enableAudio,
+        fps: 30,
         imageFormatGroup: Platform.isIOS
             ? ImageFormatGroup.bgra8888
             : ImageFormatGroup.jpeg,

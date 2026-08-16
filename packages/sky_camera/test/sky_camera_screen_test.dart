@@ -694,6 +694,65 @@ void main() {
     );
   });
 
+  testWidgets('thumbnail preview suspends camera and GPS until it closes', (
+    tester,
+  ) async {
+    final driver = _FakeSkyCameraDriver();
+    final snapshotSource = _TrackingSnapshotSource();
+    final previewClosed = Completer<Set<String>>();
+    var previewOpened = false;
+    var cameraWasSuspended = false;
+    var gpsWasSuspended = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SkyCameraScreen(
+          driver: driver,
+          snapshotSource: snapshotSource,
+          exportService: _FakeExportService(),
+          observer: const _FakeObserver(),
+          photoCropper: const _FakePhotoCropper(),
+          openCapturePreview: (context, captures, captureId) {
+            previewOpened = true;
+            cameraWasSuspended = !driver.isInitialized;
+            gpsWasSuspended = snapshotSource.isSuspended;
+            return previewClosed.future;
+          },
+          overlayComposer: const _FakeOverlayComposer(),
+          strings: _strings,
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('sky_camera.capture_button')));
+    await tester.runAsync(() async {
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    });
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.byKey(const Key('sky_camera.last_capture_thumbnail')),
+    );
+    await tester.pump();
+
+    expect(previewOpened, isTrue);
+    expect(cameraWasSuspended, isTrue);
+    expect(gpsWasSuspended, isTrue);
+    expect(driver.disposeCount, 1);
+    expect(driver.initializeCount, 1);
+    expect(snapshotSource.suspendCount, 1);
+    expect(snapshotSource.startCount, 1);
+
+    previewClosed.complete(const <String>{});
+    await tester.pumpAndSettle();
+
+    expect(driver.isInitialized, isTrue);
+    expect(driver.initializeCount, 2);
+    expect(snapshotSource.isSuspended, isFalse);
+    expect(snapshotSource.startCount, 2);
+  });
+
   testWidgets('thumbnail preview receives all camera session captures', (
     tester,
   ) async {
@@ -1224,6 +1283,8 @@ class _FakeSkyCameraDriver implements SkyCameraDriver {
   bool didStopVideo = false;
   bool _isRecordingVideo = false;
   bool _audioEnabled = false;
+  int initializeCount = 0;
+  int disposeCount = 0;
   Offset? lastFocusPoint;
   final List<double> zoomUpdates = <double>[];
   final List<AppLifecycleState> lifecycleStates = <AppLifecycleState>[];
@@ -1294,10 +1355,14 @@ class _FakeSkyCameraDriver implements SkyCameraDriver {
   }
 
   @override
-  Future<void> dispose() async {}
+  Future<void> dispose() async {
+    disposeCount += 1;
+    _isInitialized = false;
+  }
 
   @override
   Future<void> initialize() async {
+    initializeCount += 1;
     _isInitialized = true;
   }
 
@@ -1345,8 +1410,37 @@ class _FakeSnapshotSource implements SkyCameraOverlaySnapshotSource {
   Future<void> start() async {}
 
   @override
+  Future<void> suspend() async {}
+
+  @override
   Stream<SkyCameraOverlaySnapshot> watch() {
     return Stream<SkyCameraOverlaySnapshot>.value(snapshot ?? _testSnapshot());
+  }
+}
+
+class _TrackingSnapshotSource implements SkyCameraOverlaySnapshotSource {
+  int startCount = 0;
+  int suspendCount = 0;
+  bool isSuspended = true;
+
+  @override
+  Future<void> dispose() async {}
+
+  @override
+  Future<void> start() async {
+    startCount += 1;
+    isSuspended = false;
+  }
+
+  @override
+  Future<void> suspend() async {
+    suspendCount += 1;
+    isSuspended = true;
+  }
+
+  @override
+  Stream<SkyCameraOverlaySnapshot> watch() {
+    return Stream<SkyCameraOverlaySnapshot>.value(_testSnapshot());
   }
 }
 
@@ -1372,6 +1466,9 @@ class _SilentSnapshotSource implements SkyCameraOverlaySnapshotSource {
   Future<void> start() async {}
 
   @override
+  Future<void> suspend() async {}
+
+  @override
   Stream<SkyCameraOverlaySnapshot> watch() =>
       const Stream<SkyCameraOverlaySnapshot>.empty();
 }
@@ -1393,6 +1490,9 @@ class _DelayedSnapshotSource implements SkyCameraOverlaySnapshotSource {
 
   @override
   Future<void> start() => _startCompleter.future;
+
+  @override
+  Future<void> suspend() async {}
 
   @override
   Stream<SkyCameraOverlaySnapshot> watch() {

@@ -95,6 +95,7 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   bool _isRecordingVideo = false;
   bool _isStoppingVideo = false;
   bool _isClosing = false;
+  bool _isCapturePreviewOpen = false;
   bool _allowPop = false;
   Future<void>? _startingVideoOperation;
   Future<void>? _stoppingVideoOperation;
@@ -177,7 +178,10 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
                       onZoomSelected: _selectZoom,
                       captureMode: _captureMode,
                       isRecording: _isRecordingVideo,
-                      isTransitioning: _isStartingVideo || _isClosing,
+                      isTransitioning:
+                          _isStartingVideo ||
+                          _isClosing ||
+                          _isCapturePreviewOpen,
                       recordingElapsed: _isRecordingVideo
                           ? _recordingElapsed
                           : null,
@@ -189,7 +193,8 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
                               if (_isStartingVideo ||
                                   _isRecordingVideo ||
                                   _isCapturing ||
-                                  _isClosing) {
+                                  _isClosing ||
+                                  _isCapturePreviewOpen) {
                                 return;
                               }
                               setState(() => _captureMode = mode);
@@ -199,6 +204,7 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
                               _isStartingVideo ||
                               _isCapturing ||
                               _isClosing ||
+                              _isCapturePreviewOpen ||
                               !widget.driver.isInitialized
                           ? null
                           : _capture,
@@ -214,7 +220,8 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
             if (!_isStartingVideo &&
                 !_isRecordingVideo &&
                 !_isCapturing &&
-                !_isClosing)
+                !_isClosing &&
+                !_isCapturePreviewOpen)
               SafeArea(
                 child: Align(
                   alignment: Alignment.topRight,
@@ -370,6 +377,7 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   }
 
   Future<void> _handleAppLifecycleStateChanged(AppLifecycleState state) async {
+    if (_isCapturePreviewOpen) return;
     if (state == AppLifecycleState.paused) {
       // Backgrounding kills the capture session — stop and SAVE what was
       // recorded instead of discarding it. Let an in-flight start settle
@@ -471,7 +479,8 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
         _isStartingVideo ||
         _isRecordingVideo ||
         _isStoppingVideo ||
-        _isClosing) {
+        _isClosing ||
+        _isCapturePreviewOpen) {
       return;
     }
     setState(() {
@@ -635,7 +644,11 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   }
 
   Future<void> _openSettings() async {
-    if (_isStartingVideo || _isRecordingVideo || _isCapturing || _isClosing) {
+    if (_isStartingVideo ||
+        _isRecordingVideo ||
+        _isCapturing ||
+        _isClosing ||
+        _isCapturePreviewOpen) {
       return;
     }
     await showSkyCameraSettingsSheet(
@@ -667,12 +680,39 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
 
   Future<void> _openLastCapturePreview() async {
     final capture = _lastCapture;
-    if (capture == null || !mounted) return;
-    final deletedCaptureIds = await widget.openCapturePreview(
-      context,
-      List<SkyCameraSavedCapture>.unmodifiable(_sessionCaptures),
-      capture.id,
-    );
+    if (capture == null || !mounted || _isCapturePreviewOpen) return;
+    setState(() {
+      _isCapturePreviewOpen = true;
+      _isCameraLoading = true;
+      _isGpsLoading = true;
+      _errorMessage = null;
+    });
+    var deletedCaptureIds = const <String>{};
+    try {
+      await Future.wait<void>([
+        widget.driver.dispose(),
+        widget.snapshotSource.suspend(),
+      ], eagerError: false);
+      if (!mounted) return;
+      deletedCaptureIds = await widget.openCapturePreview(
+        context,
+        List<SkyCameraSavedCapture>.unmodifiable(_sessionCaptures),
+        capture.id,
+      );
+    } catch (error, stackTrace) {
+      debugPrint('Sky Camera capture preview failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      if (mounted) {
+        setState(() => _errorMessage = widget.strings.cameraUnavailable);
+      }
+    } finally {
+      if (mounted && !_isClosing) {
+        await _resumeAfterCapturePreview();
+      }
+      if (mounted) {
+        setState(() => _isCapturePreviewOpen = false);
+      }
+    }
     if (deletedCaptureIds.isEmpty || !mounted) return;
     setState(() {
       _sessionCaptures.removeWhere(
@@ -680,6 +720,33 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
       );
       _lastCapture = _sessionCaptures.isEmpty ? null : _sessionCaptures.last;
     });
+  }
+
+  Future<void> _resumeAfterCapturePreview() async {
+    try {
+      await Future.wait<void>([
+        widget.driver.initialize(),
+        _startSnapshotSource(),
+      ]);
+      if (!mounted) return;
+      await _loadCameraCapabilities();
+      if (!mounted) return;
+      setState(() => _isCameraLoading = false);
+    } on CameraException catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _isCameraLoading = false;
+        _errorMessage = error.code == 'CameraAccessDenied'
+            ? widget.strings.cameraPermissionDenied
+            : widget.strings.cameraUnavailable;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isCameraLoading = false;
+        _errorMessage = widget.strings.cameraUnavailable;
+      });
+    }
   }
 
   Future<void> _close() async {
@@ -709,7 +776,12 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
     BuildContext context,
     TapUpDetails details,
   ) async {
-    if (!widget.driver.isInitialized || _isStartingVideo || _isClosing) return;
+    if (!widget.driver.isInitialized ||
+        _isStartingVideo ||
+        _isClosing ||
+        _isCapturePreviewOpen) {
+      return;
+    }
     if (_zoomController.shouldIgnoreTap(DateTime.now())) {
       return;
     }
@@ -725,12 +797,17 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   }
 
   void _handleScaleStart(ScaleStartDetails details) {
-    if (_isStartingVideo || _isClosing) return;
+    if (_isStartingVideo || _isClosing || _isCapturePreviewOpen) return;
     _zoomController.handleScaleStart();
   }
 
   Future<void> _handleScaleUpdate(ScaleUpdateDetails details) async {
-    if (!widget.driver.isInitialized || _isStartingVideo || _isClosing) return;
+    if (!widget.driver.isInitialized ||
+        _isStartingVideo ||
+        _isClosing ||
+        _isCapturePreviewOpen) {
+      return;
+    }
     final didChange = await _zoomController.handleScaleUpdate(
       driver: widget.driver,
       pointers: _pointers,
@@ -742,7 +819,12 @@ class _SkyCameraScreenState extends State<SkyCameraScreen>
   }
 
   Future<void> _selectZoom(double zoomLevel) async {
-    if (!widget.driver.isInitialized || _isStartingVideo || _isClosing) return;
+    if (!widget.driver.isInitialized ||
+        _isStartingVideo ||
+        _isClosing ||
+        _isCapturePreviewOpen) {
+      return;
+    }
     final didChange = await _zoomController.setZoomLevel(
       driver: widget.driver,
       zoomLevel: zoomLevel,

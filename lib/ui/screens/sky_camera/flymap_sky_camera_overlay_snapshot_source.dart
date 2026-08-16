@@ -88,37 +88,63 @@ class FlymapSkyCameraOverlaySnapshotSource
   AppLocationSession? _locationSession;
   bool _started = false;
   bool _disposed = false;
+  Future<void> _operation = Future<void>.value();
 
   @override
-  Future<void> start() async {
-    if (_started) return;
+  Future<void> start() => _runOperation(_start);
+
+  Future<void> _start() async {
+    if (_started || _disposed) return;
     _started = true;
     _emit(position: locationService.latestPosition);
-    _positionSubscription = locationService.watch().listen(
+    final positionSubscription = locationService.watch().listen(
       (position) => _emit(position: position),
       onError: (_) {},
     );
-    final session = await locationService.startSession(
-      mode: AppLocationMode.camera,
-      requestPermission: true,
-    );
-    if (_disposed) {
-      await session.close();
-      return;
+    _positionSubscription = positionSubscription;
+    try {
+      final session = await locationService.startSession(
+        mode: AppLocationMode.camera,
+        requestPermission: true,
+      );
+      _locationSession = session;
+      _emit(position: session.latestPosition);
+    } catch (_) {
+      _positionSubscription = null;
+      _started = false;
+      await positionSubscription.cancel();
+      rethrow;
     }
-    _locationSession = session;
-    _emit(position: session.latestPosition);
+  }
+
+  @override
+  Future<void> suspend() => _runOperation(_suspend);
+
+  Future<void> _suspend() async {
+    _started = false;
+    final positionSubscription = _positionSubscription;
+    final locationSession = _locationSession;
+    _positionSubscription = null;
+    _locationSession = null;
+    await positionSubscription?.cancel();
+    await locationSession?.close();
   }
 
   @override
   Stream<SkyCameraOverlaySnapshot> watch() => _controller.stream;
 
   @override
-  Future<void> dispose() async {
+  Future<void> dispose() => _runOperation(() async {
+    if (_disposed) return;
     _disposed = true;
-    await _positionSubscription?.cancel();
-    await _locationSession?.close();
+    await _suspend();
     await _controller.close();
+  });
+
+  Future<void> _runOperation(Future<void> Function() action) {
+    final next = _operation.then((_) => action());
+    _operation = next.catchError((_) {});
+    return next;
   }
 
   void _emit({required Position? position}) {

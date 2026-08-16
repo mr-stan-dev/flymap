@@ -204,7 +204,7 @@ void main() {
   });
 
   testWidgets(
-    'shows camera FAB in Media tab and opens camera with no flights',
+    'shows camera FAB in Media tab and opens photo-only camera with no flights',
     (tester) async {
       await tester.pumpWidget(_testApp());
       await _pumpForInitialLoad(tester);
@@ -223,8 +223,12 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
 
       expect(find.byKey(const Key('test.sky_camera.preview')), findsOneWidget);
-      expect(find.byKey(const Key('sky_camera.mode_selector')), findsOneWidget);
-      expect(find.byKey(const Key('sky_camera.mode_video')), findsOneWidget);
+      expect(find.byKey(const Key('sky_camera.mode_selector')), findsNothing);
+      expect(find.byKey(const Key('sky_camera.mode_video')), findsNothing);
+      expect(
+        find.byKey(const Key('sky_camera.capture_button')),
+        findsOneWidget,
+      );
       expect(find.textContaining('LHR'), findsNothing);
       expect(find.textContaining('BCN'), findsNothing);
     },
@@ -1089,6 +1093,9 @@ class _FakeSkyCameraSnapshotSource implements SkyCameraOverlaySnapshotSource {
 
   @override
   Future<void> start() async {}
+
+  @override
+  Future<void> suspend() async {}
 
   @override
   Stream<SkyCameraOverlaySnapshot> watch() {
