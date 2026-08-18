@@ -348,8 +348,8 @@ class _TranslationsSettingsFr extends TranslationsSettingsEn {
 	@override String get feedbackSendFailed => 'Impossible d’envoyer le message. Veuillez réessayer.';
 	@override String get proBannerTitle => 'Flymap Pro';
 	@override String get proBannerTitleActive => 'Flymap Pro actif';
-	@override String get proBannerSubtitleActive => 'Mode carte détaillé et packs d’articles hors ligne complets débloqués.';
-	@override String get proBannerSubtitleFree => 'Débloquez les cartes détaillées et les packs d’articles hors ligne complets';
+	@override String get proBannerSubtitleActive => 'Itinéraires réels, cartes hors ligne, météo, lieux et récits débloqués.';
+	@override String get proBannerSubtitleFree => 'Débloquez les itinéraires réels, cartes hors ligne, météo, lieux et récits';
 	@override String get proBannerBadgeActive => 'PRO ACTIF';
 }
 
@@ -381,11 +381,30 @@ class _TranslationsSubscriptionFr extends TranslationsSubscriptionEn {
 	@override String get flightUnlockPurchaseCancelled => 'Achat du déblocage annulé.';
 	@override String get flightUnlockPurchaseFailed => 'Échec de l’achat du déblocage. Veuillez réessayer.';
 	@override String get proFeaturesTitle => 'Ce que débloque Flymap Pro';
-	@override String get proFeatureRoutesTitle => 'Aperçus d’itinéraire précis';
-	@override String get proFeatureMapsTitle => 'Cartes hors ligne plus détaillées';
-	@override String get proFeatureTimelineTitle => 'Timeline complète du trajet';
+	@override String get proFeaturesIncludedTitle => 'Inclus dans votre offre Pro';
+	@override String get proHeroSubtitle => 'Votre siège côté hublot, entièrement débloqué.';
+	@override String get proFeatureRoutesTitle => 'Itinéraires de vol réels récents';
+	@override String get proFeatureRoutesBody => 'Suivez une trajectoire récemment enregistrée plutôt qu’un arc approximatif.';
+	@override String get proFeatureMapsTitle => 'Cartes plus détaillées, disponibles hors ligne';
+	@override String get proFeatureMapsBody => 'Gardez des cartes enrichies accessibles en vol sans Internet.';
+	@override String get proFeatureTimelineTitle => 'Timeline complète et 10 fois plus de lieux';
+	@override String get proFeatureTimelineBody => 'Découvrez chaque région et davantage de points d’intérêt sur votre trajet.';
+	@override String get proFeatureWeatherTitle => 'Couverture nuageuse et météo des aéroports';
+	@override String get proFeatureWeatherBody => 'Sachez ce que vous pourrez voir avant le décollage.';
 	@override String get proFeaturePoiTitle => '10 fois plus de lieux sur l’itinéraire';
 	@override String get proFeatureArticlesTitle => 'Packs d’articles hors ligne complets';
+	@override String get proFeatureLearnTitle => 'Accès complet à Learn et Geo Quiz';
+	@override String get proFeatureLearnBody => 'Explorez tous les récits et défis de géographie.';
+	@override String get planAndBillingTitle => 'Offre et facturation';
+	@override String get planLabel => 'Offre';
+	@override String get activeSubscription => 'Abonnement actif';
+	@override String currentPeriodEnds({required Object date}) => 'La période en cours se termine le ${date}';
+	@override String get managePlanAndBilling => 'Gérer l’offre et la facturation';
+	@override String get cancelSubscription => 'Annuler l’abonnement';
+	@override String get cancellationHelper => 'Avant l’annulation, l’App Store ou Google Play indiqueront la date de fin de votre accès Pro.';
+	@override String get flightPassesTitle => 'Pass de vol';
+	@override String get flightPassesBody => 'Ces déblocages pour un vol resteront disponibles pour vos prochains vols.';
+	@override String get purchaseHelpTitle => 'Aide concernant les achats';
 	@override String get checkingStatus => 'Vérification de l’état de votre abonnement...';
 	@override String get freePlan => 'Vous êtes sur le forfait Gratuit.';
 	@override String get active => 'Actif';
@@ -1976,8 +1995,8 @@ extension on TranslationsFr {
 			'settings.feedbackSendFailed' => 'Impossible d’envoyer le message. Veuillez réessayer.',
 			'settings.proBannerTitle' => 'Flymap Pro',
 			'settings.proBannerTitleActive' => 'Flymap Pro actif',
-			'settings.proBannerSubtitleActive' => 'Mode carte détaillé et packs d’articles hors ligne complets débloqués.',
-			'settings.proBannerSubtitleFree' => 'Débloquez les cartes détaillées et les packs d’articles hors ligne complets',
+			'settings.proBannerSubtitleActive' => 'Itinéraires réels, cartes hors ligne, météo, lieux et récits débloqués.',
+			'settings.proBannerSubtitleFree' => 'Débloquez les itinéraires réels, cartes hors ligne, météo, lieux et récits',
 			'settings.proBannerBadgeActive' => 'PRO ACTIF',
 			'subscription.screenTitle' => 'Abonnement',
 			'subscription.contactSupport' => 'Contacter l’assistance',
@@ -2000,11 +2019,30 @@ extension on TranslationsFr {
 			'subscription.flightUnlockPurchaseCancelled' => 'Achat du déblocage annulé.',
 			'subscription.flightUnlockPurchaseFailed' => 'Échec de l’achat du déblocage. Veuillez réessayer.',
 			'subscription.proFeaturesTitle' => 'Ce que débloque Flymap Pro',
-			'subscription.proFeatureRoutesTitle' => 'Aperçus d’itinéraire précis',
-			'subscription.proFeatureMapsTitle' => 'Cartes hors ligne plus détaillées',
-			'subscription.proFeatureTimelineTitle' => 'Timeline complète du trajet',
+			'subscription.proFeaturesIncludedTitle' => 'Inclus dans votre offre Pro',
+			'subscription.proHeroSubtitle' => 'Votre siège côté hublot, entièrement débloqué.',
+			'subscription.proFeatureRoutesTitle' => 'Itinéraires de vol réels récents',
+			'subscription.proFeatureRoutesBody' => 'Suivez une trajectoire récemment enregistrée plutôt qu’un arc approximatif.',
+			'subscription.proFeatureMapsTitle' => 'Cartes plus détaillées, disponibles hors ligne',
+			'subscription.proFeatureMapsBody' => 'Gardez des cartes enrichies accessibles en vol sans Internet.',
+			'subscription.proFeatureTimelineTitle' => 'Timeline complète et 10 fois plus de lieux',
+			'subscription.proFeatureTimelineBody' => 'Découvrez chaque région et davantage de points d’intérêt sur votre trajet.',
+			'subscription.proFeatureWeatherTitle' => 'Couverture nuageuse et météo des aéroports',
+			'subscription.proFeatureWeatherBody' => 'Sachez ce que vous pourrez voir avant le décollage.',
 			'subscription.proFeaturePoiTitle' => '10 fois plus de lieux sur l’itinéraire',
 			'subscription.proFeatureArticlesTitle' => 'Packs d’articles hors ligne complets',
+			'subscription.proFeatureLearnTitle' => 'Accès complet à Learn et Geo Quiz',
+			'subscription.proFeatureLearnBody' => 'Explorez tous les récits et défis de géographie.',
+			'subscription.planAndBillingTitle' => 'Offre et facturation',
+			'subscription.planLabel' => 'Offre',
+			'subscription.activeSubscription' => 'Abonnement actif',
+			'subscription.currentPeriodEnds' => ({required Object date}) => 'La période en cours se termine le ${date}',
+			'subscription.managePlanAndBilling' => 'Gérer l’offre et la facturation',
+			'subscription.cancelSubscription' => 'Annuler l’abonnement',
+			'subscription.cancellationHelper' => 'Avant l’annulation, l’App Store ou Google Play indiqueront la date de fin de votre accès Pro.',
+			'subscription.flightPassesTitle' => 'Pass de vol',
+			'subscription.flightPassesBody' => 'Ces déblocages pour un vol resteront disponibles pour vos prochains vols.',
+			'subscription.purchaseHelpTitle' => 'Aide concernant les achats',
 			'subscription.checkingStatus' => 'Vérification de l’état de votre abonnement...',
 			'subscription.freePlan' => 'Vous êtes sur le forfait Gratuit.',
 			'subscription.active' => 'Actif',
@@ -2174,6 +2212,8 @@ extension on TranslationsFr {
 			'createFlight.mapPreview.optionsBody' => 'L’itinéraire est approximatif — le trajet réel peut varier, surtout sur les vols long-courriers.',
 			'createFlight.overview.routeNotReady' => 'L’itinéraire n’est pas encore prêt.',
 			'createFlight.overview.proPoiUpsell' => 'Le forfait Gratuit comprend une carte basique et un nombre limité de lieux',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.routeNoteTooltip' => 'Note sur l’itinéraire',
 			'createFlight.overview.routeNoteTitle' => 'Itinéraire approximatif',
 			'createFlight.overview.routeNoteBody' => 'L’itinéraire est approximatif — le trajet réel peut varier, surtout sur les vols long-courriers.',
@@ -2193,8 +2233,6 @@ extension on TranslationsFr {
 			'createFlight.overview.routeReviewedSubtitle' => ({required Object regions, required Object departure, required Object arrival}) => 'Vous survolerez ${regions} de ${departure} à ${arrival}.',
 			'createFlight.overview.fullSummary' => 'Résumé complet',
 			'createFlight.overview.routeSummaryTitle' => 'Résumé de l’itinéraire',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.routeSummaryDistanceLabel' => 'Distance',
 			'createFlight.overview.routeSummaryDurationLabel' => 'Durée',
 			'createFlight.overview.routeSummaryRegionsLabel' => 'Régions',
@@ -2688,6 +2726,8 @@ extension on TranslationsFr {
 			'countries.BZ' => 'Belize',
 			'countries.CA' => 'Canada',
 			'countries.CD' => 'Congo, République démocratique du',
+			_ => null,
+		} ?? switch (path) {
 			'countries.CF' => 'République centrafricaine',
 			'countries.CG' => 'Congo',
 			'countries.CH' => 'Suisse',
@@ -2707,8 +2747,6 @@ extension on TranslationsFr {
 			'countries.DO' => 'République dominicaine',
 			'countries.DZ' => 'Algérie',
 			'countries.EC' => 'Équateur',
-			_ => null,
-		} ?? switch (path) {
 			'countries.EE' => 'Estonie',
 			'countries.EG' => 'Égypte',
 			'countries.EH' => 'Sahara occidental',

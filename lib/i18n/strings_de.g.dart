@@ -348,8 +348,8 @@ class _TranslationsSettingsDe extends TranslationsSettingsEn {
 	@override String get feedbackSendFailed => 'Feedback konnte nicht gesendet werden. Bitte versuche es erneut.';
 	@override String get proBannerTitle => 'Flymap Pro';
 	@override String get proBannerTitleActive => 'Flymap Pro aktiv';
-	@override String get proBannerSubtitleActive => 'Detaillierter Kartenmodus und vollständige Offline-Artikelpakete freigeschaltet.';
-	@override String get proBannerSubtitleFree => 'Schalte detaillierte Karten und vollständige Offline-Artikelpakete frei';
+	@override String get proBannerSubtitleActive => 'Reale Routen, Offline-Karten, Wetter, Orte und Geschichten freigeschaltet.';
+	@override String get proBannerSubtitleFree => 'Schalte reale Routen, Offline-Karten, Wetter, Orte und Geschichten frei';
 	@override String get proBannerBadgeActive => 'PRO AKTIV';
 }
 
@@ -381,11 +381,30 @@ class _TranslationsSubscriptionDe extends TranslationsSubscriptionEn {
 	@override String get flightUnlockPurchaseCancelled => 'Kauf der Flug-Freischaltung abgebrochen.';
 	@override String get flightUnlockPurchaseFailed => 'Kauf der Flug-Freischaltung fehlgeschlagen. Bitte versuche es erneut.';
 	@override String get proFeaturesTitle => 'Was Flymap Pro freischaltet';
-	@override String get proFeatureRoutesTitle => 'Präzise Routenvorschauen';
-	@override String get proFeatureMapsTitle => 'Detailliertere Offline-Karten';
-	@override String get proFeatureTimelineTitle => 'Vollständige Routen-Timeline';
+	@override String get proFeaturesIncludedTitle => 'In deinem Pro-Tarif enthalten';
+	@override String get proHeroSubtitle => 'Dein Fensterplatz, vollständig freigeschaltet.';
+	@override String get proFeatureRoutesTitle => 'Aktuelle reale Flugrouten';
+	@override String get proFeatureRoutesBody => 'Folge einer kürzlich aufgezeichneten Route statt eines ungefähren Bogens.';
+	@override String get proFeatureMapsTitle => 'Detailliertere Karten, offline verfügbar';
+	@override String get proFeatureMapsBody => 'Halte umfangreichere Karten ohne Internet im Flug bereit.';
+	@override String get proFeatureTimelineTitle => 'Vollständige Timeline und 10-mal mehr Orte';
+	@override String get proFeatureTimelineBody => 'Sieh jede Region und mehr Sehenswürdigkeiten entlang deiner Route.';
+	@override String get proFeatureWeatherTitle => 'Wolkenbedeckung und Flughafenwetter';
+	@override String get proFeatureWeatherBody => 'Erfahre vor dem Start, was du möglicherweise sehen wirst.';
 	@override String get proFeaturePoiTitle => '10-mal mehr Orte auf der Route';
 	@override String get proFeatureArticlesTitle => 'Vollständige Offline-Artikelpakete';
+	@override String get proFeatureLearnTitle => 'Voller Zugriff auf Learn und Geo Quiz';
+	@override String get proFeatureLearnBody => 'Entdecke jede Geschichte und Geografie-Herausforderung.';
+	@override String get planAndBillingTitle => 'Tarif & Abrechnung';
+	@override String get planLabel => 'Tarif';
+	@override String get activeSubscription => 'Aktives Abonnement';
+	@override String currentPeriodEnds({required Object date}) => 'Aktueller Zeitraum endet am ${date}';
+	@override String get managePlanAndBilling => 'Tarif & Abrechnung verwalten';
+	@override String get cancelSubscription => 'Abonnement kündigen';
+	@override String get cancellationHelper => 'Vor der Kündigung zeigt dir der App Store oder Google Play, wann dein Pro-Zugriff endet.';
+	@override String get flightPassesTitle => 'Flugpässe';
+	@override String get flightPassesBody => 'Diese Freischaltungen für einen Flug bleiben für zukünftige Flüge verfügbar.';
+	@override String get purchaseHelpTitle => 'Hilfe bei Käufen';
 	@override String get checkingStatus => 'Dein Abonnementstatus wird geprüft...';
 	@override String get freePlan => 'Du nutzt den Gratis-Tarif.';
 	@override String get active => 'Aktiv';
@@ -1976,8 +1995,8 @@ extension on TranslationsDe {
 			'settings.feedbackSendFailed' => 'Feedback konnte nicht gesendet werden. Bitte versuche es erneut.',
 			'settings.proBannerTitle' => 'Flymap Pro',
 			'settings.proBannerTitleActive' => 'Flymap Pro aktiv',
-			'settings.proBannerSubtitleActive' => 'Detaillierter Kartenmodus und vollständige Offline-Artikelpakete freigeschaltet.',
-			'settings.proBannerSubtitleFree' => 'Schalte detaillierte Karten und vollständige Offline-Artikelpakete frei',
+			'settings.proBannerSubtitleActive' => 'Reale Routen, Offline-Karten, Wetter, Orte und Geschichten freigeschaltet.',
+			'settings.proBannerSubtitleFree' => 'Schalte reale Routen, Offline-Karten, Wetter, Orte und Geschichten frei',
 			'settings.proBannerBadgeActive' => 'PRO AKTIV',
 			'subscription.screenTitle' => 'Abonnement',
 			'subscription.contactSupport' => 'Support kontaktieren',
@@ -2000,11 +2019,30 @@ extension on TranslationsDe {
 			'subscription.flightUnlockPurchaseCancelled' => 'Kauf der Flug-Freischaltung abgebrochen.',
 			'subscription.flightUnlockPurchaseFailed' => 'Kauf der Flug-Freischaltung fehlgeschlagen. Bitte versuche es erneut.',
 			'subscription.proFeaturesTitle' => 'Was Flymap Pro freischaltet',
-			'subscription.proFeatureRoutesTitle' => 'Präzise Routenvorschauen',
-			'subscription.proFeatureMapsTitle' => 'Detailliertere Offline-Karten',
-			'subscription.proFeatureTimelineTitle' => 'Vollständige Routen-Timeline',
+			'subscription.proFeaturesIncludedTitle' => 'In deinem Pro-Tarif enthalten',
+			'subscription.proHeroSubtitle' => 'Dein Fensterplatz, vollständig freigeschaltet.',
+			'subscription.proFeatureRoutesTitle' => 'Aktuelle reale Flugrouten',
+			'subscription.proFeatureRoutesBody' => 'Folge einer kürzlich aufgezeichneten Route statt eines ungefähren Bogens.',
+			'subscription.proFeatureMapsTitle' => 'Detailliertere Karten, offline verfügbar',
+			'subscription.proFeatureMapsBody' => 'Halte umfangreichere Karten ohne Internet im Flug bereit.',
+			'subscription.proFeatureTimelineTitle' => 'Vollständige Timeline und 10-mal mehr Orte',
+			'subscription.proFeatureTimelineBody' => 'Sieh jede Region und mehr Sehenswürdigkeiten entlang deiner Route.',
+			'subscription.proFeatureWeatherTitle' => 'Wolkenbedeckung und Flughafenwetter',
+			'subscription.proFeatureWeatherBody' => 'Erfahre vor dem Start, was du möglicherweise sehen wirst.',
 			'subscription.proFeaturePoiTitle' => '10-mal mehr Orte auf der Route',
 			'subscription.proFeatureArticlesTitle' => 'Vollständige Offline-Artikelpakete',
+			'subscription.proFeatureLearnTitle' => 'Voller Zugriff auf Learn und Geo Quiz',
+			'subscription.proFeatureLearnBody' => 'Entdecke jede Geschichte und Geografie-Herausforderung.',
+			'subscription.planAndBillingTitle' => 'Tarif & Abrechnung',
+			'subscription.planLabel' => 'Tarif',
+			'subscription.activeSubscription' => 'Aktives Abonnement',
+			'subscription.currentPeriodEnds' => ({required Object date}) => 'Aktueller Zeitraum endet am ${date}',
+			'subscription.managePlanAndBilling' => 'Tarif & Abrechnung verwalten',
+			'subscription.cancelSubscription' => 'Abonnement kündigen',
+			'subscription.cancellationHelper' => 'Vor der Kündigung zeigt dir der App Store oder Google Play, wann dein Pro-Zugriff endet.',
+			'subscription.flightPassesTitle' => 'Flugpässe',
+			'subscription.flightPassesBody' => 'Diese Freischaltungen für einen Flug bleiben für zukünftige Flüge verfügbar.',
+			'subscription.purchaseHelpTitle' => 'Hilfe bei Käufen',
 			'subscription.checkingStatus' => 'Dein Abonnementstatus wird geprüft...',
 			'subscription.freePlan' => 'Du nutzt den Gratis-Tarif.',
 			'subscription.active' => 'Aktiv',
@@ -2174,6 +2212,8 @@ extension on TranslationsDe {
 			'createFlight.mapPreview.optionsBody' => 'Die Route ist ungefähr — der tatsächliche Flugweg kann abweichen, besonders bei Langstreckenflügen.',
 			'createFlight.overview.routeNotReady' => 'Die Route ist noch nicht bereit.',
 			'createFlight.overview.proPoiUpsell' => 'Der Gratis-Tarif enthält eine einfache Karte und begrenzte Orte',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.routeNoteTooltip' => 'Hinweis zur Route',
 			'createFlight.overview.routeNoteTitle' => 'Ungefähre Route',
 			'createFlight.overview.routeNoteBody' => 'Die Route ist ungefähr — der tatsächliche Flugweg kann abweichen, besonders bei Langstreckenflügen.',
@@ -2193,8 +2233,6 @@ extension on TranslationsDe {
 			'createFlight.overview.routeReviewedSubtitle' => ({required Object regions, required Object departure, required Object arrival}) => 'Du wirst ${regions} von ${departure} nach ${arrival} überfliegen.',
 			'createFlight.overview.fullSummary' => 'Vollständige Zusammenfassung',
 			'createFlight.overview.routeSummaryTitle' => 'Routenzusammenfassung',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.routeSummaryDistanceLabel' => 'Distanz',
 			'createFlight.overview.routeSummaryDurationLabel' => 'Dauer',
 			'createFlight.overview.routeSummaryRegionsLabel' => 'Regionen',
@@ -2688,6 +2726,8 @@ extension on TranslationsDe {
 			'countries.BZ' => 'Belize',
 			'countries.CA' => 'Kanada',
 			'countries.CD' => 'Kongo, Demokratische Republik',
+			_ => null,
+		} ?? switch (path) {
 			'countries.CF' => 'Zentralafrikanische Republik',
 			'countries.CG' => 'Kongo',
 			'countries.CH' => 'Schweiz',
@@ -2707,8 +2747,6 @@ extension on TranslationsDe {
 			'countries.DO' => 'Dominikanische Republik',
 			'countries.DZ' => 'Algerien',
 			'countries.EC' => 'Ecuador',
-			_ => null,
-		} ?? switch (path) {
 			'countries.EE' => 'Estland',
 			'countries.EG' => 'Ägypten',
 			'countries.EH' => 'Westsahara',

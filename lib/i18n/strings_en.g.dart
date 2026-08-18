@@ -824,11 +824,11 @@ class TranslationsSettingsEn {
 	/// en: 'Flymap Pro Active'
 	String get proBannerTitleActive => 'Flymap Pro Active';
 
-	/// en: 'Detailed map mode and full offline article bundles unlocked.'
-	String get proBannerSubtitleActive => 'Detailed map mode and full offline article bundles unlocked.';
+	/// en: 'Real routes, offline maps, weather, places and stories unlocked.'
+	String get proBannerSubtitleActive => 'Real routes, offline maps, weather, places and stories unlocked.';
 
-	/// en: 'Unlock detailed maps and full offline article bundles'
-	String get proBannerSubtitleFree => 'Unlock detailed maps and full offline article bundles';
+	/// en: 'Unlock real routes, offline maps, weather, places and stories'
+	String get proBannerSubtitleFree => 'Unlock real routes, offline maps, weather, places and stories';
 
 	/// en: 'PRO ACTIVE'
 	String get proBannerBadgeActive => 'PRO ACTIVE';
@@ -905,20 +905,77 @@ class TranslationsSubscriptionEn {
 	/// en: 'What Flymap Pro unlocks'
 	String get proFeaturesTitle => 'What Flymap Pro unlocks';
 
-	/// en: 'Accurate route previews'
-	String get proFeatureRoutesTitle => 'Accurate route previews';
+	/// en: 'Included with your Pro plan'
+	String get proFeaturesIncludedTitle => 'Included with your Pro plan';
 
-	/// en: 'Higher-detail offline maps'
-	String get proFeatureMapsTitle => 'Higher-detail offline maps';
+	/// en: 'Your window seat, fully unlocked.'
+	String get proHeroSubtitle => 'Your window seat, fully unlocked.';
 
-	/// en: 'Full route timeline'
-	String get proFeatureTimelineTitle => 'Full route timeline';
+	/// en: 'Recent real-world flight routes'
+	String get proFeatureRoutesTitle => 'Recent real-world flight routes';
+
+	/// en: 'Follow a recent recorded path instead of an approximate arc.'
+	String get proFeatureRoutesBody => 'Follow a recent recorded path instead of an approximate arc.';
+
+	/// en: 'Higher-detail maps, available offline'
+	String get proFeatureMapsTitle => 'Higher-detail maps, available offline';
+
+	/// en: 'Keep richer maps ready in the air without internet.'
+	String get proFeatureMapsBody => 'Keep richer maps ready in the air without internet.';
+
+	/// en: 'Full timeline and 10× more places'
+	String get proFeatureTimelineTitle => 'Full timeline and 10× more places';
+
+	/// en: 'See every region and more landmarks along your route.'
+	String get proFeatureTimelineBody => 'See every region and more landmarks along your route.';
+
+	/// en: 'Cloud cover and airport forecasts'
+	String get proFeatureWeatherTitle => 'Cloud cover and airport forecasts';
+
+	/// en: 'Know what you may see before takeoff.'
+	String get proFeatureWeatherBody => 'Know what you may see before takeoff.';
 
 	/// en: '10x more places on route'
 	String get proFeaturePoiTitle => '10x more places on route';
 
 	/// en: 'Complete offline article packs'
 	String get proFeatureArticlesTitle => 'Complete offline article packs';
+
+	/// en: 'Full Learn and Geo Quiz access'
+	String get proFeatureLearnTitle => 'Full Learn and Geo Quiz access';
+
+	/// en: 'Explore every story and geography challenge.'
+	String get proFeatureLearnBody => 'Explore every story and geography challenge.';
+
+	/// en: 'Plan & billing'
+	String get planAndBillingTitle => 'Plan & billing';
+
+	/// en: 'Plan'
+	String get planLabel => 'Plan';
+
+	/// en: 'Active subscription'
+	String get activeSubscription => 'Active subscription';
+
+	/// en: 'Current period ends $date'
+	String currentPeriodEnds({required Object date}) => 'Current period ends ${date}';
+
+	/// en: 'Manage plan & billing'
+	String get managePlanAndBilling => 'Manage plan & billing';
+
+	/// en: 'Cancel subscription'
+	String get cancelSubscription => 'Cancel subscription';
+
+	/// en: 'Before you cancel, the App Store or Google Play will show when your Pro access ends.'
+	String get cancellationHelper => 'Before you cancel, the App Store or Google Play will show when your Pro access ends.';
+
+	/// en: 'Flight passes'
+	String get flightPassesTitle => 'Flight passes';
+
+	/// en: 'These one-flight unlocks stay available for future flights.'
+	String get flightPassesBody => 'These one-flight unlocks stay available for future flights.';
+
+	/// en: 'Purchase help'
+	String get purchaseHelpTitle => 'Purchase help';
 
 	/// en: 'Checking your subscription status...'
 	String get checkingStatus => 'Checking your subscription status...';
@@ -4310,8 +4367,8 @@ extension on Translations {
 			'settings.feedbackSendFailed' => 'Couldn\'t send feedback. Please try again.',
 			'settings.proBannerTitle' => 'Flymap Pro',
 			'settings.proBannerTitleActive' => 'Flymap Pro Active',
-			'settings.proBannerSubtitleActive' => 'Detailed map mode and full offline article bundles unlocked.',
-			'settings.proBannerSubtitleFree' => 'Unlock detailed maps and full offline article bundles',
+			'settings.proBannerSubtitleActive' => 'Real routes, offline maps, weather, places and stories unlocked.',
+			'settings.proBannerSubtitleFree' => 'Unlock real routes, offline maps, weather, places and stories',
 			'settings.proBannerBadgeActive' => 'PRO ACTIVE',
 			'subscription.screenTitle' => 'Subscription',
 			'subscription.contactSupport' => 'Contact support',
@@ -4334,11 +4391,30 @@ extension on Translations {
 			'subscription.flightUnlockPurchaseCancelled' => 'Flight unlock purchase cancelled.',
 			'subscription.flightUnlockPurchaseFailed' => 'Flight unlock purchase failed. Please try again.',
 			'subscription.proFeaturesTitle' => 'What Flymap Pro unlocks',
-			'subscription.proFeatureRoutesTitle' => 'Accurate route previews',
-			'subscription.proFeatureMapsTitle' => 'Higher-detail offline maps',
-			'subscription.proFeatureTimelineTitle' => 'Full route timeline',
+			'subscription.proFeaturesIncludedTitle' => 'Included with your Pro plan',
+			'subscription.proHeroSubtitle' => 'Your window seat, fully unlocked.',
+			'subscription.proFeatureRoutesTitle' => 'Recent real-world flight routes',
+			'subscription.proFeatureRoutesBody' => 'Follow a recent recorded path instead of an approximate arc.',
+			'subscription.proFeatureMapsTitle' => 'Higher-detail maps, available offline',
+			'subscription.proFeatureMapsBody' => 'Keep richer maps ready in the air without internet.',
+			'subscription.proFeatureTimelineTitle' => 'Full timeline and 10× more places',
+			'subscription.proFeatureTimelineBody' => 'See every region and more landmarks along your route.',
+			'subscription.proFeatureWeatherTitle' => 'Cloud cover and airport forecasts',
+			'subscription.proFeatureWeatherBody' => 'Know what you may see before takeoff.',
 			'subscription.proFeaturePoiTitle' => '10x more places on route',
 			'subscription.proFeatureArticlesTitle' => 'Complete offline article packs',
+			'subscription.proFeatureLearnTitle' => 'Full Learn and Geo Quiz access',
+			'subscription.proFeatureLearnBody' => 'Explore every story and geography challenge.',
+			'subscription.planAndBillingTitle' => 'Plan & billing',
+			'subscription.planLabel' => 'Plan',
+			'subscription.activeSubscription' => 'Active subscription',
+			'subscription.currentPeriodEnds' => ({required Object date}) => 'Current period ends ${date}',
+			'subscription.managePlanAndBilling' => 'Manage plan & billing',
+			'subscription.cancelSubscription' => 'Cancel subscription',
+			'subscription.cancellationHelper' => 'Before you cancel, the App Store or Google Play will show when your Pro access ends.',
+			'subscription.flightPassesTitle' => 'Flight passes',
+			'subscription.flightPassesBody' => 'These one-flight unlocks stay available for future flights.',
+			'subscription.purchaseHelpTitle' => 'Purchase help',
 			'subscription.checkingStatus' => 'Checking your subscription status...',
 			'subscription.freePlan' => 'You are on Free plan.',
 			'subscription.active' => 'Active',
@@ -4508,6 +4584,8 @@ extension on Translations {
 			'createFlight.mapPreview.optionsBody' => 'Route is approximate — actual path may vary, especially on long-haul flights.',
 			'createFlight.overview.routeNotReady' => 'Route is not ready yet.',
 			'createFlight.overview.proPoiUpsell' => 'Free plan includes basic map and limited places',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.overview.routeNoteTooltip' => 'Route note',
 			'createFlight.overview.routeNoteTitle' => 'Approximate route',
 			'createFlight.overview.routeNoteBody' => 'Route is approximate — actual path may vary, especially on long-haul flights.',
@@ -4527,8 +4605,6 @@ extension on Translations {
 			'createFlight.overview.routeReviewedSubtitle' => ({required Object regions, required Object departure, required Object arrival}) => 'You will fly over ${regions} from ${departure} to ${arrival}.',
 			'createFlight.overview.fullSummary' => 'Full summary',
 			'createFlight.overview.routeSummaryTitle' => 'Route Summary',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.routeSummaryDistanceLabel' => 'Distance',
 			'createFlight.overview.routeSummaryDurationLabel' => 'Duration',
 			'createFlight.overview.routeSummaryRegionsLabel' => 'Regions',
@@ -5022,6 +5098,8 @@ extension on Translations {
 			'countries.BZ' => 'Belize',
 			'countries.CA' => 'Canada',
 			'countries.CD' => 'Congo, Democratic Republic of the',
+			_ => null,
+		} ?? switch (path) {
 			'countries.CF' => 'Central African Republic',
 			'countries.CG' => 'Congo',
 			'countries.CH' => 'Switzerland',
@@ -5041,8 +5119,6 @@ extension on Translations {
 			'countries.DO' => 'Dominican Republic',
 			'countries.DZ' => 'Algeria',
 			'countries.EC' => 'Ecuador',
-			_ => null,
-		} ?? switch (path) {
 			'countries.EE' => 'Estonia',
 			'countries.EG' => 'Egypt',
 			'countries.EH' => 'Western Sahara',
