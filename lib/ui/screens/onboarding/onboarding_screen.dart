@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flymap/analytics/app_analytics.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/airports_database.dart';
@@ -312,11 +311,7 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
     });
     final subscriptionCubit = context.read<SubscriptionCubit>();
     SubscriptionPaywallResult? paywallResult;
-    // Android skips the onboarding paywall entirely — users go straight into
-    // the first-flight flow (the route selector below). iOS keeps the direct
-    // paywall. Skip behaviour is unchanged on both platforms.
-    final isAndroid = defaultTargetPlatform == TargetPlatform.android;
-    if (!isAndroid && !subscriptionCubit.state.isPro) {
+    if (!subscriptionCubit.state.isPro) {
       try {
         paywallResult = await subscriptionCubit.presentPaywallFromOnboarding();
       } catch (_) {

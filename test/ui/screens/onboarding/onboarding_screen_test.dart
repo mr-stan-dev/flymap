@@ -200,7 +200,7 @@ void main() {
   );
 
   testWidgets(
-    'Android skips the onboarding paywall and lands on the flight selector',
+    'Android presents the onboarding paywall before the flight selector',
     (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
       try {
@@ -210,7 +210,7 @@ void main() {
         await _completeOnboardingToFirstFlight(tester);
 
         expect(find.text('New flight'), findsOneWidget);
-        expect(repo.paywallPresentedCount, 0);
+        expect(repo.paywallPresentedCount, 1);
       } finally {
         debugDefaultTargetPlatformOverride = null;
       }
@@ -218,7 +218,7 @@ void main() {
   );
 
   testWidgets(
-    'iOS still presents the onboarding paywall before the flight selector',
+    'iOS presents the onboarding paywall before the flight selector',
     (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
       try {
