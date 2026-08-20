@@ -1084,6 +1084,23 @@
       "title": "Vérifiez la météo de votre vol",
       "subtitle": "Chaque vol planifié s'accompagne de la météo des aéroports et d'une prévision des nuages pour votre hublot.",
       "exampleBadge": "Exemple"
+    },
+    "socialProof": {
+      "title": "Vos vols ne seront plus jamais les mêmes.",
+      "flightCount": "10 000+",
+      "flightCountCaption": "vols explorés avec Flymap",
+      "testimonialsTitle": "Plébiscité par les voyageurs curieux",
+      "ratingLabel": "$rating étoiles sur 5",
+      "testimonial1Quote": "J’ai beaucoup aimé. J’ai appris beaucoup de choses sur la géographie pendant mon vol vers Londres.",
+      "testimonial1Attribution": "Natalija, Poland",
+      "testimonial2Quote": "Use it all the time in flights across Europe. My kids love it too!",
+      "testimonial2Attribution": "Adrian, UK",
+      "testimonial3Quote": "Watching my little plane move across the map felt kind of magical",
+      "testimonial3Attribution": "Alexander, UK",
+      "testimonial4Quote": "It feels like a mix of a geography explorer and an in-flight companion. The route timeline is cool.",
+      "testimonial4Attribution": "Dina, Germany",
+      "testimonial5Quote": "I was searching for an app like this!",
+      "testimonial5Attribution": "József, Hungary"
     }
   },
   "countries": {

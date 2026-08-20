@@ -1084,6 +1084,23 @@
       "title": "Prüfe das Wetter für deinen Flug",
       "subtitle": "Jeder geplante Flug kommt mit Flughafenwetter und einer Wolkenvorhersage für deinen Fensterplatz.",
       "exampleBadge": "Beispiel"
+    },
+    "socialProof": {
+      "title": "Deine Flüge werden sich nie wieder gleich anfühlen.",
+      "flightCount": "10.000+",
+      "flightCountCaption": "mit Flymap erkundete Flüge",
+      "testimonialsTitle": "Von neugierigen Fluggästen geschätzt",
+      "ratingLabel": "$rating von 5 Sternen",
+      "testimonial1Quote": "Es hat mir sehr gut gefallen. Während meines Fluges nach London habe ich viel über Geografie gelernt.",
+      "testimonial1Attribution": "Natalija, Poland",
+      "testimonial2Quote": "Use it all the time in flights across Europe. My kids love it too!",
+      "testimonial2Attribution": "Adrian, UK",
+      "testimonial3Quote": "Watching my little plane move across the map felt kind of magical",
+      "testimonial3Attribution": "Alexander, UK",
+      "testimonial4Quote": "It feels like a mix of a geography explorer and an in-flight companion. The route timeline is cool.",
+      "testimonial4Attribution": "Dina, Germany",
+      "testimonial5Quote": "I was searching for an app like this!",
+      "testimonial5Attribution": "József, Hungary"
     }
   },
   "countries": {

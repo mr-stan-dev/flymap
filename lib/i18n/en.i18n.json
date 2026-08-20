@@ -1084,6 +1084,23 @@
       "title": "Check the weather for your flight",
       "subtitle": "Every flight you plan comes with airport weather and a window-seat cloud forecast.",
       "exampleBadge": "Example"
+    },
+    "socialProof": {
+      "title": "Your flights will never feel the same.",
+      "flightCount": "10,000+",
+      "flightCountCaption": "flights explored with Flymap",
+      "testimonialsTitle": "Trusted by curious flyers",
+      "ratingLabel": "$rating out of 5 stars",
+      "testimonial1Quote": "Very much liked it. I learned a lot of Geography during my flight to London",
+      "testimonial1Attribution": "Natalija, Poland",
+      "testimonial2Quote": "Use it all the time in flights across Europe. My kids love it too!",
+      "testimonial2Attribution": "Adrian, UK",
+      "testimonial3Quote": "Watching my little plane move across the map felt kind of magical",
+      "testimonial3Attribution": "Alexander, UK",
+      "testimonial4Quote": "It feels like a mix of a geography explorer and an in-flight companion. The route timeline is cool.",
+      "testimonial4Attribution": "Dina, Germany",
+      "testimonial5Quote": "I was searching for an app like this!",
+      "testimonial5Attribution": "József, Hungary"
     }
   },
   "countries": {

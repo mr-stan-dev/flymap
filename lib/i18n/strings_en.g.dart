@@ -1608,6 +1608,7 @@ class TranslationsOnboardingEn {
 
 	late final TranslationsOnboardingPayoffEn payoff = TranslationsOnboardingPayoffEn.internal(_root);
 	late final TranslationsOnboardingWeatherPayoffEn weatherPayoff = TranslationsOnboardingWeatherPayoffEn.internal(_root);
+	late final TranslationsOnboardingSocialProofEn socialProof = TranslationsOnboardingSocialProofEn.internal(_root);
 }
 
 // Path: countries
@@ -3897,6 +3898,60 @@ class TranslationsOnboardingWeatherPayoffEn {
 	String get exampleBadge => 'Example';
 }
 
+// Path: onboarding.socialProof
+class TranslationsOnboardingSocialProofEn {
+	TranslationsOnboardingSocialProofEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Your flights will never feel the same.'
+	String get title => 'Your flights will never feel the same.';
+
+	/// en: '10,000+'
+	String get flightCount => '10,000+';
+
+	/// en: 'flights explored with Flymap'
+	String get flightCountCaption => 'flights explored with Flymap';
+
+	/// en: 'Trusted by curious flyers'
+	String get testimonialsTitle => 'Trusted by curious flyers';
+
+	/// en: '$rating out of 5 stars'
+	String ratingLabel({required Object rating}) => '${rating} out of 5 stars';
+
+	/// en: 'Very much liked it. I learned a lot of Geography during my flight to London'
+	String get testimonial1Quote => 'Very much liked it. I learned a lot of Geography during my flight to London';
+
+	/// en: 'Natalija, Poland'
+	String get testimonial1Attribution => 'Natalija, Poland';
+
+	/// en: 'Use it all the time in flights across Europe. My kids love it too!'
+	String get testimonial2Quote => 'Use it all the time in flights across Europe. My kids love it too!';
+
+	/// en: 'Adrian, UK'
+	String get testimonial2Attribution => 'Adrian, UK';
+
+	/// en: 'Watching my little plane move across the map felt kind of magical'
+	String get testimonial3Quote => 'Watching my little plane move across the map felt kind of magical';
+
+	/// en: 'Alexander, UK'
+	String get testimonial3Attribution => 'Alexander, UK';
+
+	/// en: 'It feels like a mix of a geography explorer and an in-flight companion. The route timeline is cool.'
+	String get testimonial4Quote => 'It feels like a mix of a geography explorer and an in-flight companion. The route timeline is cool.';
+
+	/// en: 'Dina, Germany'
+	String get testimonial4Attribution => 'Dina, Germany';
+
+	/// en: 'I was searching for an app like this!'
+	String get testimonial5Quote => 'I was searching for an app like this!';
+
+	/// en: 'József, Hungary'
+	String get testimonial5Attribution => 'József, Hungary';
+}
+
 // Path: createFlight.overview.airportCard
 class TranslationsCreateFlightOverviewAirportCardEn {
 	TranslationsCreateFlightOverviewAirportCardEn.internal(this._root);
@@ -5069,6 +5124,21 @@ extension on Translations {
 			'onboarding.weatherPayoff.title' => 'Check the weather for your flight',
 			'onboarding.weatherPayoff.subtitle' => 'Every flight you plan comes with airport weather and a window-seat cloud forecast.',
 			'onboarding.weatherPayoff.exampleBadge' => 'Example',
+			'onboarding.socialProof.title' => 'Your flights will never feel the same.',
+			'onboarding.socialProof.flightCount' => '10,000+',
+			'onboarding.socialProof.flightCountCaption' => 'flights explored with Flymap',
+			'onboarding.socialProof.testimonialsTitle' => 'Trusted by curious flyers',
+			'onboarding.socialProof.ratingLabel' => ({required Object rating}) => '${rating} out of 5 stars',
+			'onboarding.socialProof.testimonial1Quote' => 'Very much liked it. I learned a lot of Geography during my flight to London',
+			'onboarding.socialProof.testimonial1Attribution' => 'Natalija, Poland',
+			'onboarding.socialProof.testimonial2Quote' => 'Use it all the time in flights across Europe. My kids love it too!',
+			'onboarding.socialProof.testimonial2Attribution' => 'Adrian, UK',
+			'onboarding.socialProof.testimonial3Quote' => 'Watching my little plane move across the map felt kind of magical',
+			'onboarding.socialProof.testimonial3Attribution' => 'Alexander, UK',
+			'onboarding.socialProof.testimonial4Quote' => 'It feels like a mix of a geography explorer and an in-flight companion. The route timeline is cool.',
+			'onboarding.socialProof.testimonial4Attribution' => 'Dina, Germany',
+			'onboarding.socialProof.testimonial5Quote' => 'I was searching for an app like this!',
+			'onboarding.socialProof.testimonial5Attribution' => 'József, Hungary',
 			'countries.AE' => 'United Arab Emirates',
 			'countries.AF' => 'Afghanistan',
 			'countries.AG' => 'Antigua and Barbuda',
@@ -5083,6 +5153,8 @@ extension on Translations {
 			'countries.BB' => 'Barbados',
 			'countries.BD' => 'Bangladesh',
 			'countries.BE' => 'Belgium',
+			_ => null,
+		} ?? switch (path) {
 			'countries.BF' => 'Burkina Faso',
 			'countries.BG' => 'Bulgaria',
 			'countries.BH' => 'Bahrain',
@@ -5098,8 +5170,6 @@ extension on Translations {
 			'countries.BZ' => 'Belize',
 			'countries.CA' => 'Canada',
 			'countries.CD' => 'Congo, Democratic Republic of the',
-			_ => null,
-		} ?? switch (path) {
 			'countries.CF' => 'Central African Republic',
 			'countries.CG' => 'Congo',
 			'countries.CH' => 'Switzerland',

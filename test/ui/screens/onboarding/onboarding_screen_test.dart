@@ -86,30 +86,29 @@ void main() {
     expect(prefs.getBool('onboarding.seen'), isNot(true));
   });
 
-  testWidgets(
-    'home airport step blocks continue and offers no skip',
-    (tester) async {
-      await tester.pumpWidget(_buildTestApp());
-      await _pumpUntilVisible(tester, find.text('Discover what’s below'));
+  testWidgets('home airport step blocks continue and offers no skip', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildTestApp());
+    await _pumpUntilVisible(tester, find.text('Discover what’s below'));
 
-      await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
-      await _pumpUi(tester);
-      await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
-      await _pumpUntilVisible(tester, find.text('Set your home airport'));
+    await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
+    await _pumpUi(tester);
+    await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
+    await _pumpUntilVisible(tester, find.text('Set your home airport'));
 
-      expect(find.text('Set your home airport'), findsOneWidget);
-      // The airport is required: no Skip on this step.
-      expect(find.widgetWithText(TertiaryButton, 'Skip'), findsNothing);
+    expect(find.text('Set your home airport'), findsOneWidget);
+    // The airport is required: no Skip on this step.
+    expect(find.widgetWithText(TertiaryButton, 'Skip'), findsNothing);
 
-      await tester.tap(
-        find.widgetWithText(PrimaryButton, 'Continue'),
-        warnIfMissed: false,
-      );
-      await _pumpUi(tester);
+    await tester.tap(
+      find.widgetWithText(PrimaryButton, 'Continue'),
+      warnIfMissed: false,
+    );
+    await _pumpUi(tester);
 
-      expect(find.text('Set your home airport'), findsOneWidget);
-    },
-  );
+    expect(find.text('Set your home airport'), findsOneWidget);
+  });
 
   testWidgets(
     'selecting a popular airport shows no not-found message and unlocks continue',
@@ -156,9 +155,9 @@ void main() {
       await _pumpUi(tester);
       await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
 
-      // Area payoff continues into the weather payoff — the last step,
-      // whose CTA presents the paywall (the fake repository reports it as
-      // cancelled) and finishes onboarding.
+      // Area and weather payoff steps lead into social proof. Its CTA presents
+      // the paywall (the fake repository reports it as cancelled) and finishes
+      // onboarding.
       await _pumpUntilVisible(tester, find.text("Stop missing what's below"));
       await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
       await _pumpUntilVisible(
@@ -166,9 +165,14 @@ void main() {
         find.text('Check the weather for your flight'),
       );
 
-      await tester.tap(
-        find.widgetWithText(PrimaryButton, 'Start my first flight'),
+      await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
+      await _pumpUntilVisible(
+        tester,
+        find.text('Your flights will never feel the same.'),
       );
+      expect(find.text('10,000+'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
       await _pumpUntilVisible(tester, find.text('New flight'));
 
       expect(find.text('New flight'), findsOneWidget);
@@ -232,8 +236,8 @@ void main() {
   );
 }
 
-/// Walks the onboarding flow from the welcome step to tapping the final
-/// "Start my first flight" CTA and waiting for the route selector.
+/// Walks the onboarding flow from the welcome step through the final social
+/// proof CTA and waits for the route selector.
 Future<void> _completeOnboardingToFirstFlight(WidgetTester tester) async {
   await _pumpUntilVisible(tester, find.text('Discover what’s below'));
   for (var i = 0; i < 2; i++) {
@@ -250,7 +254,12 @@ Future<void> _completeOnboardingToFirstFlight(WidgetTester tester) async {
     tester,
     find.text('Check the weather for your flight'),
   );
-  await tester.tap(find.widgetWithText(PrimaryButton, 'Start my first flight'));
+  await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
+  await _pumpUntilVisible(
+    tester,
+    find.text('Your flights will never feel the same.'),
+  );
+  await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
   await _pumpUntilVisible(tester, find.text('New flight'));
 }
 

@@ -684,6 +684,7 @@ class _TranslationsOnboardingFr extends TranslationsOnboardingEn {
 	@override String get failedLoadProfile => 'Échec du chargement de votre profil.';
 	@override late final _TranslationsOnboardingPayoffFr payoff = _TranslationsOnboardingPayoffFr._(_root);
 	@override late final _TranslationsOnboardingWeatherPayoffFr weatherPayoff = _TranslationsOnboardingWeatherPayoffFr._(_root);
+	@override late final _TranslationsOnboardingSocialProofFr socialProof = _TranslationsOnboardingSocialProofFr._(_root);
 }
 
 // Path: countries
@@ -1610,6 +1611,30 @@ class _TranslationsOnboardingWeatherPayoffFr extends TranslationsOnboardingWeath
 	@override String get title => 'Vérifiez la météo de votre vol';
 	@override String get subtitle => 'Chaque vol planifié s\'accompagne de la météo des aéroports et d\'une prévision des nuages pour votre hublot.';
 	@override String get exampleBadge => 'Exemple';
+}
+
+// Path: onboarding.socialProof
+class _TranslationsOnboardingSocialProofFr extends TranslationsOnboardingSocialProofEn {
+	_TranslationsOnboardingSocialProofFr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Vos vols ne seront plus jamais les mêmes.';
+	@override String get flightCount => '10 000+';
+	@override String get flightCountCaption => 'vols explorés avec Flymap';
+	@override String get testimonialsTitle => 'Plébiscité par les voyageurs curieux';
+	@override String ratingLabel({required Object rating}) => '${rating} étoiles sur 5';
+	@override String get testimonial1Quote => 'J’ai beaucoup aimé. J’ai appris beaucoup de choses sur la géographie pendant mon vol vers Londres.';
+	@override String get testimonial1Attribution => 'Natalija, Poland';
+	@override String get testimonial2Quote => 'Use it all the time in flights across Europe. My kids love it too!';
+	@override String get testimonial2Attribution => 'Adrian, UK';
+	@override String get testimonial3Quote => 'Watching my little plane move across the map felt kind of magical';
+	@override String get testimonial3Attribution => 'Alexander, UK';
+	@override String get testimonial4Quote => 'It feels like a mix of a geography explorer and an in-flight companion. The route timeline is cool.';
+	@override String get testimonial4Attribution => 'Dina, Germany';
+	@override String get testimonial5Quote => 'I was searching for an app like this!';
+	@override String get testimonial5Attribution => 'József, Hungary';
 }
 
 // Path: createFlight.overview.airportCard
@@ -2697,6 +2722,21 @@ extension on TranslationsFr {
 			'onboarding.weatherPayoff.title' => 'Vérifiez la météo de votre vol',
 			'onboarding.weatherPayoff.subtitle' => 'Chaque vol planifié s\'accompagne de la météo des aéroports et d\'une prévision des nuages pour votre hublot.',
 			'onboarding.weatherPayoff.exampleBadge' => 'Exemple',
+			'onboarding.socialProof.title' => 'Vos vols ne seront plus jamais les mêmes.',
+			'onboarding.socialProof.flightCount' => '10 000+',
+			'onboarding.socialProof.flightCountCaption' => 'vols explorés avec Flymap',
+			'onboarding.socialProof.testimonialsTitle' => 'Plébiscité par les voyageurs curieux',
+			'onboarding.socialProof.ratingLabel' => ({required Object rating}) => '${rating} étoiles sur 5',
+			'onboarding.socialProof.testimonial1Quote' => 'J’ai beaucoup aimé. J’ai appris beaucoup de choses sur la géographie pendant mon vol vers Londres.',
+			'onboarding.socialProof.testimonial1Attribution' => 'Natalija, Poland',
+			'onboarding.socialProof.testimonial2Quote' => 'Use it all the time in flights across Europe. My kids love it too!',
+			'onboarding.socialProof.testimonial2Attribution' => 'Adrian, UK',
+			'onboarding.socialProof.testimonial3Quote' => 'Watching my little plane move across the map felt kind of magical',
+			'onboarding.socialProof.testimonial3Attribution' => 'Alexander, UK',
+			'onboarding.socialProof.testimonial4Quote' => 'It feels like a mix of a geography explorer and an in-flight companion. The route timeline is cool.',
+			'onboarding.socialProof.testimonial4Attribution' => 'Dina, Germany',
+			'onboarding.socialProof.testimonial5Quote' => 'I was searching for an app like this!',
+			'onboarding.socialProof.testimonial5Attribution' => 'József, Hungary',
 			'countries.AE' => 'Émirats arabes unis',
 			'countries.AF' => 'Afghanistan',
 			'countries.AG' => 'Antigua-et-Barbuda',
@@ -2711,6 +2751,8 @@ extension on TranslationsFr {
 			'countries.BB' => 'Barbade',
 			'countries.BD' => 'Bangladesh',
 			'countries.BE' => 'Belgique',
+			_ => null,
+		} ?? switch (path) {
 			'countries.BF' => 'Burkina Faso',
 			'countries.BG' => 'Bulgarie',
 			'countries.BH' => 'Bahreïn',
@@ -2726,8 +2768,6 @@ extension on TranslationsFr {
 			'countries.BZ' => 'Belize',
 			'countries.CA' => 'Canada',
 			'countries.CD' => 'Congo, République démocratique du',
-			_ => null,
-		} ?? switch (path) {
 			'countries.CF' => 'République centrafricaine',
 			'countries.CG' => 'Congo',
 			'countries.CH' => 'Suisse',

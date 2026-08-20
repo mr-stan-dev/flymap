@@ -8,6 +8,7 @@ enum OnboardingStepId {
   homeAirport,
   areaPayoff,
   weatherPayoff,
+  socialProof,
 }
 
 typedef OnboardingStepWidgetBuilder =

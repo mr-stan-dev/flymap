@@ -1084,6 +1084,23 @@
       "title": "Consulta el tiempo de tu vuelo",
       "subtitle": "Cada vuelo que planificas incluye el tiempo en los aeropuertos y una previsión de nubes para tu ventanilla.",
       "exampleBadge": "Ejemplo"
+    },
+    "socialProof": {
+      "title": "Tus vuelos nunca volverán a sentirse igual.",
+      "flightCount": "10.000+",
+      "flightCountCaption": "vuelos explorados con Flymap",
+      "testimonialsTitle": "La confianza de viajeros curiosos",
+      "ratingLabel": "$rating de 5 estrellas",
+      "testimonial1Quote": "Me gustó mucho. Aprendí mucho sobre geografía durante mi vuelo a Londres.",
+      "testimonial1Attribution": "Natalija, Poland",
+      "testimonial2Quote": "Use it all the time in flights across Europe. My kids love it too!",
+      "testimonial2Attribution": "Adrian, UK",
+      "testimonial3Quote": "Watching my little plane move across the map felt kind of magical",
+      "testimonial3Attribution": "Alexander, UK",
+      "testimonial4Quote": "It feels like a mix of a geography explorer and an in-flight companion. The route timeline is cool.",
+      "testimonial4Attribution": "Dina, Germany",
+      "testimonial5Quote": "I was searching for an app like this!",
+      "testimonial5Attribution": "József, Hungary"
     }
   },
   "countries": {
