@@ -7,11 +7,13 @@ class PaywallPresentedEvent extends AnalyticsEvent
     required this.source,
     required this.isProUser,
     required this.hasProducts,
+    this.creationAttemptId,
   });
 
   final PaywallSource source;
   final bool isProUser;
   final bool hasProducts;
+  final String? creationAttemptId;
 
   @override
   String get firebaseEventName => 'paywall_presented';
@@ -21,6 +23,9 @@ class PaywallPresentedEvent extends AnalyticsEvent
     'source': source.analyticsValue,
     'is_pro_user': isProUser,
     'has_products': hasProducts,
+    if (creationAttemptId case final attemptId?)
+      'creation_attempt_id': attemptId,
+    'tracking_version': 2,
   };
 
   @override

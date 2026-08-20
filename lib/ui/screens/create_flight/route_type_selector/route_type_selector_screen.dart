@@ -11,12 +11,15 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/flight_unlock_gat
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart';
 import 'package:get_it/get_it.dart';
+import 'package:uuid/uuid.dart';
 import 'widgets/route_type_card.dart';
 
 enum RouteType { basic, pro }
 
 class FlightRouteTypeSelector extends StatefulWidget {
-  const FlightRouteTypeSelector({super.key});
+  const FlightRouteTypeSelector({this.entrySource = 'unknown', super.key});
+
+  final String entrySource;
 
   @override
   State<FlightRouteTypeSelector> createState() =>
@@ -27,6 +30,8 @@ class _FlightRouteTypeSelectorState extends State<FlightRouteTypeSelector> {
   RouteType _selectedType = RouteType.basic;
   bool _hasPendingFlightUnlock = false;
   final AppAnalytics _analytics = GetIt.I.get<AppAnalytics>();
+  final String _creationAttemptId = const Uuid().v4();
+  final Set<RouteType> _loggedCardTaps = <RouteType>{};
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +69,7 @@ class _FlightRouteTypeSelectorState extends State<FlightRouteTypeSelector> {
                       description: t.basicDescription,
                       isSelected: _selectedType == RouteType.basic,
                       onTap: () =>
-                          setState(() => _selectedType = RouteType.basic),
+                          _selectRouteType(RouteType.basic, isProUser: isPro),
                     ),
                     const SizedBox(height: DsSpacing.md),
                     RouteTypeCard(
@@ -75,7 +80,7 @@ class _FlightRouteTypeSelectorState extends State<FlightRouteTypeSelector> {
                       isSelected: _selectedType == RouteType.pro,
                       isProOnly: true,
                       onTap: () =>
-                          setState(() => _selectedType = RouteType.pro),
+                          _selectRouteType(RouteType.pro, isProUser: isPro),
                     ),
                     const Spacer(),
                     if (_selectedType == RouteType.pro && !hasUnlockedProRoute)
@@ -126,9 +131,34 @@ class _FlightRouteTypeSelectorState extends State<FlightRouteTypeSelector> {
               : SelectedRouteType.realRoute,
           isProUser: isProUser,
           hasPendingFlightUnlock: hasPendingFlightUnlock,
+          entrySource: widget.entrySource,
+          creationAttemptId: _creationAttemptId,
         ),
       ),
     );
+  }
+
+  void _selectRouteType(RouteType routeType, {required bool isProUser}) {
+    if (_loggedCardTaps.add(routeType)) {
+      unawaited(
+        _analytics.log(
+          RouteTypeCardTappedEvent(
+            routeType: routeType == RouteType.basic
+                ? RouteTypeCardType.basic
+                : RouteTypeCardType.realRoute,
+            accessState: isProUser
+                ? RouteTypeAccessState.pro
+                : _hasPendingFlightUnlock
+                ? RouteTypeAccessState.singleFlightUnlock
+                : RouteTypeAccessState.free,
+            entrySource: widget.entrySource,
+            creationAttemptId: _creationAttemptId,
+          ),
+        ),
+      );
+    }
+    if (_selectedType == routeType) return;
+    setState(() => _selectedType = routeType);
   }
 
   void _handleBackNavigation(BuildContext context, {required bool canPop}) {
@@ -147,7 +177,11 @@ class _FlightRouteTypeSelectorState extends State<FlightRouteTypeSelector> {
       context: context,
       subscriptionCubit: subscriptionCubit,
       source: PaywallSource.realRouteGate,
-      presentProPaywall: subscriptionCubit.presentPaywallFromRealRouteGate,
+      creationAttemptId: _creationAttemptId,
+      presentProPaywall: () =>
+          subscriptionCubit.presentPaywallFromRealRouteGate(
+            creationAttemptId: _creationAttemptId,
+          ),
       onUnlockActivated: () async {
         if (!mounted) return;
         setState(() {

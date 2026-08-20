@@ -9,6 +9,7 @@ class DownloadCompletedEvent extends AnalyticsEvent
     required this.mapSizeBytes,
     required this.accessMode,
     required this.routeSource,
+    this.creationAttemptId,
   });
 
   final double routeLengthKm;
@@ -16,6 +17,7 @@ class DownloadCompletedEvent extends AnalyticsEvent
   final int mapSizeBytes;
   final String accessMode;
   final FlightRouteSource routeSource;
+  final String? creationAttemptId;
 
   @override
   String get firebaseEventName => 'download_completed';
@@ -29,6 +31,9 @@ class DownloadCompletedEvent extends AnalyticsEvent
     ),
     'access_mode': accessMode,
     'route_source': routeSource.rawValue,
+    if (creationAttemptId case final attemptId?)
+      'creation_attempt_id': attemptId,
+    if (creationAttemptId != null) 'tracking_version': 2,
   };
 
   @override

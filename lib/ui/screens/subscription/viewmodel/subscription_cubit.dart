@@ -163,9 +163,14 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
     _emitStatus(status, source: 'purchase');
   }
 
-  Future<SubscriptionPaywallResult> presentPaywallForCreateFlight() async {
+  Future<SubscriptionPaywallResult> presentPaywallForCreateFlight({
+    String? creationAttemptId,
+  }) async {
     final source = PaywallSource.wikiLimit;
-    return _presentPaywallIfNeeded(source: source);
+    return _presentPaywallIfNeeded(
+      source: source,
+      creationAttemptId: creationAttemptId,
+    );
   }
 
   Future<SubscriptionPaywallResult> presentPaywallFromSettings() async {
@@ -202,14 +207,23 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
     return _presentPaywallIfNeeded(source: PaywallSource.geoAwarenessGate);
   }
 
-  Future<SubscriptionPaywallResult> presentPaywallFromRealRouteGate() async {
-    return _presentPaywallIfNeeded(source: PaywallSource.realRouteGate);
+  Future<SubscriptionPaywallResult> presentPaywallFromRealRouteGate({
+    String? creationAttemptId,
+  }) async {
+    return _presentPaywallIfNeeded(
+      source: PaywallSource.realRouteGate,
+      creationAttemptId: creationAttemptId,
+    );
   }
 
   Future<SubscriptionPaywallResult> presentPaywallForSource({
     required PaywallSource source,
+    String? creationAttemptId,
   }) async {
-    return _presentPaywallIfNeeded(source: source);
+    return _presentPaywallIfNeeded(
+      source: source,
+      creationAttemptId: creationAttemptId,
+    );
   }
 
   Future<SubscriptionPaywallResult>
@@ -221,19 +235,29 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
 
   Future<SubscriptionPaywallResult> _presentPaywallIfNeeded({
     required PaywallSource source,
+    String? creationAttemptId,
   }) async {
-    unawaited(
-      _analytics.log(
+    final result = await _repository.presentPaywallIfNeeded();
+    final paywallWasPresented =
+        result == SubscriptionPaywallResult.purchased ||
+        result == SubscriptionPaywallResult.restored ||
+        result == SubscriptionPaywallResult.cancelled;
+    if (paywallWasPresented) {
+      await _analytics.log(
         PaywallPresentedEvent(
           source: source,
           isProUser: state.isPro,
           hasProducts: state.products.isNotEmpty,
+          creationAttemptId: creationAttemptId,
         ),
+      );
+    }
+    await _analytics.log(
+      PaywallResultEvent(
+        source: source,
+        result: result,
+        creationAttemptId: creationAttemptId,
       ),
-    );
-    final result = await _repository.presentPaywallIfNeeded();
-    unawaited(
-      _analytics.log(PaywallResultEvent(source: source, result: result)),
     );
     if (result == SubscriptionPaywallResult.purchased ||
         result == SubscriptionPaywallResult.restored) {

@@ -385,6 +385,7 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
       context: context,
       subscriptionCubit: subscriptionCubit,
       source: source,
+      creationAttemptId: cubit.creationAttemptId,
       onUnlockActivated: () async {
         await cubit.enablePendingFlightUnlock();
         if (context.mounted) {
@@ -406,8 +407,10 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
         }
       },
       routePreview: _routePreviewText(state),
-      presentProPaywall: () =>
-          subscriptionCubit.presentPaywallForSource(source: source),
+      presentProPaywall: () => subscriptionCubit.presentPaywallForSource(
+        source: source,
+        creationAttemptId: cubit.creationAttemptId,
+      ),
     );
   }
 
@@ -459,12 +462,15 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
       context: context,
       subscriptionCubit: subscriptionCubit,
       source: PaywallSource.wikiLimit,
+      creationAttemptId: cubit.creationAttemptId,
       onUnlockActivated: () async {
         await cubit.enablePendingFlightUnlock();
       },
       onProActivated: cubit.refreshPoisForPro,
       routePreview: _routePreviewText(state),
-      presentProPaywall: subscriptionCubit.presentPaywallForCreateFlight,
+      presentProPaywall: () => subscriptionCubit.presentPaywallForCreateFlight(
+        creationAttemptId: cubit.creationAttemptId,
+      ),
     );
   }
 
@@ -545,6 +551,7 @@ class _FlightPreviewBodyState extends State<_FlightPreviewBody> {
       flightId: flightId,
       isProSubscriber: isProSubscriber,
       usedSingleFlightUnlock: state.usedSingleFlightUnlock && !isProSubscriber,
+      creationAttemptId: context.read<FlightPreviewCubit>().creationAttemptId,
     );
   }
 

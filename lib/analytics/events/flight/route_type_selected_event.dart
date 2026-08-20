@@ -16,11 +16,15 @@ class RouteTypeSelectedEvent extends AnalyticsEvent
     required this.routeType,
     required this.isProUser,
     required this.hasPendingFlightUnlock,
+    this.entrySource,
+    this.creationAttemptId,
   });
 
   final SelectedRouteType routeType;
   final bool isProUser;
   final bool hasPendingFlightUnlock;
+  final String? entrySource;
+  final String? creationAttemptId;
 
   @override
   String get firebaseEventName => 'route_type_selected';
@@ -30,6 +34,10 @@ class RouteTypeSelectedEvent extends AnalyticsEvent
     'route_type': routeType.analyticsValue,
     'is_pro_user': isProUser,
     'has_pending_flight_unlock': hasPendingFlightUnlock,
+    if (entrySource case final source?) 'entry_source': source,
+    if (creationAttemptId case final attemptId?)
+      'creation_attempt_id': attemptId,
+    if (entrySource != null || creationAttemptId != null) 'tracking_version': 2,
   };
 
   @override

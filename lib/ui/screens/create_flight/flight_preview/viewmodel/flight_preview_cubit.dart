@@ -42,6 +42,7 @@ import 'package:flymap/domain/usecase/download_wikipedia_articles_use_case.dart'
 import 'package:flymap/domain/usecase/get_route_overview_use_case.dart';
 import 'package:flymap/domain/usecase/build_flight_route_preview_use_case.dart';
 import 'package:flymap/domain/usecase/get_wiki_articles_use_case.dart';
+import 'package:uuid/uuid.dart';
 
 part 'delegates/preview_preparation_delegate.dart';
 part 'delegates/map_and_step_navigation_delegate.dart';
@@ -76,10 +77,12 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     required AppCrashlytics crashlytics,
     RouteMapImageStore? routeMapImageStore,
     bool autoPrepare = true,
+    String? creationAttemptId,
   }) : _analytics = analytics,
        _crashlytics = crashlytics,
        _subscriptionRepository = subscriptionRepository,
        _fetchFlightWeatherUseCase = fetchFlightWeatherUseCase,
+       creationAttemptId = creationAttemptId ?? const Uuid().v4(),
        super(
          FlightPreviewState.initial().copyWith(
            hasPendingFlightUnlock: hasPendingFlightUnlock,
@@ -123,14 +126,24 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   final String? fr24Id;
   final String? airlineCodeHint;
   final String? airlineNameHint;
+  final String creationAttemptId;
   late final PreviewPreparationDelegate _previewPreparationDelegate;
   late final MapAndStepNavigationDelegate _navigationDelegate;
   late final WikiSelectionDelegate _wikiSelectionDelegate;
   late final DownloadFlowDelegate _downloadFlowDelegate;
+  final Set<FlightPreviewAnalyticsStep> _viewedPreviewSteps =
+      <FlightPreviewAnalyticsStep>{};
+  final Set<FlightPreviewAnalyticsStep> _completedPreviewSteps =
+      <FlightPreviewAnalyticsStep>{};
+  bool _creationAbandonmentLogged = false;
+  String? _routeNotSupportedReason;
 
   Future<void> preparePreview() => _previewPreparationDelegate.preparePreview();
 
-  void continueFromWeather() => _navigationDelegate.continueFromWeather();
+  void continueFromWeather() {
+    _trackPreviewStepCompleted(FlightPreviewAnalyticsStep.weather);
+    _navigationDelegate.continueFromWeather();
+  }
 
   /// Fetches the weather picture for the weather step. Failure is
   /// non-blocking: the step shows a retry and Continue stays available.
@@ -209,6 +222,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
         ),
       ),
     );
+    _trackPreviewStepCompleted(FlightPreviewAnalyticsStep.overview);
     _navigationDelegate.continueFromOverview();
   }
 
@@ -236,6 +250,100 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
   bool get hasEffectiveProAccess =>
       _subscriptionRepository.currentStatus.isPro ||
       state.hasPendingFlightUnlock;
+
+  void _trackPreviewStepViewed(FlightPreviewState nextState) {
+    final route = nextState.flightRoute;
+    final step = _analyticsStep(nextState.step);
+    if (route == null ||
+        step == null ||
+        nextState.isPreviewLoading ||
+        nextState.isDownloading ||
+        !_viewedPreviewSteps.add(step)) {
+      return;
+    }
+    unawaited(
+      _analytics.log(
+        FlightPreviewStepViewedEvent(
+          step: step,
+          creationAttemptId: creationAttemptId,
+          routeSource: route.source,
+          routeLength: MapDownloadConfig.resolveRouteLength(route.distanceInKm),
+          accessMode: _analyticsAccessMode,
+        ),
+      ),
+    );
+  }
+
+  void _trackPreviewStepCompleted(FlightPreviewAnalyticsStep step) {
+    final route = state.flightRoute;
+    if (route == null ||
+        _analyticsStep(state.step) != step ||
+        !_completedPreviewSteps.add(step)) {
+      return;
+    }
+    unawaited(
+      _analytics.log(
+        FlightPreviewStepCompletedEvent(
+          step: step,
+          creationAttemptId: creationAttemptId,
+          routeSource: route.source,
+          routeLength: MapDownloadConfig.resolveRouteLength(route.distanceInKm),
+          accessMode: _analyticsAccessMode,
+        ),
+      ),
+    );
+  }
+
+  void _trackCreationAbandoned({required String reason}) {
+    final route = state.flightRoute;
+    final step = _viewedPreviewSteps.isEmpty
+        ? _analyticsStep(state.step)
+        : _viewedPreviewSteps.last;
+    if (route == null || step == null || _creationAbandonmentLogged) return;
+    _creationAbandonmentLogged = true;
+    unawaited(
+      _analytics.log(
+        FlightPreviewStepAbandonedEvent(
+          step: step,
+          creationAttemptId: creationAttemptId,
+          routeSource: route.source,
+          routeLength: MapDownloadConfig.resolveRouteLength(route.distanceInKm),
+          accessMode: _analyticsAccessMode,
+          reason: reason,
+        ),
+      ),
+    );
+  }
+
+  void _trackRouteNotSupportedAction(RouteNotSupportedAction action) {
+    final route = state.flightRoute;
+    if (route == null) return;
+    unawaited(
+      _analytics.log(
+        RouteNotSupportedActionEvent(
+          reason: _routeNotSupportedReason ?? 'unknown',
+          action: action,
+          routeSource: route.source,
+          creationAttemptId: creationAttemptId,
+        ),
+      ),
+    );
+  }
+
+  FlightPreviewAnalyticsStep? _analyticsStep(CreateFlightStep step) {
+    return switch (step) {
+      CreateFlightStep.overview => FlightPreviewAnalyticsStep.overview,
+      CreateFlightStep.weather => FlightPreviewAnalyticsStep.weather,
+      CreateFlightStep.wikipediaArticles => FlightPreviewAnalyticsStep.articles,
+      CreateFlightStep.routeNotSupported => null,
+    };
+  }
+
+  String get _analyticsAccessMode {
+    if (_subscriptionRepository.currentStatus.isPro) return 'pro';
+    if (state.hasPendingFlightUnlock) return 'single_flight_unlock';
+    return 'basic';
+  }
 
   void _applyPoisForSubscriptionTier(
     List<RoutePoiSummary> allPois, {
@@ -288,6 +396,7 @@ class FlightPreviewCubit extends Cubit<FlightPreviewState> {
     // Async delegate callbacks may complete after the cubit is disposed.
     if (isClosed) return;
     emit(nextState);
+    _trackPreviewStepViewed(nextState);
   }
 
   @override

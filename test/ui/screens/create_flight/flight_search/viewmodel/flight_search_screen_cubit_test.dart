@@ -30,6 +30,7 @@ import 'package:flymap/domain/entity/wiki_article_candidate.dart';
 import 'package:flymap/domain/policy/poi_limits_policy.dart';
 import 'package:flymap/domain/provider/weather_forecast_provider.dart';
 import 'package:flymap/i18n/strings.g.dart';
+import 'package:flymap/map_download_config.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/flight_unlock_repository.dart';
 import 'package:flymap/repository/subscription_repository.dart';
@@ -61,6 +62,7 @@ void main() {
     late _FakeSubscriptionRepository subscriptionRepository;
     late _FakeFlightUnlockRepository flightUnlockRepository;
     late _FakeGetRouteOverviewUseCase routeOverviewUseCase;
+    late _FakeAppAnalytics analytics;
     late _TestFlightPreviewCubit cubit;
 
     setUp(() {
@@ -74,6 +76,7 @@ void main() {
       routeOverviewUseCase = _FakeGetRouteOverviewUseCase(
         routeOverview: _routeOverviewFor(route),
       );
+      analytics = _FakeAppAnalytics();
       cubit = _TestFlightPreviewCubit(
         departure: route.departure,
         arrival: route.arrival,
@@ -89,7 +92,7 @@ void main() {
         subscriptionRepository: subscriptionRepository,
         flightUnlockRepository: flightUnlockRepository,
         deleteFlightUseCase: _FakeDeleteFlightUseCase(),
-        analytics: _FakeAppAnalytics(),
+        analytics: analytics,
         crashlytics: _FakeAppCrashlytics(),
       );
       cubit.setStateForTest(
@@ -105,6 +108,49 @@ void main() {
     tearDown(() async {
       await cubit.close();
       await flightUnlockRepository.close();
+    });
+
+    test('preview lifecycle events are deduplicated per attempt', () async {
+      cubit.setStateForTest(FlightPreviewState.initial());
+
+      await cubit.preparePreview();
+      cubit.continueFromOverview(isSkipped: false, isProUser: false);
+      cubit.continueFromWeather();
+      await cubit.handleBackAction();
+      cubit.continueFromWeather();
+
+      final viewed = analytics.events
+          .whereType<FlightPreviewStepViewedEvent>()
+          .map((event) => event.step)
+          .toList();
+      final completed = analytics.events
+          .whereType<FlightPreviewStepCompletedEvent>()
+          .map((event) => event.step)
+          .toList();
+
+      expect(viewed, <FlightPreviewAnalyticsStep>[
+        FlightPreviewAnalyticsStep.overview,
+        FlightPreviewAnalyticsStep.weather,
+        FlightPreviewAnalyticsStep.articles,
+      ]);
+      expect(completed, <FlightPreviewAnalyticsStep>[
+        FlightPreviewAnalyticsStep.overview,
+        FlightPreviewAnalyticsStep.weather,
+      ]);
+      expect(
+        viewed.toSet().length,
+        viewed.length,
+        reason: 'returning to a step must not spend another PostHog event',
+      );
+
+      await cubit.handleBackAction();
+      await cubit.handleBackAction();
+      expect(await cubit.handleBackAction(), isTrue);
+      final abandoned = analytics.events
+          .whereType<FlightPreviewStepAbandonedEvent>()
+          .single;
+      expect(abandoned.step, FlightPreviewAnalyticsStep.articles);
+      expect(abandoned.reason, 'back');
     });
 
     test('free user can select more than 3 articles in UI state', () {
@@ -309,6 +355,12 @@ void main() {
       );
       expect(cubit.state.overviewWarningTitle, isNull);
       expect(cubit.state.overviewWarningMessage, isNull);
+      final unsupported = analytics.events
+          .whereType<SearchRouteNotSupportedEvent>()
+          .single;
+      expect(unsupported.reason, 'approximate_super_long');
+      expect(unsupported.recommendedNextAction, 'real_route');
+      expect(unsupported.routeLength, RouteLength.superLong);
     });
 
     test('refreshPoisForPro applies cached pro POI slice', () async {
@@ -1087,6 +1139,8 @@ class _FakeUserFlightPrefsRepository implements UserFlightPrefsRepository {
 }
 
 class _FakeAppAnalytics implements AppAnalytics {
+  final List<AnalyticsEvent> events = <AnalyticsEvent>[];
+
   @override
   Future<void> setGlobalContext({
     required String appVersion,
@@ -1099,7 +1153,9 @@ class _FakeAppAnalytics implements AppAnalytics {
   Future<void> setSubscriptionContext({required bool isPro}) async {}
 
   @override
-  Future<void> log(AnalyticsEvent event) async {}
+  Future<void> log(AnalyticsEvent event) async {
+    events.add(event);
+  }
 }
 
 class _FakeAppCrashlytics implements AppCrashlytics {

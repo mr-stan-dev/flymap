@@ -11,6 +11,7 @@ class DownloadStartedEvent extends AnalyticsEvent
     required this.isProUser,
     required this.accessMode,
     required this.routeSource,
+    this.creationAttemptId,
   });
 
   final double routeLengthKm;
@@ -19,6 +20,7 @@ class DownloadStartedEvent extends AnalyticsEvent
   final bool isProUser;
   final String accessMode;
   final FlightRouteSource routeSource;
+  final String? creationAttemptId;
 
   @override
   String get firebaseEventName => 'download_started';
@@ -31,6 +33,9 @@ class DownloadStartedEvent extends AnalyticsEvent
     'is_pro_user': isProUser ? 1 : 0,
     'access_mode': accessMode,
     'route_source': routeSource.rawValue,
+    if (creationAttemptId case final attemptId?)
+      'creation_attempt_id': attemptId,
+    if (creationAttemptId != null) 'tracking_version': 2,
   };
 
   @override

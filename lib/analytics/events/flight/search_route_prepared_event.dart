@@ -10,12 +10,14 @@ class SearchRoutePreparedEvent extends AnalyticsEvent
     required this.routeLength,
     required this.mapDetail,
     required this.routeSource,
+    this.creationAttemptId,
   });
 
   final double routeLengthKm;
   final RouteLength routeLength;
   final MapDetailLevel mapDetail;
   final FlightRouteSource routeSource;
+  final String? creationAttemptId;
 
   @override
   String get firebaseEventName => 'search_route_prepared';
@@ -26,6 +28,9 @@ class SearchRoutePreparedEvent extends AnalyticsEvent
     'route_length_bucket': _routeBucket(routeLength),
     'map_detail': mapDetail.name,
     'route_source': routeSource.rawValue,
+    if (creationAttemptId case final attemptId?)
+      'creation_attempt_id': attemptId,
+    if (creationAttemptId != null) 'tracking_version': 2,
   };
 
   @override

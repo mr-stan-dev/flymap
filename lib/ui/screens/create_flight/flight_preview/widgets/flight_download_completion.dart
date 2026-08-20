@@ -4,12 +4,14 @@ import 'package:flymap/ui/design_system/design_system.dart';
 
 class FlightDownloadCompletion extends StatelessWidget {
   const FlightDownloadCompletion({
+    required this.onOpenFlightPressed,
     required this.onHomePressed,
     this.onSharePressed,
     this.onShareVideoPressed,
     super.key,
   });
 
+  final VoidCallback onOpenFlightPressed;
   final VoidCallback onHomePressed;
   final VoidCallback? onSharePressed;
   final VoidCallback? onShareVideoPressed;
@@ -40,13 +42,19 @@ class FlightDownloadCompletion extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: DsSpacing.xxl),
+          PrimaryButton(
+            label: t.preview.openFlight,
+            onPressed: onOpenFlightPressed,
+            leadingIcon: Icons.map_rounded,
+          ),
+          const SizedBox(height: DsSpacing.xl),
           Text(
             t.preview.shareFlightCard,
             style: Theme.of(context).textTheme.titleMedium,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: DsSpacing.md),
-          PrimaryButton(
+          SecondaryButton(
             label: t.preview.shareVideo,
             onPressed: onShareVideoPressed,
             leadingIcon: Icons.movie_creation_rounded,

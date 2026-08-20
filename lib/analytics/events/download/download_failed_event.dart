@@ -9,6 +9,7 @@ class DownloadFailedEvent extends AnalyticsEvent
     required this.errorMessage,
     required this.routeLengthKm,
     required this.routeSource,
+    this.creationAttemptId,
   });
 
   final String stage;
@@ -16,6 +17,7 @@ class DownloadFailedEvent extends AnalyticsEvent
   final String errorMessage;
   final double routeLengthKm;
   final FlightRouteSource routeSource;
+  final String? creationAttemptId;
 
   @override
   String get firebaseEventName => 'download_failed';
@@ -27,6 +29,9 @@ class DownloadFailedEvent extends AnalyticsEvent
     'error_message': _normalizeErrorMessage(errorMessage),
     'route_length_km': routeLengthKm.round(),
     'route_source': routeSource.rawValue,
+    if (creationAttemptId case final attemptId?)
+      'creation_attempt_id': attemptId,
+    if (creationAttemptId != null) 'tracking_version': 2,
   };
 
   @override

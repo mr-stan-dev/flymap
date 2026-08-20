@@ -117,6 +117,7 @@ class PreviewPreparationDelegate {
             routeLength: routeLength,
             mapDetail: effectiveMapDetail,
             routeSource: route.source,
+            creationAttemptId: _cubit.creationAttemptId,
           ),
         ),
       );
@@ -128,11 +129,15 @@ class PreviewPreparationDelegate {
         ),
       );
       if (_isAntimeridianRoute(route)) {
+        _cubit._routeNotSupportedReason = 'antimeridian';
         unawaited(
           _cubit._analytics.log(
             SearchRouteNotSupportedEvent(
               reason: 'antimeridian',
               routeLengthKm: route.distanceInKm,
+              routeSource: route.source,
+              routeLength: routeLength,
+              creationAttemptId: _cubit.creationAttemptId,
             ),
           ),
         );
@@ -161,6 +166,19 @@ class PreviewPreparationDelegate {
       }
 
       if (!route.isHistoricalTrack && routeLength == RouteLength.superLong) {
+        _cubit._routeNotSupportedReason = 'approximate_super_long';
+        unawaited(
+          _cubit._analytics.log(
+            SearchRouteNotSupportedEvent(
+              reason: 'approximate_super_long',
+              routeLengthKm: route.distanceInKm,
+              routeSource: route.source,
+              routeLength: routeLength,
+              recommendedNextAction: 'real_route',
+              creationAttemptId: _cubit.creationAttemptId,
+            ),
+          ),
+        );
         _cubit._emitState(
           _cubit.state.copyWith(
             step: CreateFlightStep.routeNotSupported,

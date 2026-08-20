@@ -12,6 +12,7 @@ void main() {
   testWidgets('shows the flight video action without a new badge', (
     tester,
   ) async {
+    var openedFlight = false;
     await tester.pumpWidget(
       TranslationProvider(
         child: MaterialApp(
@@ -20,6 +21,7 @@ void main() {
           localizationsDelegates: GlobalMaterialLocalizations.delegates,
           home: Scaffold(
             body: FlightDownloadCompletion(
+              onOpenFlightPressed: () => openedFlight = true,
               onHomePressed: () {},
               onSharePressed: () {},
               onShareVideoPressed: () {},
@@ -29,8 +31,13 @@ void main() {
       ),
     );
 
+    expect(find.text('Open flight'), findsOneWidget);
+    expect(find.byIcon(Icons.map_rounded), findsOneWidget);
     expect(find.text('Share flight video'), findsOneWidget);
     expect(find.byIcon(Icons.movie_creation_rounded), findsOneWidget);
     expect(find.text('NEW'), findsNothing);
+
+    await tester.tap(find.text('Open flight'));
+    expect(openedFlight, isTrue);
   });
 }

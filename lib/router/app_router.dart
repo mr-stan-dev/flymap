@@ -123,7 +123,12 @@ class AppRouter {
         GoRoute(
           path: routeTypeSelectorRoute,
           name: 'route-type-selector',
-          builder: (context, state) => const FlightRouteTypeSelector(),
+          builder: (context, state) {
+            final extra = state.extra;
+            return FlightRouteTypeSelector(
+              entrySource: extra is String ? extra : 'unknown',
+            );
+          },
         ),
 
         GoRoute(
@@ -326,7 +331,7 @@ class AppRouter {
   }
 
   static void goToRouteTypeSelector(BuildContext context) {
-    context.push(routeTypeSelectorRoute);
+    context.push(routeTypeSelectorRoute, extra: 'home');
   }
 
   static void goToRealRouteAirportSearch(
@@ -340,12 +345,24 @@ class AppRouter {
   }
 
   static void goToRouteTypeSelectorFromOnboarding(BuildContext context) {
-    context.go(routeTypeSelectorRoute);
+    context.go(routeTypeSelectorRoute, extra: 'onboarding');
   }
 
   /// Navigate to flight screen with flight
   static void goToFlight(BuildContext context, {required Flight flight}) {
     context.push(flightRoute, extra: {'flight': flight});
+  }
+
+  /// Replaces creation/completion routes with Home before opening a flight so
+  /// the flight app bar's Back action always has a valid destination.
+  static Future<void> goToFlightFromHomeStack(
+    BuildContext context, {
+    required Flight flight,
+  }) async {
+    final router = GoRouter.of(context);
+    router.go(homeRoute);
+    await Future<void>.delayed(Duration.zero);
+    await router.push<void>(flightRoute, extra: {'flight': flight});
   }
 
   /// Navigate to flight overview with selected airports
@@ -410,6 +427,7 @@ class AppRouter {
     required String flightId,
     bool isProSubscriber = false,
     bool usedSingleFlightUnlock = false,
+    String? creationAttemptId,
   }) {
     context.go(
       downloadCompletedRoute,
@@ -417,6 +435,7 @@ class AppRouter {
         flightId: flightId,
         isProSubscriber: isProSubscriber,
         usedSingleFlightUnlock: usedSingleFlightUnlock,
+        creationAttemptId: creationAttemptId,
       ),
     );
   }

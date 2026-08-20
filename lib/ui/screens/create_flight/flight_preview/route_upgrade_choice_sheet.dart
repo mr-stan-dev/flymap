@@ -29,11 +29,15 @@ Future<void> maybeShowRouteUpgradeChoiceSheet({
   final analytics = GetIt.I.get<AppAnalytics>();
   unawaited(
     analytics.log(
-      RealRouteChoiceEvent(source: source, action: RealRouteChoiceAction.shown),
+      RealRouteChoiceEvent(
+        source: source,
+        action: RealRouteChoiceAction.shown,
+        creationAttemptId: cubit.creationAttemptId,
+      ),
     ),
   );
 
-  var choseFlightNumber = false;
+  RealRouteChoiceAction? selectedAction;
   await showModalBottomSheet<void>(
     context: context,
     useSafeArea: true,
@@ -70,14 +74,17 @@ Future<void> maybeShowRouteUpgradeChoiceSheet({
             PrimaryButton(
               label: strings.ctaEnterFlightNumber,
               onPressed: () {
-                choseFlightNumber = true;
+                selectedAction = RealRouteChoiceAction.enterFlightNumber;
                 Navigator.of(sheetContext).pop();
               },
             ),
             const SizedBox(height: DsSpacing.sm),
             TertiaryButton(
               label: strings.ctaKeepRoute,
-              onPressed: () => Navigator.of(sheetContext).pop(),
+              onPressed: () {
+                selectedAction = RealRouteChoiceAction.keepRoute;
+                Navigator.of(sheetContext).pop();
+              },
             ),
           ],
         ),
@@ -89,14 +96,16 @@ Future<void> maybeShowRouteUpgradeChoiceSheet({
     analytics.log(
       RealRouteChoiceEvent(
         source: source,
-        action: choseFlightNumber
-            ? RealRouteChoiceAction.enterFlightNumber
-            : RealRouteChoiceAction.keepRoute,
+        action: selectedAction ?? RealRouteChoiceAction.dismissed,
+        creationAttemptId: cubit.creationAttemptId,
       ),
     ),
   );
 
-  if (!choseFlightNumber || !context.mounted) return;
+  if (selectedAction != RealRouteChoiceAction.enterFlightNumber ||
+      !context.mounted) {
+    return;
+  }
   AppRouter.goToFlightNumberSelector(
     context,
     hasPendingFlightUnlock: cubit.state.hasPendingFlightUnlock,

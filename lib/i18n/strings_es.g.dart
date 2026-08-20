@@ -460,6 +460,7 @@ class _TranslationsPreviewEs extends TranslationsPreviewEn {
 	@override String get downloadCongratsTitle => '¡Perfecto! Ya está todo listo.';
 	@override String get offlineSavedDetail => 'El mapa y los datos de vuelo seleccionados se guardaron para usarlos offline durante tu vuelo.';
 	@override String get downloadCompletedTitle => 'Descarga completada';
+	@override String get openFlight => 'Abrir vuelo';
 	@override String get shareFlightCard => 'Presume de tu increíble vuelo';
 	@override String get shareVideo => 'Compartir vídeo del vuelo';
 	@override String get share => 'Compartir tarjeta de vuelo';
@@ -2383,6 +2384,7 @@ extension on TranslationsEs {
 			'preview.downloadCongratsTitle' => '¡Perfecto! Ya está todo listo.',
 			'preview.offlineSavedDetail' => 'El mapa y los datos de vuelo seleccionados se guardaron para usarlos offline durante tu vuelo.',
 			'preview.downloadCompletedTitle' => 'Descarga completada',
+			'preview.openFlight' => 'Abrir vuelo',
 			'preview.shareFlightCard' => 'Presume de tu increíble vuelo',
 			'preview.shareVideo' => 'Compartir vídeo del vuelo',
 			'preview.share' => 'Compartir tarjeta de vuelo',
@@ -2750,9 +2752,9 @@ extension on TranslationsEs {
 			'countries.BA' => 'Bosnia y Herzegovina',
 			'countries.BB' => 'Barbados',
 			'countries.BD' => 'Banglades',
-			'countries.BE' => 'Belgica',
 			_ => null,
 		} ?? switch (path) {
+			'countries.BE' => 'Belgica',
 			'countries.BF' => 'Burkina Faso',
 			'countries.BG' => 'Bulgaria',
 			'countries.BH' => 'Barein',

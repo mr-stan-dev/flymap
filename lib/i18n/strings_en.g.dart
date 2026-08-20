@@ -1076,6 +1076,9 @@ class TranslationsPreviewEn {
 	/// en: 'Download completed'
 	String get downloadCompletedTitle => 'Download completed';
 
+	/// en: 'Open flight'
+	String get openFlight => 'Open flight';
+
 	/// en: 'Show off your awesome flight'
 	String get shareFlightCard => 'Show off your awesome flight';
 
@@ -4785,6 +4788,7 @@ extension on Translations {
 			'preview.downloadCongratsTitle' => 'Congrats! You are all set.',
 			'preview.offlineSavedDetail' => 'Map and selected flight data are saved for offline use during your flight.',
 			'preview.downloadCompletedTitle' => 'Download completed',
+			'preview.openFlight' => 'Open flight',
 			'preview.shareFlightCard' => 'Show off your awesome flight',
 			'preview.shareVideo' => 'Share flight video',
 			'preview.share' => 'Share flight card',
@@ -5152,9 +5156,9 @@ extension on Translations {
 			'countries.BA' => 'Bosnia and Herzegovina',
 			'countries.BB' => 'Barbados',
 			'countries.BD' => 'Bangladesh',
-			'countries.BE' => 'Belgium',
 			_ => null,
 		} ?? switch (path) {
+			'countries.BE' => 'Belgium',
 			'countries.BF' => 'Burkina Faso',
 			'countries.BG' => 'Bulgaria',
 			'countries.BH' => 'Bahrain',

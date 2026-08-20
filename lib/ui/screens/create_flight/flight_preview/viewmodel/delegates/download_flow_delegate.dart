@@ -191,6 +191,7 @@ class DownloadFlowDelegate {
     if (_cubit.state.isDownloading) return;
     final route = _cubit.state.flightRoute;
     if (route == null) return;
+    _cubit._trackPreviewStepCompleted(FlightPreviewAnalyticsStep.articles);
     final isPro = _cubit.hasEffectiveProAccess;
     final accessMode = _accessModeForCurrentDownload();
     _usedPendingFlightUnlockForCurrentDownload =
@@ -299,6 +300,7 @@ class DownloadFlowDelegate {
           isProUser: isPro,
           accessMode: accessMode,
           routeSource: route.source,
+          creationAttemptId: _cubit.creationAttemptId,
         ),
       ),
     );
@@ -713,6 +715,7 @@ class DownloadFlowDelegate {
           mapSizeBytes: mapPhase.fileSize,
           accessMode: accessMode,
           routeSource: route.source,
+          creationAttemptId: _cubit.creationAttemptId,
         ),
       ),
     );
@@ -734,6 +737,19 @@ class DownloadFlowDelegate {
 
   void cancelDownload() {
     if (!_cubit.state.isDownloading) return;
+    final route = _cubit.state.flightRoute;
+    if (route != null) {
+      unawaited(
+        _cubit._analytics.log(
+          DownloadCancelledEvent(
+            routeLengthKm: route.distanceInKm,
+            routeSource: route.source,
+            accessMode: _accessModeForCurrentDownload(),
+            creationAttemptId: _cubit.creationAttemptId,
+          ),
+        ),
+      );
+    }
     _downloadCancelled = true;
     final rollbackFlightId = _savedFlightIdDuringDownload;
     final bundleId = _activeArticleBundleId;
@@ -884,6 +900,7 @@ class DownloadFlowDelegate {
                         errorMessage: event.errorMsg,
                         routeLengthKm: routeLengthKm,
                         routeSource: route.source,
+                        creationAttemptId: _cubit.creationAttemptId,
                       ),
                     ),
                   );
@@ -1051,6 +1068,7 @@ class DownloadFlowDelegate {
             errorMessage: e.toString(),
             routeLengthKm: routeLengthKm,
             routeSource: route.source,
+            creationAttemptId: _cubit.creationAttemptId,
           ),
         ),
       );

@@ -32,7 +32,11 @@ class MapAndStepNavigationDelegate {
 
     switch (_cubit.state.step) {
       case CreateFlightStep.routeNotSupported:
+        _cubit._trackRouteNotSupportedAction(RouteNotSupportedAction.back);
+        await _cubit.clearPendingFlightUnlock();
+        return true;
       case CreateFlightStep.overview:
+        _cubit._trackCreationAbandoned(reason: 'back');
         await _cubit.clearPendingFlightUnlock();
         return true;
       case CreateFlightStep.weather:

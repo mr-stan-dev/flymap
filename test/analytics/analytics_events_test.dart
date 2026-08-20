@@ -23,6 +23,84 @@ void main() {
       });
     });
 
+    test('route intent and preview events are PostHog-safe and correlated', () {
+      const routeTap = RouteTypeCardTappedEvent(
+        routeType: RouteTypeCardType.realRoute,
+        accessState: RouteTypeAccessState.free,
+        entrySource: 'onboarding',
+        creationAttemptId: 'attempt-1',
+      );
+      const previewViewed = FlightPreviewStepViewedEvent(
+        step: FlightPreviewAnalyticsStep.weather,
+        creationAttemptId: 'attempt-2',
+        routeSource: FlightRouteSource.greatCircle,
+        routeLength: RouteLength.long,
+        accessMode: 'basic',
+      );
+
+      expect(routeTap.postHogEventName, 'route_type_card_tapped');
+      expect(routeTap.postHogParameters, <String, Object>{
+        'route_type': 'real_route',
+        'access_state': 'free',
+        'entry_source': 'onboarding',
+        'creation_attempt_id': 'attempt-1',
+        'tracking_version': 2,
+      });
+      expect(previewViewed.postHogEventName, 'flight_preview_step_viewed');
+      expect(previewViewed.postHogParameters['step'], 'weather');
+      expect(previewViewed.postHogParameters['route_length_bucket'], 'long');
+      expect(
+        previewViewed.postHogParameters['creation_attempt_id'],
+        'attempt-2',
+      );
+    });
+
+    test('unlock sheet actions are available to PostHog', () {
+      const opened = FlightUnlockSheetOpenedEvent(
+        source: PaywallSource.realRouteGate,
+        unusedUnlockCount: 0,
+        hasCachedProduct: true,
+        gateAttemptId: 'gate-1',
+        creationAttemptId: 'attempt-1',
+      );
+      const dismissed = FlightUnlockActionEvent(
+        source: PaywallSource.realRouteGate,
+        action: FlightUnlockActionType.dismissed,
+        unusedUnlockCount: 0,
+        gateAttemptId: 'gate-1',
+        creationAttemptId: 'attempt-1',
+      );
+
+      expect(opened.postHogEventName, 'flight_unlock_sheet_opened');
+      expect(dismissed.postHogEventName, 'flight_unlock_action');
+      expect(dismissed.postHogParameters['action'], 'dismissed');
+      expect(dismissed.postHogParameters['gate_attempt_id'], 'gate-1');
+    });
+
+    test('unsupported long-route and completion actions are explicit', () {
+      const unsupported = SearchRouteNotSupportedEvent(
+        reason: 'approximate_super_long',
+        routeLengthKm: 12000,
+        routeSource: FlightRouteSource.greatCircle,
+        routeLength: RouteLength.superLong,
+        recommendedNextAction: 'real_route',
+        creationAttemptId: 'attempt-1',
+      );
+      const completionAction = DownloadCompletedActionEvent(
+        action: DownloadCompletedAction.openFlight,
+        accessMode: 'basic',
+        creationAttemptId: 'attempt-1',
+      );
+
+      expect(unsupported.postHogParameters['reason'], 'approximate_super_long');
+      expect(
+        unsupported.postHogParameters['recommended_next_action'],
+        'real_route',
+      );
+      expect(completionAction.postHogEventName, 'download_completed_action');
+      expect(completionAction.postHogParameters['action'], 'open_flight');
+    });
+
     test('weather share events are Firebase-only with image/video names', () {
       const image = WeatherShareEvent(WeatherShareFormat.image);
       const video = WeatherShareEvent(WeatherShareFormat.video);

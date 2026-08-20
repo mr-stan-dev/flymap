@@ -9,6 +9,7 @@ import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/widgets/flight_unlock_bottom_sheet.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:get_it/get_it.dart';
+import 'package:uuid/uuid.dart';
 
 Future<void> showFlightUnlockGateSheet({
   required BuildContext context,
@@ -18,8 +19,11 @@ Future<void> showFlightUnlockGateSheet({
   Future<void> Function()? onUnlockActivated,
   Future<void> Function()? onProActivated,
   String? routePreview,
+  String? creationAttemptId,
 }) async {
   final analytics = GetIt.I.get<AppAnalytics>();
+  final gateAttemptId = const Uuid().v4();
+  var sheetClosedByAction = false;
 
   if (subscriptionCubit.state.unusedFlightUnlockCount <= 0 &&
       subscriptionCubit.state.flightUnlockProduct == null &&
@@ -34,6 +38,8 @@ Future<void> showFlightUnlockGateSheet({
         source: source,
         unusedUnlockCount: subscriptionCubit.state.unusedFlightUnlockCount,
         hasCachedProduct: subscriptionCubit.state.flightUnlockProduct != null,
+        gateAttemptId: gateAttemptId,
+        creationAttemptId: creationAttemptId,
       ),
     ),
   );
@@ -58,6 +64,8 @@ Future<void> showFlightUnlockGateSheet({
                     : FlightUnlockActionType.buyUnlock,
                 unusedUnlockCount:
                     subscriptionCubit.state.unusedFlightUnlockCount,
+                gateAttemptId: gateAttemptId,
+                creationAttemptId: creationAttemptId,
               ),
             ),
           );
@@ -71,6 +79,8 @@ Future<void> showFlightUnlockGateSheet({
                   result: purchaseResult.status,
                   productId: purchaseResult.productId,
                   balanceAfter: subscriptionCubit.state.unusedFlightUnlockCount,
+                  gateAttemptId: gateAttemptId,
+                  creationAttemptId: creationAttemptId,
                 ),
               ),
             );
@@ -82,6 +92,7 @@ Future<void> showFlightUnlockGateSheet({
           }
 
           if (!innerContext.mounted) return;
+          sheetClosedByAction = true;
           Navigator.of(innerContext).pop();
           if (onUnlockActivated != null) {
             await onUnlockActivated();
@@ -95,9 +106,12 @@ Future<void> showFlightUnlockGateSheet({
                 action: FlightUnlockActionType.viewProPlans,
                 unusedUnlockCount:
                     subscriptionCubit.state.unusedFlightUnlockCount,
+                gateAttemptId: gateAttemptId,
+                creationAttemptId: creationAttemptId,
               ),
             ),
           );
+          sheetClosedByAction = true;
           Navigator.of(innerContext).pop();
           final result = await presentProPaywall();
           if (!context.mounted) return;
@@ -143,6 +157,20 @@ Future<void> showFlightUnlockGateSheet({
       );
     },
   );
+
+  if (!sheetClosedByAction) {
+    unawaited(
+      analytics.log(
+        FlightUnlockActionEvent(
+          source: source,
+          action: FlightUnlockActionType.dismissed,
+          unusedUnlockCount: subscriptionCubit.state.unusedFlightUnlockCount,
+          gateAttemptId: gateAttemptId,
+          creationAttemptId: creationAttemptId,
+        ),
+      ),
+    );
+  }
 
   subscriptionCubit.clearFlightUnlockError();
 }

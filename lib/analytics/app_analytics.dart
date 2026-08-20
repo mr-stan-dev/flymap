@@ -5,6 +5,8 @@ import 'package:flymap/analytics/app_analytics_identity.dart';
 
 export 'package:flymap/analytics/events/analytics_event.dart';
 export 'package:flymap/analytics/events/download/download_completed_event.dart';
+export 'package:flymap/analytics/events/download/download_completed_action_event.dart';
+export 'package:flymap/analytics/events/download/download_cancelled_event.dart';
 export 'package:flymap/analytics/events/download/download_failed_event.dart';
 export 'package:flymap/analytics/events/download/download_started_event.dart';
 export 'package:flymap/analytics/events/flight/flight_number_lookup_result_event.dart';
@@ -29,7 +31,10 @@ export 'package:flymap/analytics/events/engagement/poi_marker_tapped_event.dart'
 export 'package:flymap/analytics/events/engagement/rate_prompt_action_event.dart';
 export 'package:flymap/analytics/events/subscription/restore_purchases_result_event.dart';
 export 'package:flymap/analytics/events/flight/route_overview_completed_event.dart';
+export 'package:flymap/analytics/events/flight/route_not_supported_action_event.dart';
+export 'package:flymap/analytics/events/flight/route_type_card_tapped_event.dart';
 export 'package:flymap/analytics/events/flight/route_type_selected_event.dart';
+export 'package:flymap/analytics/events/flight/flight_preview_step_event.dart';
 export 'package:flymap/analytics/events/flight/search_route_not_supported_event.dart';
 export 'package:flymap/analytics/events/flight/search_route_prepared_event.dart';
 export 'package:flymap/analytics/events/sharing/share_card_generated_event.dart';

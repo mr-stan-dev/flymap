@@ -271,12 +271,32 @@ void main() {
     test('logs real route gate paywall source', () async {
       repository.paywallResult = SubscriptionPaywallResult.cancelled;
 
-      final result = await cubit.presentPaywallFromRealRouteGate();
+      final result = await cubit.presentPaywallFromRealRouteGate(
+        creationAttemptId: 'attempt-1',
+      );
 
       expect(result, SubscriptionPaywallResult.cancelled);
+      final presented = analytics.events
+          .whereType<PaywallPresentedEvent>()
+          .single;
+      expect(presented.creationAttemptId, 'attempt-1');
       final event = analytics.events.whereType<PaywallResultEvent>().single;
       expect(event.source, PaywallSource.realRouteGate);
       expect(event.result, SubscriptionPaywallResult.cancelled);
+      expect(event.creationAttemptId, 'attempt-1');
+    });
+
+    test('does not count an unavailable paywall as presented', () async {
+      repository.paywallResult = SubscriptionPaywallResult.notPresented;
+
+      final result = await cubit.presentPaywallFromRealRouteGate();
+
+      expect(result, SubscriptionPaywallResult.notPresented);
+      expect(analytics.events.whereType<PaywallPresentedEvent>(), isEmpty);
+      expect(
+        analytics.events.whereType<PaywallResultEvent>().single.result,
+        SubscriptionPaywallResult.notPresented,
+      );
     });
   });
 }
