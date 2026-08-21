@@ -81,6 +81,15 @@ class _RecordingPostHogClient implements PostHogAnalyticsClient {
   }) async {}
 
   @override
+  Future<void> setPersonPropertiesForFlags({
+    required Map<String, Object> properties,
+    bool reloadFeatureFlags = true,
+  }) async {}
+
+  @override
+  Future<Object?> getFeatureFlag({required String key}) async => null;
+
+  @override
   Future<void> setup({
     required String projectToken,
     required String host,

@@ -7,12 +7,18 @@ class OnboardingCompletedEvent extends AnalyticsEvent
     required this.stepsTotal,
     required this.stepsSkippedCount,
     required this.durationSec,
+    this.experimentKey,
+    this.experimentVariant,
+    this.experimentEnrolled,
   });
 
   final String flowVersion;
   final int stepsTotal;
   final int stepsSkippedCount;
   final int durationSec;
+  final String? experimentKey;
+  final String? experimentVariant;
+  final bool? experimentEnrolled;
 
   @override
   String get firebaseEventName => 'onboarding_completed';
@@ -23,6 +29,9 @@ class OnboardingCompletedEvent extends AnalyticsEvent
     'steps_total': stepsTotal,
     'steps_skipped_count': stepsSkippedCount,
     'duration_sec': durationSec,
+    if (experimentKey != null) 'experiment_key': experimentKey!,
+    if (experimentVariant != null) 'experiment_variant': experimentVariant!,
+    if (experimentEnrolled != null) 'experiment_enrolled': experimentEnrolled!,
   };
 
   @override

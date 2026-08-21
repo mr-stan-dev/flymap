@@ -8,6 +8,7 @@ import 'package:flymap/analytics/posthog_env_config.dart';
 import 'package:flymap/auth/app_auth_repository.dart';
 import 'package:flymap/crashlytics/app_crashlytics.dart';
 import 'package:flymap/crashlytics/app_crashlytics_initializer.dart';
+import 'package:flymap/experiments/onboarding_experiment_service.dart';
 import 'package:flymap/data/api/feedback_api.dart';
 import 'package:flymap/data/api/firebase_weather_forecast_api.dart';
 import 'package:flymap/data/api/flight_info_api.dart';
@@ -129,6 +130,11 @@ class DiModule {
     i.registerLazySingleton<PostHogEnvConfig>(PostHogEnvConfig.fromEnvironment);
     i.registerLazySingleton<PostHogAnalyticsClient>(
       () => PackagePostHogAnalyticsClient(),
+    );
+    i.registerLazySingleton<OnboardingExperimentService>(
+      () => PostHogOnboardingExperimentService(
+        postHog: i.get<PostHogAnalyticsClient>(),
+      ),
     );
     i.registerLazySingleton<AppAnalytics>(
       () => CompositeAppAnalytics(

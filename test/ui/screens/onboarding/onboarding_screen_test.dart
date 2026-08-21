@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/analytics/app_analytics.dart';
 import 'package:flymap/data/local/airports_database.dart';
 import 'package:flymap/domain/entity/airport.dart';
+import 'package:flymap/experiments/onboarding_experiment_service.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/flight_unlock_repository.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
@@ -234,11 +235,71 @@ void main() {
       }
     },
   );
+
+  testWidgets('iOS control omits social proof and still presents paywall', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    try {
+      final repo = _FakeSubscriptionRepository();
+      final service = _FixedOnboardingExperimentService(
+        const OnboardingExperimentAssignment(
+          experimentKey:
+              PostHogOnboardingExperimentService.socialProofIosFlagKey,
+          variant: OnboardingExperimentVariant.control,
+          showSocialProof: false,
+          showOnboardingPaywall: true,
+        ),
+      );
+
+      await tester.pumpWidget(
+        _buildTestApp(subscriptionRepository: repo, experimentService: service),
+      );
+      await _completeOnboardingToFirstFlight(tester, expectsSocialProof: false);
+
+      expect(find.text('Your flights will never feel the same.'), findsNothing);
+      expect(find.text('New flight'), findsOneWidget);
+      expect(repo.paywallPresentedCount, 1);
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+
+  testWidgets('Android control keeps social proof and skips paywall', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    try {
+      final repo = _FakeSubscriptionRepository();
+      final service = _FixedOnboardingExperimentService(
+        const OnboardingExperimentAssignment(
+          experimentKey: PostHogOnboardingExperimentService
+              .onboardingPaywallAndroidFlagKey,
+          variant: OnboardingExperimentVariant.control,
+          showSocialProof: true,
+          showOnboardingPaywall: false,
+        ),
+      );
+
+      await tester.pumpWidget(
+        _buildTestApp(subscriptionRepository: repo, experimentService: service),
+      );
+      await _completeOnboardingToFirstFlight(tester);
+
+      expect(find.text('New flight'), findsOneWidget);
+      expect(repo.paywallPresentedCount, 0);
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
 }
 
 /// Walks the onboarding flow from the welcome step through the final social
 /// proof CTA and waits for the route selector.
-Future<void> _completeOnboardingToFirstFlight(WidgetTester tester) async {
+Future<void> _completeOnboardingToFirstFlight(
+  WidgetTester tester, {
+  bool expectsSocialProof = true,
+}) async {
   await _pumpUntilVisible(tester, find.text('Discover what’s below'));
   for (var i = 0; i < 2; i++) {
     await tester.tap(find.widgetWithText(TertiaryButton, 'Skip'));
@@ -255,6 +316,10 @@ Future<void> _completeOnboardingToFirstFlight(WidgetTester tester) async {
     find.text('Check the weather for your flight'),
   );
   await tester.tap(find.widgetWithText(PrimaryButton, 'Continue'));
+  if (!expectsSocialProof) {
+    await _pumpUntilVisible(tester, find.text('New flight'));
+    return;
+  }
   await _pumpUntilVisible(
     tester,
     find.text('Your flights will never feel the same.'),
@@ -263,7 +328,10 @@ Future<void> _completeOnboardingToFirstFlight(WidgetTester tester) async {
   await _pumpUntilVisible(tester, find.text('New flight'));
 }
 
-Widget _buildTestApp({_FakeSubscriptionRepository? subscriptionRepository}) {
+Widget _buildTestApp({
+  _FakeSubscriptionRepository? subscriptionRepository,
+  OnboardingExperimentService? experimentService,
+}) {
   final router = GoRouter(
     initialLocation: '/onboarding',
     routes: [
@@ -274,7 +342,8 @@ Widget _buildTestApp({_FakeSubscriptionRepository? subscriptionRepository}) {
       ),
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => const OnboardingScreen(),
+        builder: (context, state) =>
+            OnboardingScreen(experimentService: experimentService),
       ),
       GoRoute(
         path: '/flight-search',
@@ -332,8 +401,7 @@ class _FakeSubscriptionRepository implements SubscriptionRepository {
 
   final SubscriptionStatus _currentStatus;
 
-  /// How many times a paywall was presented — lets the platform tests assert
-  /// Android never shows one while iOS does.
+  /// How many times a paywall was presented.
   int paywallPresentedCount = 0;
 
   @override
@@ -418,6 +486,17 @@ class _FakeAppAnalytics implements AppAnalytics {
 
   @override
   Future<void> setSubscriptionContext({required bool isPro}) async {}
+}
+
+class _FixedOnboardingExperimentService implements OnboardingExperimentService {
+  const _FixedOnboardingExperimentService(this.assignment);
+
+  final OnboardingExperimentAssignment assignment;
+
+  @override
+  Future<OnboardingExperimentAssignment> resolve(
+    TargetPlatform platform,
+  ) async => assignment;
 }
 
 final _seedAirports = <Airport>[

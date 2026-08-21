@@ -25,6 +25,13 @@ abstract class PostHogAnalyticsClient {
     Map<String, Object>? userPropertiesToSet,
     Map<String, Object>? userPropertiesToSetOnce,
   });
+
+  Future<void> setPersonPropertiesForFlags({
+    required Map<String, Object> properties,
+    bool reloadFeatureFlags,
+  });
+
+  Future<Object?> getFeatureFlag({required String key});
 }
 
 class PackagePostHogAnalyticsClient implements PostHogAnalyticsClient {
@@ -47,8 +54,8 @@ class PackagePostHogAnalyticsClient implements PostHogAnalyticsClient {
     config.debug = debug;
     config.captureApplicationLifecycleEvents =
         captureApplicationLifecycleEvents;
-    config.preloadFeatureFlags = false;
-    config.sendFeatureFlagEvents = false;
+    config.preloadFeatureFlags = true;
+    config.sendFeatureFlagEvents = true;
     config.sessionReplay = false;
     config.personProfiles = PostHogPersonProfiles.identifiedOnly;
     await _posthog.setup(config);
@@ -92,5 +99,21 @@ class PackagePostHogAnalyticsClient implements PostHogAnalyticsClient {
       userPropertiesToSet: userPropertiesToSet,
       userPropertiesToSetOnce: userPropertiesToSetOnce,
     );
+  }
+
+  @override
+  Future<void> setPersonPropertiesForFlags({
+    required Map<String, Object> properties,
+    bool reloadFeatureFlags = true,
+  }) {
+    return _posthog.setPersonPropertiesForFlags(
+      properties,
+      reloadFeatureFlags: reloadFeatureFlags,
+    );
+  }
+
+  @override
+  Future<Object?> getFeatureFlag({required String key}) {
+    return _posthog.getFeatureFlag(key);
   }
 }

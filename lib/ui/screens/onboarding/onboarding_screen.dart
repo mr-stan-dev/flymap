@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/airports_database.dart';
+import 'package:flymap/experiments/onboarding_experiment_service.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/favorite_airports_repository.dart';
 import 'package:flymap/repository/feature_announcement_repository.dart';
@@ -27,7 +29,9 @@ import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart
 import 'package:get_it/get_it.dart';
 
 class OnboardingScreen extends StatelessWidget {
-  const OnboardingScreen({super.key});
+  const OnboardingScreen({super.key, this.experimentService});
+
+  final OnboardingExperimentService? experimentService;
 
   @override
   Widget build(BuildContext context) {
@@ -45,20 +49,22 @@ class OnboardingScreen extends StatelessWidget {
             ? GetIt.I<HomeAreaOverviewRepository>()
             : null,
       ),
-      child: const _OnboardingFlowView(),
+      child: _OnboardingFlowView(experimentService: experimentService),
     );
   }
 }
 
 class _OnboardingFlowView extends StatefulWidget {
-  const _OnboardingFlowView();
+  const _OnboardingFlowView({this.experimentService});
+
+  final OnboardingExperimentService? experimentService;
 
   @override
   State<_OnboardingFlowView> createState() => _OnboardingFlowViewState();
 }
 
 class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
-  static const String _flowVersion = 'v6_social_proof';
+  static const String _flowVersion = 'v7_platform_experiments';
   static const String _entrySource = 'app_launch';
 
   final AppAnalytics _analytics = GetIt.I<AppAnalytics>();
@@ -69,8 +75,11 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
   int _stepsSkippedCount = 0;
   String? _lastTrackedStepId;
   int? _lastTrackedStepIndex;
+  OnboardingExperimentAssignment? _experiment;
 
-  List<OnboardingStepDefinition> _steps() => [
+  List<OnboardingStepDefinition> _steps(
+    OnboardingExperimentAssignment experiment,
+  ) => [
     OnboardingStepDefinition(
       id: OnboardingStepId.welcome,
       stepBuilder: (context, __, ___) => OnboardingWelcomeStep(),
@@ -121,38 +130,36 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
       canContinue: (_) => true,
     ),
     // The final feature payoff: the real animated cloud map on canned
-    // routes, followed by social proof before the subscription flow.
+    // routes, optionally followed by social proof before subscription.
     OnboardingStepDefinition(
       id: OnboardingStepId.weatherPayoff,
       stepBuilder: (context, _, __) => const OnboardingWeatherPayoffStep(),
       primaryActionLabel: (context, _) => context.t.common.kContinue,
       canContinue: (_) => true,
     ),
-    OnboardingStepDefinition(
-      id: OnboardingStepId.socialProof,
-      stepBuilder: (context, _, __) => const OnboardingSocialProofStep(),
-      primaryActionLabel: (context, _) => context.t.common.kContinue,
-      canContinue: (_) => true,
-      isSkippable: false,
-    ),
+    if (experiment.showSocialProof)
+      OnboardingStepDefinition(
+        id: OnboardingStepId.socialProof,
+        stepBuilder: (context, _, __) => const OnboardingSocialProofStep(),
+        primaryActionLabel: (context, _) => context.t.common.kContinue,
+        canContinue: (_) => true,
+        isSkippable: false,
+      ),
   ];
 
   @override
   void initState() {
     super.initState();
-    unawaited(
-      _analytics.log(
-        const OnboardingStartedEvent(
-          flowVersion: _flowVersion,
-          entrySource: _entrySource,
-        ),
-      ),
-    );
+    unawaited(_resolveExperiment());
   }
 
   @override
   Widget build(BuildContext context) {
-    final steps = _steps();
+    final experiment = _experiment;
+    if (experiment == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    final steps = _steps(experiment);
     final isLastStep = _stepIndex == steps.length - 1;
 
     return BlocBuilder<OnboardingProfileFormCubit, OnboardingProfileFormState>(
@@ -299,7 +306,7 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
     });
   }
 
-  /// Finishes onboarding after the social-proof step, presents the real
+  /// Finishes the assigned onboarding steps, optionally presents the real
   /// paywall, then continues into first flight creation regardless of the
   /// outcome — the paywall never blocks onboarding.
   Future<void> _finish(
@@ -311,7 +318,9 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
     });
     final subscriptionCubit = context.read<SubscriptionCubit>();
     SubscriptionPaywallResult? paywallResult;
-    if (!subscriptionCubit.state.isPro) {
+    final experiment = _experiment;
+    if (!subscriptionCubit.state.isPro &&
+        (experiment?.showOnboardingPaywall ?? true)) {
       try {
         paywallResult = await subscriptionCubit.presentPaywallFromOnboarding();
       } catch (_) {
@@ -327,6 +336,9 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
           stepsTotal: stepsTotal,
           stepsSkippedCount: _stepsSkippedCount,
           durationSec: durationSec,
+          experimentKey: experiment?.experimentKey,
+          experimentVariant: experiment?.analyticsVariant,
+          experimentEnrolled: experiment?.isEnrolled,
         ),
       ),
     );
@@ -338,6 +350,34 @@ class _OnboardingFlowViewState extends State<_OnboardingFlowView> {
       );
     }
     AppRouter.goToRouteTypeSelectorFromOnboarding(context);
+  }
+
+  Future<void> _resolveExperiment() async {
+    final service =
+        widget.experimentService ??
+        (GetIt.I.isRegistered<OnboardingExperimentService>()
+            ? GetIt.I<OnboardingExperimentService>()
+            : null);
+    final assignment = service == null
+        ? OnboardingExperimentAssignment.currentExperience(
+            defaultTargetPlatform,
+          )
+        : await service.resolve(defaultTargetPlatform);
+    if (!mounted) return;
+    setState(() {
+      _experiment = assignment;
+    });
+    unawaited(
+      _analytics.log(
+        OnboardingStartedEvent(
+          flowVersion: _flowVersion,
+          entrySource: _entrySource,
+          experimentKey: assignment.experimentKey,
+          experimentVariant: assignment.analyticsVariant,
+          experimentEnrolled: assignment.isEnrolled,
+        ),
+      ),
+    );
   }
 
   Future<void> _skipCurrentStep({
