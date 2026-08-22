@@ -908,8 +908,26 @@ class TranslationsSubscriptionEn {
 	/// en: 'Included with your Pro plan'
 	String get proFeaturesIncludedTitle => 'Included with your Pro plan';
 
-	/// en: 'Your window seat, fully unlocked.'
-	String get proHeroSubtitle => 'Your window seat, fully unlocked.';
+	/// en: 'Your window-seat explorer, fully unlocked.'
+	String get proHeroSubtitle => 'Your window-seat explorer, fully unlocked.';
+
+	/// en: 'You’re on the weekly subscription plan.'
+	String get weeklySubscriptionPlan => 'You’re on the weekly subscription plan.';
+
+	/// en: 'You’re on the monthly subscription plan.'
+	String get monthlySubscriptionPlan => 'You’re on the monthly subscription plan.';
+
+	/// en: 'You’re on the yearly subscription plan.'
+	String get yearlySubscriptionPlan => 'You’re on the yearly subscription plan.';
+
+	/// en: 'You’re on the weekly subscription plan (ends $date)'
+	String weeklySubscriptionPlanEnds({required Object date}) => 'You’re on the weekly subscription plan (ends ${date})';
+
+	/// en: 'You’re on the monthly subscription plan (ends $date)'
+	String monthlySubscriptionPlanEnds({required Object date}) => 'You’re on the monthly subscription plan (ends ${date})';
+
+	/// en: 'You’re on the yearly subscription plan (ends $date)'
+	String yearlySubscriptionPlanEnds({required Object date}) => 'You’re on the yearly subscription plan (ends ${date})';
 
 	/// en: 'Recent real-world flight routes'
 	String get proFeatureRoutesTitle => 'Recent real-world flight routes';
@@ -4450,7 +4468,13 @@ extension on Translations {
 			'subscription.flightUnlockPurchaseFailed' => 'Flight unlock purchase failed. Please try again.',
 			'subscription.proFeaturesTitle' => 'What Flymap Pro unlocks',
 			'subscription.proFeaturesIncludedTitle' => 'Included with your Pro plan',
-			'subscription.proHeroSubtitle' => 'Your window seat, fully unlocked.',
+			'subscription.proHeroSubtitle' => 'Your window-seat explorer, fully unlocked.',
+			'subscription.weeklySubscriptionPlan' => 'You’re on the weekly subscription plan.',
+			'subscription.monthlySubscriptionPlan' => 'You’re on the monthly subscription plan.',
+			'subscription.yearlySubscriptionPlan' => 'You’re on the yearly subscription plan.',
+			'subscription.weeklySubscriptionPlanEnds' => ({required Object date}) => 'You’re on the weekly subscription plan (ends ${date})',
+			'subscription.monthlySubscriptionPlanEnds' => ({required Object date}) => 'You’re on the monthly subscription plan (ends ${date})',
+			'subscription.yearlySubscriptionPlanEnds' => ({required Object date}) => 'You’re on the yearly subscription plan (ends ${date})',
 			'subscription.proFeatureRoutesTitle' => 'Recent real-world flight routes',
 			'subscription.proFeatureRoutesBody' => 'Follow a recent recorded path instead of an approximate arc.',
 			'subscription.proFeatureMapsTitle' => 'Higher-detail maps, available offline',
@@ -4636,14 +4660,14 @@ extension on Translations {
 			'createFlight.mapPreview.estimatedMapSize' => ({required Object size}) => 'Estimated map size: ${size}',
 			'createFlight.mapPreview.upgradeToPro' => 'Upgrade to Pro',
 			'createFlight.mapPreview.basicHint' => 'Basic map detail with limited places',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.mapPreview.proGateHint' => 'Upgrade for a detailed map with all places',
 			'createFlight.mapPreview.proHint' => ({required Object count}) => 'Detailed offline map with ${count} places',
 			'createFlight.mapPreview.optionsTitle' => 'Approximate route',
 			'createFlight.mapPreview.optionsBody' => 'Route is approximate — actual path may vary, especially on long-haul flights.',
 			'createFlight.overview.routeNotReady' => 'Route is not ready yet.',
 			'createFlight.overview.proPoiUpsell' => 'Free plan includes basic map and limited places',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.routeNoteTooltip' => 'Route note',
 			'createFlight.overview.routeNoteTitle' => 'Approximate route',
 			'createFlight.overview.routeNoteBody' => 'Route is approximate — actual path may vary, especially on long-haul flights.',
@@ -5150,14 +5174,14 @@ extension on Translations {
 			'countries.AM' => 'Armenia',
 			'countries.AO' => 'Angola',
 			'countries.AR' => 'Argentina',
+			_ => null,
+		} ?? switch (path) {
 			'countries.AT' => 'Austria',
 			'countries.AU' => 'Australia',
 			'countries.AZ' => 'Azerbaijan',
 			'countries.BA' => 'Bosnia and Herzegovina',
 			'countries.BB' => 'Barbados',
 			'countries.BD' => 'Bangladesh',
-			_ => null,
-		} ?? switch (path) {
 			'countries.BE' => 'Belgium',
 			'countries.BF' => 'Burkina Faso',
 			'countries.BG' => 'Bulgaria',

@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/ui/design_system/tokens/ds_brand_colors.dart';
 
 class PremiumSurfaceGradients {
   PremiumSurfaceGradients._();
 
   static List<Color> pro({required bool isLightTheme}) {
+    return DsPremiumColors.heroGradientFor(
+      isLightTheme ? Brightness.light : Brightness.dark,
+    );
+  }
+
+  /// The subscription hero stays airy in light mode and keeps the established
+  /// navy treatment in dark mode.
+  static List<Color> membershipHero({required bool isLightTheme}) {
     return isLightTheme
-        ? const [Color(0xFFAA7003), Color(0xFFD59000), Color(0xFFE8B251)]
-        : const [Color(0xFF4D3300), Color(0xFF936000), Color(0xFFB57D03)];
+        ? const [Color(0xFFFFFFFF), Color(0xFFF7FAFE), Color(0xFFFFF9EC)]
+        : pro(isLightTheme: false);
   }
 
   static List<Color> free({required bool isLightTheme}) {

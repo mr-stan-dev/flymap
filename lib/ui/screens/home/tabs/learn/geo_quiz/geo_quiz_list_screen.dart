@@ -213,7 +213,7 @@ class _GeoQuizGridTile extends StatelessWidget {
                   Icon(
                     locked ? Icons.lock_outline_rounded : Icons.public,
                     color: locked
-                        ? DsBrandColors.proAmber
+                        ? DsPremiumColors.accent(context)
                         : isComplete
                         ? success
                         : theme.colorScheme.primary,
@@ -223,7 +223,7 @@ class _GeoQuizGridTile extends StatelessWidget {
                   if (locked)
                     const ProBadge(
                       compact: true,
-                      variant: ProBadgeVariant.premiumBlueStripes,
+                      variant: ProBadgeVariant.premiumNavy,
                     )
                   else
                     Text(

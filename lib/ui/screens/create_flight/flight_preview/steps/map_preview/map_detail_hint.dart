@@ -17,11 +17,12 @@ class MapDetailHint extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final premiumAccent = DsPremiumColors.accent(context);
     final primaryTextColor = highlighted
-        ? DsBrandColors.proAmber
+        ? premiumAccent
         : colorScheme.onSurface;
     final secondaryTextColor = highlighted
-        ? DsBrandColors.proAmber.withValues(alpha: 0.82)
+        ? premiumAccent.withValues(alpha: 0.82)
         : colorScheme.onSurfaceVariant;
 
     return Container(
@@ -29,12 +30,12 @@ class MapDetailHint extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: highlighted
-            ? DsBrandColors.proAmber.withValues(alpha: 0.12)
+            ? DsPremiumColors.subtleSurface(context)
             : colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: highlighted
-              ? DsBrandColors.proAmber.withValues(alpha: 0.35)
+              ? DsPremiumColors.border(context)
               : colorScheme.outline.withValues(alpha: 0.14),
         ),
       ),

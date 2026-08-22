@@ -26,9 +26,7 @@ class HomeSummaryHeaderPro extends StatelessWidget {
     final radius = BorderRadius.circular(DsRadii.xl);
     final gradientColors = [
       colorScheme.surfaceContainerHighest.withValues(alpha: 0.9),
-      DsBrandColors.proAmber.withValues(
-        alpha: theme.brightness == Brightness.light ? 0.16 : 0.22,
-      ),
+      DsPremiumColors.subtleSurface(context),
     ];
 
     return Container(
@@ -40,9 +38,7 @@ class HomeSummaryHeaderPro extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: gradientColors,
         ),
-        border: Border.all(
-          color: DsBrandColors.proAmber.withValues(alpha: 0.4),
-        ),
+        border: Border.all(color: DsPremiumColors.border(context)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(DsSpacing.md),
@@ -55,12 +51,12 @@ class HomeSummaryHeaderPro extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: DsBrandColors.proAmber.withValues(alpha: 0.16),
+                    color: DsPremiumColors.iconSurface(context),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.workspace_premium_rounded,
-                    color: DsBrandColors.proAmber,
+                    color: DsPremiumColors.accent(context),
                     size: 20,
                   ),
                 ),
@@ -140,7 +136,7 @@ class _ProSummaryPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: DsBrandColors.proAmber),
+          Icon(icon, size: 16, color: DsPremiumColors.accent(context)),
           const SizedBox(width: 6),
           Text(
             '$label: ',

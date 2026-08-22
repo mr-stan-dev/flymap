@@ -50,10 +50,7 @@ class LearnArticleTile extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (locked) ...[
-            const ProBadge(
-              compact: true,
-              variant: ProBadgeVariant.premiumBlueStripes,
-            ),
+            const ProBadge(compact: true, variant: ProBadgeVariant.premiumNavy),
             const SizedBox(width: 4),
           ] else ...[
             Icon(

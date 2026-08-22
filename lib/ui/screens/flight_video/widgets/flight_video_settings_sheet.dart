@@ -258,15 +258,13 @@ class _FlightVideoSettingsSheetState extends State<_FlightVideoSettingsSheet> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: DsBrandColors.proAmber.withValues(
-                              alpha: 0.18,
-                            ),
+                            color: DsPremiumColors.iconSurface(context),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             t.common.pro,
                             style: theme.textTheme.labelSmall?.copyWith(
-                              color: DsBrandColors.proAmber,
+                              color: DsPremiumColors.accent(context),
                               fontWeight: FontWeight.w800,
                             ),
                           ),

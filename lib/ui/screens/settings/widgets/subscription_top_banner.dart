@@ -194,14 +194,22 @@ class _SubscribedBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isLightTheme = theme.brightness == Brightness.light;
+    final premiumAccent = DsPremiumColors.accent(context);
     final cardRadius = BorderRadius.circular(DsRadii.xl);
     final unlockBalanceText = _unlockBalanceText(context, state);
-    final gradientColors = [
-      colorScheme.surfaceContainerHighest.withValues(alpha: 0.9),
-      DsBrandColors.proAmber.withValues(
-        alpha: theme.brightness == Brightness.light ? 0.16 : 0.22,
-      ),
-    ];
+    final gradientColors = isLightTheme
+        ? [
+            colorScheme.surface,
+            Color.alphaBlend(
+              DsPremiumColors.goldFill.withValues(alpha: 0.055),
+              colorScheme.surface,
+            ),
+          ]
+        : [
+            colorScheme.surfaceContainerHighest.withValues(alpha: 0.9),
+            DsPremiumColors.subtleSurface(context),
+          ];
 
     return Material(
       color: Colors.transparent,
@@ -209,6 +217,7 @@ class _SubscribedBanner extends StatelessWidget {
         onTap: onManage,
         borderRadius: cardRadius,
         child: Ink(
+          key: const Key('settings-pro-active-banner-surface'),
           decoration: BoxDecoration(
             borderRadius: cardRadius,
             gradient: LinearGradient(
@@ -216,9 +225,7 @@ class _SubscribedBanner extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: gradientColors,
             ),
-            border: Border.all(
-              color: DsBrandColors.proAmber.withValues(alpha: 0.4),
-            ),
+            border: Border.all(color: DsPremiumColors.border(context)),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -231,12 +238,21 @@ class _SubscribedBanner extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: DsBrandColors.proAmber.withValues(alpha: 0.16),
+                    color: isLightTheme
+                        ? DsPremiumColors.goldFill.withValues(alpha: 0.24)
+                        : DsPremiumColors.iconSurface(context),
                     shape: BoxShape.circle,
+                    border: isLightTheme
+                        ? Border.all(
+                            color: DsPremiumColors.goldFill.withValues(
+                              alpha: 0.58,
+                            ),
+                          )
+                        : null,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.workspace_premium_rounded,
-                    color: DsBrandColors.proAmber,
+                    color: DsPremiumColors.accent(context),
                     size: 20,
                   ),
                 ),
@@ -272,15 +288,20 @@ class _SubscribedBanner extends StatelessWidget {
                     vertical: DsSpacing.xs,
                   ),
                   decoration: BoxDecoration(
-                    color: colorScheme.surface.withValues(alpha: 0.72),
+                    color: isLightTheme
+                        ? DsPremiumColors.goldFill.withValues(alpha: 0.12)
+                        : colorScheme.surface.withValues(alpha: 0.72),
                     borderRadius: BorderRadius.circular(DsRadii.pill),
                     border: Border.all(
-                      color: colorScheme.outline.withValues(alpha: 0.2),
+                      color: isLightTheme
+                          ? premiumAccent.withValues(alpha: 0.24)
+                          : colorScheme.outline.withValues(alpha: 0.2),
                     ),
                   ),
                   child: Text(
                     context.t.common.manage,
                     style: theme.textTheme.labelMedium?.copyWith(
+                      color: isLightTheme ? premiumAccent : null,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

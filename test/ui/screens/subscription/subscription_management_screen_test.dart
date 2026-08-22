@@ -13,6 +13,7 @@ import 'package:flymap/subscription/flight_unlock_purchase_result.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/subscription/subscription_status.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/subscription/subscription_management_screen.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart';
@@ -32,9 +33,19 @@ void main() {
         status: SubscriptionStatus(
           isPro: true,
           entitlementId: 'Flymap Pro',
+          productId: 'com.flymap.pro.monthly',
           expiresAt: DateTime(2026, 9, 21),
           lastUpdatedAt: DateTime(2026, 8, 17),
         ),
+        products: const [
+          SubscriptionProduct(
+            packageId: 'monthly',
+            productId: 'com.flymap.pro.monthly',
+            title: 'Monthly',
+            priceText: r'$4.99',
+            subscriptionPeriod: 'P1M',
+          ),
+        ],
       ),
     );
     addTearDown(cubit.close);
@@ -42,8 +53,56 @@ void main() {
     await tester.pumpWidget(_testApp(cubit));
     await tester.pump();
 
-    expect(find.text('Your window seat, fully unlocked.'), findsOneWidget);
-    expect(find.textContaining('Current period ends '), findsOneWidget);
+    expect(
+      find.text('Your window-seat explorer, fully unlocked.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('You’re on the monthly subscription plan (ends Sep 21, 2026)'),
+      findsOneWidget,
+    );
+    final hero = find.byKey(const Key('subscription-pro-hero'));
+    final heroTitle = tester.widget<Text>(
+      find.descendant(of: hero, matching: find.text('Flymap Pro')),
+    );
+    final periodLine = tester.widget<Text>(
+      find.descendant(
+        of: hero,
+        matching: find.text(
+          'You’re on the monthly subscription plan (ends Sep 21, 2026)',
+        ),
+      ),
+    );
+    expect(heroTitle.style?.fontWeight, FontWeight.w700);
+    expect(periodLine.style?.fontWeight, FontWeight.w600);
+    expect(
+      tester
+          .widget<Text>(find.text('Included with your Pro plan'))
+          .style
+          ?.fontWeight,
+      FontWeight.w600,
+    );
+    expect(
+      tester
+          .widget<Text>(find.text('Recent real-world flight routes'))
+          .style
+          ?.fontWeight,
+      FontWeight.w600,
+    );
+    final lightHeroDecoration =
+        tester
+                .widget<DecoratedBox>(
+                  find.byKey(const Key('subscription-pro-hero-background')),
+                )
+                .decoration
+            as BoxDecoration;
+    final lightHeroGradient = lightHeroDecoration.gradient! as LinearGradient;
+    expect(lightHeroDecoration.borderRadius, BorderRadius.circular(DsRadii.xl));
+    expect(
+      lightHeroGradient.colors.every((color) => color.computeLuminance() > 0.9),
+      isTrue,
+    );
+    expect(find.textContaining('Current period ends '), findsNothing);
     expect(find.text('Included with your Pro plan'), findsOneWidget);
     expect(find.text('Complete offline stories'), findsNothing);
     await tester.scrollUntilVisible(
@@ -62,12 +121,111 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('renders the active membership in dark theme', (tester) async {
+    final cubit = _TestSubscriptionCubit(
+      SubscriptionState(
+        phase: SubscriptionPhase.pro,
+        status: SubscriptionStatus(
+          isPro: true,
+          entitlementId: 'Flymap Pro',
+          productId: 'flymap_pro',
+          productPlanId: 'weekly-base',
+          expiresAt: DateTime(2026, 9, 21),
+          lastUpdatedAt: DateTime(2026, 8, 17),
+        ),
+        products: const [
+          SubscriptionProduct(
+            packageId: 'monthly',
+            productId: 'flymap_pro',
+            productPlanId: 'monthly-base',
+            title: 'Monthly',
+            priceText: r'$4.99',
+            subscriptionPeriod: 'P1M',
+          ),
+          SubscriptionProduct(
+            packageId: 'weekly',
+            productId: 'flymap_pro',
+            productPlanId: 'weekly-base',
+            title: 'Weekly',
+            priceText: r'$1.99',
+            subscriptionPeriod: 'P1W',
+          ),
+        ],
+      ),
+    );
+    addTearDown(cubit.close);
+
+    await tester.pumpWidget(_testApp(cubit, themeMode: ThemeMode.dark));
+    await tester.pump();
+
+    expect(
+      find.text('Your window-seat explorer, fully unlocked.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('You’re on the weekly subscription plan (ends Sep 21, 2026)'),
+      findsOneWidget,
+    );
+    final darkHeroDecoration =
+        tester
+                .widget<DecoratedBox>(
+                  find.byKey(const Key('subscription-pro-hero-background')),
+                )
+                .decoration
+            as BoxDecoration;
+    final darkHeroGradient = darkHeroDecoration.gradient! as LinearGradient;
+    expect(
+      darkHeroGradient.colors.every((color) => color.computeLuminance() < 0.1),
+      isTrue,
+    );
+    expect(find.text('Included with your Pro plan'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('does not guess the period when the active product is unknown', (
+    tester,
+  ) async {
+    final cubit = _TestSubscriptionCubit(
+      SubscriptionState(
+        phase: SubscriptionPhase.pro,
+        status: SubscriptionStatus(
+          isPro: true,
+          entitlementId: 'Flymap Pro',
+          productId: 'legacy-product',
+          lastUpdatedAt: DateTime(2026, 8, 17),
+        ),
+        products: const [
+          SubscriptionProduct(
+            packageId: 'monthly',
+            productId: 'current-product',
+            title: 'Monthly',
+            priceText: r'$4.99',
+            subscriptionPeriod: 'P1M',
+          ),
+        ],
+      ),
+    );
+    addTearDown(cubit.close);
+
+    await tester.pumpWidget(_testApp(cubit));
+    await tester.pump();
+
+    expect(find.text('You’re on the monthly subscription plan.'), findsNothing);
+    expect(find.text('Active subscription'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
 
-Widget _testApp(SubscriptionCubit cubit) {
+Widget _testApp(
+  SubscriptionCubit cubit, {
+  ThemeMode themeMode = ThemeMode.light,
+}) {
   return TranslationProvider(
     child: MaterialApp(
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
       locale: AppLocale.en.flutterLocale,
       supportedLocales: AppLocaleUtils.supportedLocales,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,

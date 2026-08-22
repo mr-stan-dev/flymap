@@ -31,7 +31,7 @@ class RouteOverviewProgressTimeline extends StatelessWidget {
     final safeCount = itemCount < 2 ? 2 : itemCount;
     final safeSelected = selectedIndex.clamp(0, safeCount - 1);
     final timelineBlue = AppColoursCommon.brandBlue;
-    final premiumGold = DsBrandColors.proAmber;
+    final premiumGold = DsPremiumColors.accent(context);
     final currentGreen = AppColoursCommon.success;
     final futureColor = Theme.of(
       context,

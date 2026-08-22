@@ -6,12 +6,16 @@ class SubscriptionStatus extends Equatable {
     required this.entitlementId,
     required this.lastUpdatedAt,
     this.expiresAt,
+    this.productId,
+    this.productPlanId,
     this.error,
   });
 
   final bool isPro;
   final String entitlementId;
   final DateTime? expiresAt;
+  final String? productId;
+  final String? productPlanId;
   final DateTime lastUpdatedAt;
   final String? error;
 
@@ -19,6 +23,8 @@ class SubscriptionStatus extends Equatable {
     bool? isPro,
     String? entitlementId,
     DateTime? expiresAt,
+    String? productId,
+    String? productPlanId,
     DateTime? lastUpdatedAt,
     String? error,
     bool clearError = false,
@@ -27,6 +33,8 @@ class SubscriptionStatus extends Equatable {
       isPro: isPro ?? this.isPro,
       entitlementId: entitlementId ?? this.entitlementId,
       expiresAt: expiresAt ?? this.expiresAt,
+      productId: productId ?? this.productId,
+      productPlanId: productPlanId ?? this.productPlanId,
       lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
       error: clearError ? null : error ?? this.error,
     );
@@ -37,6 +45,8 @@ class SubscriptionStatus extends Equatable {
     isPro,
     entitlementId,
     expiresAt,
+    productId,
+    productPlanId,
     lastUpdatedAt,
     error,
   ];

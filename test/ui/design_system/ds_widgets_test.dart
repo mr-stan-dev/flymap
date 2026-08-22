@@ -117,6 +117,32 @@ void main() {
     expect(find.text('Download'), findsOneWidget);
   });
 
+  testWidgets('PremiumButton uses accessible gold in both themes', (
+    tester,
+  ) async {
+    for (final theme in <ThemeData>[AppTheme.lightTheme, AppTheme.darkTheme]) {
+      await pumpWithTheme(
+        tester,
+        theme: theme,
+        child: const PremiumButton(label: 'Upgrade', onPressed: _noop),
+      );
+
+      final button = tester.widget<FilledButton>(find.byType(FilledButton));
+      expect(
+        button.style?.backgroundColor?.resolve(<WidgetState>{}),
+        DsPremiumColors.goldFill,
+      );
+      expect(
+        button.style?.foregroundColor?.resolve(<WidgetState>{}),
+        DsPremiumColors.onGold,
+      );
+      expect(
+        tester.widget<Text>(find.text('Upgrade')).style?.color,
+        DsPremiumColors.onGold,
+      );
+    }
+  });
+
   testWidgets('compact action buttons keep content visible', (tester) async {
     await pumpWithTheme(
       tester,

@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
+import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
+import 'package:flymap/ui/screens/settings/date_display_format_context.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_cubit.dart';
 import 'package:flymap/ui/screens/subscription/viewmodel/subscription_state.dart';
 import 'package:flymap/ui/widgets/premium_surface_effects.dart';
+import 'package:flymap/utils/travel_date_format_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SubscriptionManagementScreen extends StatefulWidget {
@@ -20,6 +23,7 @@ class SubscriptionManagementScreen extends StatefulWidget {
 
 class _SubscriptionManagementScreenState
     extends State<SubscriptionManagementScreen> {
+  static const _sectionTitleStyle = TextStyle(fontWeight: FontWeight.w600);
   static const String _supportEmail = 'team@apptractor.dev';
   static final Uri _iosSubscriptionsUri = Uri.parse(
     'https://apps.apple.com/account/subscriptions',
@@ -37,7 +41,11 @@ class _SubscriptionManagementScreenState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      unawaited(context.read<SubscriptionCubit>().refresh());
+      final cubit = context.read<SubscriptionCubit>();
+      unawaited(cubit.refresh());
+      if (cubit.state.products.isEmpty && !cubit.state.isProductsLoading) {
+        unawaited(cubit.loadProducts());
+      }
     });
   }
 
@@ -57,6 +65,8 @@ class _SubscriptionManagementScreenState
             }
 
             final isPro = _isProActive(state);
+            final billingPeriod = _resolveBillingPeriod(state);
+            final formattedDate = _formatDate(context, state.status?.expiresAt);
             return RefreshIndicator(
               onRefresh: context.read<SubscriptionCubit>().refresh,
               child: ListView(
@@ -69,9 +79,10 @@ class _SubscriptionManagementScreenState
                 children: [
                   if (isPro)
                     _ProMembershipHero(
-                      formattedDate: _formatDate(
+                      membershipPeriodDescription: _membershipPeriodDescription(
                         context,
-                        state.status?.expiresAt,
+                        billingPeriod,
+                        formattedDate,
                       ),
                     )
                   else
@@ -110,12 +121,92 @@ class _SubscriptionManagementScreenState
 
   String? _formatDate(BuildContext context, DateTime? value) {
     if (value == null) return null;
-    return MaterialLocalizations.of(context).formatMediumDate(value.toLocal());
+    return TravelDateFormatUtils.formatFullDate(
+      value.toLocal(),
+      context.dateDisplayFormat,
+    );
+  }
+
+  _BillingPeriod? _resolveBillingPeriod(SubscriptionState state) {
+    final activeProduct = _findActiveProduct(state);
+    if (activeProduct == null) return null;
+
+    final normalizedPeriod = activeProduct.subscriptionPeriod
+        ?.trim()
+        .toUpperCase();
+    switch (normalizedPeriod) {
+      case 'P1W':
+        return _BillingPeriod.weekly;
+      case 'P1M':
+        return _BillingPeriod.monthly;
+      case 'P1Y':
+        return _BillingPeriod.yearly;
+    }
+
+    // Package identifiers are the fallback for stores that omit the ISO
+    // subscription period from their product metadata.
+    final packageId = activeProduct.packageId.trim().toLowerCase();
+    if (packageId.contains('week')) return _BillingPeriod.weekly;
+    if (packageId.contains('month')) return _BillingPeriod.monthly;
+    if (packageId.contains('year') || packageId.contains('annual')) {
+      return _BillingPeriod.yearly;
+    }
+    return null;
+  }
+
+  SubscriptionProduct? _findActiveProduct(SubscriptionState state) {
+    final productId = state.status?.productId?.trim();
+    if (productId == null || productId.isEmpty) return null;
+
+    final matchingProducts = state.products
+        .where((product) => product.productId == productId)
+        .toList(growable: false);
+    if (matchingProducts.isEmpty) return null;
+
+    final productPlanId = state.status?.productPlanId?.trim();
+    if (productPlanId != null && productPlanId.isNotEmpty) {
+      for (final product in matchingProducts) {
+        if (product.productPlanId == productPlanId) return product;
+      }
+    }
+    return matchingProducts.first;
+  }
+
+  String _membershipPeriodDescription(
+    BuildContext context,
+    _BillingPeriod? billingPeriod,
+    String? formattedDate,
+  ) {
+    if (formattedDate != null) {
+      return switch (billingPeriod) {
+        _BillingPeriod.weekly =>
+          context.t.subscription.weeklySubscriptionPlanEnds(
+            date: formattedDate,
+          ),
+        _BillingPeriod.monthly =>
+          context.t.subscription.monthlySubscriptionPlanEnds(
+            date: formattedDate,
+          ),
+        _BillingPeriod.yearly =>
+          context.t.subscription.yearlySubscriptionPlanEnds(
+            date: formattedDate,
+          ),
+        null => context.t.subscription.currentPeriodEnds(date: formattedDate),
+      };
+    }
+
+    return switch (billingPeriod) {
+      _BillingPeriod.weekly => context.t.subscription.weeklySubscriptionPlan,
+      _BillingPeriod.monthly => context.t.subscription.monthlySubscriptionPlan,
+      _BillingPeriod.yearly => context.t.subscription.yearlySubscriptionPlan,
+      null => context.t.subscription.activeSubscription,
+    };
   }
 
   Widget _buildFreeStatusCard(BuildContext context) {
     return SectionCard(
       title: context.t.subscription.cardTitle,
+      titleStyle: _sectionTitleStyle,
       trailing: StatusChip(
         label: context.t.subscription.notActive,
         tone: StatusChipTone.neutral,
@@ -175,6 +266,7 @@ class _SubscriptionManagementScreenState
       title: isPro
           ? context.t.subscription.proFeaturesIncludedTitle
           : context.t.subscription.proFeaturesTitle,
+      titleStyle: _sectionTitleStyle,
       child: Column(
         children: [
           for (var index = 0; index < benefits.length; index++) ...[
@@ -190,6 +282,7 @@ class _SubscriptionManagementScreenState
   Widget _buildFlightPassesCard(BuildContext context, SubscriptionState state) {
     return SectionCard(
       title: context.t.subscription.flightPassesTitle,
+      titleStyle: _sectionTitleStyle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -214,6 +307,7 @@ class _SubscriptionManagementScreenState
   Widget _buildPlanAndBillingCard(BuildContext context) {
     return SectionCard(
       title: context.t.subscription.planAndBillingTitle,
+      titleStyle: _sectionTitleStyle,
       child: Column(
         children: [
           _MetaRow(
@@ -264,6 +358,7 @@ class _SubscriptionManagementScreenState
   Widget _buildPurchaseHelpCard(BuildContext context) {
     return SectionCard(
       title: context.t.subscription.purchaseHelpTitle,
+      titleStyle: _sectionTitleStyle,
       child: Column(
         children: [
           TertiaryButton(
@@ -384,34 +479,48 @@ class _SubscriptionManagementScreenState
 }
 
 class _ProMembershipHero extends StatelessWidget {
-  const _ProMembershipHero({required this.formattedDate});
+  const _ProMembershipHero({required this.membershipPeriodDescription});
 
-  final String? formattedDate;
+  final String membershipPeriodDescription;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final radius = BorderRadius.circular(DsRadii.xl);
     final isLightTheme = theme.brightness == Brightness.light;
+    final primaryTextColor = isLightTheme
+        ? colorScheme.onSurface
+        : Colors.white;
+    final secondaryTextColor = isLightTheme
+        ? colorScheme.onSurfaceVariant
+        : Colors.white.withValues(alpha: 0.88);
 
     return ClipRRect(
+      key: const Key('subscription-pro-hero'),
       borderRadius: radius,
       child: Stack(
         children: [
           Positioned.fill(
             child: DecoratedBox(
+              key: const Key('subscription-pro-hero-background'),
               decoration: BoxDecoration(
+                borderRadius: radius,
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: PremiumSurfaceGradients.pro(
+                  colors: PremiumSurfaceGradients.membershipHero(
                     isLightTheme: isLightTheme,
                   ),
                 ),
+                border: isLightTheme
+                    ? Border.all(color: DsPremiumColors.lightBorder)
+                    : null,
               ),
             ),
           ),
-          const Positioned.fill(child: PremiumDiagonalStripesOverlay()),
+          if (!isLightTheme)
+            const Positioned.fill(child: PremiumDiagonalStripesOverlay()),
           Positioned(
             right: -18,
             bottom: -28,
@@ -420,13 +529,16 @@ class _ProMembershipHero extends StatelessWidget {
               child: Icon(
                 Icons.flight_rounded,
                 size: 154,
-                color: Colors.white.withValues(alpha: 0.09),
+                color: isLightTheme
+                    ? colorScheme.primary.withValues(alpha: 0.055)
+                    : Colors.white.withValues(alpha: 0.09),
               ),
             ),
           ),
-          const Positioned.fill(
-            child: IgnorePointer(child: PremiumAnimatedShimmerOverlay()),
-          ),
+          if (!isLightTheme)
+            const Positioned.fill(
+              child: IgnorePointer(child: PremiumAnimatedShimmerOverlay()),
+            ),
           Padding(
             padding: const EdgeInsets.all(DsSpacing.lg),
             child: Column(
@@ -438,15 +550,15 @@ class _ProMembershipHero extends StatelessWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.16),
+                        color: DsPremiumColors.goldFill,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.32),
+                          color: DsPremiumColors.goldHighlight,
                         ),
                       ),
                       child: const Icon(
                         Icons.workspace_premium_rounded,
-                        color: Colors.white,
+                        color: DsPremiumColors.onGold,
                       ),
                     ),
                     const Spacer(),
@@ -460,28 +572,24 @@ class _ProMembershipHero extends StatelessWidget {
                 Text(
                   context.t.subscription.cardTitle,
                   style: theme.textTheme.headlineMedium?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.8,
+                    color: primaryTextColor,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.45,
                   ),
                 ),
                 const SizedBox(height: DsSpacing.xxs),
                 Text(
                   context.t.subscription.proHeroSubtitle,
                   style: theme.textTheme.bodyLarge?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.88),
+                    color: secondaryTextColor,
                   ),
                 ),
                 const SizedBox(height: DsSpacing.lg),
                 Text(
-                  formattedDate == null
-                      ? context.t.subscription.activeSubscription
-                      : context.t.subscription.currentPeriodEnds(
-                          date: formattedDate!,
-                        ),
+                  membershipPeriodDescription,
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
+                    color: primaryTextColor,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -493,6 +601,8 @@ class _ProMembershipHero extends StatelessWidget {
   }
 }
 
+enum _BillingPeriod { weekly, monthly, yearly }
+
 class _HeroStatusBadge extends StatelessWidget {
   const _HeroStatusBadge({required this.label, required this.icon});
 
@@ -501,26 +611,36 @@ class _HeroStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLightTheme = Theme.of(context).brightness == Brightness.light;
+    final foregroundColor = isLightTheme
+        ? DsPremiumColors.lightAccent
+        : Colors.white;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: DsSpacing.sm,
         vertical: DsSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.16),
+        color: isLightTheme
+            ? DsPremiumColors.goldFill.withValues(alpha: 0.16)
+            : Colors.white.withValues(alpha: 0.16),
         borderRadius: BorderRadius.circular(DsRadii.pill),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.32)),
+        border: Border.all(
+          color: isLightTheme
+              ? DsPremiumColors.lightBorder
+              : Colors.white.withValues(alpha: 0.32),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 15),
+          Icon(icon, color: foregroundColor, size: 15),
           const SizedBox(width: 5),
           Text(
             label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
+              color: foregroundColor,
+              fontWeight: FontWeight.w700,
               letterSpacing: 0.45,
             ),
           ),
@@ -555,13 +675,9 @@ class _ProFeatureRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(DsSpacing.sm),
       decoration: BoxDecoration(
-        color: DsBrandColors.proAmber.withValues(
-          alpha: theme.brightness == Brightness.light ? 0.07 : 0.12,
-        ),
+        color: DsPremiumColors.subtleSurface(context),
         borderRadius: BorderRadius.circular(DsRadii.md),
-        border: Border.all(
-          color: DsBrandColors.proAmber.withValues(alpha: 0.18),
-        ),
+        border: Border.all(color: DsPremiumColors.border(context)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -570,10 +686,14 @@ class _ProFeatureRow extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: DsBrandColors.proAmber.withValues(alpha: 0.16),
+              color: DsPremiumColors.iconSurface(context),
               shape: BoxShape.circle,
             ),
-            child: Icon(benefit.icon, color: DsBrandColors.proAmber, size: 19),
+            child: Icon(
+              benefit.icon,
+              color: DsPremiumColors.accent(context),
+              size: 19,
+            ),
           ),
           const SizedBox(width: DsSpacing.sm),
           Expanded(
@@ -583,7 +703,7 @@ class _ProFeatureRow extends StatelessWidget {
                 Text(
                   benefit.title,
                   style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 2),

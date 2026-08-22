@@ -119,10 +119,10 @@ class _HomeFlightCardMapHeaderState extends State<HomeFlightCardMapHeader> {
                 if (showProInline && widget.showProCrown)
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.workspace_premium_rounded,
                         size: 18,
-                        color: DsBrandColors.proAmber,
+                        color: DsPremiumColors.accent(context),
                       ),
                       const SizedBox(width: 6),
                       Expanded(child: _title(context)),
@@ -314,10 +314,10 @@ class _ProBadge extends StatelessWidget {
         color: Colors.black.withValues(alpha: _headerBadgeScrimAlpha),
         shape: BoxShape.circle,
       ),
-      child: const Icon(
+      child: Icon(
         Icons.workspace_premium_rounded,
         size: 26,
-        color: DsBrandColors.proAmber,
+        color: DsPremiumColors.darkAccent,
       ),
     );
   }

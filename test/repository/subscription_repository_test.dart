@@ -42,6 +42,8 @@ void main() {
         'pro': RevenueCatEntitlementSnapshot(
           isActive: true,
           expirationDate: expiration,
+          productId: 'flymap_pro',
+          productPlanId: 'monthly-base',
         ),
       });
 
@@ -51,6 +53,8 @@ void main() {
       expect(status.isPro, isTrue);
       expect(status.entitlementId, 'pro');
       expect(status.expiresAt, expiration);
+      expect(status.productId, 'flymap_pro');
+      expect(status.productPlanId, 'monthly-base');
       expect(status.error, isNull);
     });
 
@@ -424,6 +428,7 @@ void main() {
           title: 'Yearly',
           priceText: r'$39.99',
           description: 'yearly plan',
+          subscriptionPeriod: 'P1Y',
         ),
         RevenueCatProductSnapshot(
           packageId: 'weekly',
@@ -431,6 +436,7 @@ void main() {
           title: 'Weekly',
           priceText: r'$2.99',
           description: 'weekly plan',
+          subscriptionPeriod: 'P1W',
         ),
         RevenueCatProductSnapshot(
           packageId: 'monthly',
@@ -438,6 +444,8 @@ void main() {
           title: 'Monthly',
           priceText: r'$9.99',
           description: 'monthly plan',
+          productPlanId: 'monthly-base',
+          subscriptionPeriod: 'P1M',
         ),
       ];
 
@@ -445,6 +453,8 @@ void main() {
       final products = await repository.getProducts();
 
       expect(products.map((e) => e.packageId), ['weekly', 'monthly', 'yearly']);
+      expect(products.map((e) => e.subscriptionPeriod), ['P1W', 'P1M', 'P1Y']);
+      expect(products[1].productPlanId, 'monthly-base');
     });
 
     test('persists last successful status to cache', () async {

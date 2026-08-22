@@ -255,6 +255,8 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
             title: found.title,
             priceText: found.priceText,
             description: found.description,
+            productPlanId: found.productPlanId,
+            subscriptionPeriod: found.subscriptionPeriod,
           ),
         );
       }
@@ -269,6 +271,8 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
             title: item.title,
             priceText: item.priceText,
             description: item.description,
+            productPlanId: item.productPlanId,
+            subscriptionPeriod: item.subscriptionPeriod,
           ),
         );
       }
@@ -380,6 +384,8 @@ class RevenueCatSubscriptionRepository implements SubscriptionRepository {
       isPro: isPro,
       entitlementId: _config.entitlementId,
       expiresAt: entitlement?.expirationDate,
+      productId: entitlement?.productId,
+      productPlanId: entitlement?.productPlanId,
       lastUpdatedAt: DateTime.now(),
     );
   }

@@ -13,6 +13,7 @@ class SectionCard extends StatelessWidget {
     required this.child,
     this.title,
     this.trailing,
+    this.titleStyle,
     this.expandChild = false,
     this.padding = const EdgeInsets.all(DsSpacing.md),
     super.key,
@@ -20,6 +21,7 @@ class SectionCard extends StatelessWidget {
 
   final String? title;
   final Widget? trailing;
+  final TextStyle? titleStyle;
   final Widget child;
   final bool expandChild;
   final EdgeInsetsGeometry padding;
@@ -38,9 +40,9 @@ class SectionCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       title!,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700)
+                          .merge(titleStyle),
                     ),
                   ),
                   if (trailing != null) trailing!,

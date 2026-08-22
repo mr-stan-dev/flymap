@@ -11,13 +11,22 @@ class RevenueCatEntitlementSnapshot extends Equatable {
   const RevenueCatEntitlementSnapshot({
     required this.isActive,
     this.expirationDate,
+    this.productId,
+    this.productPlanId,
   });
 
   final bool isActive;
   final DateTime? expirationDate;
+  final String? productId;
+  final String? productPlanId;
 
   @override
-  List<Object?> get props => [isActive, expirationDate];
+  List<Object?> get props => [
+    isActive,
+    expirationDate,
+    productId,
+    productPlanId,
+  ];
 }
 
 class RevenueCatCustomerSnapshot extends Equatable {
@@ -36,6 +45,8 @@ class RevenueCatProductSnapshot extends Equatable {
     required this.title,
     required this.priceText,
     required this.description,
+    this.productPlanId,
+    this.subscriptionPeriod,
   });
 
   final String packageId;
@@ -43,6 +54,8 @@ class RevenueCatProductSnapshot extends Equatable {
   final String title;
   final String priceText;
   final String description;
+  final String? productPlanId;
+  final String? subscriptionPeriod;
 
   @override
   List<Object?> get props => [
@@ -51,6 +64,8 @@ class RevenueCatProductSnapshot extends Equatable {
     title,
     priceText,
     description,
+    productPlanId,
+    subscriptionPeriod,
   ];
 }
 
@@ -194,6 +209,10 @@ class PurchasesRevenueCatClient implements RevenueCatClient {
         title: product.title,
         priceText: product.priceString,
         description: product.description,
+        productPlanId: product.defaultOption?.productId,
+        subscriptionPeriod:
+            product.subscriptionPeriod ??
+            product.defaultOption?.billingPeriod?.iso8601,
       );
     }).toList();
   }
@@ -307,6 +326,8 @@ class PurchasesRevenueCatClient implements RevenueCatClient {
       entitlements[entry.key] = RevenueCatEntitlementSnapshot(
         isActive: entry.value.isActive,
         expirationDate: _parseDate(entry.value.expirationDate),
+        productId: entry.value.productIdentifier,
+        productPlanId: entry.value.productPlanIdentifier,
       );
     }
 

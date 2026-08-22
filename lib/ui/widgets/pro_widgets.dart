@@ -3,13 +3,13 @@ import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/tokens/ds_brand_colors.dart';
 import 'package:flymap/ui/widgets/premium_surface_effects.dart';
 
-enum ProBadgeVariant { amber, premiumBlueStripes }
+enum ProBadgeVariant { gold, premiumNavy }
 
 class ProBadge extends StatelessWidget {
   const ProBadge({
     this.label = 'PRO',
     this.compact = false,
-    this.variant = ProBadgeVariant.amber,
+    this.variant = ProBadgeVariant.gold,
     super.key,
   });
 
@@ -23,16 +23,15 @@ class ProBadge extends StatelessWidget {
       horizontal: compact ? 8 : 10,
       vertical: compact ? 3 : 4,
     );
-    final textStyle = Theme.of(context).textTheme.labelSmall?.copyWith(
-      color: Colors.white,
+    final baseTextStyle = Theme.of(context).textTheme.labelSmall?.copyWith(
       fontWeight: FontWeight.w700,
       letterSpacing: 0.35,
     );
     final borderRadius = BorderRadius.circular(999);
 
-    if (variant == ProBadgeVariant.premiumBlueStripes) {
+    if (variant == ProBadgeVariant.premiumNavy) {
       final isLightTheme = Theme.of(context).brightness == Brightness.light;
-      final gradientColors = PremiumSurfaceGradients.free(
+      final gradientColors = PremiumSurfaceGradients.pro(
         isLightTheme: isLightTheme,
       );
       return ClipRRect(
@@ -58,7 +57,10 @@ class ProBadge extends StatelessWidget {
               ),
               Padding(
                 padding: padding,
-                child: Text(label, style: textStyle),
+                child: Text(
+                  label,
+                  style: baseTextStyle?.copyWith(color: Colors.white),
+                ),
               ),
             ],
           ),
@@ -69,12 +71,12 @@ class ProBadge extends StatelessWidget {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: DsBrandColors.proAmber,
+        color: DsPremiumColors.goldFill,
         borderRadius: borderRadius,
       ),
       child: Text(
         label,
-        style: textStyle?.copyWith(color: DsBrandColors.onProAmber),
+        style: baseTextStyle?.copyWith(color: DsPremiumColors.onGold),
       ),
     );
   }
@@ -88,6 +90,7 @@ class ProGradientStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = DsPremiumColors.accent(context);
     return Container(
       height: height,
       decoration: BoxDecoration(
@@ -96,9 +99,9 @@ class ProGradientStrip extends StatelessWidget {
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [
-            DsBrandColors.proAmber.withValues(alpha: 0.08),
-            DsBrandColors.proAmber.withValues(alpha: 0.45),
-            DsBrandColors.proAmber.withValues(alpha: 0.08),
+            accent.withValues(alpha: 0.08),
+            accent.withValues(alpha: 0.55),
+            accent.withValues(alpha: 0.08),
           ],
         ),
       ),
@@ -123,9 +126,9 @@ class ProAppBarInfoButton extends StatelessWidget {
     return IconButton(
       tooltip: tooltip,
       onPressed: () => _showDialog(context),
-      icon: const Icon(
+      icon: Icon(
         Icons.workspace_premium_rounded,
-        color: DsBrandColors.proAmber,
+        color: DsPremiumColors.accent(context),
       ),
     );
   }
@@ -164,13 +167,12 @@ class ProActiveBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final accent = DsPremiumColors.accent(context);
     return Container(
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
+        color: DsPremiumColors.subtleSurface(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: DsBrandColors.proAmber.withValues(alpha: 0.4),
-        ),
+        border: Border.all(color: DsPremiumColors.border(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,7 +186,7 @@ class ProActiveBlock extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(icon, size: 18, color: DsBrandColors.proAmber),
+                Icon(icon, size: 18, color: accent),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
@@ -193,7 +195,7 @@ class ProActiveBlock extends StatelessWidget {
                       Text(
                         title,
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: DsBrandColors.proAmber,
+                          color: accent,
                           fontWeight: FontWeight.w700,
                         ),
                       ),

@@ -199,8 +199,8 @@ class PremiumButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final enabled = onPressed != null && !isLoading;
     final contentColor = enabled
-        ? DsBrandColors.onProAmber
-        : DsBrandColors.onProAmber.withValues(alpha: 0.7);
+        ? DsPremiumColors.onGold
+        : DsPremiumColors.onGold.withValues(alpha: 0.7);
     final content = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -232,9 +232,9 @@ class PremiumButton extends StatelessWidget {
         children: [
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: DsBrandColors.proAmber,
-              foregroundColor: DsBrandColors.onProAmber,
-              shadowColor: DsBrandColors.proAmber.withValues(alpha: 0.45),
+              backgroundColor: DsPremiumColors.goldFill,
+              foregroundColor: DsPremiumColors.onGold,
+              shadowColor: DsPremiumColors.lightAccent.withValues(alpha: 0.3),
               elevation: enabled ? 6 : 0,
               shape: RoundedRectangleBorder(
                 borderRadius: borderRadius,

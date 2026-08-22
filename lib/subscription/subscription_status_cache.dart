@@ -40,6 +40,8 @@ class SharedPrefsSubscriptionStatusCache implements SubscriptionStatusCache {
         isPro: decoded['isPro'] == true,
         entitlementId: entitlementId,
         expiresAt: expiresAt,
+        productId: decoded['productId'] as String?,
+        productPlanId: decoded['productPlanId'] as String?,
         lastUpdatedAt: lastUpdatedAt,
       );
     } catch (e) {
@@ -56,6 +58,8 @@ class SharedPrefsSubscriptionStatusCache implements SubscriptionStatusCache {
         'isPro': status.isPro,
         'entitlementId': status.entitlementId,
         'expiresAt': status.expiresAt?.toUtc().toIso8601String(),
+        'productId': status.productId,
+        'productPlanId': status.productPlanId,
         'lastUpdatedAt': status.lastUpdatedAt.toUtc().toIso8601String(),
       });
       await prefs.setString(_cacheKey, payload);

@@ -457,7 +457,7 @@ class _RouteTimelineRow extends StatelessWidget {
 
     final dot = isPremiumGateRow
         ? _TimelinePremiumGateMarker(
-            borderColor: DsBrandColors.proAmber,
+            borderColor: DsPremiumColors.accent(context),
             fillColor: Theme.of(context).colorScheme.surface,
           )
         : pointState == _RouteTimelinePointState.current

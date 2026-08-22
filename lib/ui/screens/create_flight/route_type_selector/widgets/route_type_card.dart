@@ -138,10 +138,7 @@ class RouteTypeCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [
-            DsBrandColors.proAmber,
-            Color(0xFFFFB74D), // Lighter amber for gradient
-          ],
+          colors: [DsPremiumColors.goldFill, DsPremiumColors.goldHighlight],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -150,12 +147,12 @@ class RouteTypeCard extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) Icon(icon, color: Colors.white, size: 12),
+          if (icon != null) Icon(icon, color: DsPremiumColors.onGold, size: 12),
           const SizedBox(width: 4),
           Text(
             text,
             style: context.textTheme.caption14Regular.copyWith(
-              color: Colors.white,
+              color: DsPremiumColors.onGold,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
             ),

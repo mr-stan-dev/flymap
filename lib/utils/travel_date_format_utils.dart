@@ -24,6 +24,13 @@ class TravelDateFormatUtils {
     return DateFormat(pattern, _locale).format(date);
   }
 
+  /// "Aug 21, 2027" (US) / "21 Aug 2027" (international). Month names
+  /// follow the app language; their position follows the user's date setting.
+  static String formatFullDate(DateTime date, DateDisplayFormat format) {
+    final pattern = format == DateDisplayFormat.us ? 'MMM d, y' : 'd MMM y';
+    return DateFormat(pattern, _locale).format(date);
+  }
+
   /// "09:15" — 24h wall-clock time.
   static String formatTime(DateTime time) {
     return DateFormat.Hm(_locale).format(time);

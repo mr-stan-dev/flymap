@@ -165,7 +165,7 @@ class _LaurelFlightCount extends StatelessWidget {
                       count,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.displaySmall?.copyWith(
-                        color: DsBrandColors.proAmber,
+                        color: DsPremiumColors.accent(context),
                         fontWeight: FontWeight.w900,
                         letterSpacing: -1.2,
                       ),
@@ -270,10 +270,10 @@ class _TestimonialCard extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           for (var star = 0; star < rating!; star++)
-                            const Icon(
+                            Icon(
                               Icons.star_rounded,
                               size: 18,
-                              color: DsBrandColors.proAmber,
+                              color: DsPremiumColors.accent(context),
                             ),
                         ],
                       ),

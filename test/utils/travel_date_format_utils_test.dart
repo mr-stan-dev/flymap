@@ -33,6 +33,27 @@ void main() {
     });
   });
 
+  group('TravelDateFormatUtils.formatFullDate', () {
+    final expiry = DateTime(2027, 8, 21);
+
+    test('US setting puts the month before the day', () {
+      expect(
+        TravelDateFormatUtils.formatFullDate(expiry, DateDisplayFormat.us),
+        'Aug 21, 2027',
+      );
+    });
+
+    test('international setting puts the day before the month', () {
+      expect(
+        TravelDateFormatUtils.formatFullDate(
+          expiry,
+          DateDisplayFormat.international,
+        ),
+        '21 Aug 2027',
+      );
+    });
+  });
+
   group('TravelDateFormatUtils.formatDateWithOptionalTime', () {
     test('appends the time when known, honouring the date order', () {
       expect(

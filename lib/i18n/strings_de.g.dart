@@ -382,7 +382,13 @@ class _TranslationsSubscriptionDe extends TranslationsSubscriptionEn {
 	@override String get flightUnlockPurchaseFailed => 'Kauf der Flug-Freischaltung fehlgeschlagen. Bitte versuche es erneut.';
 	@override String get proFeaturesTitle => 'Was Flymap Pro freischaltet';
 	@override String get proFeaturesIncludedTitle => 'In deinem Pro-Tarif enthalten';
-	@override String get proHeroSubtitle => 'Dein Fensterplatz, vollständig freigeschaltet.';
+	@override String get proHeroSubtitle => 'Dein Entdecker für den Fensterplatz – vollständig freigeschaltet.';
+	@override String get weeklySubscriptionPlan => 'Du nutzt das Wochenabo.';
+	@override String get monthlySubscriptionPlan => 'Du nutzt das Monatsabo.';
+	@override String get yearlySubscriptionPlan => 'Du nutzt das Jahresabo.';
+	@override String weeklySubscriptionPlanEnds({required Object date}) => 'Du nutzt das Wochenabo (endet am ${date})';
+	@override String monthlySubscriptionPlanEnds({required Object date}) => 'Du nutzt das Monatsabo (endet am ${date})';
+	@override String yearlySubscriptionPlanEnds({required Object date}) => 'Du nutzt das Jahresabo (endet am ${date})';
 	@override String get proFeatureRoutesTitle => 'Aktuelle reale Flugrouten';
 	@override String get proFeatureRoutesBody => 'Folge einer kürzlich aufgezeichneten Route statt eines ungefähren Bogens.';
 	@override String get proFeatureMapsTitle => 'Detailliertere Karten, offline verfügbar';
@@ -2046,7 +2052,13 @@ extension on TranslationsDe {
 			'subscription.flightUnlockPurchaseFailed' => 'Kauf der Flug-Freischaltung fehlgeschlagen. Bitte versuche es erneut.',
 			'subscription.proFeaturesTitle' => 'Was Flymap Pro freischaltet',
 			'subscription.proFeaturesIncludedTitle' => 'In deinem Pro-Tarif enthalten',
-			'subscription.proHeroSubtitle' => 'Dein Fensterplatz, vollständig freigeschaltet.',
+			'subscription.proHeroSubtitle' => 'Dein Entdecker für den Fensterplatz – vollständig freigeschaltet.',
+			'subscription.weeklySubscriptionPlan' => 'Du nutzt das Wochenabo.',
+			'subscription.monthlySubscriptionPlan' => 'Du nutzt das Monatsabo.',
+			'subscription.yearlySubscriptionPlan' => 'Du nutzt das Jahresabo.',
+			'subscription.weeklySubscriptionPlanEnds' => ({required Object date}) => 'Du nutzt das Wochenabo (endet am ${date})',
+			'subscription.monthlySubscriptionPlanEnds' => ({required Object date}) => 'Du nutzt das Monatsabo (endet am ${date})',
+			'subscription.yearlySubscriptionPlanEnds' => ({required Object date}) => 'Du nutzt das Jahresabo (endet am ${date})',
 			'subscription.proFeatureRoutesTitle' => 'Aktuelle reale Flugrouten',
 			'subscription.proFeatureRoutesBody' => 'Folge einer kürzlich aufgezeichneten Route statt eines ungefähren Bogens.',
 			'subscription.proFeatureMapsTitle' => 'Detailliertere Karten, offline verfügbar',
@@ -2232,14 +2244,14 @@ extension on TranslationsDe {
 			'createFlight.mapPreview.estimatedMapSize' => ({required Object size}) => 'Geschätzte Kartengröße: ${size}',
 			'createFlight.mapPreview.upgradeToPro' => 'Zu Pro upgraden',
 			'createFlight.mapPreview.basicHint' => 'Einfache Kartendetails mit begrenzten Orten',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.mapPreview.proGateHint' => 'Upgrade auf Pro für eine detaillierte Karte mit allen Orten',
 			'createFlight.mapPreview.proHint' => ({required Object count}) => 'Detaillierte Offline-Karte mit ${count} Orten',
 			'createFlight.mapPreview.optionsTitle' => 'Ungefähre Route',
 			'createFlight.mapPreview.optionsBody' => 'Die Route ist ungefähr — der tatsächliche Flugweg kann abweichen, besonders bei Langstreckenflügen.',
 			'createFlight.overview.routeNotReady' => 'Die Route ist noch nicht bereit.',
 			'createFlight.overview.proPoiUpsell' => 'Der Gratis-Tarif enthält eine einfache Karte und begrenzte Orte',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.overview.routeNoteTooltip' => 'Hinweis zur Route',
 			'createFlight.overview.routeNoteTitle' => 'Ungefähre Route',
 			'createFlight.overview.routeNoteBody' => 'Die Route ist ungefähr — der tatsächliche Flugweg kann abweichen, besonders bei Langstreckenflügen.',
@@ -2746,14 +2758,14 @@ extension on TranslationsDe {
 			'countries.AM' => 'Armenien',
 			'countries.AO' => 'Angola',
 			'countries.AR' => 'Argentinien',
+			_ => null,
+		} ?? switch (path) {
 			'countries.AT' => 'Österreich',
 			'countries.AU' => 'Australien',
 			'countries.AZ' => 'Aserbaidschan',
 			'countries.BA' => 'Bosnien und Herzegowina',
 			'countries.BB' => 'Barbados',
 			'countries.BD' => 'Bangladesch',
-			_ => null,
-		} ?? switch (path) {
 			'countries.BE' => 'Belgien',
 			'countries.BF' => 'Burkina Faso',
 			'countries.BG' => 'Bulgarien',
