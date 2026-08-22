@@ -40,11 +40,13 @@ class _FakeWeatherForecastProvider implements WeatherForecastProvider {
     ],
     this.unavailable = false,
     this.sixHourlyClouds = false,
+    this.valuesVaryByHour = false,
   });
 
   final List<int> hours;
   final bool unavailable;
   final bool sixHourlyClouds;
+  final bool valuesVaryByHour;
   int callCount = 0;
   int requestCount = 0;
 
@@ -73,9 +75,9 @@ class _FakeWeatherForecastProvider implements WeatherForecastProvider {
       for (final hour in hours)
         WeatherForecastPoint(
           timeUtc: date.add(Duration(hours: hour)),
-          temperatureC: 20,
+          temperatureC: valuesVaryByHour ? hour.toDouble() : 20,
           windSpeedMs: 5,
-          cloudCoverPercent: 50,
+          cloudCoverPercent: valuesVaryByHour ? hour * 10.0 : 50,
           cloudLowPercent: sixHourlyClouds
               ? hour == 6
                     ? 20
@@ -212,6 +214,30 @@ void main() {
     // Interpolation midway between two hourly slices stays within range.
     final mid = sample.timeline.first.timeUtc.add(const Duration(minutes: 30));
     expect(sample.hiddenAt(mid), sample.timeline.first.groundHiddenPercent);
+  });
+
+  test('interpolates airport weather at the scheduled minute', () async {
+    final useCase = FetchFlightWeatherUseCase(
+      provider: _FakeWeatherForecastProvider(valuesVaryByHour: true),
+    );
+
+    final weather = await useCase.call(
+      route: _route(),
+      schedule: FlightSchedule(
+        travelDate: DateTime(2026, 8, 3),
+        departure: ZonedInstant(
+          utc: DateTime.utc(2026, 8, 3, 8, 30),
+          offsetMinutes: 0,
+        ),
+        arrival: ZonedInstant(
+          utc: DateTime.utc(2026, 8, 3, 10, 40),
+          offsetMinutes: 0,
+        ),
+      ),
+    );
+
+    expect(weather.departure.temperatureC, closeTo(8.5, 0.001));
+    expect(weather.departure.cloudCoverPercent, closeTo(85, 0.001));
   });
 
   test(

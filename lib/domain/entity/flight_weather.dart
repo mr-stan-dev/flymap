@@ -60,7 +60,7 @@ class CloudTimeSlice extends Equatable {
   final double precipitationMm;
 
   double get groundHiddenPercent =>
-      (cloudLowPercent + cloudMidPercent).clamp(0, 100);
+      _combinedCloudCoverage(cloudLowPercent, cloudMidPercent);
 
   @override
   List<Object?> get props => [
@@ -89,7 +89,8 @@ class RouteCloudSample extends Equatable {
   final double routeProgress;
   final LatLng latLon;
 
-  /// Overhead time: STD + routeProgress * block time.
+  /// Estimated overflight time at this route position. Interior samples use
+  /// the airborne window; airport anchors remain pinned to STD and STA.
   final DateTime timeUtc;
   final double cloudLowPercent;
   final double cloudMidPercent;
@@ -104,7 +105,7 @@ class RouteCloudSample extends Equatable {
   /// Share of ground hidden from a window seat: cruise sits above the
   /// low/mid bands, so those hide the ground; high cirrus is a thin veil.
   double get groundHiddenPercent =>
-      (cloudLowPercent + cloudMidPercent).clamp(0, 100);
+      _combinedCloudCoverage(cloudLowPercent, cloudMidPercent);
 
   /// Linearly interpolated hidden-ground share at [timeUtc]; falls back to
   /// the overhead value when the timeline is empty or out of range.
@@ -206,4 +207,14 @@ class FlightWeather extends Equatable {
     isTimeEstimated,
     attribution,
   ];
+}
+
+/// Estimates the union of two cloud layers without counting their overlapping
+/// area twice. Providers expose each layer's horizontal coverage separately,
+/// not their exact vertical overlap, so independence is the least-biased
+/// provider-neutral estimate available from the current contract.
+double _combinedCloudCoverage(double firstPercent, double secondPercent) {
+  final first = firstPercent.clamp(0.0, 100.0) / 100;
+  final second = secondPercent.clamp(0.0, 100.0) / 100;
+  return (100 * (1 - (1 - first) * (1 - second))).clamp(0.0, 100.0);
 }

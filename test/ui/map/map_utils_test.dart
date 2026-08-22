@@ -7,6 +7,30 @@ import 'package:flymap/ui/map/map_utils.dart';
 import 'package:latlong2/latlong.dart';
 
 void main() {
+  group('MapUtils.interpolateGreatCircle', () {
+    test('a transatlantic midpoint arcs north of a coordinate lerp', () {
+      final midpoint = MapUtils.interpolateGreatCircle(
+        from: const LatLng(51.4700, -0.4543),
+        to: const LatLng(40.6413, -73.7781),
+        progress: 0.5,
+      );
+
+      expect(midpoint.latitude, greaterThan(52));
+      expect(midpoint.longitude, closeTo(-41.3, 1));
+    });
+
+    test('crosses the antimeridian by the short path', () {
+      final midpoint = MapUtils.interpolateGreatCircle(
+        from: const LatLng(10, 170),
+        to: const LatLng(10, -170),
+        progress: 0.5,
+      );
+
+      expect(midpoint.latitude, greaterThan(10));
+      expect(midpoint.longitude.abs(), closeTo(180, 0.001));
+    });
+  });
+
   group('MapUtils.estimatedDownloadSizeRangeLabel', () {
     test('uses fallback baseline when route is null', () {
       final label = MapUtils.estimatedDownloadSizeRangeLabel(

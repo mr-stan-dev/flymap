@@ -38,6 +38,19 @@ void main() {
         WindowVerdict.patchyClouds,
       );
     });
+
+    test('cloud obstruction does not double-count overlapping layers', () {
+      final sample = _sample(progress: 0.5, low: 50, mid: 50);
+      final slice = CloudTimeSlice(
+        timeUtc: DateTime.utc(2026, 8, 3, 10),
+        cloudLowPercent: 50,
+        cloudMidPercent: 50,
+        cloudHighPercent: 0,
+      );
+
+      expect(sample.groundHiddenPercent, closeTo(75, 0.001));
+      expect(slice.groundHiddenPercent, closeTo(75, 0.001));
+    });
   });
 
   group('isBeyondForecastHorizon', () {

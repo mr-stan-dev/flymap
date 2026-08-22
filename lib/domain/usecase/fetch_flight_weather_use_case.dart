@@ -6,6 +6,7 @@ import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_schedule.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/domain/entity/weather_attribution.dart';
+import 'package:flymap/domain/policy/flight_overhead_time_policy.dart';
 import 'package:flymap/domain/provider/weather_forecast_provider.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/ui/map/map_utils.dart';
@@ -69,7 +70,7 @@ class FetchFlightWeatherUseCase {
         : departureUtc.add(
             Duration(minutes: math.max(30, route.durations.blockMinutes)),
           );
-    final blockMinutes = arrivalUtc.difference(departureUtc).inMinutes;
+    final cruiseMinutes = route.durations.cruiseMinutes;
     final points = _samplePoints(route);
     final areaPoints = _areaGridPoints(route, points);
 
@@ -94,16 +95,22 @@ class FetchFlightWeatherUseCase {
       for (final point in points)
         _PointRequest(
           point.latLon,
-          departureUtc.add(
-            Duration(minutes: (blockMinutes * point.routeProgress).round()),
+          FlightOverheadTimePolicy.estimate(
+            departureUtc: departureUtc,
+            arrivalUtc: arrivalUtc,
+            cruiseMinutes: cruiseMinutes,
+            routeProgress: point.routeProgress,
           ),
           routeProgress: point.routeProgress,
         ),
       for (final point in areaPoints)
         _PointRequest(
           point.latLon,
-          departureUtc.add(
-            Duration(minutes: (blockMinutes * point.routeProgress).round()),
+          FlightOverheadTimePolicy.estimate(
+            departureUtc: departureUtc,
+            arrivalUtc: arrivalUtc,
+            cruiseMinutes: cruiseMinutes,
+            routeProgress: point.routeProgress,
           ),
           routeProgress: point.routeProgress,
           isAreaSample: true,
@@ -127,8 +134,8 @@ class FetchFlightWeatherUseCase {
     );
     final results = batch.results;
 
-    final departureForecast = _nearest(results[0]);
-    final arrivalForecast = _nearest(results[1]);
+    final departureForecast = _atTargetTime(results[0]);
+    final arrivalForecast = _atTargetTime(results[1]);
     if (departureForecast == null || arrivalForecast == null) {
       throw const WeatherUnavailableException();
     }
@@ -204,7 +211,7 @@ class FetchFlightWeatherUseCase {
     required DateTime windowStart,
     required DateTime windowEnd,
   }) {
-    final forecast = _nearest(result);
+    final forecast = _atTargetTime(result);
     if (forecast == null) return null;
     // Bracket the window with the nearest entry on each side. Beyond ~2.5
     // days out the provider is 6-HOURLY, so the flight window often contains
@@ -434,10 +441,7 @@ class FetchFlightWeatherUseCase {
       final a = polyline[segment - 1];
       final b = polyline[segment];
       points.add((
-        latLon: LatLng(
-          a.latitude + (b.latitude - a.latitude) * t,
-          a.longitude + (b.longitude - a.longitude) * t,
-        ),
+        latLon: MapUtils.interpolateGreatCircle(from: a, to: b, progress: t),
         routeProgress: progress,
       ));
     }
@@ -484,22 +488,98 @@ class FetchFlightWeatherUseCase {
     }
   }
 
-  WeatherForecastPoint? _nearest(_PointResult result) {
-    WeatherForecastPoint? best;
-    Duration? bestDistance;
+  /// Forecast values at this location's expected overflight instant.
+  ///
+  /// Provider series are normally hourly near-term and may be six-hourly at
+  /// longer horizons. Interpolating continuous values avoids snapping a
+  /// passenger's view forecast to whichever model step happens to be closer.
+  WeatherForecastPoint? _atTargetTime(_PointResult result) {
+    final target = result.request.targetTimeUtc;
+    WeatherForecastPoint? before;
+    WeatherForecastPoint? after;
+    WeatherForecastPoint? nearest;
+    Duration? nearestDistance;
     for (final point in result.series) {
-      final distance = point.timeUtc
-          .difference(result.request.targetTimeUtc)
-          .abs();
-      if (bestDistance == null || distance < bestDistance) {
-        bestDistance = distance;
-        best = point;
+      final distance = point.timeUtc.difference(target).abs();
+      if (nearestDistance == null || distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = point;
+      }
+      if (!point.timeUtc.isAfter(target) &&
+          (before == null || point.timeUtc.isAfter(before.timeUtc))) {
+        before = point;
+      }
+      if (!point.timeUtc.isBefore(target) &&
+          (after == null || point.timeUtc.isBefore(after.timeUtc))) {
+        after = point;
       }
     }
-    if (best == null || bestDistance == null || bestDistance.inHours > 12) {
+    if (nearest == null ||
+        nearestDistance == null ||
+        nearestDistance > const Duration(hours: 12)) {
       return null;
     }
-    return best;
+    if (before == null ||
+        after == null ||
+        before.timeUtc == after.timeUtc ||
+        target.difference(before.timeUtc) > const Duration(hours: 12) ||
+        after.timeUtc.difference(target) > const Duration(hours: 12)) {
+      return nearest;
+    }
+
+    final spanMicroseconds = after.timeUtc
+        .difference(before.timeUtc)
+        .inMicroseconds;
+    if (spanMicroseconds <= 0) return nearest;
+    final fraction =
+        target.difference(before.timeUtc).inMicroseconds / spanMicroseconds;
+
+    double? interpolate(double? first, double? second, double? fallback) {
+      if (first != null && second != null) {
+        return first + (second - first) * fraction;
+      }
+      return fallback ?? first ?? second;
+    }
+
+    return WeatherForecastPoint(
+      timeUtc: target,
+      temperatureC: interpolate(
+        before.temperatureC,
+        after.temperatureC,
+        nearest.temperatureC,
+      ),
+      windSpeedMs: interpolate(
+        before.windSpeedMs,
+        after.windSpeedMs,
+        nearest.windSpeedMs,
+      ),
+      cloudCoverPercent: interpolate(
+        before.cloudCoverPercent,
+        after.cloudCoverPercent,
+        nearest.cloudCoverPercent,
+      ),
+      cloudLowPercent: interpolate(
+        before.cloudLowPercent,
+        after.cloudLowPercent,
+        nearest.cloudLowPercent,
+      ),
+      cloudMidPercent: interpolate(
+        before.cloudMidPercent,
+        after.cloudMidPercent,
+        nearest.cloudMidPercent,
+      ),
+      cloudHighPercent: interpolate(
+        before.cloudHighPercent,
+        after.cloudHighPercent,
+        nearest.cloudHighPercent,
+      ),
+      precipitationMm: interpolate(
+        before.precipitationMm,
+        after.precipitationMm,
+        nearest.precipitationMm,
+      ),
+      symbolCode: nearest.symbolCode,
+    );
   }
 }
 

@@ -7,6 +7,65 @@ import 'package:flymap/map_download_config.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapUtils {
+  /// Point [progress] of the way along the shortest spherical path from [from]
+  /// to [to]. Unlike latitude/longitude lerping this follows polar routes and
+  /// crosses the antimeridian without detouring around the globe.
+  static LatLng interpolateGreatCircle({
+    required LatLng from,
+    required LatLng to,
+    required double progress,
+  }) {
+    final t = progress.clamp(0.0, 1.0);
+    if (t <= 0) return from;
+    if (t >= 1) return to;
+
+    List<double> vector(LatLng point) {
+      final latitude = point.latitude * pi / 180;
+      final longitude = point.longitude * pi / 180;
+      return [
+        cos(latitude) * cos(longitude),
+        cos(latitude) * sin(longitude),
+        sin(latitude),
+      ];
+    }
+
+    final a = vector(from);
+    final b = vector(to);
+    final dot = (a[0] * b[0] + a[1] * b[1] + a[2] * b[2]).clamp(-1.0, 1.0);
+    final angle = acos(dot);
+    final sinAngle = sin(angle);
+    if (angle < 1e-9 || sinAngle.abs() < 1e-9) {
+      var longitudeDelta = to.longitude - from.longitude;
+      if (longitudeDelta > 180) longitudeDelta -= 360;
+      if (longitudeDelta < -180) longitudeDelta += 360;
+      return LatLng(
+        from.latitude + (to.latitude - from.latitude) * t,
+        _wrapLongitude(from.longitude + longitudeDelta * t),
+      );
+    }
+
+    final fromWeight = sin((1 - t) * angle) / sinAngle;
+    final toWeight = sin(t * angle) / sinAngle;
+    final x = fromWeight * a[0] + toWeight * b[0];
+    final y = fromWeight * a[1] + toWeight * b[1];
+    final z = fromWeight * a[2] + toWeight * b[2];
+    return LatLng(
+      atan2(z, sqrt(x * x + y * y)) * 180 / pi,
+      _wrapLongitude(atan2(y, x) * 180 / pi),
+    );
+  }
+
+  static double _wrapLongitude(double longitude) {
+    var wrapped = longitude;
+    while (wrapped > 180) {
+      wrapped -= 360;
+    }
+    while (wrapped < -180) {
+      wrapped += 360;
+    }
+    return wrapped;
+  }
+
   static String estimatedDownloadSizeRangeLabel({
     required FlightRoute? route,
     required MapDetailLevel mapDetailLevel,
