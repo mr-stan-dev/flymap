@@ -5,8 +5,8 @@
   "categories": [
     {
       "id": "general_basic",
-      "title": "Bases de l'aviation",
-      "description": "Des articles gratuits pour debuter et comprendre simplement les bases du vol, du ciel et de l'experience en cabine.",
+      "title": "Bases de l’aviation",
+      "description": "Des articles gratuits pour débuter et comprendre simplement les bases du vol, du ciel et de l’expérience en cabine.",
       "articles": [
         {
           "id": "what_happens_during_takeoff",
@@ -85,8 +85,8 @@
     },
     {
       "id": "clouds_and_weather",
-      "title": "Nuages et meteo",
-      "description": "Decouvrez comment se forment les nuages, pourquoi les orages comptent pour les vols et comment la meteo influence ce que vous voyez par le hublot.",
+      "title": "Nuages et météo",
+      "description": "Découvrez comment se forment les nuages, pourquoi les orages comptent pour les vols et comment la météo influence ce que vous voyez par le hublot.",
       "articles": [
         {
           "id": "cloud_families_explained",
@@ -178,7 +178,7 @@
     {
       "id": "flight_physics",
       "title": "Physique du vol",
-      "description": "Des explications sur la portance, la trainee, la vitesse, la pression et les forces physiques qui rendent le vol possible.",
+      "description": "Des explications sur la portance, la traînée, la vitesse, la pression et les forces physiques qui rendent le vol possible.",
       "articles": [
         {
           "id": "the_four_forces_of_flight",
@@ -263,8 +263,8 @@
     },
     {
       "id": "aircraft_and_systems",
-      "title": "Avion et systemes",
-      "description": "Comprenez le role des differentes parties de l'avion et des systemes de bord, des moteurs a la pressurisation cabine.",
+      "title": "Avion et systèmes",
+      "description": "Comprenez le rôle des différentes parties de l’avion et des systèmes de bord, des moteurs à la pressurisation de la cabine.",
       "articles": [
         {
           "id": "parts_of_an_airplane",
@@ -368,7 +368,7 @@
     {
       "id": "navigation_and_routes",
       "title": "Navigation et routes",
-      "description": "Decouvrez comment les pilotes naviguent, pourquoi certaines routes sont choisies et ce que signifient les niveaux de vol et les waypoints.",
+      "description": "Découvrez comment les pilotes naviguent, pourquoi certaines routes sont choisies et ce que signifient les niveaux de vol et les points de cheminement.",
       "articles": [
         {
           "id": "how_pilots_navigate",
@@ -459,8 +459,8 @@
     },
     {
       "id": "turbulence_and_airflows",
-      "title": "Turbulence et courants d'air",
-      "description": "Comprenez pourquoi la turbulence se produit, comment les pilotes la gerent et pourquoi les vols agites sont en general bien plus surs qu'ils n'en ont l'air.",
+      "title": "Turbulences et courants d’air",
+      "description": "Comprenez pourquoi les turbulences se produisent, comment les pilotes les gèrent et pourquoi les vols agités sont généralement bien plus sûrs qu’ils n’en ont l’air.",
       "articles": [
         {
           "id": "what_turbulence_really_is_simple_explanation",
@@ -551,8 +551,8 @@
     },
     {
       "id": "in_flight_experience",
-      "title": "Experience en vol",
-      "description": "Comprenez ce que vous ressentez, entendez, goutez et remarquez en cabine pendant un vol, et pourquoi cela se produit.",
+      "title": "Expérience en vol",
+      "description": "Comprenez ce que vous ressentez, entendez, goûtez et remarquez en cabine pendant un vol, et pourquoi cela se produit.",
       "articles": [
         {
           "id": "why_cabins_feel_so_dry_on_airplanes",
@@ -625,8 +625,8 @@
     },
     {
       "id": "airport_and_flight_operations",
-      "title": "Aeroport et operations de vol",
-      "description": "Apprenez ce qui se passe autour de l'avion au sol, de l'attribution des portes a la circulation sur piste et au travail de rotation.",
+      "title": "Aéroports et opérations aériennes",
+      "description": "Apprenez ce qui se passe autour de l’avion au sol, de l’attribution des portes à la circulation sur piste et aux opérations de rotation.",
       "articles": [
         {
           "id": "why_planes_queue_before_takeoff",
@@ -700,7 +700,7 @@
     {
       "id": "views_from_the_window",
       "title": "Vues depuis le hublot",
-      "description": "Explorez pourquoi le monde parait si different depuis les airs, des cotes et des villes jusqu'aux ombres des nuages et aux lumieres nocturnes.",
+      "description": "Explorez pourquoi le monde paraît si différent depuis les airs, des côtes et des villes jusqu’aux ombres des nuages et aux lumières nocturnes.",
       "articles": [
         {
           "id": "how_cities_look_different_from_the_air",
@@ -785,8 +785,8 @@
     },
     {
       "id": "aviation_myths",
-      "title": "Mythes de l'aviation",
-      "description": "Des explications claires sur les mythes courants du vol, les idees recues et les questions que beaucoup de passagers se posent.",
+      "title": "Mythes de l’aviation",
+      "description": "Des explications claires sur les mythes courants du vol, les idées reçues et les questions que beaucoup de passagers se posent.",
       "articles": [
         {
           "id": "do_pilots_sleep_on_long_flights",

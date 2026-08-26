@@ -256,6 +256,21 @@ void main() {
     );
   });
 
+  for (final translation in <(String, String)>[
+    ('es', 'Conceptos básicos de aviación'),
+    ('de', 'Grundlagen der Luftfahrt'),
+    ('fr', 'Bases de l’aviation'),
+  ]) {
+    test('loads bundled ${translation.$1} category translations', () async {
+      final db = LearnPackLocalDb(localeCodeProvider: () => translation.$1);
+
+      final categories = await db.getCategories();
+
+      expect(categories.first.title, translation.$2);
+      expect(categories, hasLength(10));
+    });
+  }
+
   test('loads a bundled Spanish learn article for es-MX', () async {
     final db = LearnPackLocalDb(localeCodeProvider: () => 'es-MX');
 

@@ -5,8 +5,8 @@
   "categories": [
     {
       "id": "general_basic",
-      "title": "Conceptos basicos de aviacion",
-      "description": "Articulos introductorios gratuitos que explican de forma sencilla los fundamentos del vuelo, el cielo y la experiencia a bordo.",
+      "title": "Conceptos básicos de aviación",
+      "description": "Artículos introductorios gratuitos que explican de forma sencilla los fundamentos del vuelo, el cielo y la experiencia a bordo.",
       "articles": [
         {
           "id": "what_happens_during_takeoff",
@@ -86,7 +86,7 @@
     {
       "id": "clouds_and_weather",
       "title": "Nubes y tiempo",
-      "description": "Aprende como se forman las nubes, por que las tormentas importan para los vuelos y como el tiempo influye en lo que ves desde la ventana.",
+      "description": "Aprende cómo se forman las nubes, por qué las tormentas importan para los vuelos y cómo el tiempo influye en lo que ves desde la ventana.",
       "articles": [
         {
           "id": "cloud_families_explained",
@@ -177,8 +177,8 @@
     },
     {
       "id": "flight_physics",
-      "title": "Fisica del vuelo",
-      "description": "Explicaciones sobre sustentacion, resistencia, velocidad, presion y las fuerzas fisicas que hacen posible el vuelo.",
+      "title": "Física del vuelo",
+      "description": "Explicaciones sobre sustentación, resistencia, velocidad, presión y las fuerzas físicas que hacen posible el vuelo.",
       "articles": [
         {
           "id": "the_four_forces_of_flight",
@@ -263,8 +263,8 @@
     },
     {
       "id": "aircraft_and_systems",
-      "title": "Avion y sistemas",
-      "description": "Entiende que hacen las distintas partes del avion y los sistemas de a bordo, desde los motores hasta la presion de cabina.",
+      "title": "Avión y sistemas",
+      "description": "Entiende qué hacen las distintas partes del avión y los sistemas de a bordo, desde los motores hasta la presión de cabina.",
       "articles": [
         {
           "id": "parts_of_an_airplane",
@@ -367,8 +367,8 @@
     },
     {
       "id": "navigation_and_routes",
-      "title": "Navegacion y rutas",
-      "description": "Descubre como navegan los pilotos, por que se eligen ciertas rutas y que significan los niveles de vuelo y los waypoints.",
+      "title": "Navegación y rutas",
+      "description": "Descubre cómo navegan los pilotos, por qué se eligen ciertas rutas y qué significan los niveles de vuelo y los puntos de ruta.",
       "articles": [
         {
           "id": "how_pilots_navigate",
@@ -460,7 +460,7 @@
     {
       "id": "turbulence_and_airflows",
       "title": "Turbulencia y corrientes de aire",
-      "description": "Entiende por que ocurre la turbulencia, como la gestionan los pilotos y por que los vuelos movidos suelen ser mucho mas seguros de lo que parecen.",
+      "description": "Entiende por qué ocurre la turbulencia, cómo la gestionan los pilotos y por qué los vuelos movidos suelen ser mucho más seguros de lo que parecen.",
       "articles": [
         {
           "id": "what_turbulence_really_is_simple_explanation",
@@ -552,7 +552,7 @@
     {
       "id": "in_flight_experience",
       "title": "Experiencia a bordo",
-      "description": "Entiende lo que sientes, oyes, saboreas y notas en la cabina durante un vuelo, y por que ocurre.",
+      "description": "Entiende lo que sientes, oyes, saboreas y notas en la cabina durante un vuelo, y por qué ocurre.",
       "articles": [
         {
           "id": "why_cabins_feel_so_dry_on_airplanes",
@@ -626,7 +626,7 @@
     {
       "id": "airport_and_flight_operations",
       "title": "Aeropuerto y operaciones de vuelo",
-      "description": "Aprende que sucede alrededor del avion en tierra, desde la asignacion de puertas hasta el flujo en pista y el trabajo de escala.",
+      "description": "Aprende qué sucede alrededor del avión en tierra, desde la asignación de puertas hasta el flujo en pista y el trabajo de escala.",
       "articles": [
         {
           "id": "why_planes_queue_before_takeoff",
@@ -700,7 +700,7 @@
     {
       "id": "views_from_the_window",
       "title": "Vistas desde la ventana",
-      "description": "Explora por que el mundo se ve tan distinto desde el aire, desde costas y ciudades hasta sombras de nubes y luces nocturnas.",
+      "description": "Explora por qué el mundo se ve tan distinto desde el aire, desde costas y ciudades hasta sombras de nubes y luces nocturnas.",
       "articles": [
         {
           "id": "how_cities_look_different_from_the_air",
@@ -785,7 +785,7 @@
     },
     {
       "id": "aviation_myths",
-      "title": "Mitos de la aviacion",
+      "title": "Mitos de la aviación",
       "description": "Explicaciones claras sobre mitos comunes del vuelo, malentendidos y preguntas que muchos pasajeros suelen hacerse.",
       "articles": [
         {

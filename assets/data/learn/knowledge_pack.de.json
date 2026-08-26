@@ -6,7 +6,7 @@
     {
       "id": "general_basic",
       "title": "Grundlagen der Luftfahrt",
-      "description": "Kostenlose Einstiegsartikel, die die Grundlagen von Flug, Himmel und dem Erlebnis an Bord in einfacher Sprache erklaren.",
+      "description": "Kostenlose Einstiegsartikel, die die Grundlagen von Flug, Himmel und dem Erlebnis an Bord in einfacher Sprache erklären.",
       "articles": [
         {
           "id": "what_happens_during_takeoff",
@@ -86,7 +86,7 @@
     {
       "id": "clouds_and_weather",
       "title": "Wolken und Wetter",
-      "description": "Erfahre, wie Wolken entstehen, warum Sturme fur Fluge wichtig sind und wie das Wetter beeinflusst, was du aus dem Fenster siehst.",
+      "description": "Erfahre, wie Wolken entstehen, warum Stürme für Flüge wichtig sind und wie das Wetter beeinflusst, was du aus dem Fenster siehst.",
       "articles": [
         {
           "id": "cloud_families_explained",
@@ -178,7 +178,7 @@
     {
       "id": "flight_physics",
       "title": "Flugphysik",
-      "description": "Erklarungen zu Auftrieb, Widerstand, Geschwindigkeit, Druck und den physikalischen Kraften, die Fliegen moglich machen.",
+      "description": "Erklärungen zu Auftrieb, Widerstand, Geschwindigkeit, Druck und den physikalischen Kräften, die das Fliegen möglich machen.",
       "articles": [
         {
           "id": "the_four_forces_of_flight",
@@ -264,7 +264,7 @@
     {
       "id": "aircraft_and_systems",
       "title": "Flugzeug und Systeme",
-      "description": "Verstehe, was verschiedene Flugzeugteile und Bordsysteme tun, von den Triebwerken bis zum Kabinendruck.",
+      "description": "Verstehe, welche Aufgaben die verschiedenen Flugzeugteile und Bordsysteme erfüllen, von den Triebwerken bis zum Kabinendruck.",
       "articles": [
         {
           "id": "parts_of_an_airplane",
@@ -368,7 +368,7 @@
     {
       "id": "navigation_and_routes",
       "title": "Navigation und Routen",
-      "description": "Entdecke, wie Pilotinnen und Piloten navigieren, warum bestimmte Routen gewahlt werden und was Fluglevel und Wegpunkte bedeuten.",
+      "description": "Entdecke, wie Pilotinnen und Piloten navigieren, warum bestimmte Routen gewählt werden und was Flugflächen und Wegpunkte bedeuten.",
       "articles": [
         {
           "id": "how_pilots_navigate",
@@ -459,8 +459,8 @@
     },
     {
       "id": "turbulence_and_airflows",
-      "title": "Turbulenzen und Luftstromungen",
-      "description": "Verstehe, warum Turbulenzen entstehen, wie Pilotinnen und Piloten damit umgehen und warum holprige Fluge meist viel sicherer sind, als sie sich anfuhlen.",
+      "title": "Turbulenzen und Luftströmungen",
+      "description": "Verstehe, warum Turbulenzen entstehen, wie Pilotinnen und Piloten damit umgehen und warum holprige Flüge meist viel sicherer sind, als sie sich anfühlen.",
       "articles": [
         {
           "id": "what_turbulence_really_is_simple_explanation",
@@ -552,7 +552,7 @@
     {
       "id": "in_flight_experience",
       "title": "Erlebnis an Bord",
-      "description": "Verstehe, was du in der Kabine wahrend eines Flugs fuhlst, horst, schmeckst und bemerkst und warum das so ist.",
+      "description": "Verstehe, was du in der Kabine während eines Flugs fühlst, hörst, schmeckst und bemerkst und warum das so ist.",
       "articles": [
         {
           "id": "why_cabins_feel_so_dry_on_airplanes",
@@ -626,7 +626,7 @@
     {
       "id": "airport_and_flight_operations",
       "title": "Flughafen und Flugbetrieb",
-      "description": "Erfahre, was rund um das Flugzeug am Boden passiert, von der Gate-Zuteilung bis zum Ablauf auf der Startbahn und bei der Abfertigung.",
+      "description": "Erfahre, was rund um das Flugzeug am Boden passiert, von der Gate-Zuteilung bis zu den Abläufen auf der Startbahn und bei der Abfertigung.",
       "articles": [
         {
           "id": "why_planes_queue_before_takeoff",
@@ -700,7 +700,7 @@
     {
       "id": "views_from_the_window",
       "title": "Blicke aus dem Fenster",
-      "description": "Entdecke, warum die Welt aus der Luft so anders aussieht, von Kusten und Stadten bis zu Wolkenschatten und Nachtlichtern.",
+      "description": "Entdecke, warum die Welt aus der Luft so anders aussieht, von Küsten und Städten bis zu Wolkenschatten und Nachtlichtern.",
       "articles": [
         {
           "id": "how_cities_look_different_from_the_air",
@@ -786,7 +786,7 @@
     {
       "id": "aviation_myths",
       "title": "Mythen der Luftfahrt",
-      "description": "Klare Erklarungen zu verbreiteten Flugmythen, Missverstandnissen und Fragen, die sich viele Passagiere stellen.",
+      "description": "Klare Erklärungen zu verbreiteten Flugmythen, Missverständnissen und Fragen, die sich viele Passagiere stellen.",
       "articles": [
         {
           "id": "do_pilots_sleep_on_long_flights",

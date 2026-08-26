@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:country_flags/country_flags.dart' as country_flags;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -53,6 +54,7 @@ void main() {
   });
 
   setUp(() {
+    LocaleSettings.setLocaleSync(AppLocale.en);
     SharedPreferences.setMockInitialValues(<String, Object>{});
     final getIt = GetIt.I;
     if (getIt.isRegistered<GeoQuizRepository>()) {
@@ -102,6 +104,41 @@ void main() {
         nowProvider: DateTime.now,
       ),
     );
+  });
+
+  testWidgets('reloads category translations when the locale changes', (
+    tester,
+  ) async {
+    final languageCode = ValueNotifier<String>('en');
+    addTearDown(languageCode.dispose);
+    final learnRepository = _LocaleAwareFakeLearnRepository(
+      () => languageCode.value,
+    );
+    final learnCubit = _buildLearnCubit(learnRepository);
+
+    await tester.pumpWidget(
+      _localeSwitchingTestApp(
+        isProUser: false,
+        languageCode: languageCode,
+        child: LearnTab(cubit: learnCubit),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Aviation Basics'), findsOneWidget);
+
+    for (final languageAndTitle in <(String, String)>[
+      ('es', 'Conceptos básicos de aviación'),
+      ('de', 'Grundlagen der Luftfahrt'),
+      ('fr', 'Bases de l’aviation'),
+    ]) {
+      languageCode.value = languageAndTitle.$1;
+      await tester.pump();
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text(languageAndTitle.$2), findsOneWidget);
+    }
   });
 
   testWidgets('does not show PRO badge on category cards', (tester) async {
@@ -641,7 +678,7 @@ void main() {
 }
 
 LearnCubit _buildLearnCubit(
-  _FakeLearnRepository repository, {
+  LearnRepository repository, {
   AppAnalytics? analytics,
 }) {
   final progressRepository = _InMemoryLearnArticleProgressRepository();
@@ -711,6 +748,38 @@ Widget _testApp({
         supportedLocales: AppLocaleUtils.supportedLocales,
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         routerConfig: router,
+      ),
+    ),
+  );
+}
+
+Widget _localeSwitchingTestApp({
+  required bool isProUser,
+  required ValueListenable<String> languageCode,
+  required Widget child,
+}) {
+  final appAnalytics = _FakeAppAnalytics();
+  return TranslationProvider(
+    child: ValueListenableBuilder<String>(
+      valueListenable: languageCode,
+      builder: (context, value, _) => MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => SubscriptionCubit(
+              repository: _FakeSubscriptionRepository(isProUser: isProUser),
+              flightUnlockRepository: _FakeFlightUnlockRepository(),
+              analytics: appAnalytics,
+            )..initialize(),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          locale: Locale(value),
+          supportedLocales: AppLocaleUtils.supportedLocales,
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          home: Scaffold(body: child),
+        ),
       ),
     ),
   );
@@ -787,6 +856,35 @@ class _FakeLearnRepository implements LearnRepository {
   @override
   Future<List<LearnCategory>> getCategories() async {
     return _categories;
+  }
+}
+
+class _LocaleAwareFakeLearnRepository extends _FakeLearnRepository {
+  _LocaleAwareFakeLearnRepository(this._languageCodeProvider);
+
+  final String Function() _languageCodeProvider;
+
+  static const _categoryTitles = <String, String>{
+    'en': 'Aviation Basics',
+    'es': 'Conceptos básicos de aviación',
+    'de': 'Grundlagen der Luftfahrt',
+    'fr': 'Bases de l’aviation',
+  };
+
+  @override
+  Future<List<LearnCategory>> getCategories() async {
+    final categories = await super.getCategories();
+    final category = categories.first;
+    final languageCode = _languageCodeProvider();
+    return <LearnCategory>[
+      LearnCategory(
+        id: category.id,
+        title: _categoryTitles[languageCode] ?? _categoryTitles['en']!,
+        description: category.description,
+        imageAssetPath: category.imageAssetPath,
+        articles: category.articles,
+      ),
+    ];
   }
 }
 

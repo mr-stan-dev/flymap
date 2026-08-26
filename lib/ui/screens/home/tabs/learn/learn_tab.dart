@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/i18n/strings.g.dart';
@@ -51,9 +53,43 @@ class LearnTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<LearnCubit>(
       create: (_) => (cubit ?? LearnCubit())..load(),
-      child: _LearnCategoriesView(showGeoQuizNewBadge: showGeoQuizNewBadge),
+      child: _LearnLocaleReloader(
+        child: _LearnCategoriesView(showGeoQuizNewBadge: showGeoQuizNewBadge),
+      ),
     );
   }
+}
+
+class _LearnLocaleReloader extends StatefulWidget {
+  const _LearnLocaleReloader({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_LearnLocaleReloader> createState() => _LearnLocaleReloaderState();
+}
+
+class _LearnLocaleReloaderState extends State<_LearnLocaleReloader> {
+  String? _languageCode;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final previousLanguageCode = _languageCode;
+    _languageCode = languageCode;
+    if (previousLanguageCode == null || previousLanguageCode == languageCode) {
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _languageCode != languageCode) return;
+      unawaited(context.read<LearnCubit>().load());
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 class _LearnCategoriesView extends StatelessWidget {
