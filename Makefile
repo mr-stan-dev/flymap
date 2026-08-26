@@ -3,6 +3,7 @@
 .DEFAULT_GOAL := help
 
 ANDROID_RELEASE_BUNDLE := build/app/outputs/bundle/release/app-release.aab
+APP_CHECK_DEBUG_CONFIG := env/app_check.debug.local.json
 
 # Allows: make bump 1.5.1 [BUILD=20]
 # It maps the positional argument to VERSION and ignores it as a make target.
@@ -17,6 +18,15 @@ endif
 
 help: ## Show available Make commands.
 	@awk 'BEGIN {FS = ":.*## "}; /^[a-zA-Z0-9_.-]+:.*## / { printf "  %-24s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+
+run-debug: ## Run with debug config and persistent local App Check tokens.
+	@if [ ! -f "$(APP_CHECK_DEBUG_CONFIG)" ]; then \
+		echo "Missing $(APP_CHECK_DEBUG_CONFIG). Copy env/app_check.debug.local.example.json and add registered UUIDv4 tokens." >&2; \
+		exit 1; \
+	fi
+	fvm flutter run --dart-define-from-file=env/app_config.debug.json --dart-define-from-file=$(APP_CHECK_DEBUG_CONFIG)
+
+rd: run-debug ## Alias for run-debug.
 
 # Generates iOS release config only.
 # Then you need to open Xcode and build/archive manually.

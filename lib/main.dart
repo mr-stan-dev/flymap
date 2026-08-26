@@ -24,6 +24,13 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'di/di_module.dart';
 
+const _iosAppCheckDebugToken = String.fromEnvironment(
+  'FIREBASE_APP_CHECK_IOS_DEBUG_TOKEN',
+);
+const _androidAppCheckDebugToken = String.fromEnvironment(
+  'FIREBASE_APP_CHECK_ANDROID_DEBUG_TOKEN',
+);
+
 void main() async {
   await runZonedGuarded(
     () async {
@@ -37,10 +44,18 @@ void main() async {
       );
       await FirebaseAppCheck.instance.activate(
         providerAndroid: kDebugMode
-            ? const AndroidDebugProvider()
+            ? const AndroidDebugProvider(
+                debugToken: _androidAppCheckDebugToken == ''
+                    ? null
+                    : _androidAppCheckDebugToken,
+              )
             : const AndroidPlayIntegrityProvider(),
         providerApple: kDebugMode
-            ? const AppleDebugProvider()
+            ? const AppleDebugProvider(
+                debugToken: _iosAppCheckDebugToken == ''
+                    ? null
+                    : _iosAppCheckDebugToken,
+              )
             : const AppleAppAttestProvider(),
       );
       DiModule().register();

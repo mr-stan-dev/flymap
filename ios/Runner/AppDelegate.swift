@@ -1,4 +1,5 @@
 import Flutter
+import FirebaseAppCheck
 import UIKit
 import MapLibre
 
@@ -22,6 +23,13 @@ import MapLibre
     MLNNetworkConfiguration.sharedManager.sessionConfiguration = config
 
     GeneratedPluginRegistrant.register(with: self)
+
+    #if !DEBUG
+      // FlutterFire installs its provider factory during plugin registration.
+      // Override it before Dart initializes Firebase so production never starts
+      // with FlutterFire's temporary DeviceCheck default.
+      AppCheck.setAppCheckProviderFactory(AppAttestProviderFactory())
+    #endif
 
     if let controller = window?.rootViewController as? FlutterViewController {
       nativeCaptureDelegate.register(with: controller)

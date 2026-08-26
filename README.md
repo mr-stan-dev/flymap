@@ -29,10 +29,27 @@ fvm flutter pub get
 Use `fvm`-prefixed commands for day-to-day work:
 
 ```bash
-fvm flutter run
+make run-debug
 fvm flutter analyze
 fvm flutter test
 ```
+
+### Firebase App Check in debug builds
+
+Debug builds use fixed, per-platform App Check debug tokens so reinstalling the
+app does not generate a new token. Set them up once per development machine:
+
+1. Copy `env/app_check.debug.local.example.json` to
+   `env/app_check.debug.local.json`.
+2. Replace both placeholders with UUIDv4 values.
+3. In Firebase Console, open **App Check > Apps > Manage debug tokens** and
+   register the iOS value for the iOS app and the Android value for the Android
+   app.
+4. Run the app with `make run-debug` (or `make rd`).
+
+The local token file is ignored by Git. Treat these tokens as secrets: never
+commit them, share them, or include them in a release build. Revoke and replace
+any token that is exposed.
 
 ## Getting Started
 

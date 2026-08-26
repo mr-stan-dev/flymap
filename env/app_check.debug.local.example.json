@@ -1,0 +1,4 @@
+{
+  "FIREBASE_APP_CHECK_IOS_DEBUG_TOKEN": "replace-with-ios-uuid-v4",
+  "FIREBASE_APP_CHECK_ANDROID_DEBUG_TOKEN": "replace-with-android-uuid-v4"
+}

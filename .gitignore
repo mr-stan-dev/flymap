@@ -33,6 +33,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+env/app_check.debug.local.json
 # Package build output (e.g. from running `make test` in packages/*).
 packages/*/build/
 
