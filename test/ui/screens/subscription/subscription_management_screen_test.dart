@@ -33,17 +33,17 @@ void main() {
         status: SubscriptionStatus(
           isPro: true,
           entitlementId: 'Flymap Pro',
-          productId: 'com.flymap.pro.monthly',
-          expiresAt: DateTime(2026, 9, 21),
+          productId: 'com.flymap.pro.yearly',
+          expiresAt: DateTime(2026, 8, 26),
           lastUpdatedAt: DateTime(2026, 8, 17),
         ),
         products: const [
           SubscriptionProduct(
-            packageId: 'monthly',
-            productId: 'com.flymap.pro.monthly',
-            title: 'Monthly',
-            priceText: r'$4.99',
-            subscriptionPeriod: 'P1M',
+            packageId: 'yearly',
+            productId: 'com.flymap.pro.yearly',
+            title: 'Yearly',
+            priceText: r'$39.99',
+            subscriptionPeriod: 'P1Y',
           ),
         ],
       ),
@@ -57,24 +57,12 @@ void main() {
       find.text('Your window-seat explorer, fully unlocked.'),
       findsOneWidget,
     );
-    expect(
-      find.text('You’re on the monthly subscription plan (ends Sep 21, 2026)'),
-      findsOneWidget,
-    );
+    expect(find.textContaining('You’re on the'), findsNothing);
     final hero = find.byKey(const Key('subscription-pro-hero'));
     final heroTitle = tester.widget<Text>(
       find.descendant(of: hero, matching: find.text('Flymap Pro')),
     );
-    final periodLine = tester.widget<Text>(
-      find.descendant(
-        of: hero,
-        matching: find.text(
-          'You’re on the monthly subscription plan (ends Sep 21, 2026)',
-        ),
-      ),
-    );
     expect(heroTitle.style?.fontWeight, FontWeight.w700);
-    expect(periodLine.style?.fontWeight, FontWeight.w600);
     expect(
       tester
           .widget<Text>(find.text('Included with your Pro plan'))
@@ -102,7 +90,6 @@ void main() {
       lightHeroGradient.colors.every((color) => color.computeLuminance() > 0.9),
       isTrue,
     );
-    expect(find.textContaining('Current period ends '), findsNothing);
     expect(find.text('Included with your Pro plan'), findsOneWidget);
     expect(find.text('Complete offline stories'), findsNothing);
     await tester.scrollUntilVisible(
@@ -110,16 +97,31 @@ void main() {
       350,
     );
     expect(find.text('Cloud cover and airport forecasts'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('subscription-plan-row')),
+      350,
+    );
+    final planValue = tester.widget<Text>(
+      find.descendant(
+        of: find.byKey(const Key('subscription-plan-row')),
+        matching: find.text('Yearly plan'),
+      ),
+    );
+    final planEnding = tester.widget<Text>(
+      find.descendant(
+        of: find.byKey(const Key('subscription-plan-row')),
+        matching: find.text('Ends Aug 26, 2026'),
+      ),
+    );
+    expect(planValue.style?.fontWeight, FontWeight.w700);
+    expect(
+      planEnding.style?.color,
+      AppTheme.lightTheme.colorScheme.onSurfaceVariant,
+    );
     await tester.scrollUntilVisible(find.text('Cancel subscription'), 450);
     expect(find.text('Manage plan & billing'), findsOneWidget);
     expect(find.text('Cancel subscription'), findsOneWidget);
-    expect(
-      find.text(
-        'Before you cancel, the App Store or Google Play will show when your '
-        'Pro access ends.',
-      ),
-      findsOneWidget,
-    );
+    expect(find.textContaining('Before you cancel'), findsNothing);
   });
 
   testWidgets('renders the active membership in dark theme', (tester) async {
@@ -163,10 +165,7 @@ void main() {
       find.text('Your window-seat explorer, fully unlocked.'),
       findsOneWidget,
     );
-    expect(
-      find.text('You’re on the weekly subscription plan (ends Sep 21, 2026)'),
-      findsOneWidget,
-    );
+    expect(find.textContaining('You’re on the'), findsNothing);
     final darkHeroDecoration =
         tester
                 .widget<DecoratedBox>(
@@ -180,6 +179,12 @@ void main() {
       isTrue,
     );
     expect(find.text('Included with your Pro plan'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('subscription-plan-row')),
+      450,
+    );
+    expect(find.text('Weekly plan'), findsOneWidget);
+    expect(find.text('Ends Sep 21, 2026'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -211,8 +216,18 @@ void main() {
     await tester.pumpWidget(_testApp(cubit));
     await tester.pump();
 
-    expect(find.text('You’re on the monthly subscription plan.'), findsNothing);
-    expect(find.text('Active subscription'), findsOneWidget);
+    expect(find.textContaining('You’re on the'), findsNothing);
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('subscription-plan-row')),
+      450,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const Key('subscription-plan-row')),
+        matching: find.text('Flymap Pro'),
+      ),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 }

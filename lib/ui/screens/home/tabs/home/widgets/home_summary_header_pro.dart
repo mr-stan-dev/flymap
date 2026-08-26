@@ -22,14 +22,12 @@ class HomeSummaryHeaderPro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final radius = BorderRadius.circular(DsRadii.xl);
-    final gradientColors = [
-      colorScheme.surfaceContainerHighest.withValues(alpha: 0.9),
-      DsPremiumColors.subtleSurface(context),
-    ];
+    final gradientColors = DsPremiumColors.activeCardGradient(context);
+    final iconBorderColor = DsPremiumColors.activeCardIconBorder(context);
 
     return Container(
+      key: const Key('home-pro-summary-surface'),
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: radius,
@@ -51,8 +49,11 @@ class HomeSummaryHeaderPro extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: DsPremiumColors.iconSurface(context),
+                    color: DsPremiumColors.activeCardIconSurface(context),
                     shape: BoxShape.circle,
+                    border: iconBorderColor == null
+                        ? null
+                        : Border.all(color: iconBorderColor),
                   ),
                   child: Icon(
                     Icons.workspace_premium_rounded,
@@ -129,9 +130,11 @@ class _ProSummaryPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: colorScheme.surface.withValues(alpha: 0.72),
+        color: DsPremiumColors.activeCardPillSurface(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: DsPremiumColors.activeCardPillBorder(context),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -141,7 +144,9 @@ class _ProSummaryPill extends StatelessWidget {
           Text(
             '$label: ',
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: colorScheme.onSurface.withValues(alpha: 0.72),
+              color:
+                  DsPremiumColors.activeCardPillForeground(context) ??
+                  colorScheme.onSurface.withValues(alpha: 0.72),
             ),
           ),
           Text(

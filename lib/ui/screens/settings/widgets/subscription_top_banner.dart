@@ -194,22 +194,10 @@ class _SubscribedBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isLightTheme = theme.brightness == Brightness.light;
-    final premiumAccent = DsPremiumColors.accent(context);
     final cardRadius = BorderRadius.circular(DsRadii.xl);
     final unlockBalanceText = _unlockBalanceText(context, state);
-    final gradientColors = isLightTheme
-        ? [
-            colorScheme.surface,
-            Color.alphaBlend(
-              DsPremiumColors.amber.withValues(alpha: 0.055),
-              colorScheme.surface,
-            ),
-          ]
-        : [
-            colorScheme.surfaceContainerHighest.withValues(alpha: 0.9),
-            DsPremiumColors.subtleSurface(context),
-          ];
+    final gradientColors = DsPremiumColors.activeCardGradient(context);
+    final iconBorderColor = DsPremiumColors.activeCardIconBorder(context);
 
     return Material(
       color: Colors.transparent,
@@ -238,17 +226,11 @@ class _SubscribedBanner extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: isLightTheme
-                        ? DsPremiumColors.amber.withValues(alpha: 0.24)
-                        : DsPremiumColors.iconSurface(context),
+                    color: DsPremiumColors.activeCardIconSurface(context),
                     shape: BoxShape.circle,
-                    border: isLightTheme
-                        ? Border.all(
-                            color: DsPremiumColors.amber.withValues(
-                              alpha: 0.58,
-                            ),
-                          )
-                        : null,
+                    border: iconBorderColor == null
+                        ? null
+                        : Border.all(color: iconBorderColor),
                   ),
                   child: Icon(
                     Icons.workspace_premium_rounded,
@@ -288,20 +270,16 @@ class _SubscribedBanner extends StatelessWidget {
                     vertical: DsSpacing.xs,
                   ),
                   decoration: BoxDecoration(
-                    color: isLightTheme
-                        ? DsPremiumColors.amber.withValues(alpha: 0.12)
-                        : colorScheme.surface.withValues(alpha: 0.72),
+                    color: DsPremiumColors.activeCardPillSurface(context),
                     borderRadius: BorderRadius.circular(DsRadii.pill),
                     border: Border.all(
-                      color: isLightTheme
-                          ? premiumAccent.withValues(alpha: 0.24)
-                          : colorScheme.outline.withValues(alpha: 0.2),
+                      color: DsPremiumColors.activeCardPillBorder(context),
                     ),
                   ),
                   child: Text(
                     context.t.common.manage,
                     style: theme.textTheme.labelMedium?.copyWith(
-                      color: isLightTheme ? premiumAccent : null,
+                      color: DsPremiumColors.activeCardPillForeground(context),
                       fontWeight: FontWeight.w700,
                     ),
                   ),

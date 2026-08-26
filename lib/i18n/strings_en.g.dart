@@ -911,23 +911,17 @@ class TranslationsSubscriptionEn {
 	/// en: 'Your window-seat explorer, fully unlocked.'
 	String get proHeroSubtitle => 'Your window-seat explorer, fully unlocked.';
 
-	/// en: 'You’re on the weekly subscription plan.'
-	String get weeklySubscriptionPlan => 'You’re on the weekly subscription plan.';
+	/// en: 'Weekly plan'
+	String get weeklyPlan => 'Weekly plan';
 
-	/// en: 'You’re on the monthly subscription plan.'
-	String get monthlySubscriptionPlan => 'You’re on the monthly subscription plan.';
+	/// en: 'Monthly plan'
+	String get monthlyPlan => 'Monthly plan';
 
-	/// en: 'You’re on the yearly subscription plan.'
-	String get yearlySubscriptionPlan => 'You’re on the yearly subscription plan.';
+	/// en: 'Yearly plan'
+	String get yearlyPlan => 'Yearly plan';
 
-	/// en: 'You’re on the weekly subscription plan (ends $date)'
-	String weeklySubscriptionPlanEnds({required Object date}) => 'You’re on the weekly subscription plan (ends ${date})';
-
-	/// en: 'You’re on the monthly subscription plan (ends $date)'
-	String monthlySubscriptionPlanEnds({required Object date}) => 'You’re on the monthly subscription plan (ends ${date})';
-
-	/// en: 'You’re on the yearly subscription plan (ends $date)'
-	String yearlySubscriptionPlanEnds({required Object date}) => 'You’re on the yearly subscription plan (ends ${date})';
+	/// en: 'Ends $date'
+	String planEnds({required Object date}) => 'Ends ${date}';
 
 	/// en: 'Recent real-world flight routes'
 	String get proFeatureRoutesTitle => 'Recent real-world flight routes';
@@ -982,9 +976,6 @@ class TranslationsSubscriptionEn {
 
 	/// en: 'Cancel subscription'
 	String get cancelSubscription => 'Cancel subscription';
-
-	/// en: 'Before you cancel, the App Store or Google Play will show when your Pro access ends.'
-	String get cancellationHelper => 'Before you cancel, the App Store or Google Play will show when your Pro access ends.';
 
 	/// en: 'Flight passes'
 	String get flightPassesTitle => 'Flight passes';
@@ -4469,12 +4460,10 @@ extension on Translations {
 			'subscription.proFeaturesTitle' => 'What Flymap Pro unlocks',
 			'subscription.proFeaturesIncludedTitle' => 'Included with your Pro plan',
 			'subscription.proHeroSubtitle' => 'Your window-seat explorer, fully unlocked.',
-			'subscription.weeklySubscriptionPlan' => 'You’re on the weekly subscription plan.',
-			'subscription.monthlySubscriptionPlan' => 'You’re on the monthly subscription plan.',
-			'subscription.yearlySubscriptionPlan' => 'You’re on the yearly subscription plan.',
-			'subscription.weeklySubscriptionPlanEnds' => ({required Object date}) => 'You’re on the weekly subscription plan (ends ${date})',
-			'subscription.monthlySubscriptionPlanEnds' => ({required Object date}) => 'You’re on the monthly subscription plan (ends ${date})',
-			'subscription.yearlySubscriptionPlanEnds' => ({required Object date}) => 'You’re on the yearly subscription plan (ends ${date})',
+			'subscription.weeklyPlan' => 'Weekly plan',
+			'subscription.monthlyPlan' => 'Monthly plan',
+			'subscription.yearlyPlan' => 'Yearly plan',
+			'subscription.planEnds' => ({required Object date}) => 'Ends ${date}',
 			'subscription.proFeatureRoutesTitle' => 'Recent real-world flight routes',
 			'subscription.proFeatureRoutesBody' => 'Follow a recent recorded path instead of an approximate arc.',
 			'subscription.proFeatureMapsTitle' => 'Higher-detail maps, available offline',
@@ -4493,7 +4482,6 @@ extension on Translations {
 			'subscription.currentPeriodEnds' => ({required Object date}) => 'Current period ends ${date}',
 			'subscription.managePlanAndBilling' => 'Manage plan & billing',
 			'subscription.cancelSubscription' => 'Cancel subscription',
-			'subscription.cancellationHelper' => 'Before you cancel, the App Store or Google Play will show when your Pro access ends.',
 			'subscription.flightPassesTitle' => 'Flight passes',
 			'subscription.flightPassesBody' => 'These one-flight unlocks stay available for future flights.',
 			'subscription.purchaseHelpTitle' => 'Purchase help',
@@ -4660,11 +4648,11 @@ extension on Translations {
 			'createFlight.mapPreview.estimatedMapSize' => ({required Object size}) => 'Estimated map size: ${size}',
 			'createFlight.mapPreview.upgradeToPro' => 'Upgrade to Pro',
 			'createFlight.mapPreview.basicHint' => 'Basic map detail with limited places',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.mapPreview.proGateHint' => 'Upgrade for a detailed map with all places',
 			'createFlight.mapPreview.proHint' => ({required Object count}) => 'Detailed offline map with ${count} places',
 			'createFlight.mapPreview.optionsTitle' => 'Approximate route',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.mapPreview.optionsBody' => 'Route is approximate — actual path may vary, especially on long-haul flights.',
 			'createFlight.overview.routeNotReady' => 'Route is not ready yet.',
 			'createFlight.overview.proPoiUpsell' => 'Free plan includes basic map and limited places',
@@ -5174,11 +5162,11 @@ extension on Translations {
 			'countries.AM' => 'Armenia',
 			'countries.AO' => 'Angola',
 			'countries.AR' => 'Argentina',
-			_ => null,
-		} ?? switch (path) {
 			'countries.AT' => 'Austria',
 			'countries.AU' => 'Australia',
 			'countries.AZ' => 'Azerbaijan',
+			_ => null,
+		} ?? switch (path) {
 			'countries.BA' => 'Bosnia and Herzegovina',
 			'countries.BB' => 'Barbados',
 			'countries.BD' => 'Bangladesh',

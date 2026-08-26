@@ -66,6 +66,50 @@ class DsPremiumColors {
       ? lightIconSurface
       : darkIconSurface;
 
+  static List<Color> activeCardGradient(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return theme.brightness == Brightness.light
+        ? <Color>[
+            colorScheme.surface,
+            Color.alphaBlend(
+              amber.withValues(alpha: 0.055),
+              colorScheme.surface,
+            ),
+          ]
+        : <Color>[
+            colorScheme.surfaceContainerHighest.withValues(alpha: 0.9),
+            darkSurface,
+          ];
+  }
+
+  static Color activeCardIconSurface(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.light
+      ? amber.withValues(alpha: 0.24)
+      : darkIconSurface;
+
+  static Color? activeCardIconBorder(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.light
+      ? amber.withValues(alpha: 0.58)
+      : null;
+
+  static Color activeCardPillSurface(BuildContext context) {
+    final theme = Theme.of(context);
+    return theme.brightness == Brightness.light
+        ? amber.withValues(alpha: 0.12)
+        : theme.colorScheme.surface.withValues(alpha: 0.72);
+  }
+
+  static Color activeCardPillBorder(BuildContext context) {
+    final theme = Theme.of(context);
+    return theme.brightness == Brightness.light
+        ? lightAccent.withValues(alpha: 0.24)
+        : theme.colorScheme.outline.withValues(alpha: 0.2);
+  }
+
+  static Color? activeCardPillForeground(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.light ? lightAccent : null;
+
   static List<Color> heroGradientFor(Brightness brightness) =>
       brightness == Brightness.light ? lightHeroGradient : darkHeroGradient;
 }

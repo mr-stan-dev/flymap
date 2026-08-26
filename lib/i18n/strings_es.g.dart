@@ -383,12 +383,10 @@ class _TranslationsSubscriptionEs extends TranslationsSubscriptionEn {
 	@override String get proFeaturesTitle => 'Lo que desbloquea Flymap Pro';
 	@override String get proFeaturesIncludedTitle => 'Incluido en tu plan Pro';
 	@override String get proHeroSubtitle => 'Tu explorador desde la ventanilla, totalmente desbloqueado.';
-	@override String get weeklySubscriptionPlan => 'Tienes un plan de suscripción semanal.';
-	@override String get monthlySubscriptionPlan => 'Tienes un plan de suscripción mensual.';
-	@override String get yearlySubscriptionPlan => 'Tienes un plan de suscripción anual.';
-	@override String weeklySubscriptionPlanEnds({required Object date}) => 'Tienes un plan de suscripción semanal (finaliza el ${date})';
-	@override String monthlySubscriptionPlanEnds({required Object date}) => 'Tienes un plan de suscripción mensual (finaliza el ${date})';
-	@override String yearlySubscriptionPlanEnds({required Object date}) => 'Tienes un plan de suscripción anual (finaliza el ${date})';
+	@override String get weeklyPlan => 'Plan semanal';
+	@override String get monthlyPlan => 'Plan mensual';
+	@override String get yearlyPlan => 'Plan anual';
+	@override String planEnds({required Object date}) => 'Finaliza el ${date}';
 	@override String get proFeatureRoutesTitle => 'Rutas de vuelo reales recientes';
 	@override String get proFeatureRoutesBody => 'Sigue una ruta grabada recientemente en lugar de un arco aproximado.';
 	@override String get proFeatureMapsTitle => 'Mapas más detallados, disponibles offline';
@@ -407,7 +405,6 @@ class _TranslationsSubscriptionEs extends TranslationsSubscriptionEn {
 	@override String currentPeriodEnds({required Object date}) => 'El periodo actual termina el ${date}';
 	@override String get managePlanAndBilling => 'Gestionar plan y facturación';
 	@override String get cancelSubscription => 'Cancelar suscripción';
-	@override String get cancellationHelper => 'Antes de cancelar, App Store o Google Play te mostrarán cuándo termina tu acceso Pro.';
 	@override String get flightPassesTitle => 'Pases de vuelo';
 	@override String get flightPassesBody => 'Estos desbloqueos para un vuelo seguirán disponibles para futuros vuelos.';
 	@override String get purchaseHelpTitle => 'Ayuda con compras';
@@ -2053,12 +2050,10 @@ extension on TranslationsEs {
 			'subscription.proFeaturesTitle' => 'Lo que desbloquea Flymap Pro',
 			'subscription.proFeaturesIncludedTitle' => 'Incluido en tu plan Pro',
 			'subscription.proHeroSubtitle' => 'Tu explorador desde la ventanilla, totalmente desbloqueado.',
-			'subscription.weeklySubscriptionPlan' => 'Tienes un plan de suscripción semanal.',
-			'subscription.monthlySubscriptionPlan' => 'Tienes un plan de suscripción mensual.',
-			'subscription.yearlySubscriptionPlan' => 'Tienes un plan de suscripción anual.',
-			'subscription.weeklySubscriptionPlanEnds' => ({required Object date}) => 'Tienes un plan de suscripción semanal (finaliza el ${date})',
-			'subscription.monthlySubscriptionPlanEnds' => ({required Object date}) => 'Tienes un plan de suscripción mensual (finaliza el ${date})',
-			'subscription.yearlySubscriptionPlanEnds' => ({required Object date}) => 'Tienes un plan de suscripción anual (finaliza el ${date})',
+			'subscription.weeklyPlan' => 'Plan semanal',
+			'subscription.monthlyPlan' => 'Plan mensual',
+			'subscription.yearlyPlan' => 'Plan anual',
+			'subscription.planEnds' => ({required Object date}) => 'Finaliza el ${date}',
 			'subscription.proFeatureRoutesTitle' => 'Rutas de vuelo reales recientes',
 			'subscription.proFeatureRoutesBody' => 'Sigue una ruta grabada recientemente en lugar de un arco aproximado.',
 			'subscription.proFeatureMapsTitle' => 'Mapas más detallados, disponibles offline',
@@ -2077,7 +2072,6 @@ extension on TranslationsEs {
 			'subscription.currentPeriodEnds' => ({required Object date}) => 'El periodo actual termina el ${date}',
 			'subscription.managePlanAndBilling' => 'Gestionar plan y facturación',
 			'subscription.cancelSubscription' => 'Cancelar suscripción',
-			'subscription.cancellationHelper' => 'Antes de cancelar, App Store o Google Play te mostrarán cuándo termina tu acceso Pro.',
 			'subscription.flightPassesTitle' => 'Pases de vuelo',
 			'subscription.flightPassesBody' => 'Estos desbloqueos para un vuelo seguirán disponibles para futuros vuelos.',
 			'subscription.purchaseHelpTitle' => 'Ayuda con compras',
@@ -2244,11 +2238,11 @@ extension on TranslationsEs {
 			'createFlight.mapPreview.estimatedMapSize' => ({required Object size}) => 'Tamaño estimado del mapa: ${size}',
 			'createFlight.mapPreview.upgradeToPro' => 'Pasar a Pro',
 			'createFlight.mapPreview.basicHint' => 'Detalle básico del mapa con lugares limitados',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.mapPreview.proGateHint' => 'Mejora para obtener un mapa detallado con todos los lugares',
 			'createFlight.mapPreview.proHint' => ({required Object count}) => 'Mapa offline detallado con ${count} lugares',
 			'createFlight.mapPreview.optionsTitle' => 'Ruta aproximada',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.mapPreview.optionsBody' => 'La ruta es aproximada; el trayecto real puede variar, especialmente en vuelos de larga distancia.',
 			'createFlight.overview.routeNotReady' => 'La ruta aún no está lista.',
 			'createFlight.overview.proPoiUpsell' => 'El plan Free incluye mapa básico y lugares limitados',
@@ -2758,11 +2752,11 @@ extension on TranslationsEs {
 			'countries.AM' => 'Armenia',
 			'countries.AO' => 'Angola',
 			'countries.AR' => 'Argentina',
-			_ => null,
-		} ?? switch (path) {
 			'countries.AT' => 'Austria',
 			'countries.AU' => 'Australia',
 			'countries.AZ' => 'Azerbaiyan',
+			_ => null,
+		} ?? switch (path) {
 			'countries.BA' => 'Bosnia y Herzegovina',
 			'countries.BB' => 'Barbados',
 			'countries.BD' => 'Banglades',

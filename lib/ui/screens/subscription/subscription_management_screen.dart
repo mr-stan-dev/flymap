@@ -67,6 +67,11 @@ class _SubscriptionManagementScreenState
             final isPro = _isProActive(state);
             final billingPeriod = _resolveBillingPeriod(state);
             final formattedDate = _formatDate(context, state.status?.expiresAt);
+            final planDescription = _planDescription(
+              context,
+              billingPeriod,
+              formattedDate,
+            );
             return RefreshIndicator(
               onRefresh: context.read<SubscriptionCubit>().refresh,
               child: ListView(
@@ -78,13 +83,7 @@ class _SubscriptionManagementScreenState
                 ),
                 children: [
                   if (isPro)
-                    _ProMembershipHero(
-                      membershipPeriodDescription: _membershipPeriodDescription(
-                        context,
-                        billingPeriod,
-                        formattedDate,
-                      ),
-                    )
+                    const _ProMembershipHero()
                   else
                     _buildFreeStatusCard(context),
                   if (state.errorMessage?.trim().isNotEmpty == true) ...[
@@ -102,7 +101,10 @@ class _SubscriptionManagementScreenState
                   ],
                   if (isPro) ...[
                     const SizedBox(height: DsSpacing.md),
-                    _buildPlanAndBillingCard(context),
+                    _buildPlanAndBillingCard(
+                      context,
+                      planDescription: planDescription,
+                    ),
                   ],
                   const SizedBox(height: DsSpacing.md),
                   _buildPurchaseHelpCard(context),
@@ -172,35 +174,23 @@ class _SubscriptionManagementScreenState
     return matchingProducts.first;
   }
 
-  String _membershipPeriodDescription(
+  _PlanDescription _planDescription(
     BuildContext context,
     _BillingPeriod? billingPeriod,
     String? formattedDate,
   ) {
-    if (formattedDate != null) {
-      return switch (billingPeriod) {
-        _BillingPeriod.weekly =>
-          context.t.subscription.weeklySubscriptionPlanEnds(
-            date: formattedDate,
-          ),
-        _BillingPeriod.monthly =>
-          context.t.subscription.monthlySubscriptionPlanEnds(
-            date: formattedDate,
-          ),
-        _BillingPeriod.yearly =>
-          context.t.subscription.yearlySubscriptionPlanEnds(
-            date: formattedDate,
-          ),
-        null => context.t.subscription.currentPeriodEnds(date: formattedDate),
-      };
-    }
-
-    return switch (billingPeriod) {
-      _BillingPeriod.weekly => context.t.subscription.weeklySubscriptionPlan,
-      _BillingPeriod.monthly => context.t.subscription.monthlySubscriptionPlan,
-      _BillingPeriod.yearly => context.t.subscription.yearlySubscriptionPlan,
-      null => context.t.subscription.activeSubscription,
+    final plan = switch (billingPeriod) {
+      _BillingPeriod.weekly => context.t.subscription.weeklyPlan,
+      _BillingPeriod.monthly => context.t.subscription.monthlyPlan,
+      _BillingPeriod.yearly => context.t.subscription.yearlyPlan,
+      null => context.t.subscription.cardTitle,
     };
+    return (
+      primary: plan,
+      secondary: formattedDate == null
+          ? null
+          : context.t.subscription.planEnds(date: formattedDate),
+    );
   }
 
   Widget _buildFreeStatusCard(BuildContext context) {
@@ -304,15 +294,20 @@ class _SubscriptionManagementScreenState
     );
   }
 
-  Widget _buildPlanAndBillingCard(BuildContext context) {
+  Widget _buildPlanAndBillingCard(
+    BuildContext context, {
+    required _PlanDescription planDescription,
+  }) {
     return SectionCard(
       title: context.t.subscription.planAndBillingTitle,
       titleStyle: _sectionTitleStyle,
       child: Column(
         children: [
           _MetaRow(
+            key: const Key('subscription-plan-row'),
             label: context.t.subscription.planLabel,
-            value: context.t.subscription.cardTitle,
+            value: planDescription.primary,
+            secondaryValue: planDescription.secondary,
           ),
           const SizedBox(height: DsSpacing.md),
           SecondaryButton(
@@ -340,14 +335,6 @@ class _SubscriptionManagementScreenState
                   : () => _openStoreSubscriptions(context),
               icon: const Icon(Icons.cancel_outlined, size: 19),
               label: Text(context.t.subscription.cancelSubscription),
-            ),
-          ),
-          const SizedBox(height: DsSpacing.xxs),
-          Text(
-            context.t.subscription.cancellationHelper,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -479,9 +466,7 @@ class _SubscriptionManagementScreenState
 }
 
 class _ProMembershipHero extends StatelessWidget {
-  const _ProMembershipHero({required this.membershipPeriodDescription});
-
-  final String membershipPeriodDescription;
+  const _ProMembershipHero();
 
   @override
   Widget build(BuildContext context) {
@@ -584,14 +569,6 @@ class _ProMembershipHero extends StatelessWidget {
                     color: secondaryTextColor,
                   ),
                 ),
-                const SizedBox(height: DsSpacing.lg),
-                Text(
-                  membershipPeriodDescription,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: primaryTextColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
               ],
             ),
           ),
@@ -602,6 +579,8 @@ class _ProMembershipHero extends StatelessWidget {
 }
 
 enum _BillingPeriod { weekly, monthly, yearly }
+
+typedef _PlanDescription = ({String primary, String? secondary});
 
 class _HeroStatusBadge extends StatelessWidget {
   const _HeroStatusBadge({required this.label, required this.icon});
@@ -731,10 +710,16 @@ class _ProFeatureRow extends StatelessWidget {
 }
 
 class _MetaRow extends StatelessWidget {
-  const _MetaRow({required this.label, required this.value});
+  const _MetaRow({
+    required this.label,
+    required this.value,
+    this.secondaryValue,
+    super.key,
+  });
 
   final String label;
   final String value;
+  final String? secondaryValue;
 
   @override
   Widget build(BuildContext context) {
@@ -752,12 +737,27 @@ class _MetaRow extends StatelessWidget {
         ),
         const SizedBox(width: DsSpacing.md),
         Flexible(
-          child: Text(
-            value,
-            textAlign: TextAlign.end,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                value,
+                textAlign: TextAlign.end,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              if (secondaryValue case final secondaryValue?) ...[
+                const SizedBox(height: DsSpacing.xxs),
+                Text(
+                  secondaryValue,
+                  textAlign: TextAlign.end,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
       ],
