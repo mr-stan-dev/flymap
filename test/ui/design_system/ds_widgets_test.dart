@@ -11,7 +11,9 @@ void main() {
   }) async {
     await tester.pumpWidget(
       MaterialApp(
+        key: ValueKey<Brightness>(theme.brightness),
         theme: theme,
+        themeAnimationDuration: Duration.zero,
         home: Scaffold(body: Center(child: child)),
       ),
     );
@@ -117,7 +119,7 @@ void main() {
     expect(find.text('Download'), findsOneWidget);
   });
 
-  testWidgets('PremiumButton uses accessible gold in both themes', (
+  testWidgets('PremiumButton uses theme-specific premium colors', (
     tester,
   ) async {
     for (final theme in <ThemeData>[AppTheme.lightTheme, AppTheme.darkTheme]) {
@@ -130,15 +132,15 @@ void main() {
       final button = tester.widget<FilledButton>(find.byType(FilledButton));
       expect(
         button.style?.backgroundColor?.resolve(<WidgetState>{}),
-        DsPremiumColors.goldFill,
+        DsPremiumColors.fillFor(theme.brightness),
       );
       expect(
         button.style?.foregroundColor?.resolve(<WidgetState>{}),
-        DsPremiumColors.onGold,
+        DsPremiumColors.foregroundFor(theme.brightness),
       );
       expect(
         tester.widget<Text>(find.text('Upgrade')).style?.color,
-        DsPremiumColors.onGold,
+        DsPremiumColors.foregroundFor(theme.brightness),
       );
     }
   });

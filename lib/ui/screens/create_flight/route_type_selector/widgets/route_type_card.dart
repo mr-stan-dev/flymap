@@ -111,15 +111,15 @@ class RouteTypeCard extends StatelessWidget {
           ),
           if (isProOnly)
             Positioned(
-              bottom: -12,
-              right: 24,
+              bottom: -14,
+              right: DsSpacing.xl,
               child: Row(
                 children: [
                   _chipLabel(
                     context,
                     context.t.createFlight.routeTypeSelector.mostAccurate,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: DsSpacing.sm),
                   _chipLabel(
                     context,
                     context.t.common.pro,
@@ -135,24 +135,29 @@ class RouteTypeCard extends StatelessWidget {
 
   Widget _chipLabel(BuildContext context, String text, {IconData? icon}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: DsSpacing.sm,
+        vertical: 5,
+      ),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [DsPremiumColors.goldFill, DsPremiumColors.goldHighlight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: DsPremiumColors.fill(context),
         borderRadius: BorderRadius.circular(DsRadii.pill),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) Icon(icon, color: DsPremiumColors.onGold, size: 12),
-          const SizedBox(width: 4),
+          if (icon != null) ...[
+            Icon(
+              icon,
+              color: DsPremiumColors.foreground(context),
+              size: DsIconSizes.sm,
+            ),
+            const SizedBox(width: DsSpacing.xxs),
+          ],
           Text(
             text,
             style: context.textTheme.caption14Regular.copyWith(
-              color: DsPremiumColors.onGold,
+              color: DsPremiumColors.foreground(context),
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
             ),

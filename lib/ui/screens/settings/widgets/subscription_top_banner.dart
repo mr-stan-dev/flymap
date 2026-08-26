@@ -202,7 +202,7 @@ class _SubscribedBanner extends StatelessWidget {
         ? [
             colorScheme.surface,
             Color.alphaBlend(
-              DsPremiumColors.goldFill.withValues(alpha: 0.055),
+              DsPremiumColors.amber.withValues(alpha: 0.055),
               colorScheme.surface,
             ),
           ]
@@ -239,12 +239,12 @@ class _SubscribedBanner extends StatelessWidget {
                   height: 36,
                   decoration: BoxDecoration(
                     color: isLightTheme
-                        ? DsPremiumColors.goldFill.withValues(alpha: 0.24)
+                        ? DsPremiumColors.amber.withValues(alpha: 0.24)
                         : DsPremiumColors.iconSurface(context),
                     shape: BoxShape.circle,
                     border: isLightTheme
                         ? Border.all(
-                            color: DsPremiumColors.goldFill.withValues(
+                            color: DsPremiumColors.amber.withValues(
                               alpha: 0.58,
                             ),
                           )
@@ -289,7 +289,7 @@ class _SubscribedBanner extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: isLightTheme
-                        ? DsPremiumColors.goldFill.withValues(alpha: 0.12)
+                        ? DsPremiumColors.amber.withValues(alpha: 0.12)
                         : colorScheme.surface.withValues(alpha: 0.72),
                     borderRadius: BorderRadius.circular(DsRadii.pill),
                     border: Border.all(

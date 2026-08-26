@@ -14,7 +14,7 @@ class PremiumSurfaceGradients {
   /// navy treatment in dark mode.
   static List<Color> membershipHero({required bool isLightTheme}) {
     return isLightTheme
-        ? const [Color(0xFFFFFFFF), Color(0xFFF7FAFE), Color(0xFFFFF9EC)]
+        ? const [Color(0xFFFFFFFF), Color(0xFFF7FAFE), Color(0xFFFFF5E3)]
         : pro(isLightTheme: false);
   }
 

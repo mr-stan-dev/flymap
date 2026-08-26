@@ -4,11 +4,24 @@ import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/widgets/premium_surface_effects.dart';
 
 void main() {
-  test('premium foreground pairs meet WCAG AA contrast', () {
+  test('premium high-emphasis colors resolve by theme', () {
+    expect(DsPremiumColors.fillFor(Brightness.light), DsPremiumColors.amber);
+    expect(DsPremiumColors.fillFor(Brightness.dark), DsPremiumColors.darkAmber);
     expect(
-      _contrast(DsPremiumColors.goldFill, DsPremiumColors.onGold),
+      DsPremiumColors.foregroundFor(Brightness.light),
+      DsPremiumColors.onAmber,
+    );
+    expect(
+      DsPremiumColors.foregroundFor(Brightness.dark),
+      DsPremiumColors.onDarkAmber,
+    );
+    expect(
+      _contrast(DsPremiumColors.amber, DsPremiumColors.onAmber),
       greaterThanOrEqualTo(4.5),
     );
+  });
+
+  test('premium supporting foreground pairs meet WCAG AA contrast', () {
     expect(
       _contrast(DsPremiumColors.lightSurface, DsPremiumColors.lightAccent),
       greaterThanOrEqualTo(4.5),
@@ -38,6 +51,8 @@ void main() {
           home: Builder(
             builder: (context) {
               colors = <String, Color>{
+                'fill': DsPremiumColors.fill(context),
+                'foreground': DsPremiumColors.foreground(context),
                 'accent': DsPremiumColors.accent(context),
                 'surface': DsPremiumColors.subtleSurface(context),
                 'border': DsPremiumColors.border(context),
@@ -52,12 +67,16 @@ void main() {
     }
 
     expect(await resolve(Brightness.light), <String, Color>{
+      'fill': DsPremiumColors.amber,
+      'foreground': DsPremiumColors.onAmber,
       'accent': DsPremiumColors.lightAccent,
       'surface': DsPremiumColors.lightSurface,
       'border': DsPremiumColors.lightBorder,
       'iconSurface': DsPremiumColors.lightIconSurface,
     });
     expect(await resolve(Brightness.dark), <String, Color>{
+      'fill': DsPremiumColors.darkAmber,
+      'foreground': DsPremiumColors.onDarkAmber,
       'accent': DsPremiumColors.darkAccent,
       'surface': DsPremiumColors.darkSurface,
       'border': DsPremiumColors.darkBorder,

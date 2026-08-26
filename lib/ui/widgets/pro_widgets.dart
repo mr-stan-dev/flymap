@@ -3,13 +3,13 @@ import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/tokens/ds_brand_colors.dart';
 import 'package:flymap/ui/widgets/premium_surface_effects.dart';
 
-enum ProBadgeVariant { gold, premiumNavy }
+enum ProBadgeVariant { amber, premiumNavy }
 
 class ProBadge extends StatelessWidget {
   const ProBadge({
     this.label = 'PRO',
     this.compact = false,
-    this.variant = ProBadgeVariant.gold,
+    this.variant = ProBadgeVariant.amber,
     super.key,
   });
 
@@ -71,12 +71,14 @@ class ProBadge extends StatelessWidget {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: DsPremiumColors.goldFill,
+        color: DsPremiumColors.fill(context),
         borderRadius: borderRadius,
       ),
       child: Text(
         label,
-        style: baseTextStyle?.copyWith(color: DsPremiumColors.onGold),
+        style: baseTextStyle?.copyWith(
+          color: DsPremiumColors.foreground(context),
+        ),
       ),
     );
   }

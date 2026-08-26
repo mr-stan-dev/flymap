@@ -550,15 +550,15 @@ class _ProMembershipHero extends StatelessWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: DsPremiumColors.goldFill,
+                        color: DsPremiumColors.fill(context),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: DsPremiumColors.goldHighlight,
+                          color: DsPremiumColors.fill(context),
                         ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.workspace_premium_rounded,
-                        color: DsPremiumColors.onGold,
+                        color: DsPremiumColors.foreground(context),
                       ),
                     ),
                     const Spacer(),
@@ -622,7 +622,7 @@ class _HeroStatusBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: isLightTheme
-            ? DsPremiumColors.goldFill.withValues(alpha: 0.16)
+            ? DsPremiumColors.amber.withValues(alpha: 0.16)
             : Colors.white.withValues(alpha: 0.16),
         borderRadius: BorderRadius.circular(DsRadii.pill),
         border: Border.all(
