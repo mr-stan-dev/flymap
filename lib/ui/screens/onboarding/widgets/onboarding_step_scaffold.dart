@@ -6,6 +6,7 @@ class OnboardingStepScaffold extends StatelessWidget {
     required this.body,
     this.subtitle,
     this.centerHeader = false,
+    this.headerBodySpacing = 20,
     this.bodyPadding = const EdgeInsets.fromLTRB(20, 0, 20, 12),
     super.key,
   });
@@ -13,6 +14,7 @@ class OnboardingStepScaffold extends StatelessWidget {
   final String title;
   final String? subtitle;
   final bool centerHeader;
+  final double headerBodySpacing;
   final Widget body;
   final EdgeInsets bodyPadding;
 
@@ -53,7 +55,7 @@ class OnboardingStepScaffold extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: headerBodySpacing),
         Expanded(
           child: SingleChildScrollView(padding: bodyPadding, child: body),
         ),

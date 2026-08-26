@@ -63,6 +63,7 @@ class OnboardingSocialProofStep extends StatelessWidget {
     return OnboardingStepScaffold(
       title: strings.title,
       centerHeader: true,
+      headerBodySpacing: 0,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -70,7 +71,6 @@ class OnboardingSocialProofStep extends StatelessWidget {
             count: strings.flightCount,
             caption: strings.flightCountCaption,
           ),
-          const SizedBox(height: DsSpacing.lg),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -127,7 +127,7 @@ class _LaurelFlightCount extends StatelessWidget {
       label: semanticsLabel,
       child: ExcludeSemantics(
         child: SizedBox(
-          height: 184,
+          height: 154,
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -137,7 +137,7 @@ class _LaurelFlightCount extends StatelessWidget {
                 bottom: 0,
                 width: 96,
                 child: Image.asset(
-                  'assets/images/laurel-wreath-laurel_1-left.webp',
+                  'assets/images/laurel_1-left.webp',
                   key: const ValueKey('onboarding-social-proof-laurel-left'),
                   fit: BoxFit.contain,
                   filterQuality: FilterQuality.high,
@@ -149,7 +149,7 @@ class _LaurelFlightCount extends StatelessWidget {
                 bottom: 0,
                 width: 96,
                 child: Image.asset(
-                  'assets/images/laurel-wreath-laurel_1-right.webp',
+                  'assets/images/laurel_1-right.webp',
                   key: const ValueKey('onboarding-social-proof-laurel-right'),
                   fit: BoxFit.contain,
                   filterQuality: FilterQuality.high,
@@ -174,10 +174,8 @@ class _LaurelFlightCount extends StatelessWidget {
                     Text(
                       caption,
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
+                      style: theme.textTheme.bodySmall?.copyWith(
                         color: scheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
-                        height: 1.25,
                       ),
                     ),
                   ],
