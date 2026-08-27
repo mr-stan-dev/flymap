@@ -25,7 +25,13 @@ class WeatherForecastPoint {
   final double? cloudLowPercent;
   final double? cloudMidPercent;
   final double? cloudHighPercent;
+
+  /// Expected precipitation rate in millimetres per hour.
   final double? precipitationMm;
+
+  /// Provider-neutral Flymap condition (for example `rain_showers_light`,
+  /// `snow_heavy`, `partlycloudy_day`). Adapters translate vendor symbols;
+  /// presentation derives day/night independently from time and coordinates.
   final String? symbolCode;
 }
 

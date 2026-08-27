@@ -34,6 +34,10 @@ class FetchFlightWeatherUseCase {
   static const double sampleSpacingKm = 75;
   static const int minSamples = 5;
   static const int maxSamples = 20;
+  static const int airportForecastSpanHours = 6;
+  static const int airportForecastStepHours = 3;
+  static const int airportForecastFetchPaddingHours =
+      airportForecastSpanHours + airportForecastStepHours;
 
   /// Grid spacing (in the square map-card viewport) for the full-card
   /// cloud field; grid cells the corridor already covers are skipped.
@@ -85,10 +89,18 @@ class FetchFlightWeatherUseCase {
         schedule?.arrival?.offsetMinutes ??
         _timezoneService?.utcOffsetMinutes(route.arrival, arrivalUtc) ??
         departureOffset;
-    // Timeline window: the whole flight ±1 h, for animating cloud
-    // evolution — the provider response contains it anyway.
-    final windowStart = departureUtc.subtract(const Duration(hours: 1));
-    final windowEnd = arrivalUtc.add(const Duration(hours: 1));
+    // Fetch enough data for each airport's expandable timeline. One extra
+    // three-hour step lets its +/-6 h display bracket the requested span with
+    // normal local clock slots instead of awkward flight-relative times. This
+    // widens the existing batch response; it does not add calls or locations.
+    final fetchWindowStart = departureUtc.subtract(
+      const Duration(hours: airportForecastFetchPaddingHours),
+    );
+    final fetchWindowEnd = arrivalUtc.add(
+      const Duration(hours: airportForecastFetchPaddingHours),
+    );
+    final mapWindowStart = departureUtc.subtract(const Duration(hours: 1));
+    final mapWindowEnd = arrivalUtc.add(const Duration(hours: 1));
     final requests = <_PointRequest>[
       _PointRequest(route.departure.latLon, departureUtc),
       _PointRequest(route.arrival.latLon, arrivalUtc),
@@ -129,8 +141,8 @@ class FetchFlightWeatherUseCase {
     ];
     final batch = await _fetchAll(
       requests,
-      windowStart: windowStart,
-      windowEnd: windowEnd,
+      windowStart: fetchWindowStart,
+      windowEnd: fetchWindowEnd,
     );
     final results = batch.results;
 
@@ -151,16 +163,16 @@ class FetchFlightWeatherUseCase {
       results[0],
       progress: 0,
       timeUtc: departureUtc,
-      windowStart: windowStart,
-      windowEnd: windowEnd,
+      windowStart: mapWindowStart,
+      windowEnd: mapWindowEnd,
     );
     if (departureSample != null) samples.add(departureSample);
     final arrivalSample = _buildCloudSample(
       results[1],
       progress: 1,
       timeUtc: arrivalUtc,
-      windowStart: windowStart,
-      windowEnd: windowEnd,
+      windowStart: mapWindowStart,
+      windowEnd: mapWindowEnd,
     );
     if (arrivalSample != null) samples.add(arrivalSample);
 
@@ -171,8 +183,8 @@ class FetchFlightWeatherUseCase {
         result,
         progress: progress,
         timeUtc: result.request.targetTimeUtc,
-        windowStart: windowStart,
-        windowEnd: windowEnd,
+        windowStart: mapWindowStart,
+        windowEnd: mapWindowEnd,
       );
       if (sample == null) continue;
       (result.request.isAreaSample ? areaSamples : samples).add(sample);
@@ -191,8 +203,14 @@ class FetchFlightWeatherUseCase {
         departureForecast,
         departureUtc,
         departureOffset,
+        timeline: _airportTimeline(results[0], departureUtc, departureOffset),
       ),
-      arrival: _airportWeather(arrivalForecast, arrivalUtc, arrivalOffset),
+      arrival: _airportWeather(
+        arrivalForecast,
+        arrivalUtc,
+        arrivalOffset,
+        timeline: _airportTimeline(results[1], arrivalUtc, arrivalOffset),
+      ),
       samples: samples,
       areaSamples: areaSamples,
       fetchedAt: batch.retrievedAtUtc,
@@ -384,8 +402,9 @@ class FetchFlightWeatherUseCase {
   AirportWeather _airportWeather(
     WeatherForecastPoint forecast,
     DateTime timeUtc,
-    int utcOffsetMinutes,
-  ) {
+    int utcOffsetMinutes, {
+    List<AirportForecastSlice> timeline = const <AirportForecastSlice>[],
+  }) {
     return AirportWeather(
       timeUtc: timeUtc,
       utcOffsetMinutes: utcOffsetMinutes,
@@ -394,7 +413,59 @@ class FetchFlightWeatherUseCase {
       precipitationMm: forecast.precipitationMm,
       cloudCoverPercent: forecast.cloudCoverPercent,
       symbolCode: forecast.symbolCode,
+      timeline: timeline,
     );
+  }
+
+  List<AirportForecastSlice> _airportTimeline(
+    _PointResult result,
+    DateTime airportTimeUtc,
+    int utcOffsetMinutes,
+  ) {
+    final timeline = <AirportForecastSlice>[];
+    final localAirportTime = airportTimeUtc.add(
+      Duration(minutes: utcOffsetMinutes),
+    );
+    final stepMinutes = airportForecastStepHours * 60;
+    final localMidnight = DateTime.utc(
+      localAirportTime.year,
+      localAirportTime.month,
+      localAirportTime.day,
+    );
+    final startMinutes = localAirportTime
+        .subtract(const Duration(hours: airportForecastSpanHours))
+        .difference(localMidnight)
+        .inMinutes;
+    final endMinutes = localAirportTime
+        .add(const Duration(hours: airportForecastSpanHours))
+        .difference(localMidnight)
+        .inMinutes;
+    final firstSlotMinutes = (startMinutes / stepMinutes).floor() * stepMinutes;
+    final lastSlotMinutes = (endMinutes / stepMinutes).ceil() * stepMinutes;
+
+    // Include the normal local-clock slots bracketing the requested +/-6 h
+    // range. The scheduled event is rendered separately at its exact time.
+    for (
+      var minutes = firstSlotMinutes;
+      minutes <= lastSlotMinutes;
+      minutes += stepMinutes
+    ) {
+      final localTime = localMidnight.add(Duration(minutes: minutes));
+      final timeUtc = localTime.subtract(Duration(minutes: utcOffsetMinutes));
+      final forecast = _atTime(result.series, timeUtc);
+      if (forecast == null) continue;
+      timeline.add(
+        AirportForecastSlice(
+          timeUtc: timeUtc,
+          temperatureC: forecast.temperatureC,
+          windSpeedMs: forecast.windSpeedMs,
+          precipitationMm: forecast.precipitationMm,
+          cloudCoverPercent: forecast.cloudCoverPercent,
+          symbolCode: forecast.symbolCode,
+        ),
+      );
+    }
+    return timeline;
   }
 
   /// Evenly spaced points along the route polyline (great-circle line when
@@ -491,15 +562,24 @@ class FetchFlightWeatherUseCase {
   /// Forecast values at this location's expected overflight instant.
   ///
   /// Provider series are normally hourly near-term and may be six-hourly at
-  /// longer horizons. Interpolating continuous values avoids snapping a
-  /// passenger's view forecast to whichever model step happens to be closer.
+  /// longer horizons. Continuous measurements are interpolated to avoid
+  /// snapping them to a model step. Precipitation and the condition symbol
+  /// both describe the period beginning at a provider point, so they stay
+  /// paired on the period containing the target instead of being interpolated
+  /// or selected independently.
   WeatherForecastPoint? _atTargetTime(_PointResult result) {
-    final target = result.request.targetTimeUtc;
+    return _atTime(result.series, result.request.targetTimeUtc);
+  }
+
+  WeatherForecastPoint? _atTime(
+    List<WeatherForecastPoint> series,
+    DateTime target,
+  ) {
     WeatherForecastPoint? before;
     WeatherForecastPoint? after;
     WeatherForecastPoint? nearest;
     Duration? nearestDistance;
-    for (final point in result.series) {
+    for (final point in series) {
       final distance = point.timeUtc.difference(target).abs();
       if (nearestDistance == null || distance < nearestDistance) {
         nearestDistance = distance;
@@ -573,12 +653,8 @@ class FetchFlightWeatherUseCase {
         after.cloudHighPercent,
         nearest.cloudHighPercent,
       ),
-      precipitationMm: interpolate(
-        before.precipitationMm,
-        after.precipitationMm,
-        nearest.precipitationMm,
-      ),
-      symbolCode: nearest.symbolCode,
+      precipitationMm: before.precipitationMm,
+      symbolCode: before.symbolCode,
     );
   }
 }

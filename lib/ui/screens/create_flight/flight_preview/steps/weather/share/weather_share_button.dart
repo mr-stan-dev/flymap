@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flymap/analytics/app_analytics.dart';
+import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/domain/policy/domestic_route_policy.dart';
@@ -214,17 +215,13 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
       headline: '$depCode → $arrCode',
       subtitle: flightNumber.isEmpty ? date : '$flightNumber · $date',
       departure: _airport(
-        route.departure.displayCode,
-        route.departure.city,
-        route.departure.countryCode,
+        route.departure,
         weather.departure,
         tempUnit,
         dateFormat,
       ),
       arrival: _airport(
-        route.arrival.displayCode,
-        route.arrival.city,
-        route.arrival.countryCode,
+        route.arrival,
         weather.arrival,
         tempUnit,
         dateFormat,
@@ -241,9 +238,7 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
   }
 
   WeatherShareAirport _airport(
-    String code,
-    String city,
-    String countryCode,
+    Airport airport,
     AirportWeather weather,
     TemperatureUnit tempUnit,
     DateDisplayFormat dateFormat, {
@@ -261,13 +256,22 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
     if (isNextDay) {
       dateText = '$dateText (${context.t.createFlight.weather.tomorrow})';
     }
-    final normalizedCountryCode = countryCode.trim().toUpperCase();
+    final normalizedCountryCode = airport.countryCode.trim().toUpperCase();
     return WeatherShareAirport(
-      code: code,
-      city: city,
+      code: airport.displayCode,
+      city: airport.city,
       countryCode: normalizedCountryCode,
       countryFlag: RegionHighlightModel.flagEmoji(normalizedCountryCode) ?? '',
-      emoji: weatherSymbolEmoji(weather.symbolCode, weather.cloudCoverPercent),
+      emoji: weatherSymbolEmoji(
+        weather.symbolCode,
+        weather.cloudCoverPercent,
+        isDaytime: weatherIsDaytime(
+          timeUtc: weather.timeUtc,
+          utcOffsetMinutes: weather.utcOffsetMinutes,
+          coordinate: airport.latLon,
+        ),
+        precipitationMm: weather.precipitationMm,
+      ),
       temperatureText: temperature == null
           ? '–'
           : UnitFormatUtils.formatTemperatureValue(temperature, tempUnit),
@@ -282,7 +286,7 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
       windFilledBars: windPresentation?.filledBars ?? 0,
       windTone: windPresentation?.tone ?? WeatherWindTone.normal,
       precipitationText: (weather.precipitationMm ?? 0) > 0
-          ? '${weather.precipitationMm!.toStringAsFixed(1)} mm'
+          ? '${weather.precipitationMm!.toStringAsFixed(1)} mm/h'
           : null,
     );
   }

@@ -16,6 +16,16 @@ void main() {
         precipitationMm: 0.3,
         cloudCoverPercent: 35,
         symbolCode: 'partlycloudy_day',
+        timeline: [
+          AirportForecastSlice(
+            timeUtc: DateTime.utc(2026, 8, 3, 5),
+            temperatureC: 17,
+            windSpeedMs: 2.5,
+            precipitationMm: 0.2,
+            cloudCoverPercent: 70,
+            symbolCode: 'rain',
+          ),
+        ],
       ),
       arrival: AirportWeather(
         timeUtc: DateTime.utc(2026, 8, 3, 11),

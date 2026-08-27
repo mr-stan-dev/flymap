@@ -73,6 +73,19 @@ class FlightWeatherDbMapper {
       if (airport.cloudCoverPercent != null)
         'cloudCoverPercent': airport.cloudCoverPercent,
       if (airport.symbolCode != null) 'symbolCode': airport.symbolCode,
+      'timeline': [
+        for (final slice in airport.timeline)
+          {
+            'timeUtc': slice.timeUtc.toIso8601String(),
+            if (slice.temperatureC != null) 'temperatureC': slice.temperatureC,
+            if (slice.windSpeedMs != null) 'windSpeedMs': slice.windSpeedMs,
+            if (slice.precipitationMm != null)
+              'precipitationMm': slice.precipitationMm,
+            if (slice.cloudCoverPercent != null)
+              'cloudCoverPercent': slice.cloudCoverPercent,
+            if (slice.symbolCode != null) 'symbolCode': slice.symbolCode,
+          },
+      ],
     };
   }
 
@@ -85,6 +98,19 @@ class FlightWeatherDbMapper {
       precipitationMm: (map['precipitationMm'] as num?)?.toDouble(),
       cloudCoverPercent: (map['cloudCoverPercent'] as num?)?.toDouble(),
       symbolCode: map['symbolCode'] as String?,
+      timeline: [
+        for (final raw in (map['timeline'] as List? ?? const []))
+          AirportForecastSlice(
+            timeUtc: DateTime.parse(_asMap(raw)['timeUtc'] as String),
+            temperatureC: (_asMap(raw)['temperatureC'] as num?)?.toDouble(),
+            windSpeedMs: (_asMap(raw)['windSpeedMs'] as num?)?.toDouble(),
+            precipitationMm: (_asMap(raw)['precipitationMm'] as num?)
+                ?.toDouble(),
+            cloudCoverPercent: (_asMap(raw)['cloudCoverPercent'] as num?)
+                ?.toDouble(),
+            symbolCode: _asMap(raw)['symbolCode'] as String?,
+          ),
+      ],
     );
   }
 

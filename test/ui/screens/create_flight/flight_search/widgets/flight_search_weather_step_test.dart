@@ -87,8 +87,9 @@ void main() {
     expect(find.textContaining('BBB'), findsOneWidget);
     // Times carry their UTC offset instead of a "times are local" footnote.
     expect(find.textContaining('GMT+2', findRichText: true), findsNWidgets(2));
-    // Wind reads as a strength label, not a bare number.
-    expect(find.textContaining('Light wind · 4 m/s'), findsNWidgets(2));
+    // Wind remains visible in the compact overview; its strength label is
+    // retained in semantics while the card shows the concise measurement.
+    expect(find.text('4 m/s'), findsNWidgets(2));
     // The compact verdict answers the headline without a second sentence.
     await tester.scrollUntilVisible(
       find.byKey(const ValueKey('weather-verdict-chip')),
@@ -100,7 +101,7 @@ void main() {
     expect(find.textContaining('Window seat worth it'), findsNothing);
   });
 
-  testWidgets('keeps airport codes intact in the two-column layout', (
+  testWidgets('uses airport, place, and date hierarchy in full-width cards', (
     tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(393, 850));
@@ -129,28 +130,41 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(
-      find.byKey(const ValueKey('airport-weather-cards-row')),
+      find.byKey(const ValueKey('airport-weather-cards-column')),
       findsOneWidget,
     );
     final code = tester.widget<Text>(find.text('FCO'));
     expect(code.maxLines, 1);
     expect(code.softWrap, isFalse);
-    final departure = tester.getTopLeft(
+    expect(find.text('Rome · IT'), findsOneWidget);
+    final codeCenter = tester.getCenter(find.text('FCO'));
+    final placeCenter = tester.getCenter(find.text('Rome · IT'));
+    expect(placeCenter.dy, closeTo(codeCenter.dy, 1));
+    expect(find.textContaining('GMT+2 ·'), findsOneWidget);
+    final departureBottom = tester.getBottomLeft(
       find.byKey(const ValueKey('departure-airport-weather-card')),
     );
-    final arrival = tester.getTopLeft(
+    final arrivalTop = tester.getTopLeft(
       find.byKey(const ValueKey('arrival-airport-weather-card')),
     );
-    expect(arrival.dy, closeTo(departure.dy, 0.1));
-    expect(arrival.dx, greaterThan(departure.dx));
+    expect(arrivalTop.dy, greaterThan(departureBottom.dy));
   });
 
-  testWidgets('stacks airport cards on narrow screens', (tester) async {
+  testWidgets('keeps full-width cards compact on small phone screens', (
+    tester,
+  ) async {
     await tester.binding.setSurfaceSize(const Size(320, 700));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
+    final longCity = 'A very long airport city name that must never squeeze';
     await tester.pumpWidget(
-      app(stateWith(weather: _weather()), isProUser: true),
+      app(
+        stateWith(
+          route: _route(arrivalCity: longCity),
+          weather: _weather(),
+        ),
+        isProUser: true,
+      ),
     );
     await tester.pump();
 
@@ -159,13 +173,148 @@ void main() {
       find.byKey(const ValueKey('airport-weather-cards-column')),
       findsOneWidget,
     );
-    final departureBottom = tester.getBottomLeft(
-      find.byKey(const ValueKey('departure-airport-weather-card')),
+    final departureCard = find.byKey(
+      const ValueKey('departure-airport-weather-card'),
     );
+    final departureBottom = tester.getBottomLeft(departureCard);
     final arrivalTop = tester.getTopLeft(
       find.byKey(const ValueKey('arrival-airport-weather-card')),
     );
     expect(arrivalTop.dy, greaterThan(departureBottom.dy));
+    final cardSize = tester.getSize(departureCard);
+    expect(cardSize.width, greaterThan(280));
+    expect(cardSize.height, lessThan(80));
+    final cityText = tester.widget<Text>(find.text('$longCity · ES'));
+    expect(cityText.maxLines, 1);
+    expect(cityText.overflow, TextOverflow.ellipsis);
+    // The fixed weather summary remains visible beside the truncated place.
+    expect(
+      find.byKey(const ValueKey('airport-weather-icon-clearDay')),
+      findsNWidgets(2),
+    );
+  });
+
+  testWidgets(
+    'expands to normal local clock slots with the flight at its exact time',
+    (tester) async {
+      await tester.pumpWidget(
+        app(stateWith(weather: _weather()), isProUser: true),
+      );
+      await tester.pump();
+
+      expect(find.byIcon(Icons.flight_takeoff_rounded), findsNothing);
+      await tester.tap(
+        find.byKey(const ValueKey('airport-weather-expansion-AAA')),
+      );
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(tester.takeException(), isNull);
+      expect(find.byIcon(Icons.flight_takeoff_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.flight_land_rounded), findsNothing);
+      for (final time in [
+        '03:00',
+        '06:00',
+        '09:00',
+        '12:00',
+        '15:00',
+        '18:00',
+      ]) {
+        expect(find.text(time), findsOneWidget);
+      }
+      // The scheduled departure remains 10:00 and its marker sits between
+      // the surrounding 09:00 and 12:00 forecast slots.
+      expect(
+        find.textContaining('10:00', findRichText: true),
+        findsNWidgets(2),
+      );
+      final markerCenter = tester.getCenter(
+        find.byKey(const ValueKey('airport-weather-event-marker-departure')),
+      );
+      final markerBottom = tester.getBottomLeft(
+        find.byKey(const ValueKey('airport-weather-event-marker-departure')),
+      );
+      final connectorTop = tester.getTopLeft(
+        find.byKey(const ValueKey('airport-weather-event-connector-departure')),
+      );
+      final eventDotCenter = tester.getCenter(
+        find.byKey(const ValueKey('airport-weather-event-dot-departure')),
+      );
+      expect(
+        markerCenter.dx,
+        greaterThan(tester.getCenter(find.text('09:00')).dx),
+      );
+      expect(
+        markerCenter.dx,
+        lessThan(tester.getCenter(find.text('12:00')).dx),
+      );
+      expect(connectorTop.dy, closeTo(markerBottom.dy, 0.1));
+      expect(eventDotCenter.dy, greaterThan(markerCenter.dy));
+    },
+  );
+
+  testWidgets('uses consistent SVG icons and light-rain presentation', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      app(
+        stateWith(
+          weather: _weather(
+            departureSymbolCode: 'cloudy',
+            arrivalSymbolCode: 'rain',
+            arrivalPrecipitationMm: 0.2,
+          ),
+        ),
+        isProUser: true,
+      ),
+    );
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
+    expect(
+      find.byKey(const ValueKey('airport-weather-icon-cloudy')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('airport-weather-icon-lightRainDay')),
+      findsOneWidget,
+    );
+    expect(find.text('☁️'), findsNothing);
+    expect(find.text('🌧️'), findsNothing);
+    expect(find.text('0.2 mm/h'), findsOneWidget);
+    final windText = tester.widgetList<Text>(find.text('4 m/s')).first;
+    final precipitationText = tester.widget<Text>(find.text('0.2 mm/h'));
+    expect(windText.style?.fontSize, precipitationText.style?.fontSize);
+  });
+
+  testWidgets('derives airport day and night icons from time and position', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      app(
+        stateWith(
+          weather: _weather(
+            departureTimeUtc: DateTime.utc(2026, 8, 3, 12),
+            arrivalTimeUtc: DateTime.utc(2026, 8, 3),
+            // Deliberately contradictory provider suffixes: solar position
+            // must be authoritative for presentation.
+            departureSymbolCode: 'clearsky_night',
+            arrivalSymbolCode: 'clearsky_day',
+          ),
+        ),
+        isProUser: true,
+      ),
+    );
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
+    expect(
+      find.byKey(const ValueKey('airport-weather-icon-clearDay')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('airport-weather-icon-clearNight')),
+      findsOneWidget,
+    );
   });
 
   testWidgets('stacks airport cards for accessibility text sizes', (
@@ -507,28 +656,56 @@ FlightWeather _weather({
   List<double>? lowCloudPercent,
   int departureOffsetMinutes = 120,
   int arrivalOffsetMinutes = 120,
+  DateTime? departureTimeUtc,
   DateTime? arrivalTimeUtc,
   DateTime? fetchedAt,
+  String departureSymbolCode = 'clearsky_day',
+  String arrivalSymbolCode = 'clearsky_day',
+  double departurePrecipitationMm = 0,
+  double arrivalPrecipitationMm = 0,
+  bool withAirportTimeline = true,
 }) {
   AirportWeather airport({
     double windMs = 4,
     int offsetMinutes = 120,
     DateTime? timeUtc,
-  }) => AirportWeather(
-    timeUtc: timeUtc ?? DateTime.utc(2026, 8, 3, 8),
-    utcOffsetMinutes: offsetMinutes,
-    temperatureC: 21,
-    windSpeedMs: windMs,
-    precipitationMm: 0,
-    cloudCoverPercent: 10,
-    symbolCode: 'clearsky_day',
-  );
+    required String symbolCode,
+    required double precipitationMm,
+  }) {
+    final eventTimeUtc = timeUtc ?? DateTime.utc(2026, 8, 3, 8);
+    return AirportWeather(
+      timeUtc: eventTimeUtc,
+      utcOffsetMinutes: offsetMinutes,
+      temperatureC: 21,
+      windSpeedMs: windMs,
+      precipitationMm: precipitationMm,
+      cloudCoverPercent: 10,
+      symbolCode: symbolCode,
+      timeline: withAirportTimeline
+          ? _airportTimeline(
+              eventTimeUtc: eventTimeUtc,
+              offsetMinutes: offsetMinutes,
+              windMs: windMs,
+              symbolCode: symbolCode,
+              precipitationMm: precipitationMm,
+            )
+          : const [],
+    );
+  }
+
   return FlightWeather(
-    departure: airport(offsetMinutes: departureOffsetMinutes),
+    departure: airport(
+      offsetMinutes: departureOffsetMinutes,
+      timeUtc: departureTimeUtc,
+      symbolCode: departureSymbolCode,
+      precipitationMm: departurePrecipitationMm,
+    ),
     arrival: airport(
       windMs: arrivalWindMs,
       offsetMinutes: arrivalOffsetMinutes,
       timeUtc: arrivalTimeUtc,
+      symbolCode: arrivalSymbolCode,
+      precipitationMm: arrivalPrecipitationMm,
     ),
     samples: [
       for (var i = 1; i <= 6; i++)
@@ -545,6 +722,44 @@ FlightWeather _weather({
     fetchedAt: fetchedAt ?? DateTime.utc(2026, 7, 28, 9),
     isTimeEstimated: isTimeEstimated,
   );
+}
+
+List<AirportForecastSlice> _airportTimeline({
+  required DateTime eventTimeUtc,
+  required int offsetMinutes,
+  required double windMs,
+  required String symbolCode,
+  required double precipitationMm,
+}) {
+  final eventLocal = eventTimeUtc.add(Duration(minutes: offsetMinutes));
+  final midnight = DateTime.utc(
+    eventLocal.year,
+    eventLocal.month,
+    eventLocal.day,
+  );
+  final startMinutes = eventLocal
+      .subtract(const Duration(hours: 6))
+      .difference(midnight)
+      .inMinutes;
+  final endMinutes = eventLocal
+      .add(const Duration(hours: 6))
+      .difference(midnight)
+      .inMinutes;
+  final firstSlot = (startMinutes / 180).floor() * 180;
+  final lastSlot = (endMinutes / 180).ceil() * 180;
+  return [
+    for (var minutes = firstSlot; minutes <= lastSlot; minutes += 180)
+      AirportForecastSlice(
+        timeUtc: midnight
+            .add(Duration(minutes: minutes))
+            .subtract(Duration(minutes: offsetMinutes)),
+        temperatureC: 21,
+        windSpeedMs: windMs,
+        precipitationMm: precipitationMm,
+        cloudCoverPercent: 10,
+        symbolCode: symbolCode,
+      ),
+  ];
 }
 
 class _FakeNotificationPermissionService extends NotificationPermissionService {

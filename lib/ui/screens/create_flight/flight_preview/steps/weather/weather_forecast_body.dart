@@ -19,7 +19,9 @@ import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/wea
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_symbols.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_wind_presentation.dart';
 import 'package:flymap/utils/travel_date_format_utils.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// The complete weather forecast experience, shared by the create-flight
@@ -583,10 +585,10 @@ class _WeatherContent extends StatelessWidget {
     final list = ListView(
       // Always scrollable so pull-to-refresh works even when the content fits.
       physics: onRefresh == null ? null : const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       children: [
         Text(t.title, style: theme.textTheme.titleLarge),
-        const SizedBox(height: 14),
+        const SizedBox(height: 10),
         _AirportWeatherCards(
           route: route,
           departure: weather.departure,
@@ -670,10 +672,8 @@ class _WeatherContent extends StatelessWidget {
   }
 }
 
-/// Keeps the two airport summaries side-by-side while each card has enough
-/// room, then switches to a vertical layout for narrow windows and large
-/// accessibility text. The breakpoint is based on the actual content width,
-/// so split-screen and tablet configurations behave like their visible size.
+/// Full-width airport summaries keep the route order obvious and give the
+/// weather overview enough room to remain one compact horizontal row.
 class _AirportWeatherCards extends StatelessWidget {
   const _AirportWeatherCards({
     required this.route,
@@ -689,58 +689,35 @@ class _AirportWeatherCards extends StatelessWidget {
   final bool showTime;
   final bool arrivalIsNextDay;
 
-  static const double _minimumTwoColumnWidth = 340;
-
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final labelScale = MediaQuery.textScalerOf(context).scale(14) / 14;
-        final stackCards =
-            constraints.maxWidth < _minimumTwoColumnWidth || labelScale > 1.2;
+    Widget card({required bool departureCard}) {
+      final airport = departureCard ? route?.departure : route?.arrival;
+      return _AirportWeatherCard(
+        key: ValueKey(
+          departureCard
+              ? 'departure-airport-weather-card'
+              : 'arrival-airport-weather-card',
+        ),
+        code: airport?.displayCode ?? '',
+        city: airport?.city ?? '',
+        countryCode: airport?.countryCode ?? '',
+        coordinate: airport?.latLon,
+        weather: departureCard ? departure : arrival,
+        showTime: showTime,
+        isNextDay: !departureCard && arrivalIsNextDay,
+        isDeparture: departureCard,
+      );
+    }
 
-        Widget card({required bool departureCard}) {
-          final airport = departureCard ? route?.departure : route?.arrival;
-          return _AirportWeatherCard(
-            key: ValueKey(
-              departureCard
-                  ? 'departure-airport-weather-card'
-                  : 'arrival-airport-weather-card',
-            ),
-            code: airport?.displayCode ?? '',
-            city: airport?.city ?? '',
-            countryCode: airport?.countryCode ?? '',
-            weather: departureCard ? departure : arrival,
-            showTime: showTime,
-            isNextDay: !departureCard && arrivalIsNextDay,
-            fillAvailableHeight: !stackCards,
-          );
-        }
-
-        if (stackCards) {
-          return Column(
-            key: const ValueKey('airport-weather-cards-column'),
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              card(departureCard: true),
-              const SizedBox(height: 12),
-              card(departureCard: false),
-            ],
-          );
-        }
-
-        return IntrinsicHeight(
-          child: Row(
-            key: const ValueKey('airport-weather-cards-row'),
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(child: card(departureCard: true)),
-              const SizedBox(width: 12),
-              Expanded(child: card(departureCard: false)),
-            ],
-          ),
-        );
-      },
+    return Column(
+      key: const ValueKey('airport-weather-cards-column'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        card(departureCard: true),
+        const SizedBox(height: 10),
+        card(departureCard: false),
+      ],
     );
   }
 }
@@ -792,17 +769,20 @@ class _AirportWeatherCard extends StatelessWidget {
     required this.code,
     required this.city,
     required this.countryCode,
+    required this.coordinate,
     required this.weather,
+    required this.isDeparture,
     this.showTime = true,
     this.isNextDay = false,
-    this.fillAvailableHeight = true,
     super.key,
   });
 
   final String code;
   final String city;
   final String countryCode;
+  final LatLng? coordinate;
   final AirportWeather weather;
+  final bool isDeparture;
 
   /// False only for intentionally obscured demo cards.
   final bool showTime;
@@ -810,16 +790,21 @@ class _AirportWeatherCard extends StatelessWidget {
   /// Arrival lands on the day after departure — mark it "(tomorrow)".
   final bool isNextDay;
 
-  /// Side-by-side cards receive a shared finite height and can pin wind to
-  /// the bottom. Stacked cards size naturally, so they must not use a Spacer.
-  final bool fillAvailableHeight;
-
   @override
   Widget build(BuildContext context) {
     final t = context.t.createFlight.weather;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final temperature = weather.temperatureC;
+    final symbol = weatherSymbolKind(
+      weather.symbolCode,
+      weather.cloudCoverPercent,
+      isDaytime: weatherIsDaytime(
+        timeUtc: weather.timeUtc,
+        utcOffsetMinutes: weather.utcOffsetMinutes,
+        coordinate: coordinate,
+      ),
+      precipitationMm: weather.precipitationMm,
+    );
     final flagCode = countryCode.trim().toUpperCase();
     final formattedTime = TravelDateFormatUtils.formatTime(weather.timeLocal);
     final utcOffsetLabel = TravelDateFormatUtils.formatUtcOffset(
@@ -831,163 +816,430 @@ class _AirportWeatherCard extends StatelessWidget {
       context.dateDisplayFormat,
     );
     if (isNextDay) dateLine = '$dateLine (${t.tomorrow})';
+    final timeAndDate = [
+      if (showTime)
+        '$formattedTime${utcOffsetLabel == null ? '' : ' $utcOffsetLabel'}',
+      dateLine,
+    ].join(' · ');
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        // Elevated tone + hairline border: reads as a card on both themes
-        // (surfaceContainerLow vanished against the dark background).
-        color: colorScheme.surfaceContainerHigh,
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // No departure/arrival captions: position (left/right card) and
-          // the times say it; the width goes to the code + zoned time.
-          Row(
+    final header = Row(
+      children: [
+        Expanded(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                flex: 2,
-                child: Text(
-                  code,
-                  maxLines: 1,
-                  softWrap: false,
-                  overflow: TextOverflow.fade,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
+              Row(
+                children: [
+                  Text(
+                    code,
+                    maxLines: 1,
+                    softWrap: false,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    if (showTime)
-                      Text.rich(
-                        TextSpan(
-                          text: formattedTime,
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                          children: [
-                            if (utcOffsetLabel != null)
-                              TextSpan(
-                                text: ' $utcOffsetLabel',
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                          ],
+                  if (city.isNotEmpty) ...[
+                    const SizedBox(width: 8),
+                    if (flagCode.length == 2) ...[
+                      ClipOval(
+                        child: CountryFlag.fromCountryCode(
+                          flagCode,
+                          width: 12,
+                          height: 12,
+                          shape: const Rectangle(),
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.end,
                       ),
-                    Text(
-                      dateLine,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.end,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                      const SizedBox(width: 5),
+                    ],
+                    Expanded(
+                      child: Text(
+                        flagCode.length == 2 ? '$city · $flagCode' : city,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          if (city.isNotEmpty)
-            Row(
-              children: [
-                if (flagCode.length == 2) ...[
-                  ClipOval(
-                    child: CountryFlag.fromCountryCode(
-                      flagCode,
-                      width: 12,
-                      height: 12,
-                      shape: const Rectangle(),
-                    ),
-                  ),
-                  const SizedBox(width: 5),
                 ],
-                Expanded(
-                  child: Text(
-                    flagCode.length == 2 ? '$city · $flagCode' : city,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
+              ),
+              const SizedBox(height: 3),
               Text(
-                weatherSymbolEmoji(
-                  weather.symbolCode,
-                  weather.cloudCoverPercent,
-                ),
-                style: const TextStyle(fontSize: 30),
-                textScaler: TextScaler.noScaling,
-              ),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  temperature == null
-                      ? '–'
-                      : UnitFormatUtils.formatTemperatureValue(
-                          temperature,
-                          context.temperatureUnit,
-                        ),
-                  maxLines: 1,
-                  overflow: TextOverflow.fade,
-                  softWrap: false,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (fillAvailableHeight)
-            const Spacer()
-          else
-            const SizedBox(height: 16),
-          if (fillAvailableHeight) const SizedBox(height: 8),
-          if (weather.windSpeedMs != null)
-            _WindIndicator(speedMs: weather.windSpeedMs!),
-          if ((weather.precipitationMm ?? 0) > 0) ...[
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(
-                  Icons.umbrella_rounded,
-                  size: 14,
+                timeAndDate,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  '${weather.precipitationMm!.toStringAsFixed(1)} mm',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+        _AirportWeatherSummary(weather: weather, symbol: symbol),
+      ],
+    );
+
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(14),
+      side: BorderSide(
+        color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+      ),
+    );
+    if (weather.timeline.length < 2) {
+      return Material(
+        color: colorScheme.surfaceContainerHigh,
+        shape: shape,
+        clipBehavior: Clip.antiAlias,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+          child: header,
+        ),
+      );
+    }
+
+    return Theme(
+      data: theme.copyWith(dividerColor: Colors.transparent),
+      child: ExpansionTile(
+        key: ValueKey('airport-weather-expansion-$code'),
+        shape: shape,
+        collapsedShape: shape,
+        backgroundColor: colorScheme.surfaceContainerHigh,
+        collapsedBackgroundColor: colorScheme.surfaceContainerHigh,
+        tilePadding: const EdgeInsets.only(left: 12, right: 4),
+        childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+        dense: true,
+        title: header,
+        children: [
+          const SizedBox(height: 8),
+          Divider(
+            height: 1,
+            color: colorScheme.outlineVariant.withValues(alpha: 0.45),
+          ),
+          const SizedBox(height: 10),
+          _AirportForecastTimeline(
+            weather: weather,
+            coordinate: coordinate,
+            isDeparture: isDeparture,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AirportWeatherSummary extends StatelessWidget {
+  const _AirportWeatherSummary({required this.weather, required this.symbol});
+
+  final AirportWeather weather;
+  final WeatherSymbolKind symbol;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final temperature = weather.temperatureC;
+    final precipitation = weather.precipitationMm ?? 0;
+
+    return SizedBox(
+      width: 118,
+      height: 56,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          SizedBox(
+            width: 48,
+            height: 44,
+            child: SvgPicture.asset(
+              symbol.assetPath,
+              key: ValueKey('airport-weather-icon-${symbol.name}'),
+              fit: BoxFit.contain,
+              excludeFromSemantics: true,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    temperature == null
+                        ? '–'
+                        : UnitFormatUtils.formatTemperatureValue(
+                            temperature,
+                            context.temperatureUnit,
+                          ),
+                    maxLines: 1,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
+                if (weather.windSpeedMs != null)
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: _WindIndicator(speedMs: weather.windSpeedMs!),
+                  ),
+                if (precipitation > 0)
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '${precipitation.toStringAsFixed(1)} mm/h',
+                      maxLines: 1,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
               ],
             ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AirportForecastTimeline extends StatelessWidget {
+  const _AirportForecastTimeline({
+    required this.weather,
+    required this.coordinate,
+    required this.isDeparture,
+  });
+
+  final AirportWeather weather;
+  final LatLng? coordinate;
+  final bool isDeparture;
+
+  @override
+  Widget build(BuildContext context) {
+    final slices = weather.timeline;
+    if (slices.length < 2) return const SizedBox.shrink();
+    final firstTime = slices.first.timeUtc;
+    final lastTime = slices.last.timeUtc;
+    final totalSeconds = lastTime.difference(firstTime).inSeconds;
+    final eventProgress = totalSeconds <= 0
+        ? 0.5
+        : weather.timeUtc.difference(firstTime).inSeconds / totalSeconds;
+
+    const timelineHeight = 132.0;
+    const trackCenterY = 28.0;
+    const intervalDotSize = 6.0;
+    const markerSize = 22.0;
+
+    return SizedBox(
+      height: timelineHeight,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final contentWidth = math.max(
+            constraints.maxWidth,
+            slices.length * 66.0,
+          );
+          final cellWidth = contentWidth / slices.length;
+          final trackLeft = cellWidth / 2;
+          final trackWidth = contentWidth - cellWidth;
+          final markerLeft =
+              (trackLeft +
+                      eventProgress.clamp(0.0, 1.0) * trackWidth -
+                      markerSize / 2)
+                  .clamp(0.0, contentWidth - markerSize);
+          final t = context.t.createFlight.weather;
+          final eventLabel = isDeparture ? t.departureLabel : t.arrivalLabel;
+          final eventTime = TravelDateFormatUtils.formatTime(weather.timeLocal);
+          final primary = Theme.of(context).colorScheme.primary;
+          final markerKind = isDeparture ? 'departure' : 'arrival';
+
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: contentWidth,
+              height: timelineHeight,
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: trackLeft,
+                    right: trackLeft,
+                    top: trackCenterY - 0.5,
+                    child: Container(
+                      height: 1,
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      for (final slice in slices)
+                        _AirportForecastPoint(
+                          slice: slice,
+                          utcOffsetMinutes: weather.utcOffsetMinutes,
+                          coordinate: coordinate,
+                          width: cellWidth,
+                          topSpacing: trackCenterY - intervalDotSize / 2,
+                        ),
+                    ],
+                  ),
+                  Positioned(
+                    left: markerLeft + markerSize / 2 - 0.75,
+                    top: markerSize,
+                    child: Container(
+                      key: ValueKey(
+                        'airport-weather-event-connector-$markerKind',
+                      ),
+                      width: 1.5,
+                      height: trackCenterY - markerSize,
+                      color: primary,
+                    ),
+                  ),
+                  Positioned(
+                    left: markerLeft + (markerSize - intervalDotSize) / 2,
+                    top: trackCenterY - intervalDotSize / 2,
+                    child: Container(
+                      key: ValueKey('airport-weather-event-dot-$markerKind'),
+                      width: intervalDotSize,
+                      height: intervalDotSize,
+                      decoration: BoxDecoration(
+                        color: primary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: markerLeft,
+                    top: 0,
+                    child: Semantics(
+                      label: '$eventLabel $eventTime',
+                      child: Tooltip(
+                        message: '$eventLabel · $eventTime',
+                        child: Container(
+                          key: ValueKey(
+                            'airport-weather-event-marker-$markerKind',
+                          ),
+                          width: markerSize,
+                          height: markerSize,
+                          decoration: BoxDecoration(
+                            color: primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isDeparture
+                                ? Icons.flight_takeoff_rounded
+                                : Icons.flight_land_rounded,
+                            size: 14,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _AirportForecastPoint extends StatelessWidget {
+  const _AirportForecastPoint({
+    required this.slice,
+    required this.utcOffsetMinutes,
+    required this.coordinate,
+    required this.width,
+    required this.topSpacing,
+  });
+
+  final AirportForecastSlice slice;
+  final int utcOffsetMinutes;
+  final LatLng? coordinate;
+  final double width;
+  final double topSpacing;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final localTime = slice.timeUtc.add(Duration(minutes: utcOffsetMinutes));
+    final symbol = weatherSymbolKind(
+      slice.symbolCode,
+      slice.cloudCoverPercent,
+      isDaytime: weatherIsDaytime(
+        timeUtc: slice.timeUtc,
+        utcOffsetMinutes: utcOffsetMinutes,
+        coordinate: coordinate,
+      ),
+      precipitationMm: slice.precipitationMm,
+    );
+    final temperature = slice.temperatureC;
+    final precipitation = slice.precipitationMm ?? 0;
+
+    return SizedBox(
+      width: width,
+      child: Column(
+        children: [
+          SizedBox(height: topSpacing),
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: colors.onSurfaceVariant,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            TravelDateFormatUtils.formatTime(localTime),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(
+            width: 38,
+            height: 30,
+            child: SvgPicture.asset(
+              symbol.assetPath,
+              fit: BoxFit.contain,
+              excludeFromSemantics: true,
+            ),
+          ),
+          Text(
+            temperature == null
+                ? '–'
+                : UnitFormatUtils.formatTemperatureValue(
+                    temperature,
+                    context.temperatureUnit,
+                  ),
+            maxLines: 1,
+            style: theme.textTheme.labelMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          if (slice.windSpeedMs != null)
+            Text(
+              '${slice.windSpeedMs!.round()} m/s',
+              maxLines: 1,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+          if (precipitation > 0)
+            Text(
+              '${precipitation.toStringAsFixed(1)} mm/h',
+              maxLines: 1,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
         ],
       ),
     );
@@ -1013,35 +1265,39 @@ class _WindIndicator extends StatelessWidget {
     };
     final color = accent ?? colorScheme.onSurfaceVariant;
 
-    return Row(
-      children: [
-        for (var bar = 0; bar < 3; bar++)
-          Padding(
-            padding: const EdgeInsets.only(right: 2),
-            child: Container(
-              width: 3,
-              height: 6 + bar * 3,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(1.5),
-                color: bar < presentation.filledBars
-                    ? color
-                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.25),
+    final fullLabel = '${presentation.label} · ${speedMs.round()} m/s';
+    return Semantics(
+      label: fullLabel,
+      child: ExcludeSemantics(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (var bar = 0; bar < 3; bar++)
+              Padding(
+                padding: const EdgeInsets.only(right: 2),
+                child: Container(
+                  width: 3,
+                  height: 6 + bar * 3,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(1.5),
+                    color: bar < presentation.filledBars
+                        ? color
+                        : colorScheme.onSurfaceVariant.withValues(alpha: 0.25),
+                  ),
+                ),
+              ),
+            const SizedBox(width: 4),
+            Text(
+              '${speedMs.round()} m/s',
+              maxLines: 1,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: color,
+                fontWeight: accent == null ? null : FontWeight.w700,
               ),
             ),
-          ),
-        const SizedBox(width: 4),
-        Expanded(
-          child: Text(
-            '${presentation.label} · ${speedMs.round()} m/s',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: color,
-              fontWeight: accent == null ? null : FontWeight.w700,
-            ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

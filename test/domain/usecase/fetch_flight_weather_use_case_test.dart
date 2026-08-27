@@ -49,6 +49,8 @@ class _FakeWeatherForecastProvider implements WeatherForecastProvider {
   final bool valuesVaryByHour;
   int callCount = 0;
   int requestCount = 0;
+  DateTime? receivedWindowStartUtc;
+  DateTime? receivedWindowEndUtc;
 
   @override
   Future<WeatherForecastBatch> forecastBatch({
@@ -58,6 +60,8 @@ class _FakeWeatherForecastProvider implements WeatherForecastProvider {
   }) async {
     callCount++;
     requestCount += requests.length;
+    receivedWindowStartUtc = windowStartUtc;
+    receivedWindowEndUtc = windowEndUtc;
     return WeatherForecastBatch(
       seriesByRequest: [
         for (final request in requests)
@@ -87,8 +91,18 @@ class _FakeWeatherForecastProvider implements WeatherForecastProvider {
               : request.coordinate.longitude.abs() % 100,
           cloudMidPercent: 0,
           cloudHighPercent: sixHourlyClouds ? 0 : 10,
-          precipitationMm: sixHourlyClouds ? 0.5 : 0,
-          symbolCode: sixHourlyClouds ? 'cloudy' : 'partlycloudy_day',
+          precipitationMm: valuesVaryByHour
+              ? hour / 10
+              : sixHourlyClouds
+              ? 0.5
+              : 0,
+          symbolCode: valuesVaryByHour
+              ? hour.isEven
+                    ? 'rain'
+                    : 'cloudy'
+              : sixHourlyClouds
+              ? 'cloudy'
+              : 'partlycloudy_day',
         ),
     ];
   }
@@ -144,6 +158,21 @@ void main() {
     expect(weather.isTimeEstimated, isFalse);
     expect(weather.departure.temperatureC, 20.0);
     expect(weather.departure.utcOffsetMinutes, 120);
+    expect(provider.receivedWindowStartUtc, DateTime.utc(2026, 8, 2, 23));
+    expect(provider.receivedWindowEndUtc, DateTime.utc(2026, 8, 3, 19, 40));
+    expect(weather.departure.timeline, hasLength(6));
+    expect(weather.arrival.timeline, hasLength(6));
+    // Airport UTC+2 displays normal local clock slots: 03:00 through 18:00.
+    // These bracket +/-6 hours around the scheduled 10:00 departure; the UI
+    // places the flight itself exactly between the 09:00 and 12:00 points.
+    expect(
+      weather.departure.timeline.first.timeUtc,
+      DateTime.utc(2026, 8, 3, 1),
+    );
+    expect(
+      weather.departure.timeline.last.timeUtc,
+      DateTime.utc(2026, 8, 3, 16),
+    );
     // Real STA and the arrival airport's own offset flow through.
     expect(weather.arrival.timeUtc, DateTime.utc(2026, 8, 3, 10, 40));
     expect(weather.arrival.utcOffsetMinutes, 180);
@@ -226,7 +255,7 @@ void main() {
       schedule: FlightSchedule(
         travelDate: DateTime(2026, 8, 3),
         departure: ZonedInstant(
-          utc: DateTime.utc(2026, 8, 3, 8, 30),
+          utc: DateTime.utc(2026, 8, 3, 8, 40),
           offsetMinutes: 0,
         ),
         arrival: ZonedInstant(
@@ -236,8 +265,12 @@ void main() {
       ),
     );
 
-    expect(weather.departure.temperatureC, closeTo(8.5, 0.001));
-    expect(weather.departure.cloudCoverPercent, closeTo(85, 0.001));
+    expect(weather.departure.temperatureC, closeTo(8.6667, 0.001));
+    expect(weather.departure.cloudCoverPercent, closeTo(86.667, 0.001));
+    // Period values stay together on the 08:00 period that contains 08:40,
+    // rather than combining the nearest 09:00 icon with interpolated rain.
+    expect(weather.departure.precipitationMm, closeTo(0.8, 0.001));
+    expect(weather.departure.symbolCode, 'rain');
   });
 
   test(

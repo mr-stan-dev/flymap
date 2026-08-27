@@ -2,6 +2,35 @@ import 'package:equatable/equatable.dart';
 import 'package:flymap/domain/entity/weather_attribution.dart';
 import 'package:latlong2/latlong.dart';
 
+/// One airport forecast point used by the expandable before/after timeline.
+class AirportForecastSlice extends Equatable {
+  const AirportForecastSlice({
+    required this.timeUtc,
+    this.temperatureC,
+    this.windSpeedMs,
+    this.precipitationMm,
+    this.cloudCoverPercent,
+    this.symbolCode,
+  });
+
+  final DateTime timeUtc;
+  final double? temperatureC;
+  final double? windSpeedMs;
+  final double? precipitationMm;
+  final double? cloudCoverPercent;
+  final String? symbolCode;
+
+  @override
+  List<Object?> get props => [
+    timeUtc,
+    temperatureC,
+    windSpeedMs,
+    precipitationMm,
+    cloudCoverPercent,
+    symbolCode,
+  ];
+}
+
 /// Surface forecast at one airport around the scheduled local time.
 class AirportWeather extends Equatable {
   const AirportWeather({
@@ -12,6 +41,7 @@ class AirportWeather extends Equatable {
     this.precipitationMm,
     this.cloudCoverPercent,
     this.symbolCode,
+    this.timeline = const <AirportForecastSlice>[],
   });
 
   /// Forecast instant (UTC) this entry describes.
@@ -21,11 +51,16 @@ class AirportWeather extends Equatable {
   final int utcOffsetMinutes;
   final double? temperatureC;
   final double? windSpeedMs;
+
+  /// Expected precipitation rate in millimetres per hour.
   final double? precipitationMm;
   final double? cloudCoverPercent;
 
   /// Flymap condition code (e.g. "partlycloudy_day") — maps to an icon.
   final String? symbolCode;
+
+  /// Forecasts around the scheduled airport time, ordered chronologically.
+  final List<AirportForecastSlice> timeline;
 
   DateTime get timeLocal => timeUtc.add(Duration(minutes: utcOffsetMinutes));
 
@@ -38,6 +73,7 @@ class AirportWeather extends Equatable {
     precipitationMm,
     cloudCoverPercent,
     symbolCode,
+    timeline,
   ];
 }
 
