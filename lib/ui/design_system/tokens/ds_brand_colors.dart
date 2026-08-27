@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class DsPremiumColors {
   const DsPremiumColors._();
 
-  /// High-emphasis premium colors tuned for each theme.
+  /// High-emphasis premium colors.
   static const Color amber = Color(0xFFFFBF00);
   static const Color darkAmber = Color(0xFFD59000);
   static const Color onAmber = Color(0xFF2A210F);
@@ -42,14 +42,13 @@ class DsPremiumColors {
   static Color fill(BuildContext context) =>
       fillFor(Theme.of(context).brightness);
 
-  static Color fillFor(Brightness brightness) =>
-      brightness == Brightness.light ? amber : darkAmber;
+  /// Premium buttons and badges use the original dark amber in both themes.
+  static Color fillFor(Brightness brightness) => darkAmber;
 
   static Color foreground(BuildContext context) =>
       foregroundFor(Theme.of(context).brightness);
 
-  static Color foregroundFor(Brightness brightness) =>
-      brightness == Brightness.light ? onAmber : onDarkAmber;
+  static Color foregroundFor(Brightness brightness) => onDarkAmber;
 
   static Color subtleSurface(BuildContext context) =>
       Theme.of(context).brightness == Brightness.light

@@ -130,7 +130,7 @@ class ProAppBarInfoButton extends StatelessWidget {
       onPressed: () => _showDialog(context),
       icon: Icon(
         Icons.workspace_premium_rounded,
-        color: DsPremiumColors.accent(context),
+        color: DsPremiumColors.fill(context),
       ),
     );
   }

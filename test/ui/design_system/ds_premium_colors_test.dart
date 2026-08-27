@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/widgets/premium_surface_effects.dart';
+import 'package:flymap/ui/widgets/pro_widgets.dart';
 
 void main() {
-  test('premium high-emphasis colors resolve by theme', () {
-    expect(DsPremiumColors.fillFor(Brightness.light), DsPremiumColors.amber);
+  test('premium high-emphasis colors use original dark amber', () {
+    expect(
+      DsPremiumColors.fillFor(Brightness.light),
+      DsPremiumColors.darkAmber,
+    );
     expect(DsPremiumColors.fillFor(Brightness.dark), DsPremiumColors.darkAmber);
     expect(
       DsPremiumColors.foregroundFor(Brightness.light),
-      DsPremiumColors.onAmber,
+      DsPremiumColors.onDarkAmber,
     );
     expect(
       DsPremiumColors.foregroundFor(Brightness.dark),
       DsPremiumColors.onDarkAmber,
-    );
-    expect(
-      _contrast(DsPremiumColors.amber, DsPremiumColors.onAmber),
-      greaterThanOrEqualTo(4.5),
     );
   });
 
@@ -67,8 +67,8 @@ void main() {
     }
 
     expect(await resolve(Brightness.light), <String, Color>{
-      'fill': DsPremiumColors.amber,
-      'foreground': DsPremiumColors.onAmber,
+      'fill': DsPremiumColors.darkAmber,
+      'foreground': DsPremiumColors.onDarkAmber,
       'accent': DsPremiumColors.lightAccent,
       'surface': DsPremiumColors.lightSurface,
       'border': DsPremiumColors.lightBorder,
@@ -82,6 +82,32 @@ void main() {
       'border': DsPremiumColors.darkBorder,
       'iconSurface': DsPremiumColors.darkIconSurface,
     });
+  });
+
+  testWidgets('premium app bar icon uses visible dark amber', (tester) async {
+    for (final brightness in Brightness.values) {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(brightness: brightness),
+          home: Scaffold(
+            appBar: AppBar(
+              actions: const [
+                ProAppBarInfoButton(
+                  title: 'Pro',
+                  message: 'Premium access',
+                  tooltip: 'Pro access',
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      final icon = tester.widget<Icon>(
+        find.byIcon(Icons.workspace_premium_rounded),
+      );
+      expect(icon.color, DsPremiumColors.darkAmber);
+    }
   });
 
   test('subscription hero is light only in light theme', () {
