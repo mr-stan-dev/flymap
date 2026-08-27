@@ -1,8 +1,8 @@
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/day_night/solar_position_calculator.dart';
 import 'package:latlong2/latlong.dart';
 
-/// A provider-independent visual condition used by both the in-app SVG icons
-/// and the emoji-only share renderer.
+/// A provider-independent visual condition used by both the in-app weather
+/// cards and the rasterized image/video share renderer.
 enum WeatherSymbolKind {
   isolatedThunderDay,
   isolatedThunderNight,
@@ -258,8 +258,7 @@ extension WeatherSymbolKindPresentation on WeatherSymbolKind {
   };
 }
 
-/// Emoji fallback for image/video shares, where SVGs are unavailable to the
-/// canvas renderer.
+/// Emoji fallback for exports when an SVG asset cannot be loaded.
 String weatherSymbolEmoji(
   String? symbolCode,
   double? cloudCover, {

@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_map_painter.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_symbols.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_wind_presentation.dart';
 import 'package:flymap/ui/screens/share_flight/widgets/map/share_image_painter.dart';
 
@@ -40,7 +41,7 @@ class WeatherShareAirport {
     required this.city,
     required this.countryCode,
     required this.countryFlag,
-    required this.emoji,
+    required this.symbol,
     required this.temperatureText,
     required this.timeText,
     required this.dateText,
@@ -55,7 +56,7 @@ class WeatherShareAirport {
   final String city;
   final String countryCode;
   final String countryFlag;
-  final String emoji;
+  final WeatherSymbolKind symbol;
 
   /// "21°" (dash when unknown).
   final String temperatureText;
@@ -64,7 +65,7 @@ class WeatherShareAirport {
   final String dateText;
   final String? utcOffsetText;
 
-  /// Same qualitative label and value as the live airport card.
+  /// Same compact numeric wind value as the live collapsed airport card.
   final String? windText;
   final int windFilledBars;
   final WeatherWindTone windTone;
@@ -72,11 +73,10 @@ class WeatherShareAirport {
 }
 
 /// Renders the shareable weather story card (1080x1920) fully offscreen:
-/// dark branded background, route headline, the two airport forecast
-/// blocks, the cloud map as hero (via [WeatherMapPainter], so it matches
-/// the on-screen animation exactly at any [renderFrame] progress), the
-/// verdict line and a watermark. One renderer serves both the static image
-/// and every video frame.
+/// dark branded background, route headline, two collapsed airport forecast
+/// rows, the cloud map as hero (via [WeatherMapPainter], so it matches the
+/// on-screen animation at any [renderFrame] progress), attribution and a
+/// watermark. One renderer serves both the static image and every video frame.
 class WeatherShareRenderer {
   WeatherShareRenderer({
     required this.data,
@@ -85,11 +85,16 @@ class WeatherShareRenderer {
     required this.routeKm,
     this.mapImage,
     this.logoImage,
+    this.weatherIcons = const <WeatherSymbolKind, ui.Image>{},
   });
 
   static const double width = 1080;
   static const double height = 1920;
   static const double _margin = 64;
+  static const double _airportCardsTop = 330;
+  static const double _airportCardHeight = 208;
+  static const double _airportCardGap = 28;
+  static const double _mapTop = 822;
 
   final WeatherShareData data;
 
@@ -104,6 +109,10 @@ class WeatherShareRenderer {
 
   /// White brand logo drawn as the corner watermark; text fallback when null.
   final ui.Image? logoImage;
+
+  /// Weather SVGs rasterized once and reused by the static card and all video
+  /// frames. Missing entries fall back to the symbol's native emoji.
+  final Map<WeatherSymbolKind, ui.Image> weatherIcons;
 
   /// Renders one frame. [pixelRatio] scales the OUTPUT resolution without
   /// touching the layout (video frames render at a fraction of the card's
@@ -146,8 +155,8 @@ class WeatherShareRenderer {
     _text(
       canvas,
       data.headline,
-      const Offset(_margin, 120),
-      fontSize: 72,
+      const Offset(_margin, 122),
+      fontSize: 76,
       fontWeight: FontWeight.w800,
       color: Colors.white,
       maxWidth: width - 2 * _margin,
@@ -155,8 +164,8 @@ class WeatherShareRenderer {
     _text(
       canvas,
       data.subtitle,
-      const Offset(_margin, 214),
-      fontSize: 40,
+      const Offset(_margin, 228),
+      fontSize: 42,
       fontWeight: FontWeight.w600,
       color: ShareImagePainter.routeColor,
       maxWidth: width - 2 * _margin,
@@ -164,29 +173,31 @@ class WeatherShareRenderer {
   }
 
   void _drawAirportCards(Canvas canvas) {
-    const top = 320.0;
-    const cardHeight = 390.0;
-    const gap = 24.0;
-    const cardWidth = (width - 2 * _margin - gap) / 2;
+    const cardWidth = width - 2 * _margin;
     _drawAirportCard(
       canvas,
       data.departure,
-      const Rect.fromLTWH(_margin, top, cardWidth, cardHeight),
+      const Rect.fromLTWH(
+        _margin,
+        _airportCardsTop,
+        cardWidth,
+        _airportCardHeight,
+      ),
     );
     _drawAirportCard(
       canvas,
       data.arrival,
       const Rect.fromLTWH(
-        _margin + cardWidth + gap,
-        top,
+        _margin,
+        _airportCardsTop + _airportCardHeight + _airportCardGap,
         cardWidth,
-        cardHeight,
+        _airportCardHeight,
       ),
     );
   }
 
   void _drawAirportCard(Canvas canvas, WeatherShareAirport airport, Rect rect) {
-    final card = RRect.fromRectAndRadius(rect, const Radius.circular(32));
+    final card = RRect.fromRectAndRadius(rect, const Radius.circular(34));
     canvas.drawRRect(card, Paint()..color = const Color(0xFF292929));
     canvas.drawRRect(
       card,
@@ -195,79 +206,103 @@ class WeatherShareRenderer {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
     );
-    const pad = 28.0;
+    const pad = 32.0;
     final x = rect.left + pad;
-    final innerWidth = rect.width - 2 * pad;
     final right = rect.right - pad;
+    const summaryWidth = 380.0;
+    final summaryLeft = right - summaryWidth;
+    final locationWidth = summaryLeft - x - 28;
 
-    // Same hierarchy as the live card: airport code left; local time, offset
-    // and date right. Left/right position already communicates departure and
-    // arrival, so the exported cards do not add extra captions.
-    _text(
+    // Same compact hierarchy as the live collapsed card: airport and city on
+    // the left, schedule beneath, and a protected weather column on the right.
+    final codeWidth = _text(
       canvas,
       airport.code,
-      Offset(x, rect.top + 28),
-      fontSize: 32,
+      Offset(x, rect.top + 30),
+      fontSize: 44,
       fontWeight: FontWeight.w800,
       color: const Color(0xFFE7E7E7),
-      maxWidth: innerWidth * 0.4,
-    );
-    _timeTextRight(
-      canvas,
-      time: airport.timeText,
-      utcOffset: airport.utcOffsetText,
-      right: right,
-      top: rect.top + 28,
-      maxWidth: innerWidth * 0.6,
-    );
-    _textRight(
-      canvas,
-      airport.dateText,
-      right: right,
-      top: rect.top + 62,
-      fontSize: 22,
-      color: const Color(0xFF9B9B9B),
-      maxWidth: innerWidth * 0.65,
+      maxWidth: 130,
     );
 
+    var locationX = x + codeWidth + 18;
     final hasFlag = airport.countryFlag.isNotEmpty;
-    final flagWidth = hasFlag
-        ? _text(
-            canvas,
-            airport.countryFlag,
-            Offset(x, rect.top + 92),
-            fontSize: 24,
-            maxWidth: 40,
-          )
-        : 0.0;
-    final locationInset = hasFlag ? flagWidth + 10 : 0.0;
+    if (hasFlag) {
+      final flagWidth = _text(
+        canvas,
+        airport.countryFlag,
+        Offset(locationX, rect.top + 36),
+        fontSize: 28,
+        maxWidth: 46,
+      );
+      locationX += flagWidth + 10;
+    }
     _text(
       canvas,
       airport.countryCode.isEmpty
           ? airport.city
           : '${airport.city} · ${airport.countryCode}',
-      Offset(x + locationInset, rect.top + 94),
-      fontSize: 22,
-      color: const Color(0xFF9B9B9B),
-      maxWidth: innerWidth - locationInset,
+      Offset(locationX, rect.top + 36),
+      fontSize: 32,
+      fontWeight: FontWeight.w600,
+      color: const Color(0xFFE7E7E7),
+      maxWidth: locationWidth - (locationX - x),
     );
 
-    final rowY = rect.top + 142;
-    final emojiWidth = _text(
+    final timeAndDate = [
+      '${airport.timeText}'
+          '${airport.utcOffsetText == null ? '' : ' ${airport.utcOffsetText}'}',
+      airport.dateText,
+    ].join(' · ');
+    _text(
       canvas,
-      airport.emoji,
-      Offset(x, rowY),
-      fontSize: 60,
-      maxWidth: innerWidth,
+      timeAndDate,
+      Offset(x, rect.top + 108),
+      fontSize: 28,
+      fontWeight: FontWeight.w500,
+      color: const Color(0xFF9B9B9B),
+      maxWidth: locationWidth,
     );
+
+    const iconSize = 132.0;
+    final iconRect = Rect.fromLTWH(
+      summaryLeft,
+      rect.top + 36,
+      iconSize,
+      iconSize,
+    );
+    final weatherIcon = weatherIcons[airport.symbol];
+    if (weatherIcon != null) {
+      canvas.drawImageRect(
+        weatherIcon,
+        Rect.fromLTWH(
+          0,
+          0,
+          weatherIcon.width.toDouble(),
+          weatherIcon.height.toDouble(),
+        ),
+        iconRect,
+        Paint()..filterQuality = FilterQuality.high,
+      );
+    } else {
+      _text(
+        canvas,
+        airport.symbol.emoji,
+        Offset(summaryLeft + 12, rect.top + 54),
+        fontSize: 72,
+        maxWidth: iconSize,
+      );
+    }
+
+    final detailsX = summaryLeft + iconSize + 18;
     _text(
       canvas,
       airport.temperatureText,
-      Offset(x + emojiWidth + 18, rowY + 4),
-      fontSize: 56,
-      fontWeight: FontWeight.w700,
+      Offset(detailsX, rect.top + 30),
+      fontSize: 60,
+      fontWeight: FontWeight.w800,
       color: const Color(0xFFE7E7E7),
-      maxWidth: innerWidth - emojiWidth - 18,
+      maxWidth: right - detailsX,
     );
 
     final wind = airport.windText;
@@ -277,14 +312,13 @@ class WeatherShareRenderer {
         WeatherWindTone.warning => Colors.amber.shade800,
         WeatherWindTone.strong => Colors.deepOrange.shade600,
       };
-      const windTop = 300.0;
       for (var bar = 0; bar < 3; bar++) {
-        final barHeight = 12.0 + bar * 6;
+        final barHeight = 16.0 + bar * 7;
         canvas.drawRRect(
           RRect.fromRectAndRadius(
             Rect.fromLTWH(
-              x + bar * 10,
-              rect.top + windTop + 24 - barHeight,
+              detailsX + bar * 10,
+              rect.top + 142 - barHeight,
               6,
               barHeight,
             ),
@@ -299,40 +333,33 @@ class WeatherShareRenderer {
       _text(
         canvas,
         wind,
-        Offset(x + 38, rect.top + windTop + 1),
-        fontSize: 22,
+        Offset(detailsX + 40, rect.top + 108),
+        fontSize: 26,
         fontWeight: airport.windTone == WeatherWindTone.normal
             ? FontWeight.w400
             : FontWeight.w700,
         color: windColor,
-        maxWidth: innerWidth - 38,
+        maxWidth: right - detailsX - 38,
       );
     }
 
     final precipitation = airport.precipitationText;
     if (precipitation != null) {
-      final iconWidth = _text(
-        canvas,
-        '☂',
-        Offset(x, rect.top + 340),
-        fontSize: 22,
-        color: const Color(0xFF9B9B9B),
-        maxWidth: 30,
-      );
       _text(
         canvas,
         precipitation,
-        Offset(x + iconWidth + 8, rect.top + 341),
-        fontSize: 22,
+        Offset(detailsX + 40, rect.top + 158),
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
         color: const Color(0xFF9B9B9B),
-        maxWidth: innerWidth - iconWidth - 8,
+        maxWidth: right - detailsX - 38,
       );
     }
   }
 
   void _drawMap(Canvas canvas, double progress) {
     const mapSize = width - 2 * _margin;
-    const rect = Rect.fromLTWH(_margin, 750, mapSize, mapSize);
+    const rect = Rect.fromLTWH(_margin, _mapTop, mapSize, mapSize);
     final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(36));
 
     canvas.save();
@@ -440,69 +467,6 @@ class WeatherShareRenderer {
       textScaler: TextScaler.noScaling,
     )..layout(maxWidth: 700);
     painter.paint(canvas, Offset(_margin, height - painter.height - 34));
-  }
-
-  void _timeTextRight(
-    Canvas canvas, {
-    required String time,
-    required String? utcOffset,
-    required double right,
-    required double top,
-    required double maxWidth,
-  }) {
-    final painter = TextPainter(
-      text: TextSpan(
-        text: time,
-        style: const TextStyle(
-          color: Color(0xFFE7E7E7),
-          fontSize: 24,
-          fontWeight: FontWeight.w700,
-        ),
-        children: [
-          if (utcOffset != null)
-            TextSpan(
-              text: ' $utcOffset',
-              style: const TextStyle(
-                color: Color(0xFF9B9B9B),
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-        ],
-      ),
-      maxLines: 1,
-      ellipsis: '…',
-      textDirection: TextDirection.ltr,
-      textScaler: TextScaler.noScaling,
-    )..layout(maxWidth: maxWidth);
-    painter.paint(canvas, Offset(right - painter.width, top));
-  }
-
-  void _textRight(
-    Canvas canvas,
-    String text, {
-    required double right,
-    required double top,
-    required double fontSize,
-    required double maxWidth,
-    FontWeight fontWeight = FontWeight.w400,
-    Color color = Colors.white,
-  }) {
-    final painter = TextPainter(
-      text: TextSpan(
-        text: text,
-        style: TextStyle(
-          color: color,
-          fontSize: fontSize,
-          fontWeight: fontWeight,
-        ),
-      ),
-      maxLines: 1,
-      ellipsis: '…',
-      textDirection: TextDirection.ltr,
-      textScaler: TextScaler.noScaling,
-    )..layout(maxWidth: maxWidth);
-    painter.paint(canvas, Offset(right - painter.width, top));
   }
 
   /// Draws a single line, ellipsized to [maxWidth]; returns painted width.

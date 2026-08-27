@@ -257,21 +257,22 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
       dateText = '$dateText (${context.t.createFlight.weather.tomorrow})';
     }
     final normalizedCountryCode = airport.countryCode.trim().toUpperCase();
+    final symbol = weatherSymbolKind(
+      weather.symbolCode,
+      weather.cloudCoverPercent,
+      isDaytime: weatherIsDaytime(
+        timeUtc: weather.timeUtc,
+        utcOffsetMinutes: weather.utcOffsetMinutes,
+        coordinate: airport.latLon,
+      ),
+      precipitationMm: weather.precipitationMm,
+    );
     return WeatherShareAirport(
       code: airport.displayCode,
       city: airport.city,
       countryCode: normalizedCountryCode,
       countryFlag: RegionHighlightModel.flagEmoji(normalizedCountryCode) ?? '',
-      emoji: weatherSymbolEmoji(
-        weather.symbolCode,
-        weather.cloudCoverPercent,
-        isDaytime: weatherIsDaytime(
-          timeUtc: weather.timeUtc,
-          utcOffsetMinutes: weather.utcOffsetMinutes,
-          coordinate: airport.latLon,
-        ),
-        precipitationMm: weather.precipitationMm,
-      ),
+      symbol: symbol,
       temperatureText: temperature == null
           ? '–'
           : UnitFormatUtils.formatTemperatureValue(temperature, tempUnit),
@@ -280,9 +281,7 @@ class _WeatherShareButtonState extends State<WeatherShareButton> {
         weather.utcOffsetMinutes,
       ),
       dateText: dateText,
-      windText: windPresentation == null
-          ? null
-          : '${windPresentation.label} · ${wind!.round()} m/s',
+      windText: windPresentation == null ? null : '${wind!.round()} m/s',
       windFilledBars: windPresentation?.filledBars ?? 0,
       windTone: windPresentation?.tone ?? WeatherWindTone.normal,
       precipitationText: (weather.precipitationMm ?? 0) > 0

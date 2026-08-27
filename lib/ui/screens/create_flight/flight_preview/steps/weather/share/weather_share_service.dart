@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flymap/data/api/mapbox_static_image_api.dart';
 import 'package:flymap/data/flight_video/video_encoder.dart';
 import 'package:flymap/data/local/route_map_image_store.dart';
@@ -13,6 +15,7 @@ import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/logger.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/cloud_field_builder.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/share/weather_share_renderer.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_symbols.dart';
 import 'package:flymap/ui/screens/share_flight/utils/static_route_map.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -141,6 +144,20 @@ class WeatherShareService {
       _logger.error('share logo load failed: $e');
     }
 
+    final weatherIcons = <WeatherSymbolKind, ui.Image>{};
+    for (final symbol in <WeatherSymbolKind>{
+      data.departure.symbol,
+      data.arrival.symbol,
+    }) {
+      try {
+        weatherIcons[symbol] = await _loadWeatherIcon(symbol);
+      } catch (e) {
+        // The renderer retains a native emoji fallback for corrupt or missing
+        // assets, so an icon problem must never prevent sharing.
+        _logger.error('share weather icon load failed: $e');
+      }
+    }
+
     return WeatherShareRenderer(
       data: data,
       projectedRoute: projectedRoute,
@@ -148,6 +165,7 @@ class WeatherShareService {
       routeKm: route.displayDistanceKm.toDouble(),
       mapImage: mapImage,
       logoImage: logoImage,
+      weatherIcons: weatherIcons,
     );
   }
 
@@ -157,6 +175,9 @@ class WeatherShareService {
     }
     renderer.mapImage?.dispose();
     renderer.logoImage?.dispose();
+    for (final image in renderer.weatherIcons.values) {
+      image.dispose();
+    }
   }
 
   /// Renders the static story card; returns the PNG file path.
@@ -236,5 +257,36 @@ class WeatherShareService {
       completer.complete,
     );
     return completer.future;
+  }
+
+  Future<ui.Image> _loadWeatherIcon(WeatherSymbolKind symbol) async {
+    final pictureInfo = await vg.loadPicture(
+      SvgAssetLoader(symbol.assetPath),
+      null,
+    );
+    try {
+      const outputSize = 192;
+      final sourceSize = pictureInfo.size;
+      final scale = math.min(
+        outputSize / sourceSize.width,
+        outputSize / sourceSize.height,
+      );
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder);
+      canvas.translate(
+        (outputSize - sourceSize.width * scale) / 2,
+        (outputSize - sourceSize.height * scale) / 2,
+      );
+      canvas.scale(scale);
+      canvas.drawPicture(pictureInfo.picture);
+      final picture = recorder.endRecording();
+      try {
+        return await picture.toImage(outputSize, outputSize);
+      } finally {
+        picture.dispose();
+      }
+    } finally {
+      pictureInfo.picture.dispose();
+    }
   }
 }

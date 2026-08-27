@@ -10,6 +10,7 @@ import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_weather.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/share/weather_share_renderer.dart';
 import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/share/weather_share_service.dart';
+import 'package:flymap/ui/screens/create_flight/flight_preview/steps/weather/weather_symbols.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:latlong2/latlong.dart';
@@ -147,7 +148,7 @@ const _data = WeatherShareData(
     city: 'Bristol',
     countryCode: 'GB',
     countryFlag: '🇬🇧',
-    emoji: '⛅',
+    symbol: WeatherSymbolKind.partlyCloudyDay,
     temperatureText: '21°',
     timeText: '10:00',
     utcOffsetText: 'GMT+2',
@@ -160,7 +161,7 @@ const _data = WeatherShareData(
     city: 'Krakow',
     countryCode: 'PL',
     countryFlag: '🇵🇱',
-    emoji: '⛅',
+    symbol: WeatherSymbolKind.lightRainNight,
     temperatureText: '21°',
     timeText: '10:00',
     utcOffsetText: 'GMT+2',
@@ -211,6 +212,13 @@ void main() {
       route: _route(),
       weather: _weather(),
       data: _data,
+    );
+    expect(
+      renderer.weatherIcons.keys,
+      unorderedEquals(<WeatherSymbolKind>[
+        WeatherSymbolKind.partlyCloudyDay,
+        WeatherSymbolKind.lightRainNight,
+      ]),
     );
 
     final path = await shareService.exportImage(renderer);
