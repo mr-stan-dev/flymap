@@ -197,7 +197,7 @@ void main() {
         status: SubscriptionStatus(
           isPro: true,
           entitlementId: 'Flymap Pro',
-          productId: 'legacy-product',
+          productId: 'legacy-yearly-offer',
           lastUpdatedAt: DateTime(2026, 8, 17),
         ),
         products: const [
@@ -229,6 +229,61 @@ void main() {
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('uses the entitlement product period when offerings are empty', (
+    tester,
+  ) async {
+    final cubit = _TestSubscriptionCubit(
+      SubscriptionState(
+        phase: SubscriptionPhase.pro,
+        status: SubscriptionStatus(
+          isPro: true,
+          entitlementId: 'Flymap Pro',
+          productId: 'pro_yearly_1',
+          expiresAt: DateTime(2026, 8, 27),
+          lastUpdatedAt: DateTime(2026, 8, 17),
+        ),
+      ),
+    );
+    addTearDown(cubit.close);
+
+    await tester.pumpWidget(_testApp(cubit));
+    await tester.pump();
+
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('subscription-plan-row')),
+      450,
+    );
+    expect(find.text('Yearly plan'), findsOneWidget);
+    expect(find.text('Ends Aug 27, 2026'), findsOneWidget);
+  });
+
+  testWidgets('uses the entitlement base-plan period as a fallback', (
+    tester,
+  ) async {
+    final cubit = _TestSubscriptionCubit(
+      SubscriptionState(
+        phase: SubscriptionPhase.pro,
+        status: SubscriptionStatus(
+          isPro: true,
+          entitlementId: 'Flymap Pro',
+          productId: 'flymap_pro',
+          productPlanId: 'yearly',
+          lastUpdatedAt: DateTime(2026, 8, 17),
+        ),
+      ),
+    );
+    addTearDown(cubit.close);
+
+    await tester.pumpWidget(_testApp(cubit));
+    await tester.pump();
+
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('subscription-plan-row')),
+      450,
+    );
+    expect(find.text('Yearly plan'), findsOneWidget);
   });
 }
 

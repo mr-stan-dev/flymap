@@ -31,6 +31,28 @@ class _SubscriptionManagementScreenState
   static final Uri _androidSubscriptionsUri = Uri.parse(
     'https://play.google.com/store/account/subscriptions',
   );
+  static const _billingPeriodsByRevenueCatIdentifier = <String, _BillingPeriod>{
+    r'$rc_weekly': _BillingPeriod.weekly,
+    'weekly': _BillingPeriod.weekly,
+    'weekly-plan-1': _BillingPeriod.weekly,
+    'pro_weekly_1': _BillingPeriod.weekly,
+    'pro_weekly_1:weekly-plan-1': _BillingPeriod.weekly,
+    'flymap_pro_weekly_1': _BillingPeriod.weekly,
+    'test_sub_weekly_1': _BillingPeriod.weekly,
+    r'$rc_monthly': _BillingPeriod.monthly,
+    'monthly': _BillingPeriod.monthly,
+    'monthly-plan-1': _BillingPeriod.monthly,
+    'pro_monthly_1': _BillingPeriod.monthly,
+    'pro_monthly_1:monthly-plan-1': _BillingPeriod.monthly,
+    'flymap_pro_monthly_1': _BillingPeriod.monthly,
+    'test_sub_monthly_1': _BillingPeriod.monthly,
+    r'$rc_annual': _BillingPeriod.yearly,
+    'yearly': _BillingPeriod.yearly,
+    'pro_yearly_1': _BillingPeriod.yearly,
+    'pro_yearly_1:yearly': _BillingPeriod.yearly,
+    'flymap_pro_yearly_1': _BillingPeriod.yearly,
+    'test_sub_yearly_1': _BillingPeriod.yearly,
+  };
 
   bool _isPaywallLoading = false;
   bool _isRestoreLoading = false;
@@ -131,12 +153,27 @@ class _SubscriptionManagementScreenState
 
   _BillingPeriod? _resolveBillingPeriod(SubscriptionState state) {
     final activeProduct = _findActiveProduct(state);
-    if (activeProduct == null) return null;
+    if (activeProduct != null) {
+      final periodFromMetadata = _billingPeriodFromIso8601(
+        activeProduct.subscriptionPeriod,
+      );
+      if (periodFromMetadata != null) return periodFromMetadata;
 
-    final normalizedPeriod = activeProduct.subscriptionPeriod
-        ?.trim()
-        .toUpperCase();
-    switch (normalizedPeriod) {
+      final periodFromPackage = _billingPeriodFromIdentifier(
+        activeProduct.packageId,
+      );
+      if (periodFromPackage != null) return periodFromPackage;
+    }
+
+    // CustomerInfo remains available when offerings fail to load. RevenueCat
+    // product and base-plan identifiers include the cadence in our catalog,
+    // so use them before falling back to the generic Pro name.
+    return _billingPeriodFromIdentifier(state.status?.productPlanId) ??
+        _billingPeriodFromIdentifier(state.status?.productId);
+  }
+
+  _BillingPeriod? _billingPeriodFromIso8601(String? value) {
+    switch (value?.trim().toUpperCase()) {
       case 'P1W':
         return _BillingPeriod.weekly;
       case 'P1M':
@@ -144,16 +181,13 @@ class _SubscriptionManagementScreenState
       case 'P1Y':
         return _BillingPeriod.yearly;
     }
-
-    // Package identifiers are the fallback for stores that omit the ISO
-    // subscription period from their product metadata.
-    final packageId = activeProduct.packageId.trim().toLowerCase();
-    if (packageId.contains('week')) return _BillingPeriod.weekly;
-    if (packageId.contains('month')) return _BillingPeriod.monthly;
-    if (packageId.contains('year') || packageId.contains('annual')) {
-      return _BillingPeriod.yearly;
-    }
     return null;
+  }
+
+  _BillingPeriod? _billingPeriodFromIdentifier(String? value) {
+    final normalized = value?.trim().toLowerCase();
+    if (normalized == null || normalized.isEmpty) return null;
+    return _billingPeriodsByRevenueCatIdentifier[normalized];
   }
 
   SubscriptionProduct? _findActiveProduct(SubscriptionState state) {
@@ -161,7 +195,7 @@ class _SubscriptionManagementScreenState
     if (productId == null || productId.isEmpty) return null;
 
     final matchingProducts = state.products
-        .where((product) => product.productId == productId)
+        .where((product) => _sameStoreProduct(product.productId, productId))
         .toList(growable: false);
     if (matchingProducts.isEmpty) return null;
 
@@ -170,8 +204,15 @@ class _SubscriptionManagementScreenState
       for (final product in matchingProducts) {
         if (product.productPlanId == productPlanId) return product;
       }
+      return null;
     }
-    return matchingProducts.first;
+    return matchingProducts.length == 1 ? matchingProducts.single : null;
+  }
+
+  bool _sameStoreProduct(String first, String second) {
+    String withoutBasePlan(String value) => value.trim().split(':').first;
+
+    return withoutBasePlan(first) == withoutBasePlan(second);
   }
 
   _PlanDescription _planDescription(
