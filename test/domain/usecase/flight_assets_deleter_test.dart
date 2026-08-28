@@ -18,20 +18,27 @@ import 'package:path/path.dart' as p;
 
 void main() {
   late Directory cacheDir;
+  late Directory supportDir;
   late Directory docsDir;
   late Directory mbtilesDir;
+  late Directory legacyMbtilesDir;
   late List<Flight> allFlights;
   late FlightAssetsDeleter deleter;
 
   setUp(() async {
     cacheDir = await Directory.systemTemp.createTemp('deleter_cache');
+    supportDir = await Directory.systemTemp.createTemp('deleter_support');
     docsDir = await Directory.systemTemp.createTemp('deleter_docs');
     mbtilesDir = Directory(
+      p.join(supportDir.path, MapDownloadConfig.mbtilesDirectoryName),
+    )..createSync(recursive: true);
+    legacyMbtilesDir = Directory(
       p.join(cacheDir.path, MapDownloadConfig.mbtilesDirectoryName),
     )..createSync(recursive: true);
     allFlights = [];
     deleter = FlightAssetsDeleter(
       getAllFlights: () async => allFlights,
+      applicationSupportDirectoryProvider: () async => supportDir,
       cacheDirectoryProvider: () async => cacheDir,
       documentsDirectoryProvider: () async => docsDir,
     );
@@ -39,10 +46,13 @@ void main() {
 
   tearDown(() {
     cacheDir.deleteSync(recursive: true);
+    supportDir.deleteSync(recursive: true);
     docsDir.deleteSync(recursive: true);
   });
 
   File mbtilesFile(String name) => File(p.join(mbtilesDir.path, name));
+  File legacyMbtilesFile(String name) =>
+      File(p.join(legacyMbtilesDir.path, name));
 
   File articleImage(String relativePath) {
     final file = File(p.join(docsDir.path, relativePath));
@@ -82,6 +92,16 @@ void main() {
         expect(wal.existsSync(), isFalse);
       },
     );
+
+    test('deletes a legacy cache map when it is the last reference', () async {
+      final file = legacyMbtilesFile('EGLL_EDDM_legacy.mbtiles')..createSync();
+      final flight = _flight(id: 'a', mapFile: 'EGLL_EDDM_legacy.mbtiles');
+      allFlights = [flight];
+
+      await deleter.deleteAssets(flight);
+
+      expect(file.existsSync(), isFalse);
+    });
 
     test('a different route\'s file is never touched', () async {
       final other = mbtilesFile('KJFK_KLAX_base.mbtiles')..createSync();

@@ -20,11 +20,15 @@ import 'package:latlong2/latlong.dart';
 
 void main() {
   late Directory tempDir;
+  late Directory legacyCacheDir;
   late _FakeMapAssetCacheService cacheService;
   late _FakeCrashlytics crashlytics;
 
   setUp(() async {
     tempDir = await Directory.systemTemp.createTemp('flymap-style-loader-test');
+    legacyCacheDir = await Directory.systemTemp.createTemp(
+      'flymap-style-loader-legacy-cache-test',
+    );
     cacheService = _FakeMapAssetCacheService();
     crashlytics = _FakeCrashlytics();
   });
@@ -32,6 +36,9 @@ void main() {
   tearDown(() async {
     if (await tempDir.exists()) {
       await tempDir.delete(recursive: true);
+    }
+    if (await legacyCacheDir.exists()) {
+      await legacyCacheDir.delete(recursive: true);
     }
   });
 
@@ -43,7 +50,8 @@ void main() {
       styleMapper: FlightMapStyleMapper(),
       mapAssetCacheService: cacheService,
       crashlytics: crashlytics,
-      cacheDirectoryProvider: () async => tempDir,
+      applicationSupportDirectoryProvider: () async => tempDir,
+      cacheDirectoryProvider: () async => legacyCacheDir,
       assetStyleLoader: (assetPath) async {
         requestedAssetPath = assetPath;
         return _minimalStyleJson;
@@ -70,7 +78,8 @@ void main() {
       styleMapper: FlightMapStyleMapper(),
       mapAssetCacheService: cacheService,
       crashlytics: crashlytics,
-      cacheDirectoryProvider: () async => tempDir,
+      applicationSupportDirectoryProvider: () async => tempDir,
+      cacheDirectoryProvider: () async => legacyCacheDir,
       assetStyleLoader: (assetPath) async {
         requestedAssetPath = assetPath;
         return _minimalStyleJson;
@@ -90,13 +99,39 @@ void main() {
     );
   });
 
+  test('loads a legacy offline map from the cache directory', () async {
+    final file = await _createMbtilesFile(
+      legacyCacheDir,
+      'legacy-route.mbtiles',
+    );
+    final loader = FlightMapStyleLoader(
+      logger: const Logger('test'),
+      styleMapper: FlightMapStyleMapper(),
+      mapAssetCacheService: cacheService,
+      crashlytics: crashlytics,
+      applicationSupportDirectoryProvider: () async => tempDir,
+      cacheDirectoryProvider: () async => legacyCacheDir,
+      assetStyleLoader: (_) async => _minimalStyleJson,
+      mbtilesValidator: (_, __) async => MbtilesValidationResult.valid(),
+    );
+
+    final result = await loader.load(
+      _buildFlight(file.path),
+      style: OfflineMapStyle.liberty,
+    );
+
+    expect(result.isSuccess, isTrue);
+    expect(result.styleString, contains('mbtiles://${file.absolute.path}'));
+  });
+
   test('returns missing error when resolved mbtiles file is absent', () async {
     final loader = FlightMapStyleLoader(
       logger: const Logger('test'),
       styleMapper: FlightMapStyleMapper(),
       mapAssetCacheService: cacheService,
       crashlytics: crashlytics,
-      cacheDirectoryProvider: () async => tempDir,
+      applicationSupportDirectoryProvider: () async => tempDir,
+      cacheDirectoryProvider: () async => legacyCacheDir,
       assetStyleLoader: (_) async => _minimalStyleJson,
       mbtilesValidator: (_, __) async => MbtilesValidationResult.valid(),
     );

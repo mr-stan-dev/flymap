@@ -98,7 +98,10 @@ class VectorTilesDownloader {
       controller.add(const DownloadMapInitializing());
 
       // Get proper directory path
-      final appDir = await getApplicationCacheDirectory();
+      // Offline maps must survive Android cache eviction. Unlike glyphs and
+      // other recreatable assets, an MBTiles file cannot be recovered while
+      // the user is offline, so keep new downloads in durable app storage.
+      final appDir = await getApplicationSupportDirectory();
       final targetDirPath = p.join(
         appDir.path,
         MapDownloadConfig.mbtilesDirectoryName,

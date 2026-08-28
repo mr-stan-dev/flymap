@@ -11,11 +11,10 @@ import 'package:path_provider/path_provider.dart';
 /// Deletes a flight's on-disk assets (MBTiles maps, article media) while
 /// preserving anything still referenced by ANOTHER flight.
 ///
-/// Offline maps and article bundles are keyed by ROUTE, not flight
-/// (`{routeCode}_{layer}.mbtiles`, `article_media/{routeCode}_...`), so two
-/// flights on the same route share physical files. Deletion must therefore
-/// be reference-counted: without it, deleting or completing flight A
-/// destroys flight B's offline data — discovered mid-flight, offline.
+/// Legacy offline maps and article bundles can be keyed by route, so two
+/// flights may share physical files. Deletion must therefore be
+/// reference-counted: without it, deleting or completing flight A can destroy
+/// flight B's offline data.
 ///
 /// This is the single owner of asset deletion; DeleteFlightUseCase and
 /// CompleteFlightUseCase both delegate here so the logic cannot drift apart
@@ -23,15 +22,20 @@ import 'package:path_provider/path_provider.dart';
 class FlightAssetsDeleter {
   FlightAssetsDeleter({
     required Future<List<Flight>> Function() getAllFlights,
+    Future<Directory> Function()? applicationSupportDirectoryProvider,
     Future<Directory> Function()? cacheDirectoryProvider,
     Future<Directory> Function()? documentsDirectoryProvider,
   }) : _getAllFlights = getAllFlights,
+       _applicationSupportDirectoryProvider =
+           applicationSupportDirectoryProvider ??
+           getApplicationSupportDirectory,
        _cacheDirectoryProvider =
            cacheDirectoryProvider ?? getApplicationCacheDirectory,
        _documentsDirectoryProvider =
            documentsDirectoryProvider ?? getApplicationDocumentsDirectory;
 
   final Future<List<Flight>> Function() _getAllFlights;
+  final Future<Directory> Function() _applicationSupportDirectoryProvider;
   final Future<Directory> Function() _cacheDirectoryProvider;
   final Future<Directory> Function() _documentsDirectoryProvider;
   final _logger = Logger('FlightAssetsDeleter');
@@ -66,6 +70,7 @@ class FlightAssetsDeleter {
     Set<String> referencedFiles,
   ) async {
     if (maps.isEmpty) return;
+    final supportDir = await _applicationSupportDirectoryProvider();
     final cacheDir = await _cacheDirectoryProvider();
     for (final map in maps) {
       if (map.filePath.isEmpty) continue;
@@ -76,21 +81,23 @@ class FlightAssetsDeleter {
         );
         continue;
       }
-      final filePath = p.join(
-        cacheDir.path,
-        MapDownloadConfig.mbtilesDirectoryName,
-        map.filePath,
-      );
-      final file = File(filePath);
-      if (file.existsSync()) {
-        try {
-          file.deleteSync();
-          _logger.log('Deleted MBTiles file: $filePath');
-        } catch (e) {
-          _logger.error('Failed to delete MBTiles $filePath: $e');
+      for (final rootDir in [supportDir, cacheDir]) {
+        final filePath = p.join(
+          rootDir.path,
+          MapDownloadConfig.mbtilesDirectoryName,
+          map.filePath,
+        );
+        final file = File(filePath);
+        if (file.existsSync()) {
+          try {
+            file.deleteSync();
+            _logger.log('Deleted MBTiles file: $filePath');
+          } catch (e) {
+            _logger.error('Failed to delete MBTiles $filePath: $e');
+          }
         }
+        _deleteSidecars(filePath);
       }
-      _deleteSidecars(filePath);
     }
   }
 

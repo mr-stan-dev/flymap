@@ -46,10 +46,14 @@ class FlightMapStyleLoader {
     required this.mapAssetCacheService,
     required this.crashlytics,
     Future<String> Function(String assetPath)? assetStyleLoader,
+    Future<Directory> Function()? applicationSupportDirectoryProvider,
     Future<Directory> Function()? cacheDirectoryProvider,
     Future<MbtilesValidationResult> Function(String path, Logger logger)?
     mbtilesValidator,
   }) : _assetStyleLoader = assetStyleLoader ?? rootBundle.loadString,
+       _applicationSupportDirectoryProvider =
+           applicationSupportDirectoryProvider ??
+           getApplicationSupportDirectory,
        _cacheDirectoryProvider =
            cacheDirectoryProvider ?? getApplicationCacheDirectory,
        _mbtilesValidator = mbtilesValidator ?? _defaultMbtilesValidator;
@@ -59,6 +63,7 @@ class FlightMapStyleLoader {
   final MapAssetCacheService mapAssetCacheService;
   final AppCrashlytics crashlytics;
   final Future<String> Function(String assetPath) _assetStyleLoader;
+  final Future<Directory> Function() _applicationSupportDirectoryProvider;
   final Future<Directory> Function() _cacheDirectoryProvider;
   final Future<MbtilesValidationResult> Function(String path, Logger logger)
   _mbtilesValidator;
@@ -79,16 +84,28 @@ class FlightMapStyleLoader {
     }
 
     final fileName = p.basename(storedPath);
-    final appDir = await _cacheDirectoryProvider();
-    final resolvedPath = p.join(
-      appDir.path,
+    final supportDir = await _applicationSupportDirectoryProvider();
+    final cacheDir = await _cacheDirectoryProvider();
+    final durablePath = p.join(
+      supportDir.path,
       MapDownloadConfig.mbtilesDirectoryName,
       fileName,
     );
-    final file = File(resolvedPath);
+    final legacyCachePath = p.join(
+      cacheDir.path,
+      MapDownloadConfig.mbtilesDirectoryName,
+      fileName,
+    );
+    final durableFile = File(durablePath);
+    final file = await durableFile.exists()
+        ? durableFile
+        : File(legacyCachePath);
 
     if (!await file.exists()) {
-      logger.error('MBTiles file not found: $resolvedPath');
+      logger.error(
+        'MBTiles file not found in durable or legacy storage: '
+        '$durablePath, $legacyCachePath',
+      );
       return FlightMapStyleLoadResult.failure(t.flight.map.offlineMissing);
     }
 
@@ -113,11 +130,10 @@ class FlightMapStyleLoader {
       mapAssetCacheService.ensureReadyInBackground();
 
       final styleString = await _assetStyleLoader(_assetPathFor(style));
-      final cacheDir = appDir.path;
       final updated = styleMapper.mapStyleWithMbtiles(
         styleString,
         file.absolute.path,
-        cacheDir: cacheDir,
+        cacheDir: cacheDir.path,
       );
       return FlightMapStyleLoadResult.success(updated);
     } catch (error, stack) {
