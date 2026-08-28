@@ -272,6 +272,9 @@ class _TranslationsSettingsEs extends TranslationsSettingsEn {
 	@override String get historyEmpty => 'Aún no hay vuelos.';
 	@override String get historySearchHint => 'Buscar por aeropuerto o ciudad';
 	@override String get historyNoResults => 'No se encontraron vuelos coincidentes.';
+	@override String get historyRestoreFlight => 'Restaurar vuelo';
+	@override String get historyRestoreSuccess => 'El vuelo se restauró como próximo.';
+	@override String get historyRestoreError => 'No se pudo restaurar el vuelo.';
 	@override String get historyDeleteOfflineData => 'Eliminar solo el mapa';
 	@override String get appearance => 'Apariencia';
 	@override String get language => 'Idioma';
@@ -1941,6 +1944,9 @@ extension on TranslationsEs {
 			'settings.historyEmpty' => 'Aún no hay vuelos.',
 			'settings.historySearchHint' => 'Buscar por aeropuerto o ciudad',
 			'settings.historyNoResults' => 'No se encontraron vuelos coincidentes.',
+			'settings.historyRestoreFlight' => 'Restaurar vuelo',
+			'settings.historyRestoreSuccess' => 'El vuelo se restauró como próximo.',
+			'settings.historyRestoreError' => 'No se pudo restaurar el vuelo.',
 			'settings.historyDeleteOfflineData' => 'Eliminar solo el mapa',
 			'settings.appearance' => 'Apariencia',
 			'settings.language' => 'Idioma',
@@ -2238,11 +2244,11 @@ extension on TranslationsEs {
 			'createFlight.mapPreview.estimatedMapSize' => ({required Object size}) => 'Tamaño estimado del mapa: ${size}',
 			'createFlight.mapPreview.upgradeToPro' => 'Pasar a Pro',
 			'createFlight.mapPreview.basicHint' => 'Detalle básico del mapa con lugares limitados',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.mapPreview.proGateHint' => 'Mejora para obtener un mapa detallado con todos los lugares',
 			'createFlight.mapPreview.proHint' => ({required Object count}) => 'Mapa offline detallado con ${count} lugares',
 			'createFlight.mapPreview.optionsTitle' => 'Ruta aproximada',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.mapPreview.optionsBody' => 'La ruta es aproximada; el trayecto real puede variar, especialmente en vuelos de larga distancia.',
 			'createFlight.overview.routeNotReady' => 'La ruta aún no está lista.',
 			'createFlight.overview.proPoiUpsell' => 'El plan Free incluye mapa básico y lugares limitados',
@@ -2752,11 +2758,11 @@ extension on TranslationsEs {
 			'countries.AM' => 'Armenia',
 			'countries.AO' => 'Angola',
 			'countries.AR' => 'Argentina',
+			_ => null,
+		} ?? switch (path) {
 			'countries.AT' => 'Austria',
 			'countries.AU' => 'Australia',
 			'countries.AZ' => 'Azerbaiyan',
-			_ => null,
-		} ?? switch (path) {
 			'countries.BA' => 'Bosnia y Herzegovina',
 			'countries.BB' => 'Barbados',
 			'countries.BD' => 'Banglades',

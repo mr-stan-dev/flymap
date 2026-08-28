@@ -597,6 +597,15 @@ class TranslationsSettingsEn {
 	/// en: 'No matching flights found.'
 	String get historyNoResults => 'No matching flights found.';
 
+	/// en: 'Restore flight'
+	String get historyRestoreFlight => 'Restore flight';
+
+	/// en: 'Flight restored to Upcoming.'
+	String get historyRestoreSuccess => 'Flight restored to Upcoming.';
+
+	/// en: 'Failed to restore flight.'
+	String get historyRestoreError => 'Failed to restore flight.';
+
 	/// en: 'Delete map only'
 	String get historyDeleteOfflineData => 'Delete map only';
 
@@ -4351,6 +4360,9 @@ extension on Translations {
 			'settings.historyEmpty' => 'No flights yet.',
 			'settings.historySearchHint' => 'Search by airport or city',
 			'settings.historyNoResults' => 'No matching flights found.',
+			'settings.historyRestoreFlight' => 'Restore flight',
+			'settings.historyRestoreSuccess' => 'Flight restored to Upcoming.',
+			'settings.historyRestoreError' => 'Failed to restore flight.',
 			'settings.historyDeleteOfflineData' => 'Delete map only',
 			'settings.appearance' => 'Appearance',
 			'settings.language' => 'Language',
@@ -4648,11 +4660,11 @@ extension on Translations {
 			'createFlight.mapPreview.estimatedMapSize' => ({required Object size}) => 'Estimated map size: ${size}',
 			'createFlight.mapPreview.upgradeToPro' => 'Upgrade to Pro',
 			'createFlight.mapPreview.basicHint' => 'Basic map detail with limited places',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.mapPreview.proGateHint' => 'Upgrade for a detailed map with all places',
 			'createFlight.mapPreview.proHint' => ({required Object count}) => 'Detailed offline map with ${count} places',
 			'createFlight.mapPreview.optionsTitle' => 'Approximate route',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.mapPreview.optionsBody' => 'Route is approximate — actual path may vary, especially on long-haul flights.',
 			'createFlight.overview.routeNotReady' => 'Route is not ready yet.',
 			'createFlight.overview.proPoiUpsell' => 'Free plan includes basic map and limited places',
@@ -5162,11 +5174,11 @@ extension on Translations {
 			'countries.AM' => 'Armenia',
 			'countries.AO' => 'Angola',
 			'countries.AR' => 'Argentina',
+			_ => null,
+		} ?? switch (path) {
 			'countries.AT' => 'Austria',
 			'countries.AU' => 'Australia',
 			'countries.AZ' => 'Azerbaijan',
-			_ => null,
-		} ?? switch (path) {
 			'countries.BA' => 'Bosnia and Herzegovina',
 			'countries.BB' => 'Barbados',
 			'countries.BD' => 'Bangladesh',

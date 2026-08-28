@@ -272,6 +272,9 @@ class _TranslationsSettingsFr extends TranslationsSettingsEn {
 	@override String get historyEmpty => 'Aucun vol pour l’instant.';
 	@override String get historySearchHint => 'Rechercher par aéroport ou ville';
 	@override String get historyNoResults => 'Aucun vol correspondant trouvé.';
+	@override String get historyRestoreFlight => 'Restaurer le vol';
+	@override String get historyRestoreSuccess => 'Le vol a été restauré comme vol à venir.';
+	@override String get historyRestoreError => 'Échec de la restauration du vol.';
 	@override String get historyDeleteOfflineData => 'Supprimer uniquement la carte';
 	@override String get appearance => 'Apparence';
 	@override String get language => 'Langue';
@@ -1941,6 +1944,9 @@ extension on TranslationsFr {
 			'settings.historyEmpty' => 'Aucun vol pour l’instant.',
 			'settings.historySearchHint' => 'Rechercher par aéroport ou ville',
 			'settings.historyNoResults' => 'Aucun vol correspondant trouvé.',
+			'settings.historyRestoreFlight' => 'Restaurer le vol',
+			'settings.historyRestoreSuccess' => 'Le vol a été restauré comme vol à venir.',
+			'settings.historyRestoreError' => 'Échec de la restauration du vol.',
 			'settings.historyDeleteOfflineData' => 'Supprimer uniquement la carte',
 			'settings.appearance' => 'Apparence',
 			'settings.language' => 'Langue',
@@ -2238,11 +2244,11 @@ extension on TranslationsFr {
 			'createFlight.mapPreview.estimatedMapSize' => ({required Object size}) => 'Taille estimée de la carte : ${size}',
 			'createFlight.mapPreview.upgradeToPro' => 'Passer à Pro',
 			'createFlight.mapPreview.basicHint' => 'Détail de carte basique avec des lieux limités',
+			_ => null,
+		} ?? switch (path) {
 			'createFlight.mapPreview.proGateHint' => 'Passez à Pro pour une carte détaillée avec tous les lieux',
 			'createFlight.mapPreview.proHint' => ({required Object count}) => 'Carte hors ligne détaillée avec ${count} lieux',
 			'createFlight.mapPreview.optionsTitle' => 'Itinéraire approximatif',
-			_ => null,
-		} ?? switch (path) {
 			'createFlight.mapPreview.optionsBody' => 'L’itinéraire est approximatif — le trajet réel peut varier, surtout sur les vols long-courriers.',
 			'createFlight.overview.routeNotReady' => 'L’itinéraire n’est pas encore prêt.',
 			'createFlight.overview.proPoiUpsell' => 'Le forfait Gratuit comprend une carte basique et un nombre limité de lieux',
@@ -2752,11 +2758,11 @@ extension on TranslationsFr {
 			'countries.AM' => 'Arménie',
 			'countries.AO' => 'Angola',
 			'countries.AR' => 'Argentine',
+			_ => null,
+		} ?? switch (path) {
 			'countries.AT' => 'Autriche',
 			'countries.AU' => 'Australie',
 			'countries.AZ' => 'Azerbaïdjan',
-			_ => null,
-		} ?? switch (path) {
 			'countries.BA' => 'Bosnie-Herzégovine',
 			'countries.BB' => 'Barbade',
 			'countries.BD' => 'Bangladesh',

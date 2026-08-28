@@ -105,6 +105,7 @@ import 'package:flymap/domain/usecase/get_learn_article_content_use_case.dart';
 import 'package:flymap/domain/usecase/get_learn_categories_use_case.dart';
 import 'package:flymap/domain/usecase/get_learn_category_articles_use_case.dart';
 import 'package:flymap/domain/usecase/mark_learn_article_seen_use_case.dart';
+import 'package:flymap/domain/usecase/restore_flight_use_case.dart';
 import 'package:flymap/domain/usecase/start_flight_use_case.dart';
 import 'package:flymap/domain/usecase/submit_feedback_use_case.dart';
 import 'package:flymap/domain/usecase/toggle_learn_article_favorite_use_case.dart';
@@ -365,6 +366,9 @@ class DiModule {
     );
     i.registerLazySingleton<StartFlightUseCase>(
       () => StartFlightUseCase(repository: i.get()),
+    );
+    i.registerLazySingleton<RestoreFlightUseCase>(
+      () => RestoreFlightUseCase(repository: i.get()),
     );
     i.registerLazySingleton<AutoCompleteStaleInProgressFlightsUseCase>(
       () => AutoCompleteStaleInProgressFlightsUseCase(repository: i.get()),

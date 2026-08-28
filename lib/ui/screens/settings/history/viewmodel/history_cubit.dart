@@ -7,6 +7,7 @@ import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/metric_units_repository.dart';
 import 'package:flymap/domain/usecase/complete_flight_use_case.dart';
 import 'package:flymap/domain/usecase/delete_flight_use_case.dart';
+import 'package:flymap/domain/usecase/restore_flight_use_case.dart';
 
 import 'history_state.dart';
 
@@ -16,10 +17,12 @@ class HistoryCubit extends Cubit<HistoryState> {
     required MetricUnitsRepository unitsRepository,
     required DeleteFlightUseCase deleteFlightUseCase,
     required CompleteFlightUseCase completeFlightUseCase,
+    required RestoreFlightUseCase restoreFlightUseCase,
   }) : _repository = repository,
        _unitsRepository = unitsRepository,
        _deleteFlightUseCase = deleteFlightUseCase,
        _completeFlightUseCase = completeFlightUseCase,
+       _restoreFlightUseCase = restoreFlightUseCase,
        super(const HistoryLoading()) {
     load();
   }
@@ -28,6 +31,7 @@ class HistoryCubit extends Cubit<HistoryState> {
   final MetricUnitsRepository _unitsRepository;
   final DeleteFlightUseCase _deleteFlightUseCase;
   final CompleteFlightUseCase _completeFlightUseCase;
+  final RestoreFlightUseCase _restoreFlightUseCase;
   final Logger _logger = const Logger('HistoryCubit');
 
   HistorySort _sort = HistorySort.date;
@@ -90,6 +94,18 @@ class HistoryCubit extends Cubit<HistoryState> {
       return true;
     } catch (e) {
       _logger.error('Failed to complete flight in history: $e');
+      return false;
+    }
+  }
+
+  Future<bool> restoreFlight(String flightId) async {
+    try {
+      final ok = await _restoreFlightUseCase(flightId: flightId);
+      if (!ok) return false;
+      await load();
+      return true;
+    } catch (e) {
+      _logger.error('Failed to restore flight from history: $e');
       return false;
     }
   }

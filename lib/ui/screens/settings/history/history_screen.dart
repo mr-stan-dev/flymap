@@ -7,10 +7,12 @@ import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/repository/metric_units_repository.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
+import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 import 'package:flymap/ui/screens/flight/widgets/complete_flight_confirmation_dialog.dart';
 import 'package:flymap/ui/screens/flight/widgets/delete_flight_confirmation_dialog.dart';
 import 'package:flymap/domain/usecase/complete_flight_use_case.dart';
 import 'package:flymap/domain/usecase/delete_flight_use_case.dart';
+import 'package:flymap/domain/usecase/restore_flight_use_case.dart';
 import 'package:flymap/size_utils.dart';
 import 'package:flymap/ui/theme/app_colours.dart';
 import 'package:flymap/utils/route_utils.dart';
@@ -31,6 +33,7 @@ class HistoryScreen extends StatelessWidget {
         unitsRepository: GetIt.I<MetricUnitsRepository>(),
         deleteFlightUseCase: GetIt.I<DeleteFlightUseCase>(),
         completeFlightUseCase: GetIt.I<CompleteFlightUseCase>(),
+        restoreFlightUseCase: GetIt.I<RestoreFlightUseCase>(),
       ),
       child: const _HistoryContent(),
     );
@@ -150,6 +153,23 @@ class _HistoryContentState extends State<_HistoryContent> {
     _HistoryItemAction action,
   ) async {
     switch (action) {
+      case _HistoryItemAction.restore:
+        final ok = await context.read<HistoryCubit>().restoreFlight(
+          item.flight.id,
+        );
+        if (!context.mounted) return;
+        if (ok) {
+          homeRefreshNotifier.value = true;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              ok
+                  ? context.t.settings.historyRestoreSuccess
+                  : context.t.settings.historyRestoreError,
+            ),
+          ),
+        );
       case _HistoryItemAction.complete:
         final result = await CompleteFlightConfirmationDialog.show(context);
         if (result == null || !context.mounted) return;
@@ -466,9 +486,25 @@ class _HistoryTile extends StatelessWidget {
     final status = item.flight.status;
     final hasOfflineData =
         item.flight.maps.isNotEmpty || item.flight.info.articles.isNotEmpty;
+    final travelDate = item.flight.schedule?.travelDate;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final hasPastTravelDate =
+        travelDate != null &&
+        DateTime(
+          travelDate.year,
+          travelDate.month,
+          travelDate.day,
+        ).isBefore(today);
+    final canRestore = hasOfflineData && !hasPastTravelDate;
 
     if (status == FlightStatus.completed) {
       return [
+        if (canRestore)
+          PopupMenuItem(
+            value: _HistoryItemAction.restore,
+            child: Text(context.t.settings.historyRestoreFlight),
+          ),
         if (hasOfflineData)
           PopupMenuItem(
             value: _HistoryItemAction.deleteOfflineData,
@@ -494,7 +530,7 @@ class _HistoryTile extends StatelessWidget {
   }
 }
 
-enum _HistoryItemAction { complete, deleteOfflineData, deleteFlight }
+enum _HistoryItemAction { restore, complete, deleteOfflineData, deleteFlight }
 
 class _StatusChip extends StatelessWidget {
   const _StatusChip({required this.status});
