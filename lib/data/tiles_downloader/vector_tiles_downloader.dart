@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:math' as math;
 
+import 'package:flymap/data/tiles_downloader/ios_backup_exclusion.dart';
 import 'package:flymap/data/tiles_downloader/mbtiles_verifier.dart';
 import 'package:flymap/data/tiles_downloader/sea_tiles_filter.dart';
 import 'package:flymap/data/tiles_downloader/tile_utils.dart';
@@ -23,6 +24,7 @@ class VectorTilesDownloader {
   final int maxZoom;
   final int isolatesCount;
   final _logger = Logger('VectorTilesDownloader');
+  final IosBackupExclusion _iosBackupExclusion;
 
   VectorTilesDownloader({
     List<LatLng>? polygon,
@@ -30,7 +32,9 @@ class VectorTilesDownloader {
     required this.minZoom,
     required this.maxZoom,
     this.isolatesCount = MapDownloadConfig.defaultWorkerCount,
-  }) : polygons = polygons ?? (polygon == null ? const [] : [polygon]);
+    IosBackupExclusion? iosBackupExclusion,
+  }) : polygons = polygons ?? (polygon == null ? const [] : [polygon]),
+       _iosBackupExclusion = iosBackupExclusion ?? IosBackupExclusion();
 
   final List<Isolate> _isolates = [];
   ReceivePort? _receivePort;
@@ -404,6 +408,13 @@ class VectorTilesDownloader {
         await db.close();
         db = null;
         await _promoteWorkFile(workPath, mbtilesPath);
+        try {
+          await _iosBackupExclusion.exclude(mbtilesPath);
+        } catch (e) {
+          // Backup metadata is independent of map integrity. Keep the verified
+          // offline map usable even if iOS cannot persist the attribute.
+          _logger.error('Failed to exclude MBTiles from iOS backup: $e');
+        }
         _logger.log('File verification successful, yielding success event');
         keepArtifacts = true;
         controller.add(DownloadMapDone(mbtilesPath, verification.fileSize));

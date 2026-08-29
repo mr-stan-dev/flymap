@@ -8,6 +8,7 @@ import MapLibre
   private let nativeCaptureDelegate = NativeCaptureDelegate()
   private let flightVideoEncoderDelegate = FlightVideoEncoderDelegate()
   private let videoToolsDelegate = VideoToolsDelegate()
+  private let offlineStorageDelegate = OfflineStorageDelegate()
 
   override func application(
     _ application: UIApplication,
@@ -35,6 +36,7 @@ import MapLibre
       nativeCaptureDelegate.register(with: controller)
       flightVideoEncoderDelegate.register(with: controller)
       videoToolsDelegate.register(with: controller)
+      offlineStorageDelegate.register(with: controller)
     }
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
