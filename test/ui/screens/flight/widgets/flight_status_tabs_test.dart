@@ -32,6 +32,7 @@ import 'package:flymap/subscription/flight_unlock_purchase_result.dart';
 import 'package:flymap/subscription/subscription_paywall_result.dart';
 import 'package:flymap/subscription/subscription_product.dart';
 import 'package:flymap/subscription/subscription_status.dart';
+import 'package:flymap/ui/design_system/design_system.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_cubit.dart';
 import 'package:flymap/ui/screens/flight/viewmodel/flight_screen_state.dart';
 import 'package:flymap/ui/screens/flight/flight_screen.dart';
@@ -39,6 +40,7 @@ import 'package:flymap/ui/screens/flight/widgets/gps_signal_help_sheet.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/dashboard_panel.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/dashboard_tab_view.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/dashboard/gps_live_status_card.dart';
+import 'package:flymap/ui/screens/flight/widgets/tabs/map/day_night/route_sun_event_forecast.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/geo_card/geo_awareness_card.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_gps_status_badge.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/widgets/map_bottom_status_card.dart';
@@ -631,31 +633,63 @@ void main() {
     expect(helpTapped, isTrue);
   });
 
-  testWidgets(
-    'hub tab keeps stale progress content visible while searching',
-    (tester) async {
-      final gpsProvider = _FakeGpsDataProvider();
-      final cubit = _buildFlightCubit(
-        status: FlightStatus.inProgress,
-        gpsProvider: gpsProvider,
-      );
-      await tester.pumpWidget(_hubApp(cubit: cubit));
-      for (var i = 0; i < 5; i++) {
-        await tester.pump(const Duration(milliseconds: 20));
-      }
+  testWidgets('map GPS badge includes telemetry and the next sun event', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _testApp(
+        child: MapGpsStatusBadge(
+          gpsStatus: GpsStatus.gpsActive,
+          gpsData: const GpsData(
+            latitude: 51,
+            longitude: 0.1,
+            accuracy: 10,
+            speed: SpeedValue(800, 'km/h'),
+            altitude: AltitudeValue(11000, 'm'),
+          ),
+          sunEventForecast: RouteSunEventForecast(
+            type: RouteSunEventType.sunset,
+            eta: const Duration(minutes: 18),
+            eventTimeUtc: DateTime.utc(2026, 3, 20, 18, 30),
+          ),
+        ),
+      ),
+    );
 
-      gpsProvider.emit(
-        GpsStatus.gpsActive,
-        data: const GpsData(latitude: 50.0, longitude: 10.0),
-      );
-      await tester.pump();
-      gpsProvider.emit(GpsStatus.searching);
-      await tester.pump();
+    expect(find.text('800 km/h • 11,000 m'), findsOneWidget);
+    expect(find.text('Sunset in 18 min'), findsOneWidget);
+    final badge = tester.widget<AnimatedContainer>(
+      find.byType(AnimatedContainer),
+    );
+    final decoration = badge.decoration! as BoxDecoration;
+    expect(decoration.borderRadius, BorderRadius.circular(DsRadii.md));
+    expect(decoration.border, isNull);
+  });
 
-      expect(find.text('Route progress'), findsOneWidget);
-      expect(find.text('Showing last known data'), findsOneWidget);
-    },
-  );
+  testWidgets('hub tab keeps stale progress content visible while searching', (
+    tester,
+  ) async {
+    final gpsProvider = _FakeGpsDataProvider();
+    final cubit = _buildFlightCubit(
+      status: FlightStatus.inProgress,
+      gpsProvider: gpsProvider,
+    );
+    await tester.pumpWidget(_hubApp(cubit: cubit));
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+
+    gpsProvider.emit(
+      GpsStatus.gpsActive,
+      data: const GpsData(latitude: 50.0, longitude: 10.0),
+    );
+    await tester.pump();
+    gpsProvider.emit(GpsStatus.searching);
+    await tester.pump();
+
+    expect(find.text('Route progress'), findsOneWidget);
+    expect(find.text('Showing last known data'), findsOneWidget);
+  });
 
   testWidgets('GPS help sheet shows recovery tips', (tester) async {
     await tester.pumpWidget(

@@ -28,7 +28,6 @@ import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_initializing_overl
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/map_style_loading_view.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/widgets/flight_map_bottom_status_overlay.dart';
 import 'package:flymap/ui/screens/flight/widgets/tabs/map/widgets/flight_map_gps_badge_overlay.dart';
-import 'package:flymap/ui/screens/flight/widgets/tabs/map/widgets/flight_map_sun_event_hint_overlay.dart';
 import 'package:flymap/ui/screens/home/tabs/home/home_tab.dart';
 import 'package:get_it/get_it.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -422,11 +421,8 @@ class _FlightMapState extends State<FlightMap> {
           ),
           FlightMapGpsBadgeOverlay(
             topOffset: controlsTopOffset,
+            sunEventForecast: _dayNightController.sunEventForecast,
             onGpsHelpTap: widget.onGpsHelpTap,
-          ),
-          FlightMapSunEventHintOverlay(
-            topOffset: controlsTopOffset,
-            forecast: _dayNightController.sunEventForecast,
           ),
           FlightMapControls(
             topOffset: controlsTopOffset + 4,
