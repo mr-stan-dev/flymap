@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flymap/domain/entity/flight.dart';
+import 'package:flymap/domain/entity/flight_map_position.dart';
 import 'package:flymap/domain/entity/gps_data.dart';
 import 'package:flymap/domain/entity/route_region.dart';
 
@@ -24,12 +25,14 @@ final class FlightGpsState extends Equatable {
   final GpsData? data;
   final int updateTick;
   final DateTime? lastFixAt;
+  final FlightMapPosition? mapPosition;
 
   const FlightGpsState({
     this.status = GpsStatus.off,
     this.data,
     this.updateTick = 0,
     this.lastFixAt,
+    this.mapPosition,
   });
 
   FlightGpsState copyWith({
@@ -41,6 +44,9 @@ final class FlightGpsState extends Equatable {
     DateTime? lastFixAt,
     bool preserveLastFixAt = true,
     bool clearLastFixAt = false,
+    FlightMapPosition? mapPosition,
+    bool preserveMapPosition = true,
+    bool clearMapPosition = false,
   }) {
     return FlightGpsState(
       status: status ?? this.status,
@@ -49,11 +55,14 @@ final class FlightGpsState extends Equatable {
       lastFixAt: clearLastFixAt
           ? null
           : lastFixAt ?? (preserveLastFixAt ? this.lastFixAt : null),
+      mapPosition: clearMapPosition
+          ? null
+          : mapPosition ?? (preserveMapPosition ? this.mapPosition : null),
     );
   }
 
   @override
-  List<Object?> get props => [status, data, updateTick, lastFixAt];
+  List<Object?> get props => [status, data, updateTick, lastFixAt, mapPosition];
 }
 
 /// Flight in progress state

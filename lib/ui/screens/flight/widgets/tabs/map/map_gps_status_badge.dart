@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flymap/domain/entity/flight_map_position.dart';
 import 'package:flymap/domain/entity/gps_data.dart';
 import 'package:flymap/i18n/strings.g.dart';
 import 'package:flymap/ui/design_system/design_system.dart';
@@ -10,6 +11,7 @@ class MapGpsStatusBadge extends StatelessWidget {
   const MapGpsStatusBadge({
     required this.gpsStatus,
     required this.gpsData,
+    this.mapPosition,
     this.sunEventForecast,
     this.onHelpTap,
     super.key,
@@ -17,6 +19,7 @@ class MapGpsStatusBadge extends StatelessWidget {
 
   final GpsStatus gpsStatus;
   final GpsData? gpsData;
+  final FlightMapPosition? mapPosition;
   final RouteSunEventForecast? sunEventForecast;
   final VoidCallback? onHelpTap;
 
@@ -123,14 +126,22 @@ class MapGpsStatusBadge extends StatelessWidget {
   }
 
   String? _telemetryLabel() {
-    if (gpsStatus != GpsStatus.gpsActive && gpsStatus != GpsStatus.weakSignal) {
+    final live =
+        gpsStatus == GpsStatus.gpsActive || gpsStatus == GpsStatus.weakSignal;
+    final approximate =
+        gpsStatus == GpsStatus.searching && mapPosition?.isApproximate == true;
+    if (!live && !approximate) {
       return null;
     }
     if (gpsData?.speed == null || gpsData?.altitude == null) return null;
 
     final telemetry = InstrumentTelemetry.fromGpsData(gpsData);
-    return '${telemetry.speedLabel} ${telemetry.speedUnit} '
+    final label =
+        '${telemetry.speedLabel} ${telemetry.speedUnit} '
         '• ${telemetry.altitudeLabel} ${telemetry.altitudeUnit}';
+    return approximate
+        ? '${t.flight.dashboard.gpsLastTelemetryShort} · $label'
+        : label;
   }
 
   _MapGpsStatusView _statusView(BuildContext context) {
@@ -157,6 +168,20 @@ class MapGpsStatusBadge extends StatelessWidget {
           ),
         );
       case GpsStatus.searching:
+        final position = mapPosition;
+        if (position != null && position.isApproximate) {
+          final estimated =
+              position.source == FlightMapPositionSource.estimated;
+          return _MapGpsStatusView(
+            icon: estimated
+                ? Icons.near_me_outlined
+                : Icons.location_history_rounded,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            label:
+                '${estimated ? t.flight.dashboard.gpsEstimatedShort : t.flight.dashboard.gpsLastKnownShort}'
+                ' · ${_compactAge(position.gpsAge)}',
+          );
+        }
         return _MapGpsStatusView(
           icon: Icons.gps_not_fixed_rounded,
           color: info,
@@ -176,6 +201,14 @@ class MapGpsStatusBadge extends StatelessWidget {
           label: t.flight.dashboard.gpsOffLabel,
         );
     }
+  }
+
+  String _compactAge(Duration age) {
+    final seconds = age.isNegative ? 0 : age.inSeconds;
+    if (seconds < 60) return '${seconds}s';
+    final minutes = seconds ~/ 60;
+    if (minutes < 60) return '${minutes}m';
+    return '${minutes ~/ 60}h';
   }
 
   _SignalQuality _signalQuality(double? accuracy) {

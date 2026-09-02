@@ -3,6 +3,7 @@ import 'package:flymap/data/debug/map_debug_gps_provider.dart';
 import 'package:flymap/data/gps_data_provider.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight.dart';
+import 'package:flymap/domain/entity/flight_map_position.dart';
 import 'package:flymap/domain/entity/flight_info.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
 import 'package:flymap/domain/entity/flight_route_metrics.dart';
@@ -151,6 +152,104 @@ void main() {
       expect(recovered.gps.status, GpsStatus.gpsActive);
       expect(recovered.gps.data?.latitude, 52.0);
     });
+
+    test(
+      'estimates only the map position after an airborne GPS loss',
+      () async {
+        var now = DateTime.utc(2026, 1, 1, 12);
+        final gpsProvider = _FakeGpsDataProvider();
+        final cubit = FlightScreenCubit(
+          flight: _buildFlight(status: FlightStatus.inProgress),
+          deleteFlightUseCase: _NoopDeleteFlightUseCase(),
+          completeFlightUseCase: _NoopCompleteFlightUseCase(),
+          startFlightUseCase: _FakeStartFlightUseCase(result: true),
+          gpsProvider: gpsProvider,
+          nowProvider: () => now,
+          enableGpsCheckTimer: false,
+        );
+        addTearDown(cubit.close);
+        await Future<void>.delayed(Duration.zero);
+
+        for (var index = 0; index < 3; index++) {
+          now = DateTime.utc(2026, 1, 1, 12, 0, index * 2);
+          gpsProvider.emit(
+            GpsStatus.gpsActive,
+            data: GpsData(
+              latitude: 50,
+              longitude: 5 + index * 0.0056,
+              altitude: const AltitudeValue(11000, 'm'),
+              speed: const SpeedValue(720, 'km/h'),
+              course: 90,
+              accuracy: 12,
+              speedAccuracy: 5,
+              courseAccuracy: 5,
+              recordedAt: now,
+            ),
+          );
+        }
+
+        final lastLive = cubit.state as FlightScreenLoaded;
+        final lastGpsLongitude = lastLive.gps.data!.longitude!;
+        now = now.add(const Duration(seconds: 21));
+        await cubit.checkGpsStatusForTest();
+
+        final searching = cubit.state as FlightScreenLoaded;
+        expect(searching.gps.status, GpsStatus.searching);
+        expect(searching.gps.data?.longitude, lastGpsLongitude);
+        expect(
+          searching.gps.mapPosition?.source,
+          FlightMapPositionSource.estimated,
+        );
+        expect(
+          searching.gps.mapPosition!.data.longitude!,
+          greaterThan(lastGpsLongitude),
+        );
+      },
+    );
+
+    test(
+      'does not estimate an upcoming flight or retain a disabled marker',
+      () async {
+        var now = DateTime.utc(2026, 1, 1, 12);
+        final gpsProvider = _FakeGpsDataProvider();
+        final cubit = FlightScreenCubit(
+          flight: _buildFlight(status: FlightStatus.upcoming),
+          deleteFlightUseCase: _NoopDeleteFlightUseCase(),
+          completeFlightUseCase: _NoopCompleteFlightUseCase(),
+          startFlightUseCase: _FakeStartFlightUseCase(result: true),
+          gpsProvider: gpsProvider,
+          nowProvider: () => now,
+          enableGpsCheckTimer: false,
+        );
+        addTearDown(cubit.close);
+        await Future<void>.delayed(Duration.zero);
+
+        gpsProvider.emit(
+          GpsStatus.gpsActive,
+          data: GpsData(
+            latitude: 50,
+            longitude: 5,
+            speed: const SpeedValue(720, 'km/h'),
+            course: 90,
+            accuracy: 12,
+            recordedAt: now,
+          ),
+        );
+        now = now.add(const Duration(seconds: 21));
+        await cubit.checkGpsStatusForTest();
+
+        final searching = cubit.state as FlightScreenLoaded;
+        expect(
+          searching.gps.mapPosition?.source,
+          FlightMapPositionSource.lastKnown,
+        );
+
+        gpsProvider.emit(GpsStatus.off);
+        final off = cubit.state as FlightScreenLoaded;
+        expect(off.gps.mapPosition, isNull);
+        expect(off.gps.data, isNull);
+      },
+    );
   });
 
   group('FlightScreenCubit.checkInFlight', () {

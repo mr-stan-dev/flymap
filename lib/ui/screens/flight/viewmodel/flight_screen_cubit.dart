@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/debug/map_debug_gps_provider.dart';
 import 'package:flymap/data/gps_data_provider.dart';
 import 'package:flymap/domain/entity/flight.dart';
+import 'package:flymap/domain/entity/flight_map_position.dart';
 import 'package:flymap/domain/entity/flight_status.dart';
 import 'package:flymap/domain/entity/flight_timestamp.dart';
 import 'package:flymap/domain/entity/gps_data.dart';
@@ -16,6 +17,7 @@ import 'package:flymap/domain/usecase/complete_flight_use_case.dart';
 import 'package:flymap/domain/usecase/delete_flight_use_case.dart';
 import 'package:flymap/repository/flight_repository.dart';
 import 'package:flymap/domain/usecase/start_flight_use_case.dart';
+import 'package:flymap/domain/policy/flight_position_estimator.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get_it/get_it.dart';
 
@@ -34,9 +36,9 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   final Duration _gpsStaleThresholdOverride;
   final bool _enableGpsCheckTimer;
   final MapDebugGpsProvider _debugGpsProvider;
+  final FlightPositionEstimator _positionEstimator;
   Timer? _gpsCheckTimer;
   int _gpsUpdateTick = 0;
-  DateTime? _lastGpsEventAt;
   bool _debugGpsOverrideActive = false;
 
   FlightScreenCubit({
@@ -51,6 +53,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
     Duration gpsStaleThreshold = _gpsStaleThreshold,
     bool enableGpsCheckTimer = true,
     MapDebugGpsProvider? debugGpsProvider,
+    FlightPositionEstimator? positionEstimator,
   }) : _currentFlight = flight,
        _flightRepository =
            flightRepository ??
@@ -66,6 +69,12 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
        _gpsStaleThresholdOverride = gpsStaleThreshold,
        _enableGpsCheckTimer = enableGpsCheckTimer,
        _debugGpsProvider = debugGpsProvider ?? MapDebugGpsProvider(),
+       _positionEstimator =
+           positionEstimator ??
+           FlightPositionEstimator(
+             departure: flight.departure.latLon,
+             arrival: flight.arrival.latLon,
+           ),
        super(FlightScreenLoading()) {
     _logger.log('flight routeInsights: ${flight.routeInsights}');
     _loadDebugGpsRoute();
@@ -105,12 +114,15 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
         switch (status) {
           case GpsStatus.gpsActive:
           case GpsStatus.weakSignal:
+            if (data != null) {
+              _positionEstimator.recordFix(data, receivedAt: _nowProvider());
+            }
+            break;
           case GpsStatus.searching:
-            _lastGpsEventAt = _nowProvider();
             break;
           case GpsStatus.off:
           case GpsStatus.permissionsNotGranted:
-            _lastGpsEventAt = null;
+            _positionEstimator.reset();
             break;
         }
         _emitTelemetryUpdate(status: status, data: data);
@@ -118,7 +130,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
     );
     if (_enableGpsCheckTimer) {
       _gpsCheckTimer = Timer.periodic(
-        const Duration(seconds: 5),
+        const Duration(seconds: 1),
         (_) => _checkGpsStatus(),
       );
     }
@@ -220,8 +232,8 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
       return;
     }
 
-    final lastEventAt = _lastGpsEventAt;
-    if (lastEventAt == null) {
+    final lastFixAt = current.gps.lastFixAt;
+    if (lastFixAt == null) {
       if (current.gps.status != GpsStatus.searching) {
         _emitTelemetryUpdate(status: GpsStatus.searching);
       }
@@ -229,8 +241,8 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
     }
 
     final now = _nowProvider();
-    final stale = now.difference(lastEventAt) > _gpsStaleThresholdOverride;
-    if (stale && current.gps.status != GpsStatus.searching) {
+    final stale = now.difference(lastFixAt) > _gpsStaleThresholdOverride;
+    if (stale || current.gps.status == GpsStatus.searching) {
       _emitTelemetryUpdate(status: GpsStatus.searching);
     }
   }
@@ -257,7 +269,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
   void applyDebugGpsData(GpsData data, {bool resetGeoState = false}) {
     if (!kDebugMode) return;
     _debugGpsOverrideActive = true;
-    _lastGpsEventAt = _nowProvider();
+    _positionEstimator.recordFix(data, receivedAt: _nowProvider());
     _emitTelemetryUpdate(
       status: GpsStatus.gpsActive,
       data: data,
@@ -365,11 +377,18 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
       GpsStatus.off || GpsStatus.permissionsNotGranted => null,
     };
     final resolvedGpsLastFixAt = switch (status) {
-      GpsStatus.gpsActive ||
-      GpsStatus.weakSignal => data != null ? now : currentGpsLastFixAt,
+      GpsStatus.gpsActive || GpsStatus.weakSignal =>
+        data != null ? _resolvedFixAt(data, now) : currentGpsLastFixAt,
       GpsStatus.searching => currentGpsLastFixAt,
       GpsStatus.off || GpsStatus.permissionsNotGranted => null,
     };
+    final mapPosition = _resolveMapPosition(
+      status: status,
+      data: data,
+      currentGpsData: currentGpsData,
+      currentGpsLastFixAt: currentGpsLastFixAt,
+      now: now,
+    );
     _gpsUpdateTick++;
     emit(
       FlightScreenLoaded(
@@ -378,6 +397,7 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
           data: resolvedGpsData,
           updateTick: _gpsUpdateTick,
           lastFixAt: resolvedGpsLastFixAt,
+          mapPosition: mapPosition,
         ),
         flight: _currentFlight,
         routeRegions: _currentFlight.info.routeRegions,
@@ -388,6 +408,53 @@ class FlightScreenCubit extends Cubit<FlightScreenState> {
         nextRegionEtaMinutes: geo.nextRegionEtaMinutes,
       ),
     );
+  }
+
+  FlightMapPosition? _resolveMapPosition({
+    required GpsStatus status,
+    required GpsData? data,
+    required GpsData? currentGpsData,
+    required DateTime? currentGpsLastFixAt,
+    required DateTime now,
+  }) {
+    switch (status) {
+      case GpsStatus.gpsActive:
+      case GpsStatus.weakSignal:
+        if (data?.latitude == null || data?.longitude == null) return null;
+        final fixAt = _resolvedFixAt(data!, now);
+        return FlightMapPosition.live(data: data, fixAt: fixAt);
+      case GpsStatus.searching:
+        final estimated = _currentFlight.status == FlightStatus.inProgress
+            ? _positionEstimator.estimate(now: now)
+            : null;
+        if (estimated != null) return estimated;
+        if (currentGpsData?.latitude == null ||
+            currentGpsData?.longitude == null ||
+            currentGpsLastFixAt == null) {
+          return null;
+        }
+        final age = now.difference(currentGpsLastFixAt);
+        return FlightMapPosition(
+          data: currentGpsData!,
+          source: FlightMapPositionSource.lastKnown,
+          confidence: FlightMapPositionConfidence.none,
+          gpsAge: age.isNegative ? Duration.zero : age,
+          lastGpsFixAt: currentGpsLastFixAt,
+        );
+      case GpsStatus.off:
+      case GpsStatus.permissionsNotGranted:
+        return null;
+    }
+  }
+
+  DateTime _resolvedFixAt(GpsData data, DateTime receivedAt) {
+    final recordedAt = data.recordedAt?.toUtc();
+    if (recordedAt == null ||
+        recordedAt.isBefore(receivedAt.subtract(const Duration(seconds: 20))) ||
+        recordedAt.isAfter(receivedAt.add(const Duration(seconds: 2)))) {
+      return receivedAt;
+    }
+    return recordedAt;
   }
 
   @override

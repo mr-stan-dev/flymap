@@ -28,6 +28,9 @@ class GpsData extends Equatable {
   final double? course;
   final double? accuracy;
   final double? altitudeAccuracy;
+  final double? speedAccuracy;
+  final double? courseAccuracy;
+  final DateTime? recordedAt;
 
   const GpsData({
     this.latitude,
@@ -37,6 +40,9 @@ class GpsData extends Equatable {
     this.course,
     this.accuracy,
     this.altitudeAccuracy,
+    this.speedAccuracy,
+    this.courseAccuracy,
+    this.recordedAt,
   });
 
   @override
@@ -48,6 +54,9 @@ class GpsData extends Equatable {
     course,
     accuracy,
     altitudeAccuracy,
+    speedAccuracy,
+    courseAccuracy,
+    recordedAt,
   ];
 
   GpsData copyWith({
@@ -58,6 +67,9 @@ class GpsData extends Equatable {
     double? course,
     double? accuracy,
     double? altitudeAccuracy,
+    double? speedAccuracy,
+    double? courseAccuracy,
+    DateTime? recordedAt,
   }) {
     return GpsData(
       latitude: latitude ?? this.latitude,
@@ -67,6 +79,9 @@ class GpsData extends Equatable {
       course: course ?? this.course,
       accuracy: accuracy ?? this.accuracy,
       altitudeAccuracy: altitudeAccuracy ?? this.altitudeAccuracy,
+      speedAccuracy: speedAccuracy ?? this.speedAccuracy,
+      courseAccuracy: courseAccuracy ?? this.courseAccuracy,
+      recordedAt: recordedAt ?? this.recordedAt,
     );
   }
 }

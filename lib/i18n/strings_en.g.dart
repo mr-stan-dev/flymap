@@ -3519,6 +3519,15 @@ class TranslationsFlightDashboardEn {
 	/// en: 'GPS searching'
 	String get gpsSearchingLabel => 'GPS searching';
 
+	/// en: 'Estimated'
+	String get gpsEstimatedShort => 'Estimated';
+
+	/// en: 'Last known'
+	String get gpsLastKnownShort => 'Last known';
+
+	/// en: 'Last'
+	String get gpsLastTelemetryShort => 'Last';
+
 	/// en: 'GPS permission needed'
 	String get gpsPermissionNeededLabel => 'GPS permission needed';
 
@@ -4907,6 +4916,9 @@ extension on Translations {
 			'flight.dashboard.signalSearching' => 'Searching',
 			'flight.dashboard.gpsQuality' => ({required Object quality}) => 'GPS ${quality}',
 			'flight.dashboard.gpsSearchingLabel' => 'GPS searching',
+			'flight.dashboard.gpsEstimatedShort' => 'Estimated',
+			'flight.dashboard.gpsLastKnownShort' => 'Last known',
+			'flight.dashboard.gpsLastTelemetryShort' => 'Last',
 			'flight.dashboard.gpsPermissionNeededLabel' => 'GPS permission needed',
 			'flight.dashboard.gpsOffLabel' => 'GPS off',
 			'flight.dashboard.aircraftHeading' => 'Aircraft heading',
@@ -5171,11 +5183,11 @@ extension on Translations {
 			'countries.AF' => 'Afghanistan',
 			'countries.AG' => 'Antigua and Barbuda',
 			'countries.AL' => 'Albania',
+			_ => null,
+		} ?? switch (path) {
 			'countries.AM' => 'Armenia',
 			'countries.AO' => 'Angola',
 			'countries.AR' => 'Argentina',
-			_ => null,
-		} ?? switch (path) {
 			'countries.AT' => 'Austria',
 			'countries.AU' => 'Australia',
 			'countries.AZ' => 'Azerbaijan',

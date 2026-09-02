@@ -4,10 +4,11 @@ class UserLayer {
   static CircleOptions markerCircle(
     LatLng userPosition, {
     bool visible = true,
+    bool approximate = false,
   }) {
     return CircleOptions(
       geometry: userPosition,
-      circleColor: '#2E7DFF',
+      circleColor: approximate ? '#8490A3' : '#2E7DFF',
       circleRadius: visible ? 6.0 : 0.0,
       circleOpacity: visible ? 0.9 : 0.0,
       circleStrokeColor: '#FFFFFF',

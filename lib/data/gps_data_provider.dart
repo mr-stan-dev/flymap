@@ -58,6 +58,12 @@ class GpsDataProvider {
       final altitudeAccuracy = position.altitudeAccuracy > 0
           ? position.altitudeAccuracy
           : null;
+      final speedAccuracy = position.speedAccuracy >= 0
+          ? position.speedAccuracy
+          : null;
+      final courseAccuracy = position.headingAccuracy > 0
+          ? position.headingAccuracy
+          : null;
       final data = GpsData(
         latitude: position.latitude,
         longitude: position.longitude,
@@ -66,6 +72,9 @@ class GpsDataProvider {
         course: position.heading,
         accuracy: position.accuracy,
         altitudeAccuracy: altitudeAccuracy,
+        speedAccuracy: speedAccuracy,
+        courseAccuracy: courseAccuracy,
+        recordedAt: position.timestamp.toUtc(),
       );
       final status =
           position.accuracy <= 40 &&

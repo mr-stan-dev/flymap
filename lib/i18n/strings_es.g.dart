@@ -1455,6 +1455,9 @@ class _TranslationsFlightDashboardEs extends TranslationsFlightDashboardEn {
 	@override String get signalSearching => 'Buscando';
 	@override String gpsQuality({required Object quality}) => 'GPS ${quality}';
 	@override String get gpsSearchingLabel => 'Buscando GPS';
+	@override String get gpsEstimatedShort => 'Estimada';
+	@override String get gpsLastKnownShort => 'Última pos.';
+	@override String get gpsLastTelemetryShort => 'Último';
 	@override String get gpsPermissionNeededLabel => 'Permiso de GPS necesario';
 	@override String get gpsOffLabel => 'GPS apagado';
 	@override String get aircraftHeading => 'Rumbo de la aeronave';
@@ -2491,6 +2494,9 @@ extension on TranslationsEs {
 			'flight.dashboard.signalSearching' => 'Buscando',
 			'flight.dashboard.gpsQuality' => ({required Object quality}) => 'GPS ${quality}',
 			'flight.dashboard.gpsSearchingLabel' => 'Buscando GPS',
+			'flight.dashboard.gpsEstimatedShort' => 'Estimada',
+			'flight.dashboard.gpsLastKnownShort' => 'Última pos.',
+			'flight.dashboard.gpsLastTelemetryShort' => 'Último',
 			'flight.dashboard.gpsPermissionNeededLabel' => 'Permiso de GPS necesario',
 			'flight.dashboard.gpsOffLabel' => 'GPS apagado',
 			'flight.dashboard.aircraftHeading' => 'Rumbo de la aeronave',
@@ -2755,11 +2761,11 @@ extension on TranslationsEs {
 			'countries.AF' => 'Afganistan',
 			'countries.AG' => 'Antigua y Barbuda',
 			'countries.AL' => 'Albania',
+			_ => null,
+		} ?? switch (path) {
 			'countries.AM' => 'Armenia',
 			'countries.AO' => 'Angola',
 			'countries.AR' => 'Argentina',
-			_ => null,
-		} ?? switch (path) {
 			'countries.AT' => 'Austria',
 			'countries.AU' => 'Australia',
 			'countries.AZ' => 'Azerbaiyan',

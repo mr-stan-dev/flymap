@@ -13,9 +13,12 @@ class FlightMapUserLocationController {
   FlightMapUserLocationController({required Logger logger}) : _logger = logger;
 
   static const _planeImageId = 'flight-map-user-plane';
+  static const _estimatedPlaneImageId = 'flight-map-user-plane-estimated';
   static const _planeSourceId = 'flight-map-user-plane-source';
   static const _planeLayerId = 'flight-map-user-plane-layer';
   static const _planeIconAssetPath = 'assets/images/icons/plane_blue.png';
+  static const _estimatedPlaneIconAssetPath =
+      'assets/images/icons/plane_gray.png';
   static const _stationarySpeedThresholdMetersPerSecond = 4.0;
   static const _defaultAnimationDuration = Duration(milliseconds: 1200);
   static const _minAnimationDuration = Duration(milliseconds: 350);
@@ -26,7 +29,7 @@ class FlightMapUserLocationController {
   final Map<String, Uint8List> _assetBytesCache = {};
 
   Circle? _userCircle;
-  GpsData? _pendingGpsData;
+  _UserLocationUpdate? _pendingUpdate;
   bool _isApplyingUserLocation = false;
   bool _isPlaneLayerReady = false;
   LatLng? _renderedPosition;
@@ -39,6 +42,7 @@ class FlightMapUserLocationController {
 
   Future<void> updateUserLocation(
     GpsData data, {
+    bool approximate = false,
     required MapLibreMapController? controller,
     required bool Function() isReady,
     required bool Function() shouldFollowUser,
@@ -46,18 +50,19 @@ class FlightMapUserLocationController {
     required double Function() followZoomProvider,
     required double Function() followTiltProvider,
   }) async {
-    _pendingGpsData = data;
+    _pendingUpdate = _UserLocationUpdate(data: data, approximate: approximate);
 
     if (controller == null || !isReady()) return;
     if (_isApplyingUserLocation) return;
 
     _isApplyingUserLocation = true;
     try {
-      while (_pendingGpsData != null) {
-        final next = _pendingGpsData!;
-        _pendingGpsData = null;
+      while (_pendingUpdate != null) {
+        final next = _pendingUpdate!;
+        _pendingUpdate = null;
         await _applyUserLocation(
-          next,
+          next.data,
+          approximate: next.approximate,
           controller: controller,
           isReady: isReady,
           shouldFollowUser: shouldFollowUser,
@@ -73,6 +78,7 @@ class FlightMapUserLocationController {
 
   Future<void> _applyUserLocation(
     GpsData data, {
+    required bool approximate,
     required MapLibreMapController controller,
     required bool Function() isReady,
     required bool Function() shouldFollowUser,
@@ -96,7 +102,11 @@ class FlightMapUserLocationController {
     try {
       if (_userCircle == null) {
         _userCircle = await controller.addCircle(
-          UserLayer.markerCircle(pos, visible: showCircle),
+          UserLayer.markerCircle(
+            pos,
+            visible: showCircle,
+            approximate: approximate,
+          ),
         );
         createdCircle = true;
       } else {
@@ -109,6 +119,7 @@ class FlightMapUserLocationController {
           followZoomProvider: followZoomProvider,
           followTiltProvider: followTiltProvider,
           showCircle: showCircle,
+          approximate: approximate,
         );
         if (!reachedTarget) {
           return;
@@ -121,6 +132,7 @@ class FlightMapUserLocationController {
           position: pos,
           heading: heading,
           showCircle: showCircle,
+          approximate: approximate,
         );
       }
     } catch (error) {
@@ -128,14 +140,18 @@ class FlightMapUserLocationController {
       if (_isStyleBoundAnnotationError(error)) {
         invalidateStyle(keepRenderedPosition: true);
       }
-      _pendingGpsData = data;
+      _pendingUpdate = _UserLocationUpdate(
+        data: data,
+        approximate: approximate,
+      );
       if (isReady()) {
         Future.delayed(const Duration(milliseconds: 250), () {
-          final pending = _pendingGpsData;
+          final pending = _pendingUpdate;
           if (pending != null && isReady()) {
             unawaited(
               updateUserLocation(
-                pending,
+                pending.data,
+                approximate: pending.approximate,
                 controller: controller,
                 isReady: isReady,
                 shouldFollowUser: shouldFollowUser,
@@ -171,6 +187,7 @@ class FlightMapUserLocationController {
     required double Function() followZoomProvider,
     required double Function() followTiltProvider,
     required bool showCircle,
+    required bool approximate,
   }) async {
     final startPosition = _renderedPosition ?? targetPosition;
     final startHeading = _renderedHeading;
@@ -184,6 +201,7 @@ class FlightMapUserLocationController {
         position: targetPosition,
         heading: targetHeading,
         showCircle: showCircle,
+        approximate: approximate,
       );
       if (shouldFollowUser()) {
         await _moveFollowCamera(
@@ -206,12 +224,13 @@ class FlightMapUserLocationController {
     var previousFramePosition = startPosition;
     for (var frame = 1; frame <= totalFrames; frame++) {
       if (generation != _animationGeneration) return false;
-      if (_pendingGpsData != null) {
+      if (_pendingUpdate != null) {
         await _updateRenderedMarker(
           controller: controller,
           position: targetPosition,
           heading: targetHeading,
           showCircle: showCircle,
+          approximate: approximate,
         );
         if (shouldFollowUser()) {
           await _moveFollowCamera(
@@ -252,6 +271,7 @@ class FlightMapUserLocationController {
         position: position,
         heading: heading,
         showCircle: showCircle,
+        approximate: approximate,
       );
       if (shouldFollowUser()) {
         await _moveFollowCamera(
@@ -301,16 +321,22 @@ class FlightMapUserLocationController {
     required LatLng position,
     required double heading,
     required bool showCircle,
+    required bool approximate,
   }) async {
     await controller.updateCircle(
       _userCircle!,
-      UserLayer.markerCircle(position, visible: showCircle),
+      UserLayer.markerCircle(
+        position,
+        visible: showCircle,
+        approximate: approximate,
+      ),
     );
     await _updatePlaneLayer(
       controller: controller,
       position: position,
       heading: heading,
       visible: !showCircle,
+      approximate: approximate,
     );
     _renderedPosition = position;
     _renderedHeading = heading;
@@ -321,6 +347,7 @@ class FlightMapUserLocationController {
     required LatLng position,
     required double heading,
     required bool visible,
+    required bool approximate,
   }) async {
     if (!_isPlaneLayerReady) {
       await _rebuildPlaneLayer(
@@ -328,6 +355,7 @@ class FlightMapUserLocationController {
         position: position,
         heading: heading,
         visible: visible,
+        approximate: approximate,
       );
       return;
     }
@@ -339,6 +367,7 @@ class FlightMapUserLocationController {
           position: position,
           heading: heading,
           visible: visible,
+          approximate: approximate,
         ),
       );
     } on PlatformException catch (error) {
@@ -352,6 +381,7 @@ class FlightMapUserLocationController {
         position: position,
         heading: heading,
         visible: visible,
+        approximate: approximate,
       );
     }
   }
@@ -361,8 +391,9 @@ class FlightMapUserLocationController {
     required LatLng position,
     required double heading,
     required bool visible,
+    required bool approximate,
   }) async {
-    await _ensurePlaneImageRegistered(controller);
+    await _ensurePlaneImagesRegistered(controller);
     await _removePlaneLayerArtifacts(controller);
     await controller.addGeoJsonSource(
       _planeSourceId,
@@ -370,13 +401,23 @@ class FlightMapUserLocationController {
         position: position,
         heading: heading,
         visible: visible,
+        approximate: approximate,
       ),
     );
     await controller.addLayer(
       _planeSourceId,
       _planeLayerId,
       SymbolLayerProperties(
-        iconImage: _planeImageId,
+        iconImage: [
+          'case',
+          [
+            '==',
+            ['get', 'approximate'],
+            true,
+          ],
+          _estimatedPlaneImageId,
+          _planeImageId,
+        ],
         iconSize: 0.52,
         iconRotate: ['get', 'bearing'],
         iconRotationAlignment: 'map',
@@ -414,6 +455,7 @@ class FlightMapUserLocationController {
     required LatLng position,
     required double heading,
     required bool visible,
+    required bool approximate,
   }) {
     return <String, dynamic>{
       'type': 'FeatureCollection',
@@ -423,6 +465,7 @@ class FlightMapUserLocationController {
           'properties': <String, dynamic>{
             'bearing': _normalizeHeading(heading),
             'visible': visible,
+            'approximate': approximate,
           },
           'geometry': <String, dynamic>{
             'type': 'Point',
@@ -439,18 +482,33 @@ class FlightMapUserLocationController {
         _stationarySpeedThresholdMetersPerSecond;
   }
 
-  Future<void> _ensurePlaneImageRegistered(
+  Future<void> _ensurePlaneImagesRegistered(
     MapLibreMapController controller,
   ) async {
-    final bytes = await _loadAssetBytes(_planeIconAssetPath);
+    await _ensurePlaneImageRegistered(
+      controller,
+      imageId: _planeImageId,
+      assetPath: _planeIconAssetPath,
+    );
+    await _ensurePlaneImageRegistered(
+      controller,
+      imageId: _estimatedPlaneImageId,
+      assetPath: _estimatedPlaneIconAssetPath,
+    );
+  }
+
+  Future<void> _ensurePlaneImageRegistered(
+    MapLibreMapController controller, {
+    required String imageId,
+    required String assetPath,
+  }) async {
+    final bytes = await _loadAssetBytes(assetPath);
     if (bytes == null) return;
     try {
-      await controller.addImage(_planeImageId, bytes);
+      await controller.addImage(imageId, bytes);
     } catch (error) {
       if (!_isImageAlreadyRegisteredError(error)) {
-        _logger.error(
-          'Failed to register plane image "$_planeImageId": $error',
-        );
+        _logger.error('Failed to register plane image "$imageId": $error');
       }
     }
   }
@@ -600,10 +658,11 @@ class FlightMapUserLocationController {
     required double Function() followZoomProvider,
     required double Function() followTiltProvider,
   }) async {
-    final pending = _pendingGpsData;
+    final pending = _pendingUpdate;
     if (pending == null) return;
     await updateUserLocation(
-      pending,
+      pending.data,
+      approximate: pending.approximate,
       controller: controller,
       isReady: isReady,
       shouldFollowUser: shouldFollowUser,
@@ -611,6 +670,39 @@ class FlightMapUserLocationController {
       followZoomProvider: followZoomProvider,
       followTiltProvider: followTiltProvider,
     );
+  }
+
+  Future<void> hideUserLocation({
+    required MapLibreMapController? controller,
+  }) async {
+    _animationGeneration++;
+    _pendingUpdate = null;
+    final position = _renderedPosition;
+    if (controller != null && position != null) {
+      try {
+        final circle = _userCircle;
+        if (circle != null) {
+          await controller.updateCircle(
+            circle,
+            UserLayer.markerCircle(position, visible: false),
+          );
+        }
+        if (_isPlaneLayerReady) {
+          await _updatePlaneLayer(
+            controller: controller,
+            position: position,
+            heading: _renderedHeading,
+            visible: false,
+            approximate: true,
+          );
+        }
+      } catch (error) {
+        _logger.error('Failed to hide user location marker: $error');
+      }
+    }
+    _renderedPosition = null;
+    _renderedHeading = 0;
+    _lastAppliedFixAt = null;
   }
 
   void invalidateStyle({bool keepRenderedPosition = true}) {
@@ -633,6 +725,13 @@ class FlightMapUserLocationController {
 
   void dispose() {
     invalidateStyle(keepRenderedPosition: false);
-    _pendingGpsData = null;
+    _pendingUpdate = null;
   }
+}
+
+class _UserLocationUpdate {
+  const _UserLocationUpdate({required this.data, required this.approximate});
+
+  final GpsData data;
+  final bool approximate;
 }

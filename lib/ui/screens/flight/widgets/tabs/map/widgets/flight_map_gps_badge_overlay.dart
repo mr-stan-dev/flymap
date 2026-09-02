@@ -32,7 +32,8 @@ class FlightMapGpsBadgeOverlay extends StatelessWidget {
                 current is FlightScreenLoaded) {
               return previous.gps.status != current.gps.status ||
                   previous.gps.updateTick != current.gps.updateTick ||
-                  previous.gps.data?.accuracy != current.gps.data?.accuracy;
+                  previous.gps.data?.accuracy != current.gps.data?.accuracy ||
+                  previous.gps.mapPosition != current.gps.mapPosition;
             }
             return previous.runtimeType != current.runtimeType;
           },
@@ -43,6 +44,7 @@ class FlightMapGpsBadgeOverlay extends StatelessWidget {
             return MapGpsStatusBadge(
               gpsStatus: state.gps.status,
               gpsData: state.gps.data,
+              mapPosition: state.gps.mapPosition,
               sunEventForecast: sunEventForecast,
               onHelpTap: _showGpsHelpAction(state.gps) ? onGpsHelpTap : null,
             );

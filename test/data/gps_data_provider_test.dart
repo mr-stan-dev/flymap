@@ -34,6 +34,9 @@ void main() {
       expect(updates.last.status, GpsStatus.gpsActive);
       expect(updates.last.data?.latitude, 51.47);
       expect(updates.last.data?.speed?.unit, 'km/h');
+      expect(updates.last.data?.speedAccuracy, 5);
+      expect(updates.last.data?.courseAccuracy, 5);
+      expect(updates.last.data?.recordedAt, client.position.timestamp.toUtc());
       expect(
         client.streamSettings.single.accuracy,
         LocationAccuracy.bestForNavigation,

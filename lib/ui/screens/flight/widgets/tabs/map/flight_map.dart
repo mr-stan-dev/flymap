@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flymap/data/local/mappers/flight_map_mapper.dart';
 import 'package:flymap/domain/entity/flight.dart';
-import 'package:flymap/domain/entity/gps_data.dart';
+import 'package:flymap/domain/entity/flight_map_position.dart';
 import 'package:flymap/domain/entity/offline_map_style.dart';
 import 'package:flymap/domain/entity/route_region.dart';
 import 'package:flymap/i18n/strings.g.dart';
@@ -337,15 +337,22 @@ class _FlightMapState extends State<FlightMap> {
     );
   }
 
-  Future<void> _updateUserLocation(GpsData data) async {
+  Future<void> _updateUserLocation(FlightMapPosition position) async {
     await _userLocationController.updateUserLocation(
-      data,
+      position.data,
+      approximate: position.isApproximate,
       controller: _mapSession.controller,
       isReady: () => _mapSession.isReadyForUserLocation,
       shouldFollowUser: () => _cameraController.followUser,
       shouldFollowHeadingUp: () => _cameraController.followHeadingUp,
       followZoomProvider: () => _cameraController.cameraZoom,
       followTiltProvider: () => _cameraController.cameraTilt,
+    );
+  }
+
+  Future<void> _hideUserLocation() async {
+    await _userLocationController.hideUserLocation(
+      controller: _mapSession.controller,
     );
   }
 
@@ -394,8 +401,11 @@ class _FlightMapState extends State<FlightMap> {
             status: state.gps.status,
             data: state.gps.data,
           );
-          if (state.gps.data != null) {
-            _updateUserLocation(state.gps.data!);
+          final mapPosition = state.gps.mapPosition;
+          if (mapPosition != null) {
+            _updateUserLocation(mapPosition);
+          } else {
+            _hideUserLocation();
           }
         }
       },

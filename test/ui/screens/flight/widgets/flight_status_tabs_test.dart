@@ -9,6 +9,7 @@ import 'package:flymap/data/gps_data_provider.dart';
 import 'package:flymap/domain/entity/airport.dart';
 import 'package:flymap/domain/entity/flight_article.dart';
 import 'package:flymap/domain/entity/flight.dart';
+import 'package:flymap/domain/entity/flight_map_position.dart';
 import 'package:flymap/domain/entity/flight_info.dart';
 import 'package:flymap/domain/entity/flight_offline_content.dart';
 import 'package:flymap/domain/entity/flight_route.dart';
@@ -664,6 +665,41 @@ void main() {
     final decoration = badge.decoration! as BoxDecoration;
     expect(decoration.borderRadius, BorderRadius.circular(DsRadii.md));
     expect(decoration.border, isNull);
+  });
+
+  testWidgets('map GPS badge keeps estimated position copy compact', (
+    tester,
+  ) async {
+    final lastFix = DateTime.utc(2026, 9, 2, 12);
+    const data = GpsData(
+      latitude: 50,
+      longitude: 5,
+      accuracy: 10,
+      speed: SpeedValue(800, 'km/h'),
+      altitude: AltitudeValue(11000, 'm'),
+    );
+    await tester.pumpWidget(
+      _testApp(
+        child: SizedBox(
+          width: 280,
+          child: MapGpsStatusBadge(
+            gpsStatus: GpsStatus.searching,
+            gpsData: data,
+            mapPosition: FlightMapPosition(
+              data: data,
+              source: FlightMapPositionSource.estimated,
+              confidence: FlightMapPositionConfidence.high,
+              gpsAge: const Duration(minutes: 2),
+              lastGpsFixAt: lastFix,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Estimated · 2m'), findsOneWidget);
+    expect(find.text('Last · 800 km/h • 11,000 m'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('hub tab keeps stale progress content visible while searching', (
